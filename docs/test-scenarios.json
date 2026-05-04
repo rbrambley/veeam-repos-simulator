@@ -1,0 +1,425 @@
+{
+  "scenarios": [
+    {
+      "id": "das-basic",
+      "name": "DAS Repository - Basic Operation",
+      "description": "Verify DAS repos can run simulation without crashing",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 16,
+      "checkpoints": [
+        {"day": 1, "description": "Day 1: Simulation starts"},
+        {"day": 8, "description": "Day 8: Week 1 complete"},
+        {"day": 16, "description": "Day 16: Retention cycles"}
+      ],
+      "finalState": {"expectedRPCount": 10}
+    },
+    {
+      "id": "das-retention-14",
+      "name": "DAS Repository - Retention 14 Days",
+      "description": "Second DAS scenario with retention=14 to triangulate chain formula against Veeam Calculator",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 23,
+      "checkpoints": [
+        {"day": 1, "description": "Day 1: Simulation starts"},
+        {"day": 14, "description": "Day 14: Retention window full"},
+        {"day": 23, "description": "Day 23: Chain rollover"}
+      ],
+      "finalState": {"expectedRPCount": 17}
+    },
+    {
+      "id": "sobr-moveonly",
+      "name": "SOBR Move-Only - Basic Operation",
+      "description": "Verify SOBR Move-only mode runs without crashing",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 30,
+      "checkpoints": [
+        {"day": 1, "description": "Day 1: Start"},
+        {"day": 15, "description": "Day 15: Offload window"}
+      ],
+      "finalState": {"expectedRPCount": 17}
+    },
+    {
+      "id": "sobr-copymove",
+      "name": "SOBR Copy+Move - Basic Operation",
+      "description": "Verify SOBR Copy+Move mode with Archive runs without crashing",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 21,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": true
+      },
+      "totalDays": 45,
+      "checkpoints": [
+        {"day": 1, "description": "Day 1: Copy enabled"},
+        {"day": 22, "description": "Day 22: Archive window"}
+      ],
+      "finalState": {"expectedRPCount": 25}
+    },
+    {
+      "id": "das-gfs",
+      "name": "DAS with GFS - Basic Operation",
+      "description": "Verify DAS with GFS runs without crashing",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 22,
+      "checkpoints": [
+        {"day": 1, "description": "Day 1: GFS starts"},
+        {"day": 15, "description": "Day 15: GFS preservation"}
+      ],
+      "finalState": {"expectedRPCount": 9}
+    },
+    {
+      "id": "sobr-gfs-archive",
+      "name": "SOBR Move-Only with GFS and Archive - Basic Operation",
+      "description": "Verify complete SOBR tiering with GFS and Archive runs without crashing",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 84,
+      "checkpoints": [
+        {"day": 1, "description": "Day 1: GFS starts"},
+        {"day": 30, "description": "Day 30: Offload window"},
+        {"day": 60, "description": "Day 60: Archive window"}
+      ],
+      "finalState": {"expectedRPCount": 64}
+    },
+    {
+      "id": "sobr-copyonly-archive-gating",
+      "name": "SOBR Copy-Only Archive Gating",
+      "description": "Verify Archive does not receive GFS points before the offload threshold plus archive delay has elapsed",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 7,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 30,
+      "checkpoints": [
+        {"day": 14, "description": "Day 14: Offload threshold not yet enough for Archive"},
+        {"day": 21, "description": "Day 21: First Archive-eligible GFS point can appear"},
+        {"day": 30, "description": "Day 30: Archive gating verified"}
+      ],
+      "finalState": {"expectedArchivePointCountAtLeast": 1, "minArchivePointAgeDays": 21, "noCapacityResidueInArchivedChains": true}
+    },
+    {
+      "id": "das-monthly-2-small-r7",
+      "name": "DAS with 2 Monthly GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1 TB, 5% change, 7d retention, 2 monthly GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 2, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-yearly-2-small-r7",
+      "name": "DAS with 2 Yearly GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1 TB, 5% change, 7d retention, 2 yearly GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-monthly-2-large-r7",
+      "name": "DAS with 2 Monthly GFS - Large Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 13.32 TB, 10% change, 7d retention, 2 monthly GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 13.32,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 10,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 2, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-yearly-2-large-r7",
+      "name": "DAS with 2 Yearly GFS - Large Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 13.32 TB, 10% change, 7d retention, 2 yearly GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 13.32,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 10,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-mixed-2w1m-small-r7",
+      "name": "DAS with 2W+1M Mixed GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1TB, 5% change, 7d retention, 2W+1M mixed GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 1, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-mixed-2w1y-small-r7",
+      "name": "DAS with 2W+1Y Mixed GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1TB, 5% change, 7d retention, 2W+1Y mixed GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 1},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-mixed-1m1y-small-r7",
+      "name": "DAS with 1M+1Y Mixed GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1TB, 5% change, 7d retention, 1M+1Y mixed GFS (no weekly), 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 1, "yearly": 1},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-mixed-2w1m1y-small-r7",
+      "name": "DAS with 2W+1M+1Y Mixed GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1TB, 5% change, 7d retention, 2W+1M+1Y mixed GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 1, "yearly": 1},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "das-mixed-2w1m1y-large-r7",
+      "name": "DAS with 2W+1M+1Y Mixed GFS - Large Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 13.32TB, 10% change, 7d retention, 2W+1M+1Y mixed GFS, 0% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 13.32,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 10,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 1, "yearly": 1},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "sobr-mixed-2w1m1y-small-r60",
+      "name": "SOBR Move-Only + Archive with 2W+1M+1Y Mixed GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1TB, 5% change, 60d retention, 2W+1M+1Y mixed GFS, Capacity Tier on, 10% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 2, "monthly": 1, "yearly": 1},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "sobr-mixed-1m1y-small-r60",
+      "name": "SOBR Move-Only + Archive with 0W+1M+1Y Mixed GFS - Small Case",
+      "description": "Forecast-only scenario matching live Veeam calculator capture: 1TB, 5% change, 60d retention, 0W+1M+1Y mixed GFS, Capacity Tier on, 10% growth, 3 year forecast",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 0, "monthly": 1, "yearly": 1},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {"expectedRPCount": 2}
+    }
+  ]
+}

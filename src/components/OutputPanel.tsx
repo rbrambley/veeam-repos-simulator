@@ -1,0 +1,1128 @@
+import React, { useMemo, useState } from 'react';
+import { VeeamSimulator } from '../simulator/engine';
+import { ChainTimeline } from './ChainTimeline';
+import { computeVeeamWorkingSpaceTB } from '../models/veeam';
+
+interface OutputPanelProps {
+  sim: VeeamSimulator;
+  currentDate: string;
+  onNextDay: (days?: number) => void;
+}
+
+interface RestorePointRow {
+  id: string;
+  chainId: string;
+  type: string;
+  date: string;
+  sizeGB: number;
+  isGFS: boolean;
+  isGlobalBase?: boolean;
+  isWeeklyGFS: boolean;
+  isMonthlyGFS: boolean;
+  isYearlyGFS: boolean;
+  sobrTier?: string;
+  isTierSeed?: boolean;
+  baseTiers?: string[];
+  representsRestorePointId?: string;
+  representsRestorePointDate?: string;
+  tierMoveHistory?: Array<{ tier: string; date: string }>;
+  hasPerformanceData?: boolean;
+  hasCapacityData?: boolean;
+  hasArchiveData?: boolean;
+  capacityCopyCreatedAt?: string;
+  capacityMoveFinalizedAt?: string;
+}
+
+export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNextDay }) => {
+  const [showChainTimeline, setShowChainTimeline] = useState(true);
+  const [showRestoreCatalog, setShowRestoreCatalog] = useState(true);
+  const [showTierContents, setShowTierContents] = useState(true);
+
+  function formatTB(val: number) {
+    return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TB';
+  }
+
+  function shortId(id: string) {
+    if (!id) return '-';
+    const compact = id.replace(/T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, '');
+    return compact.length > 22 ? `${compact.slice(0, 10)}...${compact.slice(-8)}` : compact;
+  }
+
+  function normalizeActivityText(text: string) {
+    // Drop verbose midnight UTC timestamp fragment from RP ids for readability.
+    return text.replace(/T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, '');
+  }
+
+  function wasPrunedFromCapacity(rp: RestorePointRow) {
+    const history = rp.tierMoveHistory || [];
+    let sawCapacity = false;
+    for (const step of history) {
+      if (step.tier === 'Capacity') sawCapacity = true;
+      if (sawCapacity && step.tier === 'Performance') return true;
+    }
+    return false;
+  }
+
+  function getSimulationDayLabel(date: string) {
+    const d = new Date(`${date}T00:00:00.000Z`);
+    const weekday = d.toLocaleDateString(undefined, { weekday: 'long', timeZone: 'UTC' });
+    return `${date} (${weekday})`;
+  }
+
+  function parseISODate(date: string) {
+    return new Date(`${date}T00:00:00.000Z`);
+  }
+
+  const restorePoints: RestorePointRow[] = sim.getCurrentRestorePoints();
+  const storageUsage = sim.getStorageUsage();
+  const dailyExplanation = sim.getDailyExplanation();
+  const [selectedRestorePointId, setSelectedRestorePointId] = useState<string | null>(null);
+
+  const totalUsedTB = Object.values(storageUsage).reduce((sum, used) => sum + used, 0);
+  const gfsCount = restorePoints.filter(rp => rp.isGFS).length;
+  const activeChains = sim.state.chains.filter(c => c.status === 'Active').length;
+  const sortedRestorePoints = useMemo(
+    () => restorePoints.slice().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [restorePoints]
+  );
+  const chainById = Object.fromEntries(sim.state.chains.map(chain => [chain.id, chain]));
+
+  const tierBuckets = useMemo(() => ({
+    Performance: sortedRestorePoints.filter(rp => {
+      if (rp.hasPerformanceData !== undefined || rp.hasCapacityData !== undefined || rp.hasArchiveData !== undefined) {
+        return !!rp.hasPerformanceData;
+      }
+      return (rp.sobrTier ?? 'Performance') === 'Performance';
+    }),
+    Capacity: sortedRestorePoints.filter(rp => {
+      if (rp.hasCapacityData !== undefined) return !!rp.hasCapacityData;
+      return rp.sobrTier === 'Capacity';
+    }),
+    Archive: sortedRestorePoints.filter(rp => {
+      if (rp.hasArchiveData !== undefined) return !!rp.hasArchiveData;
+      return rp.sobrTier === 'Archive';
+    }),
+  }), [sortedRestorePoints]);
+
+  const workingSpaceByRepo = useMemo((): Record<string, { totalTB: number; additionalTB: number; largestFullTB: number; pct?: number; initialSourceTB?: number; byTier: Record<string, number>; byTierAdditional: Record<string, number> }> => {
+    return Object.fromEntries(sim.state.repositories.map(repo => {
+      const repoJob = sim.state.jobs.find(job => job.repositoryId === repo.id);
+      if (!repoJob) {
+        return [repo.id, {
+          totalTB: 0,
+          additionalTB: 0,
+          largestFullTB: 0,
+          pct: 0,
+          byTier: { Performance: 0, Capacity: 0, Archive: 0 },
+          byTierAdditional: { Performance: 0, Capacity: 0, Archive: 0 },
+        }];
+      }
+
+      const forecastYears = Math.max(0, repoJob.forecastYears ?? 0);
+      const annualGrowth = (repoJob.annualGrowthRatePct ?? 10) / 100;
+      const effectiveSourceTB = (repoJob.sourceDataTB || 1) * Math.pow(1 + annualGrowth, forecastYears);
+      const largestFullTB = effectiveSourceTB * 0.5;
+      // Working space: Veeam progressive tiered scale on initial source TB (no growth factor)
+      const initialSourceTB = repoJob.sourceDataTB || 1;
+      const reserveTB = computeVeeamWorkingSpaceTB(initialSourceTB);
+
+      if (repo.type === 'SOBR' && repo.sobrConfig) {
+        return [repo.id, {
+          totalTB: reserveTB,
+          additionalTB: reserveTB,
+          largestFullTB,
+          initialSourceTB,
+          byTier: { Performance: reserveTB, Capacity: 0, Archive: 0 },
+          byTierAdditional: { Performance: reserveTB, Capacity: 0, Archive: 0 },
+        }];
+      }
+
+      return [repo.id, {
+        totalTB: reserveTB,
+        additionalTB: reserveTB,
+        largestFullTB,
+        initialSourceTB,
+        byTier: { Performance: 0, Capacity: 0, Archive: 0 },
+        byTierAdditional: { Performance: 0, Capacity: 0, Archive: 0 },
+      }];
+    }));
+  }, [sim.state.repositories, sim.state.jobs]);
+
+  const totalWorkingSpaceTB = useMemo(
+    () => Object.values(workingSpaceByRepo).reduce((sum, ws) => sum + ws.totalTB, 0),
+    [workingSpaceByRepo]
+  );
+
+  const temporarySpacePlanningStatus = useMemo(() => {
+    const pressureByRepo = sim.state.repositories.map(repo => {
+      const usedTB = storageUsage[repo.id] || 0;
+      const neededTB = workingSpaceByRepo[repo.id]?.totalTB ?? 0;
+      const capacityTB = repo.capacityTB || 0;
+      const combinedTB = usedTB + neededTB;
+      const combinedPct = capacityTB > 0 ? (combinedTB / capacityTB) * 100 : 0;
+      return { combinedTB, combinedPct, capacityTB };
+    });
+
+    const hasAlert = pressureByRepo.some(r => r.capacityTB > 0 && r.combinedTB > r.capacityTB + 0.000001);
+    if (hasAlert) {
+      return {
+        level: 'alert',
+        message: 'Alert: Temporary space planning exceeds available repository capacity in the current scenario.',
+      };
+    }
+
+    const hasWarning = pressureByRepo.some(r => r.capacityTB > 0 && r.combinedPct >= 85);
+    if (hasWarning) {
+      return {
+        level: 'warn',
+        message: 'Warn: Temporary space planning is close to repository capacity in the current scenario.',
+      };
+    }
+
+    return {
+      level: 'confirm',
+      message: 'Confirm: Temporary space planning is within repository capacity in the current scenario.',
+    };
+  }, [sim.state.repositories, storageUsage, workingSpaceByRepo]);
+
+  const policyInsight = useMemo(() => {
+    const repo = sim.state.repositories.find(r => r.type === 'SOBR' && r.sobrConfig);
+    if (!repo?.sobrConfig) {
+      const level = temporarySpacePlanningStatus.level;
+      const severity = level === 'alert' ? 'danger' : level === 'warn' ? 'warning' : 'ok';
+      return {
+        title: temporarySpacePlanningStatus.message,
+        offloadDays: 0,
+        retentionDays: 0,
+        oldestInactiveDays: 0,
+        recommendations: [],
+        infoNotes: ['Switch repository type to SOBR to also view offload and retention guidance.'],
+        severity,
+      };
+    }
+
+    const job = sim.state.jobs.find(j => j.repositoryId === repo.id);
+    if (!job) return null;
+
+    const copyEnabled = !!repo.sobrConfig.copyEnabled;
+    const moveEnabled = repo.sobrConfig.moveEnabled ?? true;
+    const offloadDays = Math.max(0, repo.sobrConfig.offloadAfterDays || 0);
+    const archiveDays = Math.max(0, repo.sobrConfig.archiveAfterDays || 0);
+    const hasArchiveTier = !!repo.sobrConfig.hasArchiveTier;
+    const retentionDays = Math.max(0, job.retention?.restorePoints || 0);
+
+    const now = new Date(`${currentDate}T00:00:00.000Z`).getTime();
+    const inactiveChains = sim.state.chains.filter(c => c.jobId === job.id && c.status === 'Inactive' && !!c.inactiveSince);
+    const inactiveAges = inactiveChains.map(c => {
+      const since = new Date(`${c.inactiveSince}T00:00:00.000Z`).getTime();
+      return Math.max(0, Math.floor((now - since) / 86400000));
+    });
+
+    const oldestInactiveDays = inactiveAges.length > 0 ? Math.max(...inactiveAges) : 0;
+    const riskyWindow = moveEnabled && retentionDays > 0 && retentionDays <= offloadDays;
+
+    const inactiveChainStats = inactiveChains.map(chain => {
+      const since = new Date(`${chain.inactiveSince}T00:00:00.000Z`).getTime();
+      const ageDays = Math.max(0, Math.floor((now - since) / 86400000));
+      const points = restorePoints.filter(rp => rp.chainId === chain.id);
+      const hasPerformance = points.some(rp => !!rp.hasPerformanceData || ((rp.hasPerformanceData === undefined && rp.hasCapacityData === undefined && rp.hasArchiveData === undefined) && (rp.sobrTier ?? 'Performance') === 'Performance'));
+      const hasCapacity = points.some(rp => !!rp.hasCapacityData || rp.sobrTier === 'Capacity');
+      const pastThreshold = moveEnabled && ageDays >= offloadDays;
+      return { ageDays, hasPerformance, hasCapacity, pastThreshold };
+    });
+
+    const overdueInactiveCount = inactiveChainStats.filter(s => s.pastThreshold && s.hasPerformance).length;
+    const offloadedInactiveCount = inactiveChainStats.filter(s => s.pastThreshold && !s.hasPerformance && s.hasCapacity).length;
+    const eligibleButNotYetOffloaded = inactiveChainStats.filter(s => !s.pastThreshold && s.hasPerformance).length;
+    const invalidArchiveOrdering = hasArchiveTier && archiveDays > 0 && archiveDays < offloadDays;
+
+    const recommendations: string[] = [];
+    const infoNotes: string[] = [];
+    if (invalidArchiveOrdering) {
+      recommendations.push(`Archive threshold (${archiveDays}d) is shorter than the offload threshold (${offloadDays}d). Archive will only begin after ${offloadDays + archiveDays}d total age.`);
+    }
+    if (riskyWindow) {
+      recommendations.push(`Fix: Increase retention to at least ${offloadDays + 7}d (currently ${retentionDays}d) so it exceeds the offload threshold (${offloadDays}d).`);
+    }
+    if (moveEnabled && overdueInactiveCount > 0) {
+      recommendations.push(`${overdueInactiveCount} inactive chain(s) are older than the offload threshold (${offloadDays}d) but still have data in Performance.`);
+    }
+    if (moveEnabled && !riskyWindow && overdueInactiveCount === 0 && oldestInactiveDays < offloadDays) {
+      infoNotes.push(`Oldest inactive chain is ${oldestInactiveDays}d old; offload starts at ${offloadDays}d.`);
+    }
+    if (moveEnabled && (job.type === 'ForwardIncremental' || job.type === 'SyntheticFull') && retentionDays <= offloadDays) {
+      recommendations.push(`Chains are not offloading to Capacity — retention (${retentionDays}d) must be greater than the offload threshold (${offloadDays}d).`);
+    }
+    if (job.gfsPolicy && hasArchiveTier === false) {
+      recommendations.push(`GFS policy is configured but Archive tier is disabled — GFS points will stay in Capacity. Enable Archive tier for long-term cold storage.`);
+    }
+    if (hasArchiveTier && !job.gfsPolicy) {
+      recommendations.push(`Archive tier is enabled but no GFS policy is configured — Archive will remain empty (only GFS-tagged points move to Archive).`);
+    }
+    if (!job.gfsPolicy && !hasArchiveTier) {
+      infoNotes.push(`No GFS policy configured — no weekly, monthly, or yearly retention marks will be applied.`);
+    }
+
+    const hasAnyGfs = !!job.gfsPolicy && (
+      (job.gfsPolicy.weekly ?? 0) > 0 ||
+      (job.gfsPolicy.monthly ?? 0) > 0 ||
+      (job.gfsPolicy.yearly ?? 0) > 0
+    );
+    const hasMixedMonthlyYearly = !!job.gfsPolicy && (
+      (job.gfsPolicy.monthly ?? 0) > 0 && (job.gfsPolicy.yearly ?? 0) > 0
+    );
+
+    // Detect orphan starter chain: GFS is active but job starts on a non-Saturday.
+    // The first chain will accumulate points until the next Saturday, then expire
+    // through normal retention with no GFS tag — it will never reach Archive.
+    if (hasAnyGfs && sim.state.startDate) {
+      const startDay = new Date(`${sim.state.startDate}T00:00:00.000Z`).getUTCDay(); // 0=Sun,6=Sat
+      if (startDay !== 6) {
+        const daysUntilSat = (6 - startDay + 7) % 7;
+        infoNotes.push(
+          `Job starts on a non-Saturday (${daysUntilSat}d until first GFS tag). ` +
+          `The initial chain has no GFS flag and will be removed by retention — it will not archive.`
+        );
+      }
+    }
+
+    if (hasArchiveTier && hasAnyGfs) {
+      recommendations.push(
+        hasMixedMonthlyYearly
+          ? 'Forecast confidence note: SOBR + Archive + mixed GFS (W/M/Y) can overestimate total capacity versus the Veeam Calculator. Treat this as directional until block-generation-period modeling is implemented.'
+          : 'Forecast confidence note: SOBR + Archive + GFS can overestimate total capacity versus the Veeam Calculator. Treat this as directional until block-generation-period modeling is implemented.'
+      );
+    }
+
+    const tierUsage = sim.getSOBRTierUsage(repo.id);
+    const perfWorkingSpaceTB = workingSpaceByRepo[repo.id]?.byTierAdditional.Performance ?? 0;
+    const perfFreeTB = Math.max(0, (repo.sobrConfig.performanceCapacityTB || 0) - (tierUsage.Performance || 0));
+    if (perfWorkingSpaceTB > 0 && perfFreeTB + 0.000001 < perfWorkingSpaceTB) {
+      const largestFullTB = workingSpaceByRepo[repo.id]?.largestFullTB ?? 0;
+      const totalNeededTB = workingSpaceByRepo[repo.id]?.byTier.Performance ?? perfWorkingSpaceTB;
+      recommendations.push(`Performance free headroom (${perfFreeTB.toFixed(2)} TB) is below additional temporary space needed (${perfWorkingSpaceTB.toFixed(2)} TB). Working-space requirement is ${totalNeededTB.toFixed(2)} TB (${largestFullTB.toFixed(2)} TB full + ${perfWorkingSpaceTB.toFixed(2)} TB temp).`);
+    }
+
+    const title = invalidArchiveOrdering
+      ? `Archive waits until the ${offloadDays}d offload window is met, then ${archiveDays}d more before Archive.`
+      : riskyWindow
+      ? `Offload risk: retention (${retentionDays}d) is too short for the ${offloadDays}d offload threshold.`
+      : moveEnabled && overdueInactiveCount > 0
+        ? `Action needed: ${overdueInactiveCount} inactive chain(s) are past threshold and still in Performance.`
+        : moveEnabled && offloadedInactiveCount > 0
+          ? `Healthy: ${offloadedInactiveCount} inactive chain(s) past ${offloadDays}d have moved out of Performance.`
+          : copyEnabled && !moveEnabled
+            ? 'Healthy: Copy mode is active; new restore points are copied to Capacity immediately.'
+            : moveEnabled && eligibleButNotYetOffloaded > 0
+              ? `Healthy: ${eligibleButNotYetOffloaded} inactive chain(s) are still below the ${offloadDays}d threshold.`
+              : 'Healthy: Offload and retention settings are compatible.';
+
+    const severity = (invalidArchiveOrdering || riskyWindow || overdueInactiveCount > 0)
+      ? 'danger'
+      : (recommendations.length > 0 ? 'warning' : 'ok');
+
+    return {
+      title,
+      offloadDays,
+      retentionDays,
+      oldestInactiveDays,
+      recommendations,
+      infoNotes,
+      severity,
+    };
+  }, [sim.state.repositories, sim.state.jobs, sim.state.chains, currentDate, restorePoints, sim, workingSpaceByRepo, temporarySpacePlanningStatus]);
+
+  const hasSobrRepo = sim.state.repositories.some(r => r.type === 'SOBR' && !!r.sobrConfig);
+  const bodyAlignmentOffset = (showChainTimeline || showRestoreCatalog || showTierContents) ? '2.1rem' : '0';
+  const policyVisual = policyInsight
+    ? policyInsight.severity === 'danger'
+      ? {
+          icon: '!',
+          badgeShape: 'octagon',
+          badgeBg: '#fce8e6',
+          badgeColor: '#b42318',
+          border: '#f7c7c3',
+          panelBg: 'linear-gradient(180deg, #fff8f7 0%, #fff2f1 100%)',
+          shadow: '0 10px 24px rgba(180, 35, 24, 0.10)',
+          accent: '#d92d20',
+          titleColor: '#b42318',
+        }
+      : policyInsight.severity === 'warning'
+        ? {
+            icon: '!',
+          badgeShape: 'triangle',
+            badgeBg: '#fff4dd',
+            badgeColor: '#b54708',
+            border: '#f5d4a0',
+            panelBg: 'linear-gradient(180deg, #fffaf2 0%, #fff7ec 100%)',
+            shadow: '0 10px 24px rgba(181, 71, 8, 0.10)',
+            accent: '#f79009',
+            titleColor: '#9a4d00',
+          }
+        : {
+            icon: '✓',
+          badgeShape: 'circle',
+            badgeBg: '#e8f7ed',
+            badgeColor: '#067647',
+            border: '#c7e9d2',
+            panelBg: 'linear-gradient(180deg, #f7fcf9 0%, #edf8f1 100%)',
+            shadow: '0 10px 24px rgba(6, 118, 71, 0.10)',
+            accent: '#12b76a',
+            titleColor: '#067647',
+          }
+    : null;
+
+  const typeColors: Record<string, string> = {
+    Full: '#1e6bb8',
+    Incremental: '#2e7d32',
+    SyntheticFull: '#6a1b9a',
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+        <h2 style={{ margin: 0 }}>Simulation Output</h2>
+        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#555' }}>
+          📅 {currentDate}
+        </span>
+        <button onClick={() => onNextDay(1)} style={{ padding: '6px 16px', fontWeight: 'bold' }}>
+          ▶ +1 Day
+        </button>
+        <button onClick={() => onNextDay(7)} style={{ padding: '6px 16px', fontWeight: 'bold' }}>
+          ▶ +7 Days
+        </button>
+        <button onClick={() => onNextDay(30)} style={{ padding: '6px 16px', fontWeight: 'bold' }}>
+          ▶ +30 Days
+        </button>
+      </div>
+
+      {/* Storage Usage per Repository + Summary Stats */}
+      <h3 className="section-heading">Repository Storage Usage</h3>
+      <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'stretch', flexWrap: 'nowrap', marginBottom: '1.2rem' }}>
+        <div style={{ flex: '1 1 0', minWidth: 0, overflow: 'auto', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)', display: 'flex', flexDirection: 'column' }}>
+          <table className="storage-table" style={{ flex: '1 1 auto' }}>
+        <thead>
+          <tr>
+            <th>Repository</th>
+            <th>Type</th>
+            <th>Used</th>
+            <th>Working Space Needed</th>
+            <th>Capacity</th>
+            <th>Usage %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sim.state.repositories.map(repo => {
+            const used = storageUsage[repo.id] || 0;
+            const neededWorkingSpaceTB = workingSpaceByRepo[repo.id]?.totalTB ?? 0;
+            const largestFullTB = workingSpaceByRepo[repo.id]?.largestFullTB ?? 0;
+            const additionalWorkingSpaceTB = workingSpaceByRepo[repo.id]?.additionalTB ?? 0;
+            const initialSourceTB = workingSpaceByRepo[repo.id]?.initialSourceTB ?? 0;
+            const pct = repo.capacityTB > 0 ? Math.min(100, (used / repo.capacityTB) * 100) : 0;
+            const isSobr = repo.type === 'SOBR' && repo.sobrConfig;
+            const tierUsage = isSobr ? sim.getSOBRTierUsage(repo.id) : null;
+            const tierColors: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
+            return (
+              <React.Fragment key={repo.id}>
+                <tr>
+                  <td>{repo.name}</td>
+                  <td>{repo.type}</td>
+                  <td>{formatTB(used)}</td>
+                  <td title={`${formatTB(additionalWorkingSpaceTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)`}>{formatTB(neededWorkingSpaceTB)}</td>
+                  <td>{formatTB(repo.capacityTB)}</td>
+                  <td>
+                    <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '14px', width: '120px', display: 'inline-block', verticalAlign: 'middle' }}>
+                      <div style={{ background: pct > 85 ? '#d32f2f' : '#1976d2', width: `${pct}%`, height: '100%', borderRadius: '3px' }} />
+                    </div>
+                    {' '}{pct.toFixed(1)}%
+                  </td>
+                </tr>
+                {isSobr && repo.sobrConfig && ['Performance', 'Capacity', ...(repo.sobrConfig.hasArchiveTier ? ['Archive'] : [])].map(tier => {
+                  const tierUsed = tierUsage?.[tier] ?? 0;
+                  const tierWorkingSpaceNeededTB = workingSpaceByRepo[repo.id]?.byTier[tier as 'Performance' | 'Capacity' | 'Archive'] ?? 0;
+                  const tierWorkingSpaceAdditionalTB = workingSpaceByRepo[repo.id]?.byTierAdditional[tier as 'Performance' | 'Capacity' | 'Archive'] ?? 0;
+                  const tierCap = tier === 'Performance' ? repo.sobrConfig!.performanceCapacityTB
+                    : tier === 'Capacity' ? repo.sobrConfig!.capacityCapacityTB
+                    : repo.sobrConfig!.archiveCapacityTB;
+                  const tierPct = tierCap > 0 ? Math.min(100, (tierUsed / tierCap) * 100) : 0;
+                  return (
+                    <tr key={tier} style={{ background: '#f9f9f9', fontSize: '0.85rem' }}>
+                      <td style={{ paddingLeft: '1.5rem', color: tierColors[tier], fontWeight: 'bold' }}>↳ {tier}</td>
+                      <td style={{ color: '#999' }}>SOBR Tier</td>
+                      <td>{formatTB(tierUsed)}</td>
+                      <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)` : 'No working-space requirement on this tier'}>{formatTB(tierWorkingSpaceNeededTB)}</td>
+                      <td>{formatTB(tierCap)}</td>
+                      <td>
+                        <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '10px', width: '100px', display: 'inline-block', verticalAlign: 'middle' }}>
+                          <div style={{ background: tierPct > 85 ? '#d32f2f' : tierColors[tier], width: `${tierPct}%`, height: '100%', borderRadius: '3px' }} />
+                        </div>
+                        {' '}{tierPct.toFixed(1)}%
+                      </td>
+                    </tr>
+                  );
+                })}
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+          </table>
+        </div>
+
+        <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.85rem', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.8rem', alignItems: 'stretch' }}>
+            <div style={{ background: '#e3f2fd', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d5e8f7', boxShadow: '0 6px 16px rgba(30, 107, 184, 0.10)' }}>
+              <div style={{ fontSize: '0.8rem', color: '#555' }}>Total Restore Points</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{restorePoints.length}</div>
+            </div>
+            <div style={{ background: '#e8f5e9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6ead8', boxShadow: '0 6px 16px rgba(56, 142, 60, 0.10)' }}>
+              <div style={{ fontSize: '0.8rem', color: '#555' }}>Total Used Storage</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{formatTB(totalUsedTB)}</div>
+            </div>
+            <div style={{ background: '#fff8e1', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #f5e4b6', boxShadow: '0 6px 16px rgba(186, 137, 0, 0.10)' }}>
+              <div style={{ fontSize: '0.8rem', color: '#555' }}>Working Space Needed</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{formatTB(totalWorkingSpaceTB)}</div>
+            </div>
+            <div style={{ background: '#f3e5f5', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #ead9ef', boxShadow: '0 6px 16px rgba(122, 31, 162, 0.10)' }}>
+              <div style={{ fontSize: '0.8rem', color: '#555' }}>Active Chains</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{activeChains}</div>
+            </div>
+            <div style={{ background: '#fce4ec', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #f4d5df', boxShadow: '0 6px 16px rgba(194, 24, 91, 0.10)' }}>
+              <div style={{ fontSize: '0.8rem', color: '#555' }}>GFS Points</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{gfsCount}</div>
+            </div>
+          </div>
+
+          {policyInsight ? (
+            <div style={{ border: `1px solid ${policyVisual!.border}`, borderRadius: '14px', background: policyVisual!.panelBg, padding: '0.95rem 1rem', minWidth: '320px', boxShadow: policyVisual!.shadow, borderLeft: `6px solid ${policyVisual!.accent}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                <span style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: policyVisual!.badgeShape === 'circle' ? '999px' : '0',
+                  clipPath: policyVisual!.badgeShape === 'triangle'
+                    ? 'polygon(50% 8%, 8% 92%, 92% 92%)'
+                    : policyVisual!.badgeShape === 'octagon'
+                      ? 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)'
+                      : 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: policyVisual!.badgeBg,
+                  color: policyVisual!.badgeColor,
+                  fontWeight: 900,
+                  fontSize: policyVisual!.badgeShape === 'circle' ? '0.88rem' : '0.8rem',
+                  lineHeight: 1,
+                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)'
+                }}>
+                  {policyVisual!.icon}
+                </span>
+                <div style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: policyVisual!.titleColor }}>
+                  Policy Insight
+                </div>
+              </div>
+              <div style={{ fontSize: '0.92rem', color: '#37474f', marginBottom: '0.45rem', lineHeight: '1.45' }}>
+                {policyInsight.title}
+              </div>
+              {hasSobrRepo && (
+                <div style={{ fontSize: '0.82rem', color: '#607d8b', marginBottom: policyInsight.recommendations.length > 0 ? '0.45rem' : 0, fontWeight: 600 }}>
+                  Retention: {policyInsight.retentionDays}d | Offload: {policyInsight.offloadDays}d | Oldest inactive chain: {policyInsight.oldestInactiveDays}d
+                </div>
+              )}
+              {policyInsight.recommendations.length > 0 && (
+                <ul style={{ margin: 0, paddingLeft: '1rem', fontSize: '0.84rem', color: '#546e7a' }}>
+                  {policyInsight.recommendations.map((rec, idx) => (
+                    <li key={idx} style={{ marginBottom: '0.2rem' }}>{rec}</li>
+                  ))}
+                </ul>
+              )}
+              {policyInsight.infoNotes.length > 0 && (
+                <div style={{ marginTop: policyInsight.recommendations.length > 0 ? '0.35rem' : 0, fontSize: '0.82rem', color: '#78909c', fontStyle: 'italic' }}>
+                  {policyInsight.infoNotes.map((note, idx) => (
+                    <div key={idx}>{note}</div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Section toggle buttons — above the flex row so the sidebar aligns with content */}
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+        <button
+          onClick={() => setShowChainTimeline(v => !v)}
+          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          {showChainTimeline ? '▼' : '▶'} Chain Timeline
+        </button>
+        <button
+          onClick={() => setShowRestoreCatalog(v => !v)}
+          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          {showRestoreCatalog ? '▼' : '▶'} Restore Point Catalog ({restorePoints.length} restore points)
+        </button>
+        <button
+          onClick={() => setShowTierContents(v => !v)}
+          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 820px', minWidth: '340px' }}>
+      {/* Chain Timeline */}
+      {showChainTimeline && <ChainTimeline sim={sim} currentDate={currentDate} onSelectRestorePoint={setSelectedRestorePointId} />}
+
+      {/* Restore Point Catalog */}
+      {showRestoreCatalog && (
+      <>
+      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Restore Point Catalog</h3>
+      <table border={1} cellPadding={6} className="backup-table" style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1rem' }}>
+        <thead>
+          <tr style={{ background: '#f5f5f5' }}>
+            <th>RP ID</th>
+            <th>Created</th>
+            <th>Type</th>
+            <th>Role</th>
+            <th>Chain State</th>
+            <th>Represents</th>
+            <th>Current Tier</th>
+            <th>Size (TB)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedRestorePoints.map((rp) => {
+            const isSelected = selectedRestorePointId === rp.id;
+            const isSobr = !!rp.sobrTier;
+            const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
+            const isGlobalBase = !!rp.isGlobalBase;
+            const role = isGlobalBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
+            const displayType = rp.type;
+            const displaySizeTB = isSobr ? sim.getRestorePointSizeForTier(rp.id, currentTier) : rp.sizeGB;
+            const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
+            const chain = chainById[rp.chainId];
+            return (
+              <tr
+                key={rp.id}
+                onClick={() => setSelectedRestorePointId(rp.id)}
+                style={{
+                  background: isSelected ? '#e3f2fd' : (rp.isGFS ? '#fff9c4' : undefined),
+                  cursor: 'pointer',
+                }}
+              >
+                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{shortId(rp.id)}</td>
+                <td>{rp.date}</td>
+                <td>
+                  <span style={{ color: typeColors[rp.type] || '#333', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                    {displayType}
+                  </span>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    {isGlobalBase && (
+                      <span style={{ background: '#455a64', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                        Base Full
+                      </span>
+                    )}
+                    {!isGlobalBase && !rp.isGFS && (
+                      <span style={{ background: '#546e7a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                        Daily
+                      </span>
+                    )}
+                    {rp.isWeeklyGFS && (
+                      <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>W</span>
+                    )}
+                    {rp.isMonthlyGFS && (
+                      <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>M</span>
+                    )}
+                    {rp.isYearlyGFS && (
+                      <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>Y</span>
+                    )}
+                  </div>
+                </td>
+                <td style={{ fontSize: '0.8rem' }}>
+                  {chain ? (
+                    <>
+                      <div style={{ fontWeight: 'bold', color: chain.status === 'Inactive' ? '#b26a00' : '#2e7d32' }}>{chain.status}</div>
+                      {chain.inactiveSince && <div style={{ color: '#666' }}>since {chain.inactiveSince}</div>}
+                    </>
+                  ) : (
+                    <span style={{ color: '#666' }}>Preserved / Detached</span>
+                  )}
+                </td>
+                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                  {rp.representsRestorePointDate ? `${rp.representsRestorePointDate} / ${shortId(rp.representsRestorePointId || '')}` : `${rp.date} / self`}
+                </td>
+                <td style={{ textAlign: 'center' }}>
+                  {isSobr ? (
+                    <span style={{ background: tierColor[rp.sobrTier || 'Performance'] ?? '#888', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem' }}>
+                      {rp.sobrTier}
+                    </span>
+                  ) : '-'}
+                </td>
+                <td>{formatTB(displaySizeTB)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      </>
+      )}
+
+      {/* Tier Contents */}
+      {showTierContents && (
+      <>
+      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Tier Contents</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
+        {(['Performance', 'Capacity', 'Archive'] as const).map((tier) => {
+          const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
+          const list = tierBuckets[tier];
+          return (
+            <div key={tier} style={{ border: `1px solid ${tierColor[tier]}`, borderRadius: '6px', overflow: 'hidden' }}>
+              <div style={{ background: tierColor[tier], color: '#fff', padding: '6px 10px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                {tier} ({list.length})
+              </div>
+              <div style={{ background: '#fafafa' }}>
+                {list.length === 0 ? (
+                  <div style={{ padding: '8px 10px', color: '#777', fontSize: '0.85rem' }}>No restore points currently in this tier.</div>
+                ) : (
+                  list.map((rp) => {
+                    const isSelected = selectedRestorePointId === rp.id;
+                    const isGlobalBase = !!rp.isGlobalBase;
+                    const displayType = rp.type;
+                    const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, tier);
+                    const prunedFromCapacity = tier === 'Performance' && wasPrunedFromCapacity(rp);
+                    return (
+                      <button
+                        key={`${tier}-${rp.id}`}
+                        onClick={() => setSelectedRestorePointId(rp.id)}
+                        style={{
+                          width: '100%',
+                          textAlign: 'left',
+                          border: 'none',
+                          borderBottom: '1px solid #eceff1',
+                          background: isSelected ? '#e3f2fd' : '#fff',
+                          padding: '7px 10px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
+                          <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#455a64' }}>{shortId(rp.id)}</span>
+                          <span style={{ fontSize: '0.8rem', color: '#607d8b' }}>{rp.date}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center', marginTop: '2px' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isGlobalBase ? ' (Base)' : ''}</span>
+                          <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{formatTB(displaySizeTB)}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '3px', marginTop: '3px', flexWrap: 'wrap' }}>
+                          {prunedFromCapacity && (
+                            <span style={{ background: '#8d6e63', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                              Pruned from Capacity
+                            </span>
+                          )}
+                          {rp.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>W</span>}
+                          {rp.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>M</span>}
+                          {rp.isYearlyGFS && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>Y</span>}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      </>
+      )}
+        </div>
+
+        <div style={{ flex: '0 1 360px', minWidth: '300px', alignSelf: 'flex-start', marginTop: bodyAlignmentOffset }}>
+          <div style={{ border: '1px solid #f9a825', borderRadius: '6px', background: '#fffde7', padding: '0.7rem 0.9rem', marginBottom: '0.8rem' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '0.4rem' }}>Activity Log</div>
+            <div style={{ fontSize: '0.78rem', color: '#795548', marginBottom: '0.45rem' }}>
+              Simulation Date: {getSimulationDayLabel(currentDate)}
+            </div>
+            <div style={{ fontSize: '0.85rem', color: '#5d4037' }}>
+              {dailyExplanation
+                ? (() => {
+                    // Parse activity into per-event items while preserving the source day.
+                    // For multi-day jumps, entries are prefixed like: [YYYY-MM-DD] <day activity...>
+                    const dayChunkPattern = /(\[\d{4}-\d{2}-\d{2}\][\s\S]*?)(?=\s\[\d{4}-\d{2}-\d{2}\]|$)/g;
+                    const chunks = dailyExplanation.match(dayChunkPattern) || [dailyExplanation];
+                    const items: string[] = [];
+                    for (const chunk of chunks) {
+                      const dayMatch = chunk.match(/^\[(\d{4}-\d{2}-\d{2})\]\s*/);
+                      const dayPrefix = dayMatch ? `[${dayMatch[1]}] ` : '';
+                      const body = chunk.replace(/^\[\d{4}-\d{2}-\d{2}\]\s*/, '');
+                      const sentences = body
+                        .split('. ')
+                        .flatMap(s => s.split('.\u0020'))
+                        .map(s => s.trim().replace(/\.$/, ''))
+                        .filter(Boolean);
+
+                      for (const sentence of sentences) {
+                        items.push(`${dayPrefix}${sentence}`.trim());
+                      }
+                    }
+
+                    // De-duplicate promotion housekeeping lines.
+                    // If both "promoted as" and "set as" exist for the same RP+tier, keep only "set as".
+                    const promotionPattern = /^Restore point\s+(\S+)\s+(promoted as|set as)\s+(Performance|Capacity|Archive)\s+base full$/i;
+                    const bestPromotionByKey = new Map<string, { text: string; score: number }>();
+                    for (const item of items) {
+                      const match = item.match(promotionPattern);
+                      if (!match) continue;
+                      const rpId = match[1];
+                      const action = match[2].toLowerCase();
+                      const tier = match[3].toLowerCase();
+                      const key = `${rpId}|${tier}`;
+                      const score = action.includes('set as') ? 2 : 1;
+                      const current = bestPromotionByKey.get(key);
+                      if (!current || score >= current.score) {
+                        bestPromotionByKey.set(key, { text: item, score });
+                      }
+                    }
+
+                    const seenPromotion = new Set<string>();
+                    const displayItems = items.filter(item => {
+                      const match = item.match(promotionPattern);
+                      if (!match) return true;
+                      const key = `${match[1]}|${match[3].toLowerCase()}`;
+                      const best = bestPromotionByKey.get(key);
+                      if (!best || best.text !== item || seenPromotion.has(key)) return false;
+                      seenPromotion.add(key);
+                      return true;
+                    });
+
+                    // Categorise each item for grouping
+                    const categorise = (s: string): { label: string; color: string; bg: string } => {
+                      if (/pruned .*Capacity point|pruned from Capacity/i.test(s))
+                        return { label: 'Prune', color: '#6d4c41', bg: '#efebe9' };
+                      if (/copied to Capacity tier.*Copy mode|GFS point.*copied to Capacity/i.test(s))
+                        return { label: 'Copy', color: '#00695c', bg: '#e0f2f1' };
+                      if (/move finalized|offloaded in full Performance\s*->|GFS point.*offloaded.*Performance/i.test(s))
+                        return { label: 'Move', color: '#1565c0', bg: '#e3f2fd' };
+                      if (/offloaded.*Capacity.*Archive|Capacity\s*->|GFS point.*offloaded.*Capacity/i.test(s))
+                        return { label: 'Tier Move', color: '#1565c0', bg: '#e3f2fd' };
+                      if (/tagged as GFS/i.test(s))
+                        return { label: 'GFS Tag', color: '#6a1b9a', bg: '#f3e5f5' };
+                      if (/GFS.*deleted|exceeds.*GFS limit/i.test(s))
+                        return { label: 'GFS Expiry', color: '#b71c1c', bg: '#ffebee' };
+                      if (/promoted as|base full|set as.*base/i.test(s))
+                        return { label: 'Promotion', color: '#37474f', bg: '#eceff1' };
+                      if (/created a.*restore point|SyntheticFull|Full restore/i.test(s))
+                        return { label: 'Backup', color: '#1b5e20', bg: '#e8f5e9' };
+                      if (/deleted due to retention|Chain.*deleted/i.test(s))
+                        return { label: 'Retention', color: '#e65100', bg: '#fff3e0' };
+                      return { label: 'Info', color: '#4e342e', bg: '#f5f5f5' };
+                    };
+
+                    type GroupedActivity = { day: string; text: string };
+                    const dayPrefixPattern = /^\[(\d{4}-\d{2}-\d{2})\]\s*/;
+                    const grouped = new Map<string, GroupedActivity[]>();
+
+                    for (const item of displayItems) {
+                      const prefixMatch = item.match(dayPrefixPattern);
+                      const day = prefixMatch?.[1] || currentDate;
+                      const text = item.replace(dayPrefixPattern, '').trim();
+                      const list = grouped.get(day) || [];
+                      list.push({ day, text });
+                      grouped.set(day, list);
+                    }
+
+                    const groupedDays = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
+
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.2rem' }}>
+                        {groupedDays.map((day) => {
+                          const dayItems = grouped.get(day) || [];
+                          const summaryCounts = new Map<string, number>();
+                          for (const entry of dayItems) {
+                            const label = categorise(entry.text).label;
+                            summaryCounts.set(label, (summaryCounts.get(label) || 0) + 1);
+                          }
+                          const summaryText = Array.from(summaryCounts.entries())
+                            .map(([label, count]) => `${count} ${label}`)
+                            .join(', ');
+
+                          return (
+                            <details key={day} open={day === currentDate} style={{ border: '1px solid #f0d6a8', borderRadius: '6px', background: '#fffef8' }}>
+                              <summary style={{ cursor: 'pointer', listStyle: 'none', fontSize: '0.74rem', fontWeight: 700, color: '#6d4c41', padding: '0.34rem 0.5rem' }}>
+                                {day === currentDate ? `${day} (current)` : day}
+                                <span style={{ fontWeight: 400, marginLeft: '0.5rem' }}>- {summaryText}</span>
+                              </summary>
+                              <ul style={{ margin: 0, padding: '0 0.35rem 0.35rem', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                {dayItems.map((entry, i) => {
+                                  const cat = categorise(entry.text);
+                                  return (
+                                  <li key={`${day}-${i}`} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', background: cat.bg, borderRadius: '6px', padding: '0.28rem 0.45rem' }}>
+                                    <span style={{ fontSize: '0.68rem', fontWeight: 800, color: cat.color, whiteSpace: 'nowrap', marginTop: '0.05rem', minWidth: '54px', letterSpacing: '0.02em' }}>
+                                      {cat.label}
+                                    </span>
+                                    <span style={{ lineHeight: '1.4' }}>{normalizeActivityText(entry.text)}.</span>
+                                  </li>
+                                );
+                                })}
+                              </ul>
+                            </details>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()
+                : <span style={{ color: '#888' }}>No activity yet. Run +1 Day, +7 Days, or +30 Days to generate activity.</span>}
+            </div>
+
+          </div>
+
+          <div style={{ border: '1px solid #cfd8dc', borderRadius: '6px', padding: '0.7rem 0.9rem', background: '#fafcfd' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '0.4rem' }}>Selected Restore Point Info</div>
+            {selectedRestorePointId && (() => {
+              const selected = sortedRestorePoints.find(rp => rp.id === selectedRestorePointId);
+              if (!selected) return <div style={{ fontSize: '0.85rem', color: '#607d8b' }}>Select a restore point from the catalog or tier contents.</div>;
+
+              const selectedChain = chainById[selected.chainId];
+              const selectedWasPrunedFromCapacity = wasPrunedFromCapacity(selected);
+              const isSobr = !!selected.sobrTier;
+              const currentTier = (selected.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
+              const sizeTB = isSobr ? sim.getRestorePointSizeForTier(selected.id, currentTier) : selected.sizeGB;
+              const currentDateObj = parseISODate(currentDate);
+              const pointDateObj = parseISODate(selected.date);
+              const ageDays = Math.floor((currentDateObj.getTime() - pointDateObj.getTime()) / 86400000);
+
+              // Job + SOBR config
+              const selJob = sim.state.jobs.find(j => selectedChain ? j.id === selectedChain.jobId : false)
+                          ?? sim.state.jobs[0];
+              const selRepo = selJob ? sim.state.repositories.find(r => r.id === selJob.repositoryId) : undefined;
+              const sobrCfg = selRepo?.sobrConfig;
+              const retentionDays = selJob?.retention?.restorePoints || 0;
+
+              // --- 1. Tier journey with dwell times ---
+              const tierBg: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
+              const history = selected.tierMoveHistory || [];
+              const journeySteps = history.map((step, idx) => {
+                const enteredMs = parseISODate(step.date).getTime();
+                const exitMs = idx < history.length - 1 ? parseISODate(history[idx + 1].date).getTime() : currentDateObj.getTime();
+                const daysInTier = Math.max(0, Math.floor((exitMs - enteredMs) / 86400000));
+                return { tier: step.tier, date: step.date, daysInTier, isCurrent: idx === history.length - 1 };
+              });
+
+              // --- 2. Restore dependency ---
+              const chainPointsAsc = sortedRestorePoints
+                .filter(rp => rp.chainId === selected.chainId)
+                .slice()
+                .sort((a, b) => a.date.localeCompare(b.date));
+              const idxOfSelected = chainPointsAsc.findIndex(rp => rp.id === selected.id);
+              let anchorIdx = -1;
+              for (let i = idxOfSelected; i >= 0; i--) {
+                if (chainPointsAsc[i].type === 'Full' || chainPointsAsc[i].type === 'SyntheticFull') {
+                  anchorIdx = i;
+                  break;
+                }
+              }
+              let dependencyNote: React.ReactNode;
+              if (selected.type === 'Full' || selected.type === 'SyntheticFull') {
+                dependencyNote = <>Self-contained — no other restore points required.</>;
+              } else if (anchorIdx < 0) {
+                dependencyNote = <>Chain anchor not found in current retention window — restore may not be possible.</>;
+              } else {
+                const anchor = chainPointsAsc[anchorIdx];
+                const intermediates = chainPointsAsc.slice(anchorIdx + 1, idxOfSelected + 1);
+                dependencyNote = (
+                  <>
+                    Requires <strong>{anchor.type}</strong> from <span style={{ fontFamily: 'monospace' }}>{anchor.date}</span>
+                    {intermediates.length > 0 && (
+                      <> + <strong>{intermediates.length}</strong> incremental{intermediates.length > 1 ? 's' : ''} ({intermediates[0].date}{intermediates.length > 1 ? ` – ${intermediates[intermediates.length - 1].date}` : ''})</>
+                    )}.
+                  </>
+                );
+              }
+
+              // --- 3. Retention forecast ---
+              const gfsLabels = [
+                selected.isWeeklyGFS && 'Weekly',
+                selected.isMonthlyGFS && 'Monthly',
+                selected.isYearlyGFS && 'Yearly',
+              ].filter(Boolean).join(' + ');
+              let retentionNote: React.ReactNode;
+              if (selected.isGFS && gfsLabels) {
+                retentionNote = <>Preserved by <strong>{gfsLabels} GFS</strong> — retained until policy is modified.</>;
+              } else if (retentionDays > 0) {
+                const newestNonGfs = chainPointsAsc
+                  .filter(rp => !rp.isGFS)
+                  .reduce<RestorePointRow | null>((best, rp) => (!best || rp.date > best.date) ? rp : best, null);
+                if (newestNonGfs) {
+                  const expiryMs = parseISODate(newestNonGfs.date).getTime() + retentionDays * 86400000;
+                  const expiryIso = new Date(expiryMs).toISOString().slice(0, 10);
+                  const daysUntil = Math.ceil((expiryMs - currentDateObj.getTime()) / 86400000);
+                  if (daysUntil > 0) {
+                    retentionNote = <>Expires <strong>{expiryIso}</strong> ({daysUntil}d — when chain's newest point ages past {retentionDays}d retention).</>;
+                  } else {
+                    retentionNote = <>Retention window has passed — chain will be removed on next retention cycle.</>;
+                  }
+                } else {
+                  retentionNote = <>Retention: {retentionDays}d.</>;
+                }
+              } else {
+                retentionNote = <>No retention policy configured.</>;
+              }
+
+              // --- 4. Archive eligibility ---
+              let archiveNote: React.ReactNode = null;
+              if (isSobr && sobrCfg?.hasArchiveTier) {
+                const copyEnabled = !!sobrCfg.copyEnabled;
+                const offloadDays = sobrCfg.offloadAfterDays || 0;
+                const archiveAfterDays = sobrCfg.archiveAfterDays || 0;
+                if (selected.hasArchiveData) {
+                  archiveNote = <>Currently in Archive tier.</>;
+                } else if (!selected.isGFS) {
+                  archiveNote = <>Not archive-eligible — no GFS tag (only GFS-tagged points move to Archive).</>;
+                } else if (copyEnabled) {
+                  const totalNeeded = offloadDays + archiveAfterDays;
+                  const daysUntil = totalNeeded - ageDays;
+                  if (daysUntil > 0) {
+                    const archiveIso = new Date(pointDateObj.getTime() + totalNeeded * 86400000).toISOString().slice(0, 10);
+                    archiveNote = <>Archive-eligible on <strong>{archiveIso}</strong> ({daysUntil}d — needs {totalNeeded}d total age: offload {offloadDays}d + archive {archiveAfterDays}d).</>;
+                  } else {
+                    archiveNote = <>Archive-eligible now (age {ageDays}d ≥ {offloadDays}d offload + {archiveAfterDays}d archive).</>;
+                  }
+                } else {
+                  // Move-only: eligible after archiveAfterDays in Capacity tier
+                  const capEnteredIso = selected.capacityMoveFinalizedAt || selected.capacityCopyCreatedAt;
+                  if (!capEnteredIso) {
+                    const daysUntilCapacity = offloadDays - ageDays;
+                    archiveNote = daysUntilCapacity > 0
+                      ? <>Not yet in Capacity tier — eligible for offload in {daysUntilCapacity}d, then {archiveAfterDays}d more for Archive.</>
+                      : <>Waiting for Capacity move — then {archiveAfterDays}d in Capacity before Archive.</>;
+                  } else {
+                    const capAgeMs = currentDateObj.getTime() - parseISODate(capEnteredIso).getTime();
+                    const capAgeDays = Math.floor(capAgeMs / 86400000);
+                    const daysUntilArchive = archiveAfterDays - capAgeDays;
+                    if (daysUntilArchive > 0) {
+                      const archiveIso = new Date(parseISODate(capEnteredIso).getTime() + archiveAfterDays * 86400000).toISOString().slice(0, 10);
+                      archiveNote = <>Archive-eligible on <strong>{archiveIso}</strong> ({daysUntilArchive}d — needs {archiveAfterDays}d in Capacity; currently {capAgeDays}d).</>;
+                    } else {
+                      archiveNote = <>Archive-eligible now ({capAgeDays}d in Capacity ≥ {archiveAfterDays}d threshold).</>;
+                    }
+                  }
+                }
+              }
+
+              // GFS tag badges
+              const gfsBadges = (
+                <>
+                  {selected.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>W</span>}
+                  {selected.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>M</span>}
+                  {selected.isYearlyGFS && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>Y</span>}
+                  {selected.isGlobalBase && <span style={{ background: '#455a64', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>Base Full</span>}
+                </>
+              );
+
+              const infoRow = (label: string, value: React.ReactNode) => (
+                <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.84rem', marginBottom: '0.28rem' }}>
+                  <span style={{ color: '#78909c', minWidth: '120px', flexShrink: 0 }}>{label}</span>
+                  <span style={{ color: '#263238' }}>{value}</span>
+                </div>
+              );
+
+              return (
+                <>
+                  {/* Quick-facts header */}
+                  <div style={{ marginBottom: '0.55rem' }}>
+                    {/* ID line — muted, truncated if needed */}
+                    <div style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#90a4ae', marginBottom: '0.35rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {normalizeActivityText(selected.id)}
+                    </div>
+                    {/* All badges on one line — type badge shows present role */}
+                    <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'nowrap' }}>
+                      <span style={{ background: selected.isGlobalBase ? '#455a64' : ((typeColors as Record<string,string>)[selected.type] || '#546e7a'), color: '#fff', borderRadius: '4px', padding: '2px 9px', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                        {selected.isGlobalBase ? 'Base Full' : selected.type}
+                      </span>
+                      <span style={{ color: '#b0bec5', fontSize: '0.85rem' }}>in</span>
+                      <span style={{ background: tierBg[currentTier] || '#546e7a', color: '#fff', borderRadius: '4px', padding: '2px 9px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                        {currentTier}
+                      </span>
+                      {(selected.isWeeklyGFS || selected.isMonthlyGFS || selected.isYearlyGFS) && (
+                        <span style={{ color: '#b0bec5', fontSize: '0.85rem' }}>·</span>
+                      )}
+                      {selected.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>W</span>}
+                      {selected.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>M</span>}
+                      {selected.isYearlyGFS && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>Y</span>}
+                    </div>
+                  </div>
+
+                  {/* Key facts */}
+                  {infoRow('Date', selected.representsRestorePointDate || selected.date)}
+                  {infoRow('Age', `${ageDays}d`)}
+                  {infoRow('Size in tier', formatTB(sizeTB))}
+                  {selected.isGlobalBase && infoRow('Created as', selected.type)}
+                  {infoRow('Chain', selectedChain
+                    ? <><strong style={{ color: selectedChain.status === 'Inactive' ? '#b26a00' : '#2e7d32' }}>{selectedChain.status}</strong>{selectedChain.inactiveSince ? ` since ${selectedChain.inactiveSince}` : ''}</>
+                    : 'Detached (GFS orphan)')}
+
+                  <div style={{ borderTop: '1px solid #eceff1', margin: '0.5rem 0' }} />
+
+                  {/* Restore dependency */}
+                  {infoRow('To restore', dependencyNote)}
+
+                  {/* Retention forecast */}
+                  {infoRow('Retention', retentionNote)}
+
+                  {/* Archive eligibility */}
+                  {archiveNote && infoRow('Archive', archiveNote)}
+
+                  {/* Pruned-from-capacity note */}
+                  {selectedWasPrunedFromCapacity && (
+                    <div style={{ fontSize: '0.82rem', marginTop: '0.4rem', color: '#6d4c41', background: '#efebe9', border: '1px solid #d7ccc8', borderRadius: '6px', padding: '0.4rem 0.5rem' }}>
+                      This point was copied to Capacity, then pruned after the chain's GFS full was preserved in Archive.
+                    </div>
+                  )}
+
+                  <div style={{ borderTop: '1px solid #eceff1', margin: '0.5rem 0' }} />
+
+                  {/* Tier journey timeline */}
+                  <div style={{ fontSize: '0.78rem', color: '#78909c', marginBottom: '0.3rem' }}>Tier journey</div>
+                  {journeySteps.length > 0 ? (
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
+                      {journeySteps.map((step, idx) => (
+                        <React.Fragment key={`${selected.id}-journey-${idx}`}>
+                          <div style={{
+                            background: tierBg[step.tier] || '#607d8b',
+                            color: '#fff',
+                            borderRadius: '4px',
+                            padding: '3px 9px',
+                            fontSize: '0.8rem',
+                            fontWeight: step.isCurrent ? 'bold' : 'normal',
+                            outline: step.isCurrent ? '2px solid #37474f' : 'none',
+                            outlineOffset: '1px',
+                          }}>
+                            {step.tier}
+                            <span style={{ marginLeft: '5px', opacity: 0.85, fontWeight: 'normal' }}>
+                              {step.isCurrent ? `${step.daysInTier}d ★` : `${step.daysInTier}d`}
+                            </span>
+                          </div>
+                          {idx < journeySteps.length - 1 && (
+                            <span style={{ color: '#90a4ae', fontSize: '1rem' }}>→</span>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '0.82rem', color: '#90a4ae' }}>No tier history recorded (point has not moved tiers yet).</div>
+                  )}
+                </>
+              );
+            })()}
+            {!selectedRestorePointId && (
+              <div style={{ fontSize: '0.85rem', color: '#607d8b' }}>
+                Select a restore point from the catalog or tier contents to view its info.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

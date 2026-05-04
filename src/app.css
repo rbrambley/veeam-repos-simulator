@@ -1,0 +1,103 @@
+/* ── Form section cards ── */
+.form-card {
+  margin-bottom: 0.65rem;
+  border: 1px solid #c5cae9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.form-card-header {
+  background: #1a237e;
+  color: #fff;
+  padding: 5px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.form-card-body {
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  background: #fafbff;
+}
+
+/* Direct-child labels get a flex row layout (text left, input right) */
+.form-card-body > label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  color: #37474f;
+}
+
+/* ── Apply / action buttons ── */
+.apply-btn {
+  margin-top: 0.25rem;
+  padding: 8px 28px;
+  background: #1a237e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: background 0.15s;
+}
+
+.apply-btn:hover {
+  background: #283593;
+}
+
+/* ── Repository Storage table ── */
+.storage-table {
+  border-collapse: collapse;
+  min-width: 400px;
+  width: 100%;
+  font-size: 0.84rem;
+}
+
+.storage-table thead tr {
+  background: #1a237e;
+}
+
+.storage-table th {
+  color: #fff;
+  padding: 8px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  border: none;
+}
+
+.storage-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #e8eaf6;
+  vertical-align: middle;
+}
+
+.storage-table tbody tr:nth-child(even) {
+  background: #f5f7ff;
+}
+
+.storage-table tbody tr:hover {
+  background: #eef1fb;
+}
+
+/* ── Section heading (used for h3 above tables/panels) ── */
+.section-heading {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #455a64;
+  border-bottom: 2px solid #1a237e;
+  padding-bottom: 5px;
+}

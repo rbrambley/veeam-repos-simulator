@@ -1,0 +1,141 @@
+{
+  "defaults": {
+    "startDate": "2026-05-02",
+    "forecastYears": 3,
+    "workingSpacePct": 20,
+    "veeamWorkingSpacePct": 80,
+    "tolerancePct": 5
+  },
+  "scenarios": [
+    {
+      "id": "das-basic",
+      "notes": "captured-from-veeam-calculator-2026-05-02",
+      "expected": {
+        "plannedCapacityTB": 1.6,
+        "veeamWorkingSpaceTB": 0.53
+      }
+    },
+    {
+      "id": "das-retention-14",
+      "notes": "captured-from-veeam-calculator-2026-05-03",
+      "expected": {
+        "plannedCapacityTB": 1.9,
+        "veeamWorkingSpaceTB": 0.53
+      }
+    },
+    {
+      "id": "sobr-moveonly",
+      "notes": "captured-from-veeam-calculator-2026-05-02",
+      "expected": {
+        "plannedCapacityTB": 2.7,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 1.1,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "sobr-copymove",
+      "expected": {
+        "plannedCapacityTB": 3.7,
+        "plannedPerformanceTierTB": 2.1,
+        "plannedCapacityTierTB": 1.6,
+        "plannedArchiveTierTB": 0
+      },
+      "notes": "captured-from-veeam-calculator-2026-05-02"
+    },
+    {
+      "id": "das-gfs",
+      "expected": {
+        "plannedCapacityTB": 2.1
+      },
+      "notes": "captured-from-veeam-calculator-2026-05-02"
+    },
+    {
+      "id": "sobr-gfs-archive",
+      "expected": {
+        "plannedCapacityTB": 4.6,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 3,
+        "plannedArchiveTierTB": 0
+      },
+      "notes": "captured-from-veeam-calculator-2026-05-02"
+    },
+    {
+      "id": "das-monthly-2-small-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2M 0%-growth; storage-required=1.6TB",
+      "expected": {
+        "plannedCapacityTB": 1.6
+      }
+    },
+    {
+      "id": "das-yearly-2-small-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2Y 0%-growth; storage-required=2.3TB",
+      "expected": {
+        "plannedCapacityTB": 2.3
+      }
+    },
+    {
+      "id": "das-monthly-2-large-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2M 0%-growth; storage-required=28.3TB",
+      "expected": {
+        "plannedCapacityTB": 28.3
+      }
+    },
+    {
+      "id": "das-yearly-2-large-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2Y 0%-growth; storage-required=35.0TB",
+      "expected": {
+        "plannedCapacityTB": 35.0
+      }
+    },
+    {
+      "id": "das-mixed-2w1m-small-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M 0%-growth; storage-required=1.5TB",
+      "expected": {
+        "plannedCapacityTB": 1.5
+      }
+    },
+    {
+      "id": "das-mixed-2w1y-small-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1Y 0%-growth; storage-required=1.8TB",
+      "expected": {
+        "plannedCapacityTB": 1.8
+      }
+    },
+    {
+      "id": "das-mixed-1m1y-small-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 0W+1M+1Y 0%-growth; storage-required=1.9TB",
+      "expected": {
+        "plannedCapacityTB": 1.9
+      }
+    },
+    {
+      "id": "das-mixed-2w1m1y-small-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M+1Y 0%-growth; storage-required=1.9TB",
+      "expected": {
+        "plannedCapacityTB": 1.9
+      }
+    },
+    {
+      "id": "das-mixed-2w1m1y-large-r7",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2W+1M+1Y 0%-growth; storage-required=31.7TB",
+      "expected": {
+        "plannedCapacityTB": 31.7
+      }
+    },
+    {
+      "id": "sobr-mixed-2w1m1y-small-r60",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 2W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB",
+      "expected": {
+        "plannedCapacityTB": 4.1
+      }
+    },
+    {
+      "id": "sobr-mixed-1m1y-small-r60",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 0W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB",
+      "expected": {
+        "plannedCapacityTB": 4.1
+      }
+    }
+  ]
+}
