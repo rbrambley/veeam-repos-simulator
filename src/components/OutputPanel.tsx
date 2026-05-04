@@ -111,6 +111,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
   );
   const chainById = Object.fromEntries(sim.state.chains.map(chain => [chain.id, chain]));
   const generationSnapshots = sim.getCurrentGenerations(currentDate) as GenerationSnapshot[];
+  const hasGenerationUi = generationSnapshots.length > 0;
   const generationById = useMemo(
     () => Object.fromEntries(generationSnapshots.map(gen => [gen.id, gen])) as Record<string, GenerationSnapshot>,
     [generationSnapshots]
@@ -169,6 +170,25 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     }
     return { color: '#1565c0', bg: '#e3f2fd' };
   };
+
+  const getGenerationStateLabel = (state: GenerationSnapshot['lifecycleState']) => {
+    if (state === 'DeleteOn Pending') return 'Locked';
+    return state;
+  };
+
+  const renderGenTotals = (locked: number, waiting: number, deletable: number) => (
+    <div style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
+      <span title="Locked GENs" style={{ background: '#e3f2fd', color: '#1565c0', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        L {locked}
+      </span>
+      <span title="Waiting Immutability GENs" style={{ background: '#efebe9', color: '#8d6e63', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        W {waiting}
+      </span>
+      <span title="Deletable GENs" style={{ background: '#e8f5e9', color: '#1b5e20', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        D {deletable}
+      </span>
+    </div>
+  );
 
   const tierBuckets = useMemo(() => ({
     Performance: sortedRestorePoints.filter(rp => {
@@ -481,20 +501,18 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
       {/* Storage Usage per Repository + Summary Stats */}
       <h3 className="section-heading">Repository Storage Usage</h3>
-      <StateLegend />
+      {hasGenerationUi && <StateLegend />}
       <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'stretch', flexWrap: 'nowrap', marginBottom: '1.2rem' }}>
-        <div style={{ flex: '1 1 0', minWidth: 0, overflow: 'auto', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: '1 1 0', minWidth: 0, overflowX: 'hidden', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)', display: 'flex', flexDirection: 'column' }}>
           <table className="storage-table" style={{ flex: '1 1 auto' }}>
         <thead>
           <tr>
             <th>Repository</th>
             <th>Type</th>
             <th>Used</th>
-            <th>Working Space Needed</th>
-            <th>GENs</th>
-            <th>Locked</th>
-            <th>Deletable</th>
-            <th>Next DeleteOn</th>
+            <th>Work Space</th>
+            {hasGenerationUi && <th>GENs</th>}
+            {hasGenerationUi && <th>Next Delete</th>}
             <th>Capacity</th>
             <th>Usage %</th>
           </tr>
@@ -512,7 +530,8 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             const tierColors: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
             const repoJobIds = sim.state.jobs.filter(j => j.repositoryId === repo.id).map(j => j.id);
             const repoGenerations = generationSnapshots.filter(g => repoJobIds.includes(g.jobId));
-            const repoLockedGenerations = repoGenerations.filter(g => g.immutabilityLocked).length;
+            const repoLockedGenerations = repoGenerations.filter(g => g.lifecycleState === 'DeleteOn Pending').length;
+            const repoWaitingGenerations = repoGenerations.filter(g => g.lifecycleState === 'Waiting Immutability').length;
             const repoDeletableGenerations = repoGenerations.filter(g => g.lifecycleState === 'Deletable').length;
             const repoNextDeleteOn = repoGenerations.map(g => g.deleteOn).sort()[0];
             return (
@@ -522,13 +541,11 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   <td>{repo.type}</td>
                   <td>{formatTB(used)}</td>
                   <td title={`${formatTB(additionalWorkingSpaceTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)`}>{formatTB(neededWorkingSpaceTB)}</td>
-                  <td>{repoGenerations.length}</td>
-                  <td>{repoLockedGenerations}</td>
-                  <td>{repoDeletableGenerations}</td>
-                  <td>{repoNextDeleteOn || '-'}</td>
+                  {hasGenerationUi && <td>{renderGenTotals(repoLockedGenerations, repoWaitingGenerations, repoDeletableGenerations)}</td>}
+                  {hasGenerationUi && <td>{repoNextDeleteOn || '-'}</td>}
                   <td>{formatTB(repo.capacityTB)}</td>
                   <td>
-                    <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '14px', width: '120px', display: 'inline-block', verticalAlign: 'middle' }}>
+                    <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '12px', width: '68px', display: 'inline-block', verticalAlign: 'middle' }}>
                       <div style={{ background: pct > 85 ? '#d32f2f' : '#1976d2', width: `${pct}%`, height: '100%', borderRadius: '3px' }} />
                     </div>
                     {' '}{pct.toFixed(1)}%
@@ -548,16 +565,24 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       <td style={{ color: '#999' }}>SOBR Tier</td>
                       <td>{formatTB(tierUsed)}</td>
                       <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)` : 'No working-space requirement on this tier'}>{formatTB(tierWorkingSpaceNeededTB)}</td>
-                      <td>{repoGenerations.filter(g => tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData).length}</td>
-                      <td>{repoGenerations.filter(g => tier === 'Performance' ? g.performanceLocked : tier === 'Capacity' ? g.capacityLocked : g.archiveLocked).length}</td>
-                      <td>{repoGenerations.filter(g => {
-                        const inTier = tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData;
-                        return inTier && g.lifecycleState === 'Deletable';
-                      }).length}</td>
-                      <td>-</td>
+                      {hasGenerationUi && <td>{renderGenTotals(
+                        repoGenerations.filter(g => {
+                          const inTier = tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData;
+                          return inTier && g.lifecycleState === 'DeleteOn Pending';
+                        }).length,
+                        repoGenerations.filter(g => {
+                          const inTier = tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData;
+                          return inTier && g.lifecycleState === 'Waiting Immutability';
+                        }).length,
+                        repoGenerations.filter(g => {
+                          const inTier = tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData;
+                          return inTier && g.lifecycleState === 'Deletable';
+                        }).length
+                      )}</td>}
+                      {hasGenerationUi && <td>-</td>}
                       <td>{formatTB(tierCap)}</td>
                       <td>
-                        <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '10px', width: '100px', display: 'inline-block', verticalAlign: 'middle' }}>
+                        <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '9px', width: '58px', display: 'inline-block', verticalAlign: 'middle' }}>
                           <div style={{ background: tierPct > 85 ? '#d32f2f' : tierColors[tier], width: `${tierPct}%`, height: '100%', borderRadius: '3px' }} />
                         </div>
                         {' '}{tierPct.toFixed(1)}%
@@ -594,18 +619,22 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               <div style={{ fontSize: '0.8rem', color: '#555' }}>GFS Points</div>
               <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{gfsCount}</div>
             </div>
-            <div style={{ background: '#e8eaf6', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6dbf5', boxShadow: '0 6px 16px rgba(63, 81, 181, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Total GENs</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.total}</div>
-            </div>
-            <div style={{ background: '#efebe9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #ddd6d2', boxShadow: '0 6px 16px rgba(93, 64, 55, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Locked GENs</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.locked}</div>
-            </div>
-            <div style={{ background: '#e8f5e9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6ead8', boxShadow: '0 6px 16px rgba(46, 125, 50, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Deletable GENs</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.deletable}</div>
-            </div>
+            {hasGenerationUi && (
+              <>
+                <div style={{ background: '#e8eaf6', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6dbf5', boxShadow: '0 6px 16px rgba(63, 81, 181, 0.10)' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#555' }}>Total GENs</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.total}</div>
+                </div>
+                <div style={{ background: '#efebe9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #ddd6d2', boxShadow: '0 6px 16px rgba(93, 64, 55, 0.10)' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#555' }}>Locked GENs</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.locked}</div>
+                </div>
+                <div style={{ background: '#e8f5e9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6ead8', boxShadow: '0 6px 16px rgba(46, 125, 50, 0.10)' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#555' }}>Deletable GENs</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.deletable}</div>
+                </div>
+              </>
+            )}
           </div>
 
           {policyInsight ? (
@@ -709,7 +738,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       {showRestoreCatalog && (
       <>
       <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Restore Point Catalog</h3>
-      <StateLegend />
+      {hasGenerationUi && <StateLegend />}
       <table border={1} cellPadding={6} className="backup-table" style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1rem' }}>
         <thead>
           <tr style={{ background: '#f5f5f5' }}>
@@ -718,9 +747,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             <th>Type</th>
             <th>Role</th>
             <th>Chain State</th>
-            <th>GEN</th>
-            <th>DeleteOn</th>
-            <th>GEN State</th>
+            {hasGenerationUi && <th>GEN</th>}
+            {hasGenerationUi && <th>DeleteOn</th>}
+            {hasGenerationUi && <th>GEN State</th>}
             <th>Represents</th>
             <th>Current Tier</th>
             <th>Size (TB)</th>
@@ -786,15 +815,15 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     <span style={{ color: '#666' }}>Preserved / Detached</span>
                   )}
                 </td>
-                <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{shortId(rp.generationId || '-')}</td>
-                <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{rp.generationId ? (generationById[rp.generationId]?.deleteOn || '-') : '-'}</td>
-                <td>
+                {hasGenerationUi && <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{shortId(rp.generationId || '-')}</td>}
+                {hasGenerationUi && <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{rp.generationId ? (generationById[rp.generationId]?.deleteOn || '-') : '-'}</td>}
+                {hasGenerationUi && <td>
                   {rp.generationId && generationById[rp.generationId] ? (() => {
                     const genState = generationById[rp.generationId].lifecycleState;
                     const style = getGenerationStateStyle(genState);
-                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>{genState}</span>;
+                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>{getGenerationStateLabel(genState)}</span>;
                   })() : '-'}
-                </td>
+                </td>}
                 <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                   {rp.representsRestorePointDate ? `${rp.representsRestorePointDate} / ${shortId(rp.representsRestorePointId || '')}` : `${rp.date} / self`}
                 </td>
@@ -818,7 +847,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       {showTierContents && (
       <>
       <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Tier Contents</h3>
-      <StateLegend />
+      {hasGenerationUi && <StateLegend />}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
         {(['Performance', 'Capacity', 'Archive'] as const).map((tier) => {
           const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
@@ -861,17 +890,17 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                           <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{formatTB(displaySizeTB)}</span>
                         </div>
                         <div style={{ display: 'flex', gap: '3px', marginTop: '3px', flexWrap: 'wrap' }}>
-                          {rp.generationId && (
+                          {hasGenerationUi && rp.generationId && (
                             <span style={{ background: '#eceff1', color: '#455a64', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
                               {shortId(rp.generationId)}
                             </span>
                           )}
-                          {rp.generationId && generationById[rp.generationId] && (() => {
+                          {hasGenerationUi && rp.generationId && generationById[rp.generationId] && (() => {
                             const genState = generationById[rp.generationId].lifecycleState;
                             const style = getGenerationStateStyle(genState);
                             return (
                               <span style={{ background: style.bg, color: style.color, borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                {genState}
+                                {getGenerationStateLabel(genState)}
                               </span>
                             );
                           })()}
@@ -993,12 +1022,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       grouped.set(day, list);
                     }
 
-                    const genList = grouped.get(currentDate) || [];
-                    genList.unshift({
-                      day: currentDate,
-                      text: `GEN summary: ${genSummary.total} total, ${genSummary.locked} locked, ${genSummary.deletable} deletable${genSummary.nextDeleteOn ? `, next DeleteOn ${genSummary.nextDeleteOn}` : ''}`,
-                    });
-                    grouped.set(currentDate, genList);
+                    if (hasGenerationUi) {
+                      const genList = grouped.get(currentDate) || [];
+                      genList.unshift({
+                        day: currentDate,
+                        text: `GEN summary: ${genSummary.total} total, ${genSummary.locked} locked, ${genSummary.deletable} deletable${genSummary.nextDeleteOn ? `, next DeleteOn ${genSummary.nextDeleteOn}` : ''}`,
+                      });
+                      grouped.set(currentDate, genList);
+                    }
 
                     const groupedDays = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
 
@@ -1221,21 +1252,16 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     </div>
                   </div>
 
-                  {/* State legend */}
-                  <div style={{ marginBottom: '0.5rem' }}>
-                    <StateLegend />
-                  </div>
-
                   {/* Key facts */}
                   {infoRow('Date', selected.representsRestorePointDate || selected.date)}
                   {infoRow('Age', `${ageDays}d`)}
                   {infoRow('Size in tier', formatTB(sizeTB))}
-                  {selected.generationId && generationById[selected.generationId] && infoRow('GEN', shortId(selected.generationId))}
-                  {selected.generationId && generationById[selected.generationId] && infoRow('DeleteOn', generationById[selected.generationId].deleteOn)}
-                  {selected.generationId && generationById[selected.generationId] && infoRow('GEN state', (() => {
+                  {hasGenerationUi && selected.generationId && generationById[selected.generationId] && infoRow('GEN', shortId(selected.generationId))}
+                  {hasGenerationUi && selected.generationId && generationById[selected.generationId] && infoRow('DeleteOn', generationById[selected.generationId].deleteOn)}
+                  {hasGenerationUi && selected.generationId && generationById[selected.generationId] && infoRow('GEN state', (() => {
                     const genState = generationById[selected.generationId!].lifecycleState;
                     const style = getGenerationStateStyle(genState);
-                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.78rem', fontWeight: 700 }}>{genState}</span>;
+                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.78rem', fontWeight: 700 }}>{getGenerationStateLabel(genState)}</span>;
                   })())}
                   {selected.isGlobalBase && infoRow('Created as', selected.type)}
                   {infoRow('Chain', selectedChain

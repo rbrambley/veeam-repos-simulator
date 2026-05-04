@@ -326,6 +326,33 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </div>
           </div>
           <div className="form-card">
+            <div className="form-card-header">Backup Job</div>
+            <div className="form-card-body">
+            <label>
+              Name:
+              <input value={jobName} onChange={e => setJobName(e.target.value)} />
+            </label>
+            <label>
+              Source (TB):
+              <input type="number" value={sourceDataTB} min={0.1} step={0.1} onChange={e => setSourceDataTB(Number(e.target.value))} style={compactNumberInputStyle} />
+            </label>
+            <label>
+              Type:
+              <select value={jobType} onChange={e => setJobType(e.target.value as BackupJobType)}>
+                <option value="ForwardIncremental">Forward Incremental</option>
+                <option value="ReverseIncremental">Reverse Incremental</option>
+                <option value="SyntheticFull">Synthetic Full</option>
+                <option value="ActiveFull">Active Full</option>
+                <option value="GFS">GFS</option>
+              </select>
+            </label>
+              <label>
+              Retention (d):
+              <input type="number" value={retention} min={1} onChange={e => setRetention(Number(e.target.value))} style={compactNumberInputStyle} />
+            </label>
+            </div>
+          </div>
+          <div className="form-card">
             <div className="form-card-header">Repository</div>
             <div className="form-card-body">
             <label>
@@ -343,57 +370,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                 <option value="SOBR">SOBR</option>
               </select>
             </label>
-            </div>
-          </div>
-          <div className="form-card">
-            <div className="form-card-header">Immutability Policy</div>
-            <div className="form-card-body">
-              <label>
-                Primary / Performance immutability (d):
-                <input
-                  type="number"
-                  value={sobrPerformanceImmutabilityDays}
-                  min={0}
-                  onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))}
-                  style={compactNumberInputStyle}
-                />
-              </label>
-              <label>
-                Capacity immutability (d):
-                <input
-                  type="number"
-                  value={sobrCapacityImmutabilityDays}
-                  min={0}
-                  disabled={!supportsTieredImmutability}
-                  onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))}
-                  style={{ ...compactNumberInputStyle, opacity: supportsTieredImmutability ? 1 : 0.55 }}
-                />
-              </label>
-              <label>
-                Archive immutability (d):
-                <input
-                  type="number"
-                  value={sobrArchiveImmutabilityDays}
-                  min={0}
-                  disabled={!supportsArchiveImmutability}
-                  onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))}
-                  style={{ ...compactNumberInputStyle, opacity: supportsArchiveImmutability ? 1 : 0.55 }}
-                />
-              </label>
-              <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '0.45rem' }}>
-                {repoType === 'SOBR'
-                  ? 'SOBR selected: all tier immutability controls are available based on enabled tiers.'
-                  : `${repoType} selected: primary immutability applies; Capacity/Archive controls are disabled.`}
-              </div>
-              <div style={{ marginTop: '0.45rem' }}>
-                <span
-                  style={tooltipBadgeStyle}
-                  title="Primary/Performance immutability delays generation delete eligibility. Capacity and Archive immutability are only applicable when using SOBR tiers."
-                  aria-label="Immutability policy notes"
-                >
-                  ?
-                </span>
-              </div>
             </div>
           </div>
           {repoType === 'SOBR' && (
@@ -459,33 +435,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </div>
           )}
           <div className="form-card">
-            <div className="form-card-header">Backup Job</div>
-            <div className="form-card-body">
-            <label>
-              Name:
-              <input value={jobName} onChange={e => setJobName(e.target.value)} />
-            </label>
-            <label>
-              Source (TB):
-              <input type="number" value={sourceDataTB} min={0.1} step={0.1} onChange={e => setSourceDataTB(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
-            <label>
-              Type:
-              <select value={jobType} onChange={e => setJobType(e.target.value as BackupJobType)}>
-                <option value="ForwardIncremental">Forward Incremental</option>
-                <option value="ReverseIncremental">Reverse Incremental</option>
-                <option value="SyntheticFull">Synthetic Full</option>
-                <option value="ActiveFull">Active Full</option>
-                <option value="GFS">GFS</option>
-              </select>
-            </label>
-            <label>
-              Retention (d):
-              <input type="number" value={retention} min={1} onChange={e => setRetention(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
-            </div>
-          </div>
-          <div className="form-card">
             <div className="form-card-header">GFS Policy (optional)</div>
             <div className="form-card-body">
             <label>
@@ -500,6 +449,57 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               Yearly:
               <input type="number" value={gfsYearly} min={0} onChange={e => setGfsYearly(Number(e.target.value))} style={compactNumberInputStyle} />
             </label>
+            </div>
+          </div>
+          <div className="form-card">
+            <div className="form-card-header">Immutability Policy</div>
+            <div className="form-card-body">
+              <label>
+                Primary / Performance immutability (d):
+                <input
+                  type="number"
+                  value={sobrPerformanceImmutabilityDays}
+                  min={0}
+                  onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))}
+                  style={compactNumberInputStyle}
+                />
+              </label>
+              <label>
+                Capacity immutability (d):
+                <input
+                  type="number"
+                  value={sobrCapacityImmutabilityDays}
+                  min={0}
+                  disabled={!supportsTieredImmutability}
+                  onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))}
+                  style={{ ...compactNumberInputStyle, opacity: supportsTieredImmutability ? 1 : 0.55 }}
+                />
+              </label>
+              <label>
+                Archive immutability (d):
+                <input
+                  type="number"
+                  value={sobrArchiveImmutabilityDays}
+                  min={0}
+                  disabled={!supportsArchiveImmutability}
+                  onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))}
+                  style={{ ...compactNumberInputStyle, opacity: supportsArchiveImmutability ? 1 : 0.55 }}
+                />
+              </label>
+              <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '0.45rem' }}>
+                {repoType === 'SOBR'
+                  ? 'SOBR selected: all tier immutability controls are available based on enabled tiers.'
+                  : `${repoType} selected: primary immutability applies; Capacity/Archive controls are disabled.`}
+              </div>
+              <div style={{ marginTop: '0.45rem' }}>
+                <span
+                  style={tooltipBadgeStyle}
+                  title="Primary/Performance immutability delays generation delete eligibility. Capacity and Archive immutability are only applicable when using SOBR tiers."
+                  aria-label="Immutability policy notes"
+                >
+                  ?
+                </span>
+              </div>
             </div>
           </div>
           <button type="submit" className="apply-btn">Simulate</button>

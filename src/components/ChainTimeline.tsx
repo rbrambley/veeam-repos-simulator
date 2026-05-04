@@ -63,6 +63,10 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [timeWindowDays, setTimeWindowDays] = useState<number | 'all'>(90);
 
+  function formatGenerationStateLabel(state: GenerationSnapshot['lifecycleState']): string {
+    return state === 'DeleteOn Pending' ? 'Locked' : state;
+  }
+
   function formatRpId(id: string): string {
     return id.replace(/T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, '');
   }
@@ -494,7 +498,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
             <div>Tier: <strong style={{ color: TIER_LABEL_COLOR[currentTier] }}>{currentTier}</strong></div>
             {rp.generationId && <div>GEN: <strong>{formatRpId(rp.generationId)}</strong></div>}
             {gen && <div>DeleteOn: <strong>{gen.deleteOn}</strong></div>}
-            {gen && <div>State: <strong>{gen.lifecycleState}</strong></div>}
+            {gen && <div>State: <strong>{formatGenerationStateLabel(gen.lifecycleState)}</strong></div>}
             {rp.isGFS && (
               <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <span style={{ color: '#607d8b' }}>GFS:</span>

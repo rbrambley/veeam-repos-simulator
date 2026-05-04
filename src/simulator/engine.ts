@@ -30,6 +30,12 @@ export class VeeamSimulator {
     return Math.max(1, repo?.sobrConfig?.generationPeriodDays ?? 10);
   }
 
+  private usesGenerationLifecycle(repo?: Repository): boolean {
+    // Current behavior model: generations are for SOBR object tiers.
+    // ObjectStorage repo type support will be added when implemented.
+    return repo?.type === 'SOBR';
+  }
+
   private getTierImmutabilityDays(repo: Repository | undefined, tier: SOBRTier): number {
     const cfg = repo?.sobrConfig;
     if (!cfg) {
@@ -37,7 +43,9 @@ export class VeeamSimulator {
       if (tier === 'Performance') return Math.max(0, repo?.immutabilityDays ?? 0);
       return 0;
     }
-    if (tier === 'Performance') return Math.max(0, cfg.performanceImmutabilityDays ?? 0);
+    // Current model defaults Performance to block storage (ReFS/XFS), so GEN immutability
+    // gates only apply to object tiers.
+    if (tier === 'Performance') return 0;
     if (tier === 'Capacity') return Math.max(0, cfg.capacityImmutabilityDays ?? 0);
     return Math.max(0, cfg.archiveImmutabilityDays ?? 0);
   }
@@ -49,8 +57,12 @@ export class VeeamSimulator {
   }
 
   private registerPointInGeneration(job: BackupJob, chain: BackupChain, rp: RestorePoint) {
-    this.ensureGenerationState();
     const repo = this.state.repositories.find(r => r.id === job.repositoryId);
+    if (!this.usesGenerationLifecycle(repo)) {
+      return;
+    }
+
+    this.ensureGenerationState();
     const periodDays = this.getGenerationPeriodDays(repo);
     const elapsedDays = this.state.startDate
       ? Math.floor((this.parseISODate(rp.date).getTime() - this.parseISODate(this.state.startDate).getTime()) / 86400000)
@@ -80,14 +92,6 @@ export class VeeamSimulator {
     rp.generationId = generation.id;
     if (!generation.pointIds.includes(rp.id)) {
       generation.pointIds.push(rp.id);
-    }
-
-    if (!generation.performanceEnteredAt) {
-      generation.performanceEnteredAt = rp.date;
-      generation.performanceImmutableUntil = this.addDaysISO(
-        generation.performanceEnteredAt,
-        this.getTierImmutabilityDays(repo, 'Performance')
-      );
     }
   }
 
@@ -891,7 +895,6 @@ export class VeeamSimulator {
 
       const gen = this.getGenerationForPoint(rp);
       if (gen) {
-        this.markGenerationTierEntered(gen, 'Performance', rp.date, repo);
         if (copyEnabled) {
           this.markGenerationTierEntered(gen, 'Capacity', rp.date, repo);
         }
@@ -1185,14 +1188,26 @@ export class VeeamSimulator {
     this.ensureGenerationState();
     const currentMs = this.parseISODate(currentDate).getTime();
 
-    return this.state.generations!.map(gen => {
+    return this.state.generations!
+      .map(gen => {
       const points = gen.pointIds
         .map(id => this.state.restorePoints.find(rp => rp.id === id))
         .filter((rp): rp is RestorePoint => !!rp);
 
+      const job = this.state.jobs.find(j => j.id === gen.jobId);
+      const repo = job ? this.state.repositories.find(r => r.id === job.repositoryId) : undefined;
+      if (!this.usesGenerationLifecycle(repo)) {
+        return null;
+      }
+
       const hasPerformanceData = points.some(p => this.hasTierData(p, 'Performance'));
       const hasCapacityData = points.some(p => this.hasTierData(p, 'Capacity'));
       const hasArchiveData = points.some(p => this.hasTierData(p, 'Archive'));
+
+      // Current model: only object tiers participate in GEN lifecycle visibility.
+      if (!hasCapacityData && !hasArchiveData) {
+        return null;
+      }
 
       const deleteOnReached = currentMs >= this.parseISODate(gen.deleteOn).getTime();
       const performanceLocked = hasPerformanceData && !!gen.performanceImmutableUntil && currentMs < this.parseISODate(gen.performanceImmutableUntil).getTime();
@@ -1227,6 +1242,7 @@ export class VeeamSimulator {
         immutabilityLocked,
         lifecycleState,
       };
-    });
+    })
+      .filter((gen): gen is NonNullable<typeof gen> => !!gen);
   }
 }

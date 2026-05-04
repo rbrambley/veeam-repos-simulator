@@ -12,7 +12,7 @@ export const StateLegend: React.FC = () => {
     },
     {
       state: 'waiting',
-      label: 'DeleteOn Reached',
+      label: 'Waiting Immutability',
       description: 'Waiting for tier immutability expiry',
       bgColor: '#efebe9',
       badgeColor: '#8d6e63',

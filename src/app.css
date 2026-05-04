@@ -58,6 +58,7 @@
   border-collapse: collapse;
   min-width: 400px;
   width: 100%;
+  table-layout: fixed;
   font-size: 0.84rem;
 }
 
@@ -67,20 +68,30 @@
 
 .storage-table th {
   color: #fff;
-  padding: 8px 10px;
+  padding: 7px 8px;
   text-align: left;
   font-weight: 600;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   letter-spacing: 0.04em;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.2;
   border: none;
 }
 
 .storage-table td {
-  padding: 7px 10px;
+  padding: 6px 8px;
   border-bottom: 1px solid #e8eaf6;
   vertical-align: middle;
 }
+
+.storage-table th:nth-child(1), .storage-table td:nth-child(1) { width: 16%; }
+.storage-table th:nth-child(2), .storage-table td:nth-child(2) { width: 9%; }
+.storage-table th:nth-child(3), .storage-table td:nth-child(3) { width: 10%; }
+.storage-table th:nth-child(4), .storage-table td:nth-child(4) { width: 14%; }
+.storage-table th:nth-child(5), .storage-table td:nth-child(5) { width: 20%; }
+.storage-table th:nth-child(6), .storage-table td:nth-child(6) { width: 12%; }
+.storage-table th:nth-child(7), .storage-table td:nth-child(7) { width: 10%; }
+.storage-table th:nth-child(8), .storage-table td:nth-child(8) { width: 9%; }
 
 .storage-table tbody tr:nth-child(even) {
   background: #f5f7ff;
