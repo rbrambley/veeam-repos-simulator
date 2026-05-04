@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { VeeamSimulator } from '../simulator/engine';
 import { BackupChain, RestorePoint, SOBRTier } from '../models/veeam';
 
@@ -50,6 +50,15 @@ interface TierSegment {
   endMs: number;
 }
 
+interface GenerationSnapshot {
+  id: string;
+  deleteOn: string;
+  performanceImmutableUntil?: string;
+  capacityImmutableUntil?: string;
+  archiveImmutableUntil?: string;
+  lifecycleState: 'DeleteOn Pending' | 'Waiting Immutability' | 'Deletable';
+}
+
 export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, onSelectRestorePoint }) => {
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [timeWindowDays, setTimeWindowDays] = useState<number | 'all'>(90);
@@ -59,6 +68,11 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
   }
 
   const allPoints = sim.state.restorePoints;
+  const generations = sim.getCurrentGenerations(currentDate) as GenerationSnapshot[];
+  const generationById = useMemo(
+    () => Object.fromEntries(generations.map(gen => [gen.id, gen])) as Record<string, GenerationSnapshot>,
+    [generations]
+  );
   if (allPoints.length === 0) return null;
 
   const allDates = allPoints.map(rp => rp.date).sort();
@@ -455,6 +469,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         const rp = tooltip.rp;
         const currentTier: SOBRTier = rp.hasArchiveData ? 'Archive' : (rp.hasCapacityData ? 'Capacity' : 'Performance');
         const sizeTB = sim.getRestorePointSizeForTier(rp.id, currentTier);
+        const gen = rp.generationId ? generationById[rp.generationId] : undefined;
         return (
           <div style={{
             position: 'fixed', left: tooltip.mouseX + 14, top: tooltip.mouseY - 10,
@@ -477,6 +492,9 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
             <div>Date: <strong>{rp.date}</strong></div>
             <div>Size: <strong>{sizeTB.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TB</strong></div>
             <div>Tier: <strong style={{ color: TIER_LABEL_COLOR[currentTier] }}>{currentTier}</strong></div>
+            {rp.generationId && <div>GEN: <strong>{formatRpId(rp.generationId)}</strong></div>}
+            {gen && <div>DeleteOn: <strong>{gen.deleteOn}</strong></div>}
+            {gen && <div>State: <strong>{gen.lifecycleState}</strong></div>}
             {rp.isGFS && (
               <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <span style={{ color: '#607d8b' }}>GFS:</span>

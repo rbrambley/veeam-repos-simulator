@@ -28,6 +28,10 @@ export interface SOBRConfig {
   archiveCapacityTB: number;       // capacity of Archive tier
   offloadAfterDays: number;        // move from Performance → Capacity after N days in Performance
   archiveAfterDays: number;        // move from Capacity → Archive after N days in Capacity
+  generationPeriodDays?: number;   // fixed GEN window, default 10 days
+  performanceImmutabilityDays?: number; // Performance-tier immutability window per GEN
+  capacityImmutabilityDays?: number; // Capacity-tier immutability window per GEN
+  archiveImmutabilityDays?: number; // Archive-tier immutability window per GEN
   hasArchiveTier: boolean;         // whether Archive tier is enabled
   copyEnabled?: boolean;           // copy backup files immediately to Capacity tier
   moveEnabled?: boolean;           // move backup files to Capacity tier after offload age
@@ -79,7 +83,26 @@ export interface BackupChain {
   jobId: string;
   status: ChainStatus;
   inactiveSince?: string; // ISO date when the chain became inactive
+  offloadComplete?: boolean; // true once all chain points are uploaded to Capacity
+  offloadCompletedAt?: string; // ISO date when chain offload completed
+  performancePrunedAt?: string; // ISO date when chain was pruned from Performance
   restorePoints: RestorePoint[];
+}
+
+export interface BackupGeneration {
+  id: string;
+  jobId: string;
+  chainId: string;
+  windowStartDate: string;
+  windowEndDate: string;
+  pointIds: string[];
+  deleteOn: string;
+  performanceEnteredAt?: string;
+  capacityEnteredAt?: string;
+  archiveEnteredAt?: string;
+  performanceImmutableUntil?: string;
+  capacityImmutableUntil?: string;
+  archiveImmutableUntil?: string;
 }
 
 export type RestorePointType = 'Full' | 'Incremental' | 'SyntheticFull';
@@ -92,6 +115,7 @@ export interface TierMoveEvent {
 export interface RestorePoint {
   id: string;
   chainId: string;
+  generationId?: string;
   type: RestorePointType;
   date: string; // ISO date
   sizeGB: number;
@@ -127,6 +151,7 @@ export interface SimulationState {
   repositories: Repository[];
   jobs: BackupJob[];
   chains: BackupChain[];
+  generations?: BackupGeneration[];
   restorePoints: RestorePoint[];
   blocks: BlockObject[];
   date: string; // current simulation date

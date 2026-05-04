@@ -21,6 +21,10 @@ interface TestScenario {
     gfsPolicy: { weekly: number; monthly: number; yearly: number };
     offloadAfterDays: number;
     archiveAfterDays: number;
+    generationPeriodDays?: number;
+    performanceImmutabilityDays?: number;
+    capacityImmutabilityDays?: number;
+    archiveImmutabilityDays?: number;
     hasArchiveTier: boolean;
     copyEnabled: boolean;
     moveEnabled: boolean;
@@ -36,6 +40,105 @@ interface TestScenario {
     minArchivePointAgeDays?: number;
     noCapacityResidueInArchivedChains?: boolean;
   };
+}
+
+function getSortedDates(points: Array<{ date: string }>): string[] {
+  return points.map((p) => p.date).sort();
+}
+
+function buildStateSignature(sim: VeeamSimulator): string {
+  const chains = sim.state.chains
+    .map((chain) => ({
+      id: chain.id,
+      jobId: chain.jobId,
+      status: chain.status,
+      inactiveSince: chain.inactiveSince,
+      offloadComplete: !!chain.offloadComplete,
+      offloadCompletedAt: chain.offloadCompletedAt,
+      performancePrunedAt: chain.performancePrunedAt,
+      restorePointIds: chain.restorePoints.map((rp) => rp.id).sort(),
+    }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+
+  const restorePoints = sim.state.restorePoints
+    .map((rp) => ({
+      id: rp.id,
+      chainId: rp.chainId,
+      date: rp.date,
+      type: rp.type,
+      isGFS: !!rp.isGFS,
+      isGlobalBase: !!rp.isGlobalBase,
+      hasPerformanceData: !!rp.hasPerformanceData,
+      hasCapacityData: !!rp.hasCapacityData,
+      hasArchiveData: !!rp.hasArchiveData,
+      sobrTier: rp.sobrTier,
+    }))
+    .sort((a, b) => a.id.localeCompare(b.id));
+
+  return JSON.stringify({
+    date: sim.state.date,
+    chains,
+    restorePoints,
+  });
+}
+
+function assertDailyLifecycleInvariants(sim: VeeamSimulator, scenario: TestScenario, day: number): void {
+  for (const chain of sim.state.chains) {
+    if (chain.status === 'Active' && chain.offloadComplete) {
+      throw new Error(`Day ${day}: active chain ${chain.id} is marked offloadComplete`);
+    }
+
+    if (chain.performancePrunedAt) {
+      if (!chain.offloadComplete) {
+        throw new Error(`Day ${day}: chain ${chain.id} was pruned before offload completed`);
+      }
+      if (chain.offloadCompletedAt && chain.performancePrunedAt < chain.offloadCompletedAt) {
+        throw new Error(`Day ${day}: chain ${chain.id} was pruned before its offload completion date`);
+      }
+
+      const perfResidue = chain.restorePoints.filter((rp) => !!rp.hasPerformanceData || rp.sobrTier === 'Performance');
+      if (perfResidue.length > 0) {
+        throw new Error(`Day ${day}: chain ${chain.id} still has ${perfResidue.length} Performance point(s) after pruning`);
+      }
+    }
+  }
+
+  if (scenario.config.repositoryType === 'SOBR' && scenario.config.moveEnabled) {
+    const activeChains = sim.state.chains.filter((chain) => chain.status === 'Active');
+    for (const chain of activeChains) {
+      const capacityOnlyPoints = chain.restorePoints.filter((rp) => !rp.hasPerformanceData && !!rp.hasCapacityData);
+      if (capacityOnlyPoints.length > 0) {
+        throw new Error(`Day ${day}: active chain ${chain.id} has ${capacityOnlyPoints.length} Capacity-only point(s)`);
+      }
+    }
+  }
+}
+
+function simulateScenario(scenario: TestScenario): VeeamSimulator {
+  const initialState = createInitialState(scenario.config);
+  const sim = new VeeamSimulator(initialState);
+
+  for (let day = 1; day <= scenario.totalDays; day++) {
+    sim.nextDay();
+
+    for (const job of sim.state.jobs) {
+      const jobChainIds = new Set(
+        sim.state.chains.filter((c) => c.jobId === job.id).map((c) => c.id)
+      );
+      const baseCount = sim.state.restorePoints.filter(
+        (rp) => jobChainIds.has(rp.chainId) && rp.isGlobalBase
+      ).length;
+      if (baseCount > 1) {
+        throw new Error(
+          `Day ${day}: Job "${job.id}" has ${baseCount} base fulls (expected at most 1)`
+        );
+      }
+    }
+
+    assertDailyLifecycleInvariants(sim, scenario, day);
+  }
+
+  return sim;
 }
 
 // Keep scenario execution deterministic across machines and calendar days.
@@ -55,6 +158,10 @@ function createInitialState(config: TestScenario['config']): SimulationState {
           moveEnabled: config.moveEnabled,
           offloadAfterDays: config.offloadAfterDays,
           archiveAfterDays: config.archiveAfterDays,
+          generationPeriodDays: config.generationPeriodDays ?? 10,
+          performanceImmutabilityDays: config.performanceImmutabilityDays ?? 7,
+          capacityImmutabilityDays: config.capacityImmutabilityDays ?? 0,
+          archiveImmutabilityDays: config.archiveImmutabilityDays ?? 0,
           hasArchiveTier: config.hasArchiveTier,
         }
       : undefined;
@@ -114,34 +221,23 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
   console.log(`   Days: ${scenario.totalDays}\n`);
 
   try {
-    const initialState = createInitialState(scenario.config);
-    const sim = new VeeamSimulator(initialState);
+    const sim = simulateScenario(scenario);
 
-    // Step through each day and check checkpoints
-    for (let day = 1; day <= scenario.totalDays; day++) {
-      sim.nextDay();
+    for (const checkpoint of scenario.checkpoints) {
+      console.log(`   Day ${checkpoint.day}: ${checkpoint.description || 'checkpoint'}`);
+      console.log(`      ✓ Checkpoint passed`);
+    }
 
-      // Per-day invariant: each job must have at most one base
-      for (const job of sim.state.jobs) {
-        const jobChainIds = new Set(
-          sim.state.chains.filter((c) => c.jobId === job.id).map((c) => c.id)
-        );
-        const baseCount = sim.state.restorePoints.filter(
-          (rp) => jobChainIds.has(rp.chainId) && rp.isGlobalBase
-        ).length;
-        if (baseCount > 1) {
-          throw new Error(
-            `Day ${day}: Job "${job.id}" has ${baseCount} base fulls (expected at most 1)`
-          );
-        }
-      }
+    const replaySim = simulateScenario(scenario);
+    const firstSignature = buildStateSignature(sim);
+    const replaySignature = buildStateSignature(replaySim);
+    if (firstSignature !== replaySignature) {
+      throw new Error('Determinism check failed: identical scenario produced a different final state on replay');
+    }
 
-      // Check if this day has a checkpoint
-      const checkpoint = scenario.checkpoints.find((cp) => cp.day === day);
-      if (checkpoint) {
-        console.log(`   Day ${day}: ${checkpoint.description || 'checkpoint'}`);
-        console.log(`      ✓ Checkpoint passed`);
-      }
+    const sortedChainDates = getSortedDates(sim.state.restorePoints);
+    if (sortedChainDates.length === 0) {
+      throw new Error('Scenario produced no restore points');
     }
 
     // Final state verification
@@ -193,6 +289,7 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
 
     console.log(`      RP count: ${finalRpCount}${scenario.finalState.expectedRPCount !== undefined ? ` (expected ${scenario.finalState.expectedRPCount})` : ''}`);
     console.log(`      Base invariant count: ${baseInvariantCount} (expected 1)`);
+    console.log(`      Determinism replay: matched`);
     console.log(`      Base is oldest full across all chains: ${baseIsOldest ? 'yes' : `NO — base=${actualBase?.id} oldest=${expectedBase?.id}`}`);
     console.log(
       `      Non-base SyntheticFull incremental-size check: ${nonBaseSyntheticFulls.length - syntheticMismatches.length}/${nonBaseSyntheticFulls.length} passed`
@@ -274,7 +371,24 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
 async function runAllScenarios(): Promise<void> {
   const scenariosPath = path.join(__dirname, '../../docs/test-scenarios.json');
   const scenariosData = JSON.parse(fs.readFileSync(scenariosPath, 'utf-8'));
-  const scenarios: TestScenario[] = scenariosData.scenarios;
+  const idArgIndex = process.argv.indexOf('--id');
+  const prefixArgIndex = process.argv.indexOf('--id-prefix');
+  const scenarioId = idArgIndex >= 0 ? process.argv[idArgIndex + 1] : undefined;
+  const scenarioPrefix = prefixArgIndex >= 0 ? process.argv[prefixArgIndex + 1] : undefined;
+  let scenarios: TestScenario[] = scenariosData.scenarios;
+
+  if (scenarioId) {
+    scenarios = scenarios.filter((scenario) => scenario.id === scenarioId);
+  }
+
+  if (scenarioPrefix) {
+    scenarios = scenarios.filter((scenario) => scenario.id.startsWith(scenarioPrefix));
+  }
+
+  if (scenarios.length === 0) {
+    console.error('No scenarios matched the provided filter.');
+    process.exit(1);
+  }
 
   console.log(`\n🧪 Running ${scenarios.length} test scenarios...\n`);
 

@@ -17,6 +17,10 @@ interface ScenarioConfig {
   gfsPolicy: { weekly: number; monthly: number; yearly: number };
   offloadAfterDays: number;
   archiveAfterDays: number;
+  generationPeriodDays?: number;
+  performanceImmutabilityDays?: number;
+  capacityImmutabilityDays?: number;
+  archiveImmutabilityDays?: number;
   hasArchiveTier: boolean;
   copyEnabled: boolean;
   moveEnabled: boolean;
@@ -64,6 +68,19 @@ interface PlannedResult {
 function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, forecastYears: number, gfsSizingMode: GfsSizingMode): PlannedResult {
   const effectiveMoveEnabled = config.moveEnabled || !config.copyEnabled;
   const fullIntervalDays = (config.jobType === 'SyntheticFull' || config.jobType === 'ForwardIncremental') ? 7 : config.retention;
+  const generationPeriodDays = Math.max(1, config.generationPeriodDays ?? 10);
+  const performanceImmutabilityDays = Math.max(0, config.performanceImmutabilityDays ?? 7);
+
+  const computeMoveLifecycleWindows = (elapsedDays: number, retentionDays: number, offloadDays: number) => {
+    const moveGateDays = offloadDays + performanceImmutabilityDays;
+    const generationAlignedGateDays = Math.ceil(moveGateDays / generationPeriodDays) * generationPeriodDays;
+    const performanceWindowDays = Math.max(fullIntervalDays, generationAlignedGateDays + fullIntervalDays);
+    const capacityAccumulationDays = Math.max(0, elapsedDays - generationAlignedGateDays + 1);
+    return {
+      performanceWindowDays,
+      capacityAccumulationDays,
+    };
+  };
 
   const yearSourceTB = config.sourceDataTB * Math.pow(1 + config.annualGrowthRatePct / 100, forecastYears);
   const yearFullSizeTB = yearSourceTB * 0.5;
@@ -124,12 +141,10 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
       yearArchUsedTB = yearGfsStats.additionalArchFullTB;
     }
   } else {
-    // Move-only: Perf Tier holds at most one full interval before points are offloaded.
-    const perfDays = Math.min(config.offloadAfterDays, fullIntervalDays);
-    yearPerfUsedTB = estimateTierChainDataForYearTB(perfDays) + yearGfsStats.additionalPerfFullTB;
-
-    const capDays = Math.max(0, config.retention - config.offloadAfterDays);
-    yearCapUsedTB = estimateTierChainDataForYearTB(capDays) + yearGfsStats.additionalCapFullTB;
+    const elapsedDays = forecastYears * 365;
+    const windows = computeMoveLifecycleWindows(elapsedDays, config.retention, config.offloadAfterDays);
+    yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
+    yearCapUsedTB = estimateTierChainDataForYearTB(windows.capacityAccumulationDays) + yearGfsStats.additionalCapFullTB;
 
     if (config.hasArchiveTier) {
       yearArchUsedTB = yearGfsStats.additionalArchFullTB;
@@ -170,12 +185,17 @@ async function run(): Promise<void> {
   const seedMode = process.argv.includes('--seed');
   const gfsReverseMode = process.argv.includes('--gfs-reverse');
   const gfsEndperiodMode = process.argv.includes('--gfs-endperiod');
+  const baselineArgIndex = process.argv.indexOf('--baseline');
+  const baselineName = baselineArgIndex >= 0 ? process.argv[baselineArgIndex + 1] : 'calculator';
   const gfsSizingMode: GfsSizingMode = gfsEndperiodMode ? 'endperiod' : (gfsReverseMode ? 'reverse' : 'legacy');
   const scenariosPath = path.join(__dirname, '../../docs/test-scenarios.json');
-  const baselinePath = path.join(__dirname, '../../docs/veeam-calculator-baseline.json');
+  const baselineFileName = baselineName === 'model'
+    ? 'veeam-model-baseline.json'
+    : 'veeam-calculator-baseline.json';
+  const baselinePath = path.join(__dirname, `../../docs/${baselineFileName}`);
 
   if (!fs.existsSync(baselinePath)) {
-    console.error('Baseline file not found: docs/veeam-calculator-baseline.json');
+    console.error(`Baseline file not found: docs/${baselineFileName}`);
     process.exit(1);
   }
 
@@ -221,7 +241,7 @@ async function run(): Promise<void> {
 
     fs.writeFileSync(baselinePath, JSON.stringify(seededBaseline, null, 2) + '\n', 'utf-8');
     console.log('✅ Baseline file seeded from current simulator calculations.');
-    console.log('   File: docs/veeam-calculator-baseline.json');
+    console.log(`   File: docs/${baselineFileName}`);
     process.exit(0);
   }
 
@@ -229,7 +249,7 @@ async function run(): Promise<void> {
   let fail = 0;
   let pending = 0;
 
-  console.log(`\n🔍 Comparing simulator vs Veeam baseline (tolerance ${tolerancePct}%)`);
+  console.log(`\n🔍 Comparing simulator vs ${baselineName === 'model' ? 'model-aligned' : 'Veeam calculator'} baseline (tolerance ${tolerancePct}%)`);
   console.log(`\n  ⚠  Known structural differences — deltas are expected:`);
   console.log(`     • Veeam block generation period (10 days default) adds overhead to SOBR Cap/Archive Tiers — not modeled yet`);
   console.log(`     • Simulator and Veeam Calculator now use the same progressive tiered WS scale — no WS adjustment applied`);

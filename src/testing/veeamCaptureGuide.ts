@@ -15,6 +15,7 @@
  *   - Veeam "Block generation period" (10 days by default) is a cloud object
  *     storage behavior that is not modeled yet in this simulator.
  *   - The simulator currently uses its own chain/full cadence logic.
+ *   - The model-aligned baseline is stored separately in docs/veeam-model-baseline.json.
  *   - "Working space" can be captured for reference, but its definition may not
  *     be one-to-one with the simulator's planned-capacity working space.
  *   - These comparisons are directional, not exact equivalents.

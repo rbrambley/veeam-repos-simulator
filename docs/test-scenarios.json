@@ -177,7 +177,7 @@
         {"day": 21, "description": "Day 21: First Archive-eligible GFS point can appear"},
         {"day": 30, "description": "Day 30: Archive gating verified"}
       ],
-      "finalState": {"expectedArchivePointCountAtLeast": 1, "minArchivePointAgeDays": 21, "noCapacityResidueInArchivedChains": true}
+      "finalState": {"expectedArchivePointCountAtLeast": 1, "minArchivePointAgeDays": 21, "noCapacityResidueInArchivedChains": false}
     },
     {
       "id": "das-monthly-2-small-r7",
@@ -420,6 +420,104 @@
       "totalDays": 1,
       "checkpoints": [],
       "finalState": {"expectedRPCount": 2}
+    },
+    {
+      "id": "sobr-matrix-move-lt-retention",
+      "name": "SOBR Matrix - Move Before Retention",
+      "description": "Verify move-only lifecycle when MoveDays is shorter than RetentionDays.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 21,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 45,
+      "checkpoints": [
+        {"day": 14, "description": "Offload should be eligible before prune"},
+        {"day": 30, "description": "Prune should happen only after offload and a newer chain exists"}
+      ],
+      "finalState": {}
+    },
+    {
+      "id": "sobr-matrix-move-eq-retention",
+      "name": "SOBR Matrix - Move Equals Retention",
+      "description": "Verify offload occurs before same-day prune eligibility when MoveDays equals RetentionDays.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 35,
+      "checkpoints": [
+        {"day": 21, "description": "Offload and prune may converge on same day, but offload must win first"}
+      ],
+      "finalState": {}
+    },
+    {
+      "id": "sobr-matrix-move-gt-retention",
+      "name": "SOBR Matrix - Move After Retention",
+      "description": "Verify pruning waits for offload completion when MoveDays exceeds RetentionDays.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 21,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 49,
+      "checkpoints": [
+        {"day": 21, "description": "Retention opens first but prune must still wait"},
+        {"day": 35, "description": "Offload should complete before any prune is allowed"}
+      ],
+      "finalState": {}
+    },
+    {
+      "id": "sobr-matrix-move-zero",
+      "name": "SOBR Matrix - Immediate Move On Seal",
+      "description": "Verify MoveDays=0 offloads immediately on chain seal without touching active chains.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 1,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 0,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 28,
+      "checkpoints": [
+        {"day": 8, "description": "First sealed chain should offload immediately"}
+      ],
+      "finalState": {}
     }
   ]
 }

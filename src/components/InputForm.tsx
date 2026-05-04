@@ -25,6 +25,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const existingSobr = simState.repositories[0]?.sobrConfig;
   const [sobrOffloadDays, setSobrOffloadDays] = useState(existingSobr?.offloadAfterDays ?? 14);
   const [sobrArchiveDays, setSobrArchiveDays] = useState(existingSobr?.archiveAfterDays ?? 90);
+  const [sobrGenerationPeriodDays, setSobrGenerationPeriodDays] = useState(existingSobr?.generationPeriodDays ?? 10);
+  const [sobrPerformanceImmutabilityDays, setSobrPerformanceImmutabilityDays] = useState(existingSobr?.performanceImmutabilityDays ?? 7);
+  const [sobrCapacityImmutabilityDays, setSobrCapacityImmutabilityDays] = useState(existingSobr?.capacityImmutabilityDays ?? 0);
+  const [sobrArchiveImmutabilityDays, setSobrArchiveImmutabilityDays] = useState(existingSobr?.archiveImmutabilityDays ?? 0);
   const [sobrHasArchive, setSobrHasArchive] = useState(existingSobr?.hasArchiveTier ?? false);
   const [sobrCopyEnabled, setSobrCopyEnabled] = useState(existingSobr?.copyEnabled ?? false);
   const [sobrMoveEnabled, setSobrMoveEnabled] = useState(existingSobr?.moveEnabled ?? true);
@@ -35,6 +39,29 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     width: '84px',
     textAlign: 'right',
     fontVariantNumeric: 'tabular-nums',
+  };
+
+  const tooltipHintStyle: React.CSSProperties = {
+    cursor: 'help',
+    borderBottom: '1px dotted #607d8b',
+    color: '#455a64',
+    fontSize: '0.74rem',
+  };
+
+  const tooltipBadgeStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '16px',
+    height: '16px',
+    borderRadius: '50%',
+    background: '#e3f2fd',
+    border: '1px solid #90caf9',
+    color: '#1565c0',
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    lineHeight: 1,
+    cursor: 'help',
   };
 
   const computeGfsStatsAtYear = (yearOffset: number) => {
@@ -59,6 +86,19 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     });
 
     return stats;
+  };
+
+  const computeMoveLifecycleWindows = (elapsedDays: number, retentionDays: number, offloadDays: number) => {
+    const moveGateDays = offloadDays + sobrPerformanceImmutabilityDays;
+    const generationAlignedGateDays = Math.ceil(moveGateDays / Math.max(1, sobrGenerationPeriodDays)) * sobrGenerationPeriodDays;
+    // Performance pruning can only happen after move gate and next-chain sequencing.
+    const performanceWindowDays = Math.max(fullIntervalDays, generationAlignedGateDays + fullIntervalDays);
+    // Capacity accumulates GENs that passed move gate but are still before DeleteOn.
+    const capacityAccumulationDays = Math.max(0, elapsedDays - generationAlignedGateDays + 1);
+    return {
+      performanceWindowDays,
+      capacityAccumulationDays,
+    };
   };
 
   // ── Calculated capacity requirements (derived from scenario inputs) ───────────
@@ -148,12 +188,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
         yearArchUsedTB = yearGfsStats.additionalArchFullTB;
       }
     } else {
-      // Move-only: Perf Tier holds at most one full interval before points are offloaded.
-      const perfDays = Math.min(sobrOffloadDays, fullIntervalDays);
-      yearPerfUsedTB = estimateTierChainDataForYearTB(perfDays) + yearGfsStats.additionalPerfFullTB;
-
-      const capDays = Math.max(0, retention - sobrOffloadDays);
-      yearCapUsedTB = estimateTierChainDataForYearTB(capDays) + yearGfsStats.additionalCapFullTB;
+      const elapsedDays = year * 365;
+      const windows = computeMoveLifecycleWindows(elapsedDays, retention, sobrOffloadDays);
+      yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
+      yearCapUsedTB = estimateTierChainDataForYearTB(windows.capacityAccumulationDays) + yearGfsStats.additionalCapFullTB;
 
       if (sobrHasArchive) {
         yearArchUsedTB = yearGfsStats.additionalArchFullTB;
@@ -214,6 +252,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             archiveCapacityTB: calcArchTB,
             offloadAfterDays: sobrOffloadDays,
             archiveAfterDays: sobrArchiveDays,
+            generationPeriodDays: sobrGenerationPeriodDays,
+            performanceImmutabilityDays: sobrPerformanceImmutabilityDays,
+            capacityImmutabilityDays: sobrCapacityImmutabilityDays,
+            archiveImmutabilityDays: sobrArchiveImmutabilityDays,
             hasArchiveTier: sobrHasArchive,
             copyEnabled: effectiveCopyEnabled,
             moveEnabled: effectiveMoveEnabled,
@@ -334,15 +376,38 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               <label>Offload after (d):
                 <input type="number" value={sobrOffloadDays} min={1} onChange={e => setSobrOffloadDays(Number(e.target.value))} style={compactNumberInputStyle} />
               </label>
+              <label>GEN period (d):
+                <input type="number" value={sobrGenerationPeriodDays} min={1} onChange={e => setSobrGenerationPeriodDays(Number(e.target.value))} style={compactNumberInputStyle} />
+              </label>
+              <label>Perf immutability (d):
+                <input type="number" value={sobrPerformanceImmutabilityDays} min={0} onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))} style={compactNumberInputStyle} />
+              </label>
+              <label>Capacity immutability (d):
+                <input type="number" value={sobrCapacityImmutabilityDays} min={0} onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))} style={compactNumberInputStyle} />
+              </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <input type="checkbox" checked={sobrHasArchive} onChange={e => setSobrHasArchive(e.target.checked)} />
                 Enable Archive Tier
               </label>
               {sobrHasArchive && (
-                <label>Archive after (d):
-                  <input type="number" value={sobrArchiveDays} min={1} onChange={e => setSobrArchiveDays(Number(e.target.value))} style={compactNumberInputStyle} />
-                </label>
+                <>
+                  <label>Archive after (d):
+                    <input type="number" value={sobrArchiveDays} min={1} onChange={e => setSobrArchiveDays(Number(e.target.value))} style={compactNumberInputStyle} />
+                  </label>
+                  <label>Archive immutability (d):
+                    <input type="number" value={sobrArchiveImmutabilityDays} min={0} onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))} style={compactNumberInputStyle} />
+                  </label>
+                </>
               )}
+              <div style={{ marginTop: '0.55rem' }}>
+                <span
+                  style={tooltipBadgeStyle}
+                  title="GEN period defines fixed object-generation windows (default 10 days). Performance immutability delays move/prune eligibility for sealed chains. Capacity and Archive immutability extend how long a GEN must stay before delete is allowed after DeleteOn is reached."
+                  aria-label="GEN timing notes"
+                >
+                  ?
+                </span>
+              </div>
               </div>
             </div>
           )}
@@ -400,14 +465,15 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
           borderRadius: '6px', padding: '1rem',
           alignSelf: 'flex-start', position: 'sticky', top: '1rem',
         }}>
-          <div style={{ fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '0.6rem', color: '#1a237e' }}>
+          <div style={{ fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '0.6rem', color: '#1a237e', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
             📐 Calculated Capacity Requirements
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.8rem' }}>
-            Annual view with {annualGrowthRate}% growth. Working space = 7 × daily incremental.
-            {clampedForecast > 5
-              ? ` Years 1–4 shown plus forecast year ${clampedForecast} (★ = applied capacity).`
-              : ` Showing Year 1 to Year ${visibleYears}${clampedForecast >= 1 ? ` (★ Year ${clampedForecast} = applied capacity).` : '.'}`}
+            <span
+              style={tooltipBadgeStyle}
+              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${clampedForecast > 5 ? `Years 1-4 plus year ${clampedForecast} are shown.` : `Years 1-${visibleYears} are shown.`} ★ marks the applied forecast year.`}
+              aria-label="Capacity assumptions"
+            >
+              ?
+            </span>
           </div>
 
           <div style={{ overflowX: 'auto', paddingBottom: '0.2rem' }}>
@@ -442,7 +508,16 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   ))}
                 </tr>
                 <tr>
-                  <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>Working Space (tiered)</td>
+                  <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>
+                    Working Space (tiered){' '}
+                    <span
+                      style={tooltipBadgeStyle}
+                      title="Working Space uses the Veeam progressive tiered scale on initial source TB (<10 x1.05, 10-20 x0.66, 20-100 x0.40, 100-500 x0.25, >500 x0.10, then x50% compression). Planned Capacity includes working space. SOBR tier rows are planning recommendations, not live utilization."
+                      aria-label="Working-space details"
+                    >
+                      ?
+                    </span>
+                  </td>
                   {yearlyRequirements.map(row => (
                     <td key={`working-space-needed-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.workingSpaceNeededTB)}</td>
                   ))}
@@ -510,9 +585,17 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </table>
           </div>
 
-          <div style={{ marginTop: '0.8rem', fontSize: '0.75rem', color: '#888', fontStyle: 'italic' }}>
-            Working Space = Veeam progressive tiered scale on initial source TB (&lt;10 TB &times;1.05, 10&ndash;20 &times;0.66, 20&ndash;100 &times;0.40, 100&ndash;500 &times;0.25, &gt;500 &times;0.10, &times;50% compression). Planned Capacity includes working space. SOBR tier rows show recommended tier sizes for planning, not current tier usage.
-          </div>
+          {repoType === 'SOBR' && !effectiveCopyEnabled && effectiveMoveEnabled && (
+            <div style={{ marginTop: '0.55rem' }}>
+              <span
+                style={{ ...tooltipBadgeStyle, background: '#fff3e0', border: '1px solid #ffcc80', color: '#5d4037' }}
+                title="Move-only lifecycle assumption: sealed chains offload when newest point age reaches the offload threshold, then remain in Capacity until a newer chain exists and the oldest point reaches retention. This increases planned Capacity versus the older simplified window model."
+                aria-label="Move-only lifecycle note"
+              >
+                ?
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

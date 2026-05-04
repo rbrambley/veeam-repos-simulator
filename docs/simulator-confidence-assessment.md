@@ -2,7 +2,11 @@
 
 **Audience:** Veeam SEs evaluating whether to use the simulator in place of the Veeam Calculator.
 **Last updated:** 2026-05-04
-**Baseline version:** `compare:veeam` result 14/17 scenarios passing.
+**Baseline version:** `compare:veeam` against live calculator captures, and `compare:model` against lifecycle-aligned internal expectations.
+
+**Baseline note:**
+- [docs/veeam-calculator-baseline.json](docs/veeam-calculator-baseline.json) stores live-captured Veeam Calculator expectations.
+- [docs/veeam-model-baseline.json](docs/veeam-model-baseline.json) stores the simulator's lifecycle-aligned internal baseline after the 2026-05-04 offload/prune update.
 
 ---
 
