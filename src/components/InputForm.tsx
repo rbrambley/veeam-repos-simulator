@@ -22,11 +22,12 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const [gfsYearly, setGfsYearly] = useState(simState.jobs[0]?.gfsPolicy?.yearly || 0);
   const [startDate, setStartDate] = useState(simState.date);
   // SOBR config (policy inputs only — capacity is calculated)
-  const existingSobr = simState.repositories[0]?.sobrConfig;
+  const existingRepo = simState.repositories[0];
+  const existingSobr = existingRepo?.sobrConfig;
   const [sobrOffloadDays, setSobrOffloadDays] = useState(existingSobr?.offloadAfterDays ?? 14);
   const [sobrArchiveDays, setSobrArchiveDays] = useState(existingSobr?.archiveAfterDays ?? 90);
   const [sobrGenerationPeriodDays, setSobrGenerationPeriodDays] = useState(existingSobr?.generationPeriodDays ?? 10);
-  const [sobrPerformanceImmutabilityDays, setSobrPerformanceImmutabilityDays] = useState(existingSobr?.performanceImmutabilityDays ?? 7);
+  const [sobrPerformanceImmutabilityDays, setSobrPerformanceImmutabilityDays] = useState(existingSobr?.performanceImmutabilityDays ?? existingRepo?.immutabilityDays ?? 7);
   const [sobrCapacityImmutabilityDays, setSobrCapacityImmutabilityDays] = useState(existingSobr?.capacityImmutabilityDays ?? 0);
   const [sobrArchiveImmutabilityDays, setSobrArchiveImmutabilityDays] = useState(existingSobr?.archiveImmutabilityDays ?? 0);
   const [sobrHasArchive, setSobrHasArchive] = useState(existingSobr?.hasArchiveTier ?? false);
@@ -34,6 +35,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const [sobrMoveEnabled, setSobrMoveEnabled] = useState(existingSobr?.moveEnabled ?? true);
   const effectiveCopyEnabled = sobrCopyEnabled;
   const effectiveMoveEnabled = sobrMoveEnabled || !sobrCopyEnabled;
+  const supportsTieredImmutability = repoType === 'SOBR';
+  const supportsArchiveImmutability = repoType === 'SOBR' && sobrHasArchive;
 
   const compactNumberInputStyle: React.CSSProperties = {
     width: '84px',
@@ -246,6 +249,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
           name: repoName,
           type: repoType,
           capacityTB: calcRepoCapTB,
+          immutabilityDays: repoType === 'SOBR' ? undefined : Math.max(0, sobrPerformanceImmutabilityDays),
+          isImmutable: repoType === 'SOBR' ? undefined : sobrPerformanceImmutabilityDays > 0,
           sobrConfig: repoType === 'SOBR' ? {
             performanceCapacityTB: calcPerfTB,
             capacityCapacityTB: calcCapTB,
@@ -340,6 +345,57 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </label>
             </div>
           </div>
+          <div className="form-card">
+            <div className="form-card-header">Immutability Policy</div>
+            <div className="form-card-body">
+              <label>
+                Primary / Performance immutability (d):
+                <input
+                  type="number"
+                  value={sobrPerformanceImmutabilityDays}
+                  min={0}
+                  onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))}
+                  style={compactNumberInputStyle}
+                />
+              </label>
+              <label>
+                Capacity immutability (d):
+                <input
+                  type="number"
+                  value={sobrCapacityImmutabilityDays}
+                  min={0}
+                  disabled={!supportsTieredImmutability}
+                  onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))}
+                  style={{ ...compactNumberInputStyle, opacity: supportsTieredImmutability ? 1 : 0.55 }}
+                />
+              </label>
+              <label>
+                Archive immutability (d):
+                <input
+                  type="number"
+                  value={sobrArchiveImmutabilityDays}
+                  min={0}
+                  disabled={!supportsArchiveImmutability}
+                  onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))}
+                  style={{ ...compactNumberInputStyle, opacity: supportsArchiveImmutability ? 1 : 0.55 }}
+                />
+              </label>
+              <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '0.45rem' }}>
+                {repoType === 'SOBR'
+                  ? 'SOBR selected: all tier immutability controls are available based on enabled tiers.'
+                  : `${repoType} selected: primary immutability applies; Capacity/Archive controls are disabled.`}
+              </div>
+              <div style={{ marginTop: '0.45rem' }}>
+                <span
+                  style={tooltipBadgeStyle}
+                  title="Primary/Performance immutability delays generation delete eligibility. Capacity and Archive immutability are only applicable when using SOBR tiers."
+                  aria-label="Immutability policy notes"
+                >
+                  ?
+                </span>
+              </div>
+            </div>
+          </div>
           {repoType === 'SOBR' && (
             <div className="form-card">
               <div className="form-card-header">SOBR Tier Policy</div>
@@ -379,12 +435,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               <label>GEN period (d):
                 <input type="number" value={sobrGenerationPeriodDays} min={1} onChange={e => setSobrGenerationPeriodDays(Number(e.target.value))} style={compactNumberInputStyle} />
               </label>
-              <label>Perf immutability (d):
-                <input type="number" value={sobrPerformanceImmutabilityDays} min={0} onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))} style={compactNumberInputStyle} />
-              </label>
-              <label>Capacity immutability (d):
-                <input type="number" value={sobrCapacityImmutabilityDays} min={0} onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))} style={compactNumberInputStyle} />
-              </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <input type="checkbox" checked={sobrHasArchive} onChange={e => setSobrHasArchive(e.target.checked)} />
                 Enable Archive Tier
@@ -393,9 +443,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                 <>
                   <label>Archive after (d):
                     <input type="number" value={sobrArchiveDays} min={1} onChange={e => setSobrArchiveDays(Number(e.target.value))} style={compactNumberInputStyle} />
-                  </label>
-                  <label>Archive immutability (d):
-                    <input type="number" value={sobrArchiveImmutabilityDays} min={0} onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))} style={compactNumberInputStyle} />
                   </label>
                 </>
               )}

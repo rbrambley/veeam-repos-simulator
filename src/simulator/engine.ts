@@ -32,7 +32,11 @@ export class VeeamSimulator {
 
   private getTierImmutabilityDays(repo: Repository | undefined, tier: SOBRTier): number {
     const cfg = repo?.sobrConfig;
-    if (!cfg) return 0;
+    if (!cfg) {
+      // Non-SOBR repositories use repository-level immutability for their primary tier.
+      if (tier === 'Performance') return Math.max(0, repo?.immutabilityDays ?? 0);
+      return 0;
+    }
     if (tier === 'Performance') return Math.max(0, cfg.performanceImmutabilityDays ?? 0);
     if (tier === 'Capacity') return Math.max(0, cfg.capacityImmutabilityDays ?? 0);
     return Math.max(0, cfg.archiveImmutabilityDays ?? 0);

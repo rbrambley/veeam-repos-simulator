@@ -14,6 +14,7 @@ export interface Repository {
   name: string;
   type: RepositoryType;
   capacityTB: number;
+  immutabilityDays?: number;
   isImmutable?: boolean;
   supportsBlockClone?: boolean;
   supportsDirectToObject?: boolean;

@@ -138,6 +138,28 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     };
   }, [generationSnapshots]);
 
+  const immutabilitySummary = useMemo(() => {
+    const primaryJob = sim.state.jobs[0];
+    const primaryRepo = primaryJob
+      ? sim.state.repositories.find(r => r.id === primaryJob.repositoryId)
+      : sim.state.repositories[0];
+
+    if (!primaryRepo) return 'Immutability: Not configured';
+
+    if (primaryRepo.type === 'SOBR' && primaryRepo.sobrConfig) {
+      const perf = Math.max(0, primaryRepo.sobrConfig.performanceImmutabilityDays ?? 0);
+      const cap = Math.max(0, primaryRepo.sobrConfig.capacityImmutabilityDays ?? 0);
+      const archEnabled = !!primaryRepo.sobrConfig.hasArchiveTier;
+      const arch = Math.max(0, primaryRepo.sobrConfig.archiveImmutabilityDays ?? 0);
+      return archEnabled
+        ? `Immutability: Performance ${perf}d | Capacity ${cap}d | Archive ${arch}d`
+        : `Immutability: Performance ${perf}d | Capacity ${cap}d | Archive disabled`;
+    }
+
+    const primary = Math.max(0, primaryRepo.immutabilityDays ?? 0);
+    return `Immutability: Primary ${primary}d`;
+  }, [sim.state.jobs, sim.state.repositories]);
+
   const getGenerationStateStyle = (state: GenerationSnapshot['lifecycleState']) => {
     if (state === 'Deletable') {
       return { color: '#1b5e20', bg: '#e8f5e9' };
@@ -616,6 +638,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               </div>
               <div style={{ fontSize: '0.92rem', color: '#37474f', marginBottom: '0.45rem', lineHeight: '1.45' }}>
                 {policyInsight.title}
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: '0.35rem', fontWeight: 600 }}>
+                {immutabilitySummary}
               </div>
               {hasSobrRepo && (
                 <div style={{ marginBottom: '0.35rem' }}>
