@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-05-05T12:10:44.393Z",
+  "probeScenarioCount": 43,
+  "mutationCount": 5,
+  "caughtCount": 5,
+  "blindSpotCount": 0,
+  "status": "PASS",
+  "outcomes": [
+    {
+      "id": "M-01",
+      "description": "Skip chain deletion — applyRetentionAndGFS is a no-op; chains accumulate forever",
+      "targetMethod": "applyRetentionAndGFS",
+      "expectedCatchingRule": "R-DRIFT-01 (maxInactiveChainsAtAnyTime)",
+      "caught": true,
+      "catchResult": {
+        "scenarioId": "lb-das-gfs-preserves-chain",
+        "day": 21,
+        "date": "2026-05-23",
+        "rule": "R-GFS-01",
+        "message": "expected: weeklyGFS count ≤ 2 | actual: weeklyGFS count = 3"
+      }
+    },
+    {
+      "id": "M-02",
+      "description": "Skip GFS retention pruning — applyGFSRetention is a no-op; GFS tags accumulate",
+      "targetMethod": "applyGFSRetention",
+      "expectedCatchingRule": "R-GFS-03 (gfsWeeklyCountNeverExceedsLimit)",
+      "caught": true,
+      "catchResult": {
+        "scenarioId": "ti-sobr-move-3yr",
+        "day": 35,
+        "date": "2026-06-06",
+        "rule": "R-GFS-01",
+        "message": "expected: weeklyGFS count ≤ 4 | actual: weeklyGFS count = 5"
+      }
+    },
+    {
+      "id": "M-03",
+      "description": "Skip GFS tagging — tagGFSRestorePoint is a no-op; no GFS points ever created",
+      "targetMethod": "tagGFSRestorePoint",
+      "expectedCatchingRule": "PREDICTED BLIND SPOT (no minimum GFS count assertion)",
+      "caught": true,
+      "catchResult": {
+        "scenarioId": "ti-sobr-move-chain-rp-drift-3yr",
+        "day": 35,
+        "date": "2026-06-06",
+        "rule": "R-DRIFT-01",
+        "message": "expected: inactive chain count ≤ 4 | actual: inactive chain count = 5 (chains accumulating — engine not cleaning up)"
+      }
+    },
+    {
+      "id": "M-04",
+      "description": "Skip base promotion — promoteChainBases is a no-op; no isGlobalBase ever set",
+      "targetMethod": "promoteChainBases",
+      "expectedCatchingRule": "singleGlobalBasePerJobEveryDay",
+      "caught": true,
+      "catchResult": {
+        "scenarioId": "ti-das-3yr-gfs-wmy",
+        "day": 21,
+        "date": "2026-05-23",
+        "rule": "R-BASE-01",
+        "message": "expected: exactly 1 global base per job | actual: job job-ti-das-3yr-gfs-wmy has 0 global bases"
+      }
+    },
+    {
+      "id": "M-05",
+      "description": "Tag every restore point as weekly GFS (ignore day-of-week and type guards)",
+      "targetMethod": "tagGFSRestorePoint",
+      "expectedCatchingRule": "R-GFS-03 (gfsWeeklyCountNeverExceedsLimit)",
+      "caught": true,
+      "catchResult": {
+        "scenarioId": "ti-sobr-move-chain-rp-drift-3yr",
+        "day": 35,
+        "date": "2026-06-06",
+        "rule": "R-DRIFT-01",
+        "message": "expected: inactive chain count ≤ 4 | actual: inactive chain count = 5 (chains accumulating — engine not cleaning up)"
+      }
+    }
+  ]
+}

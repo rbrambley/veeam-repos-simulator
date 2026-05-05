@@ -357,7 +357,12 @@
         "gfsYearlyCountNeverExceedsLimit": true,
         "gfsTagsOnlyOnFullOrSyntheticFull": true,
         "singleGlobalBasePerJobEveryDay": true,
-        "noActiveChainOffloadComplete": true
+        "noActiveChainOffloadComplete": true,
+        // R-DRIFT-01/02: detect chain + RP accumulation drift over 3 years
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 42,
+        // R-STOR-01: 3yr with 5% annual growth — peak ≈ 6.76 TB, buffer to 8.0
+        "maxFinalStorageTB": 8.0
       }
     },
 
@@ -483,7 +488,108 @@
         "singleGlobalBasePerJobEveryDay": true,
         "gfsWeeklyCountNeverExceedsLimit": true,
         "gfsMonthlyCountNeverExceedsLimit": true,
-        "gfsYearlyCountNeverExceedsLimit": true
+        "gfsYearlyCountNeverExceedsLimit": true,
+        // R-DRIFT-01/02: detect chain + RP accumulation drift over 5 years
+        // max = (2 × retention=14) + (weekly=4 + monthly=3 + yearly=2) = 37 + buffer
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 42,
+        // R-STOR-01: 5yr with 5% annual growth — peak ≈ 7.24 TB, buffer to 8.5
+        "maxFinalStorageTB": 8.5
+      }
+    },
+
+    {
+      "id": "ti-das-chain-rp-drift-3yr",
+      "layer": 2,
+      "name": "DAS 3-year drift: inactive chains and RP count never accumulate",
+      "description": "Over 3 years, assert every day that inactive chains never exceed 3 (steady-state max) and total restore points never exceed 42 (2×retention + GFS limits + buffer). Catches chain cleanup failures and pruning regressions that only manifest over long horizons.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-GFS-01", "R-GFS-03", "R-BASE-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 42,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "slaMinimumNeverViolated": true
+      }
+    },
+
+    {
+      "id": "ti-sobr-move-chain-rp-drift-3yr",
+      "layer": 2,
+      "name": "SOBR Move 3-year drift: inactive chains and RP count never accumulate",
+      "description": "Over 3 years with SOBR Move mode, assert that inactive chains never exceed 4 (offload + immutability extend chain lifetime but should still plateau) and total restore points never exceed 78 (2×retention=30 + GFS limits + buffer). Detects SOBR-specific chain lifecycle failures over extended runs.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-GFS-01", "R-GFS-03", "R-BASE-01", "R-PRUNE-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 4,
+        "maxRestorePointsAtAnyTime": 78,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "pruneNeverBeforeOffload": true,
+        "noPerfDataAfterPrune": true,
+        "noActiveChainOffloadComplete": true
+      }
+    },
+
+    {
+      "id": "ti-das-high-retention-drift-3yr",
+      "layer": 2,
+      "name": "DAS high-retention 3-year drift: retention=30 with full GFS never accumulates",
+      "description": "Higher retention (30 days) with full W+M+Y GFS over 3 years. Max inactive chains ≤ 3, max restore points ≤ 75 (2×30 + 9 + buffer). Validates that the engine scales correctly with larger retention windows without drift.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-GFS-01", "R-GFS-03", "R-GFS-05", "R-RET-03"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 75,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "slaMinimumNeverViolated": true
       }
     },
 
@@ -1008,6 +1114,172 @@
         "gfsYearlyCountNeverExceedsLimit": true,
         "pruneNeverBeforeOffload": true,
         "noActiveChainOffloadComplete": true
+      }
+    },
+
+    {
+      "id": "ix-high-change-rate-drift-2yr",
+      "layer": 3,
+      "name": "High change-rate adversarial: 40% daily delta over 2 years",
+      "description": "Stress scenario with extreme daily churn (40%) to catch storage or pruning behavior that appears stable at 5% but fails under heavy write amplification.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-STOR-01", "R-GFS-01", "R-BASE-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 40,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 1},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 730,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 37,
+        "maxFinalStorageTB": 11.0,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true
+      }
+    },
+
+    {
+      "id": "ix-short-retention-drift-3yr",
+      "layer": 3,
+      "name": "Short retention adversarial: retention=3 over 3 years",
+      "description": "Very short retention with GFS enabled to stress frequent chain sealing/deletion. Ensures cleanup remains stable and restore points do not accumulate over long duration.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-RET-01", "R-GFS-04", "R-GFS-05"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 3,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 1},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 14,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "chainDeletionRequiresAllGensUnlocked": true
+      }
+    },
+
+    {
+      "id": "ix-policy-change-mid-run",
+      "layer": 3,
+      "name": "Mid-run policy change: retention 7 → 30 on day 180",
+      "description": "Retention is expanded from 7 to 30 restore points partway through a 365-day run. Validates that the engine correctly grows the active chain toward the new limit, that old chains are not orphaned, and that GFS cardinality stays within limits throughout the transition.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-RET-01", "R-GFS-04", "R-GFS-05"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 365,
+      "policyChanges": [
+        { "onDay": 180, "newRetention": 30 }
+      ],
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 50,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true
+      }
+    },
+
+    {
+      "id": "ix-gfs-only-policy",
+      "layer": 3,
+      "name": "GFS-only policy: weekly=52 with minimal daily retention",
+      "description": "Stress test where daily retention is set to 1 (near-zero daily RPs) while weekly GFS keeps 52 weeks. After 2 years the engine should hold exactly 52 weekly GFS snapshots and no more. Validates GFS dominance over retention-based pruning.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-GFS-03", "R-GFS-04", "R-GFS-05"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 1,
+        "gfsPolicy": {"weekly": 52, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 730,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 3,
+        "maxRestorePointsAtAnyTime": 60,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true
+      }
+    },
+
+    {
+      "id": "ix-two-jobs-one-repo",
+      "layer": 3,
+      "name": "Two jobs sharing one repository",
+      "description": "Two independent backup jobs (different retention and GFS policies) write to the same DAS repository. Validates that chains do not cross-contaminate between jobs, each job maintains its own global base, and storage accounts for both jobs. Checks that inactive chain drift stays bounded across both job lifecycles.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-BASE-01", "R-RET-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 2, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "extraJobs": [
+        {
+          "repositoryType": "DAS",
+          "sourceDataTB": 0.5,
+          "dailyChangeRatePct": 5,
+          "annualGrowthRatePct": 0,
+          "retention": 7,
+          "gfsPolicy": {"weekly": 2, "monthly": 1, "yearly": 0},
+          "offloadAfterDays": 7,
+          "archiveAfterDays": 30,
+          "hasArchiveTier": false,
+          "copyEnabled": false,
+          "moveEnabled": false
+        }
+      ],
+      "totalDays": 400,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 4,
+        "maxRestorePointsAtAnyTime": 80,
+        "singleGlobalBasePerJobEveryDay": true
       }
     },
 

@@ -16,7 +16,11 @@
     "verify:known-veeam-deltas": "tsx src/testing/verifyKnownCalculatorDeltas.ts",
     "compare:model": "tsx src/testing/veeamBaselineComparator.ts --baseline model",
     "capture:veeam": "tsx src/testing/veeamCaptureGuide.ts",
-    "test:lifecycle": "tsx src/testing/lifecycleRunner.ts"
+    "test:lifecycle": "tsx src/testing/lifecycleRunner.ts",
+    "test:mutation": "tsx src/testing/mutationRunner.ts",
+    "test:quality": "tsx src/testing/qualityRunner.ts",
+    "test:quality:update-snapshots": "tsx src/testing/qualityRunner.ts --update-snapshots",
+    "test:all": "npm run test:quality"
   },
   "dependencies": {
     "react": "^18.0.0",

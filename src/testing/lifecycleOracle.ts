@@ -703,6 +703,19 @@ export interface DailyAssertionConfig {
   noArchivePointBeforePointAge?: number;    // value = min point age in days
   noArchivePointBeforeCapTierAge?: number;  // value = min cap-tier age in days
   slaMinimumNeverViolated?: boolean;
+  /**
+   * R-DRIFT-01: inactive chain count must never exceed this value.
+   * In steady state a job should have at most 2 inactive chains at any time
+   * (the just-sealed outgoing chain + at most one waiting for SLA expiry).
+   * Exceeding this signals the engine is failing to clean up old chains.
+   */
+  maxInactiveChainsAtAnyTime?: number;
+  /**
+   * R-DRIFT-02: total restore-point count must never exceed this value.
+   * Theoretical max = (2 × retention) + (gfsWeekly + gfsMonthly + gfsYearly limits).
+   * Exceeding this signals restore points are accumulating and not being pruned.
+   */
+  maxRestorePointsAtAnyTime?: number;
 }
 
 export function runDailyChecks(
@@ -759,6 +772,24 @@ export function runDailyChecks(
 
   if (cfg.slaMinimumNeverViolated && deletedChainIds.size > 0)
     violations.push(...checkSlaMinimumNeverViolated(state, day, slaDays, deletedChainIds, deletedChainNewestPointDates));
+
+  if (typeof cfg.maxInactiveChainsAtAnyTime === 'number') {
+    const inactiveCount = state.chains.filter((c) => c.status === 'Inactive').length;
+    if (inactiveCount > cfg.maxInactiveChainsAtAnyTime) {
+      violations.push(v(day, state.date, 'R-DRIFT-01',
+        `inactive chain count ≤ ${cfg.maxInactiveChainsAtAnyTime}`,
+        `inactive chain count = ${inactiveCount} (chains accumulating — engine not cleaning up)`));
+    }
+  }
+
+  if (typeof cfg.maxRestorePointsAtAnyTime === 'number') {
+    const rpCount = state.restorePoints.length;
+    if (rpCount > cfg.maxRestorePointsAtAnyTime) {
+      violations.push(v(day, state.date, 'R-DRIFT-02',
+        `restore point count ≤ ${cfg.maxRestorePointsAtAnyTime}`,
+        `restore point count = ${rpCount} (restore points accumulating — pruning may have broken)`));
+    }
+  }
 
   return violations;
 }

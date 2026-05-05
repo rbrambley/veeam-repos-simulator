@@ -7,9 +7,10 @@
  *
  * Usage:  npx tsx src/testing/lifecycleRunner.ts
  *         npx tsx src/testing/lifecycleRunner.ts <scenario-id>   (run one)
+ *         npx tsx src/testing/lifecycleRunner.ts --update-snapshots
  */
 
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { VeeamSimulator } from '../simulator/engine.ts';
 import type {
@@ -32,6 +33,10 @@ import {
   monthlyGfsDates,
   yearlyGfsDates,
 } from './lifecycleOracle.ts';
+import {
+  GoldenSnapshotManager,
+  type GoldenSnapshotCheck,
+} from './goldenSnapshots.ts';
 
 // ---------------------------------------------------------------------------
 // Scenario JSON types
@@ -94,6 +99,10 @@ interface LifecycleScenario {
   assertions: ScenarioAssertions;
   /** If set, violations for the listed rules are treated as SKIP (known engine gap) */
   knownEngineGaps?: string[];
+  /** Mid-run policy changes: applied to the job before sim.nextDay() on the given day */
+  policyChanges?: Array<{ onDay: number; newRetention: number }>;
+  /** Additional jobs that write to the same repository as the primary job */
+  extraJobs?: ScenarioConfig[];
 }
 
 // ---------------------------------------------------------------------------
@@ -149,9 +158,28 @@ function buildInitialState(sc: LifecycleScenario): SimulationState {
       : undefined,
   };
 
+  const extraJobObjects: BackupJob[] = (sc.extraJobs ?? []).map((ej, idx) => ({
+    id: `job${idx + 2}-${sc.id}`,
+    name: `Job${idx + 2}-${sc.id}`,
+    type: 'SyntheticFull',
+    repositoryId: repoId,
+    sourceDataTB: ej.sourceDataTB,
+    dailyChangeRatePct: ej.dailyChangeRatePct,
+    annualGrowthRatePct: ej.annualGrowthRatePct,
+    forecastYears: Math.ceil(sc.totalDays / 365) + 1,
+    schedule: { frequency: 'Daily', timeOfDay: '03:00', syntheticFullDay: 6 },
+    retention: {
+      restorePoints: ej.retention,
+      slaDays: ej.retention,
+    },
+    gfsPolicy: (ej.gfsPolicy.weekly + ej.gfsPolicy.monthly + ej.gfsPolicy.yearly) > 0
+      ? ej.gfsPolicy
+      : undefined,
+  }));
+
   return {
     repositories: [repository],
-    jobs: [job],
+    jobs: [job, ...extraJobObjects],
     chains: [],
     generations: [],
     restorePoints: [],
@@ -176,6 +204,34 @@ interface RunResult {
   durationMs: number;
   expectedLifecycle: ExpectedLifecycle;
   actualLifecycle: ActualLifecycle;
+  goldenSnapshotChecks: GoldenSnapshotCheck[];
+}
+
+interface MutationCatchResult {
+  scenarioId: string;
+  day: number;
+  date: string;
+  rule: string;
+  message: string;
+}
+
+interface MutationOutcome {
+  id: string;
+  description: string;
+  targetMethod: string;
+  expectedCatchingRule: string;
+  caught: boolean;
+  catchResult: MutationCatchResult | null;
+}
+
+interface MutationReport {
+  generatedAt: string;
+  probeScenarioCount: number;
+  mutationCount: number;
+  caughtCount: number;
+  blindSpotCount: number;
+  status: 'PASS' | 'FAIL';
+  outcomes: MutationOutcome[];
 }
 
 interface ExpectedLifecycle {
@@ -267,28 +323,37 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   }
 
   // ── Storage estimate ─────────────────────────────────────────────────────
-  // Engine uses: Full = sourceTB × 0.5, SyntheticFull/Incremental = sourceTB × changeRate × 0.5
+  // Engine uses: Full = sourceTB × 0.5, SyntheticFull = same as Incremental until promoted as base.
+  // promoteChainBases() runs every day and inflates the OLDEST SyntheticFull (the global base)
+  // to full size. All other SyntheticFulls stay at incremental size.
+  //
+  // Steady-state peak (SLA overlap window, both chains coexist):
+  //   Inactive chain (holds the global base full):   fullSizeTB + (retention-1) × incrSizeTB
+  //   Active chain at peak (SF not yet base, so SF = incrSizeTB):  retention × incrSizeTB
   const cfg = sc.config;
   const compression = 0.5;
   const changeRate = (cfg.dailyChangeRatePct ?? 5) / 100;
   const sourceTB = cfg.sourceDataTB ?? 1;
   const fullSizeTB = sourceTB * compression;
   const incrSizeTB = sourceTB * changeRate * compression;
-  // Steady-state: 1 active chain has 1 SyntheticFull + up to (retention-1) incrementals
-  // plus at most 1 older inactive chain waiting for SLA expiry
-  const activeChainTB = fullSizeTB + (cfg.retention - 1) * incrSizeTB;
+  // Inactive chain: SF promoted to base full size + (retention-1) incrementals
+  const inactiveChainTB = fullSizeTB + (cfg.retention - 1) * incrSizeTB;
+  // Active chain at peak just before SyntheticFull day:
+  //   SF is still at incremental size + (retention-1) incrementals
+  const activeChainPeakTB = cfg.retention * incrSizeTB;
   const gfsPointCount = gfs.weekly + gfs.monthly + gfs.yearly;
-  const gfsTB = gfsPointCount * fullSizeTB; // GFS are full-sized
+  const gfsTB = gfsPointCount * fullSizeTB; // GFS points are always base fulls (full size)
   // Copy mode keeps data in both perf and capacity tiers
   const tierMultiplier = cfg.copyEnabled ? 2 : 1;
-  const expectedMaxStorageTB = (activeChainTB * tierMultiplier) + gfsTB;
+  const expectedMaxStorageTB = ((inactiveChainTB + activeChainPeakTB) * tierMultiplier) + gfsTB;
   const workingSpaceReserveTB = computeVeeamWorkingSpaceTB(sourceTB);
 
   const storageSummary: string[] = [];
   storageSummary.push(`Source data: ${sourceTB} TB → compressed full backup ≈ ${fullSizeTB.toFixed(3)} TB`);
   storageSummary.push(`Incremental size ≈ ${incrSizeTB.toFixed(3)} TB (${cfg.dailyChangeRatePct}% daily change)`);
-  storageSummary.push(`Steady-state active chain ≈ ${activeChainTB.toFixed(3)} TB (1 SF + ${cfg.retention - 1} incr)`);
-  if (gfsPointCount > 0) storageSummary.push(`GFS long-term points: ${gfsPointCount} × ${fullSizeTB.toFixed(3)} TB ≈ ${gfsTB.toFixed(3)} TB`);
+  storageSummary.push(`Inactive chain (global base full + incrementals) ≈ ${inactiveChainTB.toFixed(3)} TB (SF promoted to ${fullSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr)`);
+  storageSummary.push(`Active chain at peak ≈ ${activeChainPeakTB.toFixed(3)} TB (SF at incr size ${incrSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr, base not yet promoted)`);
+  if (gfsPointCount > 0) storageSummary.push(`GFS long-term points: ${gfsPointCount} × ${fullSizeTB.toFixed(3)} TB ≈ ${gfsTB.toFixed(3)} TB (GFS are always base fulls)`);
   if (cfg.copyEnabled) storageSummary.push(`Copy mode: data occupies both Performance and Capacity tiers (×2)`);
   storageSummary.push(`Estimated max total storage ≈ ${expectedMaxStorageTB.toFixed(3)} TB`);
   storageSummary.push(`Veeam working space reserve ≈ ${workingSpaceReserveTB.toFixed(3)} TB`);
@@ -361,7 +426,7 @@ function buildActualPath(finalSnapshot: DailySnapshot, cfg: ScenarioConfig): str
   return 'Active (no offload observed)';
 }
 
-function runScenario(sc: LifecycleScenario): RunResult {
+function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManager): RunResult {
   const startMs = Date.now();
   const violations: ViolationReport[] = [];
   const cfg = sc.config;
@@ -408,6 +473,24 @@ function runScenario(sc: LifecycleScenario): RunResult {
   }
 
   for (let day = 1; day <= sc.totalDays; day++) {
+    // Apply any mid-run policy changes before this tick
+    if (sc.policyChanges) {
+      for (const pc of sc.policyChanges) {
+        if (day === pc.onDay) {
+          const job = sim.state.jobs.find((j) => j.id === `job-${sc.id}`);
+          if (job) {
+            job.retention.restorePoints = pc.newRetention;
+            job.retention.slaDays = pc.newRetention;
+            milestones.push({
+              day,
+              date: addDaysSimple(START_DATE, day),
+              text: `Policy change applied: retention changed to ${pc.newRetention} restore points on day ${day}`,
+            });
+          }
+        }
+      }
+    }
+
     // Detect chains deleted this tick (before advancing)
     const prevChainMap = new Map(
       sim.state.chains.map((c) => [c.id, c])
@@ -635,6 +718,17 @@ function runScenario(sc: LifecycleScenario): RunResult {
   );
   const finalSnapshot = allSnapshots[allSnapshots.length - 1] ?? snapshotFromState(0, START_DATE, sim.state, sim);
 
+  const goldenResult = goldenSnapshots.evaluateScenario(sc.id, sc.totalDays, allSnapshots);
+  for (const gv of goldenResult.violations) {
+    violations.push({
+      day: gv.day,
+      date: gv.date,
+      violatedRule: 'R-SNAP-01',
+      expected: gv.expected,
+      actual: gv.actual,
+    });
+  }
+
   // ── Storage assertions (end-of-run) ──────────────────────────────────────
   const finalStorageTB = finalSnapshot.totalStorageTB;
   if (assertions.maxFinalStorageTB !== undefined) {
@@ -692,6 +786,7 @@ function runScenario(sc: LifecycleScenario): RunResult {
     durationMs: Date.now() - startMs,
     expectedLifecycle,
     actualLifecycle,
+    goldenSnapshotChecks: goldenResult.checks,
   };
 }
 
@@ -707,6 +802,8 @@ function addDaysSimple(isoDate: string, n: number): string {
 // ---------------------------------------------------------------------------
 
 const RULE_DESCRIPTIONS: Record<string, string> = {
+  'R-DRIFT-01': 'Inactive chain count remains bounded in long-run steady state',
+  'R-DRIFT-02': 'Total restore-point count remains bounded in long-run steady state',
   'R-RET-01': 'Chain deletion only after all GENs are unlocked',
   'R-RET-02': 'SLA window extends chain lifetime past retention count',
   'R-RET-03': 'GFS tags extend chain lifetime indefinitely',
@@ -733,6 +830,7 @@ const RULE_DESCRIPTIONS: Record<string, string> = {
   'R-IMM-01': 'No Performance data deleted while Performance tier immutable',
   'R-IMM-02': 'No chain deleted while Capacity tier immutable',
   'R-IMM-03': 'No chain deleted while Archive tier immutable',
+  'R-SNAP-01': 'Golden snapshot state (day 365/730) matches approved baseline',
 };
 
 const LAYER_INFO: Record<number, { name: string; description: string }> = {
@@ -795,10 +893,22 @@ function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function readMutationReport(): MutationReport | null {
+  const path = join(process.cwd(), 'docs', 'mutation-report.json');
+  if (!existsSync(path)) return null;
+  try {
+    const raw = readFileSync(path, 'utf8');
+    return JSON.parse(raw) as MutationReport;
+  } catch {
+    return null;
+  }
+}
+
 function writeHtmlReport(
   scenarios: LifecycleScenario[],
   results: RunResult[],
-  outputPath: string
+  outputPath: string,
+  mutationReport: MutationReport | null
 ): void {
   const timestamp = new Date().toLocaleString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -819,6 +929,42 @@ function writeHtmlReport(
     : failed <= 2
     ? 'Most contract rules validated. Review failures before trusting simulator output.'
     : 'Significant failures detected. Simulator output should not be relied upon until failures are resolved.';
+
+  const mutationSection = mutationReport
+    ? `<div id="section-mutations" class="coverage-section" style="margin-bottom:20px;">
+  <h2>Mutation Testing Status</h2>
+  <p>
+    Generated ${esc(new Date(mutationReport.generatedAt).toLocaleString('en-US'))} ·
+    Probes: <strong>${mutationReport.probeScenarioCount}</strong> ·
+    Mutations: <strong>${mutationReport.mutationCount}</strong> ·
+    Caught: <strong>${mutationReport.caughtCount}</strong> ·
+    Blind spots: <strong>${mutationReport.blindSpotCount}</strong>
+  </p>
+  <table class="ctable">
+    <thead><tr><th>ID</th><th>Target</th><th>Description</th><th>Expected Catch</th><th>Observed</th><th>Status</th></tr></thead>
+    <tbody>
+      ${mutationReport.outcomes.map((o) => {
+        const status = o.caught ? 'CAUGHT' : 'BLIND SPOT';
+        const statusColor = o.caught ? '#1a7f37' : '#b91c1c';
+        const observed = o.catchResult
+          ? `${o.catchResult.scenarioId} · day ${o.catchResult.day} · ${o.catchResult.rule}`
+          : 'No violation observed';
+        return `<tr>
+          <td class="mono">${esc(o.id)}</td>
+          <td class="mono">${esc(o.targetMethod)}</td>
+          <td>${esc(o.description)}</td>
+          <td>${esc(o.expectedCatchingRule)}</td>
+          <td>${esc(observed)}</td>
+          <td><span class="status-badge small" style="background:${statusColor}">${status}</span></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+</div>`
+    : `<div id="section-mutations" class="coverage-section" style="margin-bottom:20px;">
+  <h2>Mutation Testing Status</h2>
+  <p>No mutation report found at <span class="mono">docs/mutation-report.json</span>. Run <span class="mono">npm run test:mutation</span> (or <span class="mono">npm run test:quality</span>) before generating this report.</p>
+</div>`;
 
   const resultMap = new Map(results.map((r) => [r.id, r]));
 
@@ -916,7 +1062,44 @@ function writeHtmlReport(
 
     const searchText = `${sc.id} ${sc.name} layer ${sc.layer} ${sc.rules.join(' ')} ${labels.join(' ')}`.toLowerCase();
 
-    return `<details class="sc-card" data-status="${status.toLowerCase()}" data-layer="${sc.layer}" data-id="${esc(sc.id)}" data-rules="${esc(sc.rules.join(' '))}" data-search="${esc(searchText)}" style="border-left:4px solid ${sc_color};background:${sc_bg}">
+    const goldenRows = result.goldenSnapshotChecks.map((chk) => {
+      const color = chk.status === 'match' ? '#166534' : chk.status === 'seeded' ? '#1d4ed8' : '#991b1b';
+      const label = chk.status === 'match' ? 'MATCH' : chk.status === 'seeded' ? 'SEEDED' : 'MISMATCH';
+      const baseline = chk.expected
+        ? `chain=${chk.expected.chainCount}, rp=${chk.expected.rpCount}, gfs=${chk.expected.gfsWeeklyCount}/${chk.expected.gfsMonthlyCount}/${chk.expected.gfsYearlyCount}, storage=${chk.expected.storageTB.toFixed(3)} TB`
+        : 'new baseline captured';
+      const actual = `chain=${chk.actual.chainCount}, rp=${chk.actual.rpCount}, gfs=${chk.actual.gfsWeeklyCount}/${chk.actual.gfsMonthlyCount}/${chk.actual.gfsYearlyCount}, storage=${chk.actual.storageTB.toFixed(3)} TB`;
+      const diff = chk.differences.length > 0 ? chk.differences.join('; ') : 'none';
+      return `<tr>
+        <td>${chk.day}</td>
+        <td class="mono">${esc(chk.date)}</td>
+        <td><span class="status-badge small" style="background:${color}">${label}</span></td>
+        <td>${esc(baseline)}</td>
+        <td>${esc(actual)}</td>
+        <td>${esc(diff)}</td>
+      </tr>`;
+    }).join('');
+
+    const goldenSection = result.goldenSnapshotChecks.length > 0
+      ? `<div class="timeline-block">
+          <h3>Golden Snapshots (Phase 2)</h3>
+          <table class="snap-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Baseline</th>
+                <th>Actual</th>
+                <th>Diff</th>
+              </tr>
+            </thead>
+            <tbody>${goldenRows}</tbody>
+          </table>
+        </div>`
+      : '';
+
+    return `<details id="sc-${esc(sc.id)}" class="sc-card" data-status="${status.toLowerCase()}" data-layer="${sc.layer}" data-id="${esc(sc.id)}" data-rules="${esc(sc.rules.join(' '))}" data-search="${esc(searchText)}" style="border-left:4px solid ${sc_color};background:${sc_bg}">
       <summary class="sc-head">
         <span class="sc-caret">▶</span>
         <span class="status-badge" style="background:${sc_color}">${status}</span>
@@ -978,6 +1161,8 @@ function writeHtmlReport(
           </table>
         </div>
 
+        ${goldenSection}
+
         ${detail}
       </div>
     </details>`;
@@ -989,7 +1174,7 @@ function writeHtmlReport(
     const lStats  = layerStats.find((s) => s.layer === l)!;
     const cards   = scenarios.filter((s) => s.layer === l).map(scenarioCard).join('\n');
     const lColor  = lStats.fail > 0 ? '#b91c1c' : lStats.skip > 0 ? '#b45309' : '#1a7f37';
-    return `<section class="layer-section">
+    return `<section id="section-layer-${l}" class="layer-section">
       <div class="layer-header" style="border-left:5px solid ${lColor}">
         <div>
           <h2>${esc(info.name)}</h2>
@@ -1024,13 +1209,92 @@ function writeHtmlReport(
     </tr>`;
   }).join('\n');
 
+  const coveredKnownRuleCount = allRules.filter((rule) => (ruleCoverage.get(rule)?.length ?? 0) > 0).length;
+  const uncoveredKnownRuleCount = allRules.length - coveredKnownRuleCount;
+
+  // ── Full HTML ────────────────────────────────────────────────────────────
+  // ── Findings dashboard computation ───────────────────────────────────────
+  type ActionItem = { severity: 'error' | 'warning' | 'info'; category: string; label: string; href: string; detail: string };
+  const actionItems: ActionItem[] = [];
+
+  for (const r of results.filter((r) => !r.passed)) {
+    actionItems.push({ severity: 'error', category: 'Test Failure', label: r.id, href: `#sc-${r.id}`, detail: `${r.violations.length} violation(s)` });
+  }
+  for (const r of results) {
+    for (const chk of r.goldenSnapshotChecks.filter((c) => c.status === 'mismatch')) {
+      actionItems.push({ severity: 'error', category: 'Snapshot Mismatch', label: `${r.id} · day ${chk.day}`, href: `#sc-${r.id}`, detail: chk.differences.join('; ') });
+    }
+  }
+  if (mutationReport) {
+    for (const o of mutationReport.outcomes.filter((o) => !o.caught)) {
+      actionItems.push({ severity: 'error', category: 'Mutation Blind Spot', label: o.id, href: '#section-mutations', detail: o.description });
+    }
+  }
+  for (const r of results.filter((r) => r.skipped)) {
+    actionItems.push({ severity: 'warning', category: 'Known Engine Gap', label: r.id, href: `#sc-${r.id}`, detail: (r.skippedRules ?? []).map((rule) => `${rule}: ${RULE_DESCRIPTIONS[rule] ?? rule}`).join(' · ') });
+  }
+  for (const rule of allRules.filter((rule) => (ruleCoverage.get(rule)?.length ?? 0) === 0)) {
+    actionItems.push({ severity: 'info', category: 'Uncovered Rule', label: rule, href: '#section-rule-coverage', detail: RULE_DESCRIPTIONS[rule] ?? '' });
+  }
+
+  const renderFindingGroup = (items: ActionItem[], title: string, color: string, bg: string, icon: string): string => {
+    if (items.length === 0) return '';
+    const rows = items.map((item) => `<tr>
+          <td><span class="finding-cat" style="background:${bg};color:${color}">${esc(item.category)}</span></td>
+          <td><a class="finding-link" href="${item.href}">${esc(item.label)}</a></td>
+          <td class="finding-detail">${esc(item.detail)}</td>
+        </tr>`).join('');
+    return `<div class="finding-group" style="border-left:4px solid ${color};background:${bg}">
+      <div class="finding-group-title">${icon}&nbsp;<strong>${esc(title)}</strong><span class="finding-count" style="background:${color}">${items.length}</span></div>
+      <table class="finding-table"><tbody>${rows}</tbody></table>
+    </div>`;
+  };
+
+  const errorItems = actionItems.filter((i) => i.severity === 'error');
+  const warnItems  = actionItems.filter((i) => i.severity === 'warning');
+  const infoItems  = actionItems.filter((i) => i.severity === 'info');
+
+  const dashboardHtml = actionItems.length === 0
+    ? `<div class="all-clear">&#10003;&nbsp;No findings &mdash; all scenarios passed, all snapshots match, all mutations caught. Simulator output can be trusted for the tested configuration space.</div>`
+    : `${renderFindingGroup(errorItems, 'Must Fix', '#991b1b', '#fff5f5', '&#128308;')}
+       ${renderFindingGroup(warnItems,  'Known Engine Gaps (tracked, not counted as failures)', '#92400e', '#fffbeb', '&#9888;')}
+       ${renderFindingGroup(infoItems,  'Coverage Gaps (informational)', '#374151', '#f9fafb', '&#8505;')}`;
+
+  // ── Golden snapshot overview ──────────────────────────────────────────────
+  const goldenOverviewRows = results
+    .filter((r) => r.goldenSnapshotChecks.length > 0)
+    .map((r) => {
+      const checksHtml = r.goldenSnapshotChecks.map((chk) => {
+        const color = chk.status === 'match' ? '#166534' : chk.status === 'seeded' ? '#1d4ed8' : '#991b1b';
+        const label = chk.status === 'match' ? 'MATCH' : chk.status === 'seeded' ? 'SEEDED' : 'MISMATCH';
+        const diff = chk.differences.length > 0 ? ` · ${chk.differences.join(', ')}` : '';
+        return `<span class="status-badge small" style="background:${color}" title="Day ${chk.day}${esc(diff)}">${label}&nbsp;d${chk.day}</span>`;
+      }).join('&nbsp; ');
+      return `<tr>
+        <td><a href="#sc-${esc(r.id)}" class="mono" style="font-size:12px">${esc(r.id)}</a></td>
+        <td style="color:#374151;font-size:12px">${esc(r.name)}</td>
+        <td>${checksHtml}</td>
+      </tr>`;
+    }).join('');
+
+  const goldenOverviewHtml = goldenOverviewRows
+    ? `<div id="section-golden" class="coverage-section" style="margin-bottom:20px;">
+  <h2>Golden Snapshot Registry</h2>
+  <p>Approved baseline state at fixed checkpoints (day 365 &amp; 730) for long-running scenarios. A MISMATCH appears in the Findings Dashboard above and must be reviewed &mdash; either re-seed the baseline (<span class="mono">npm run test:quality:update-snapshots</span>) or investigate a regression.</p>
+  <table class="ctable">
+    <thead><tr><th>Scenario ID</th><th>Name</th><th>Checkpoint Status</th></tr></thead>
+    <tbody>${goldenOverviewRows}</tbody>
+  </table>
+</div>`
+    : '';
+
   // ── Full HTML ────────────────────────────────────────────────────────────
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Veeam Simulator — Lifecycle Test Report</title>
+  <title>Veeam Simulator — Quality &amp; Validation Report</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: #111827; background: #f3f4f6; margin: 0; padding: 0; }
@@ -1145,12 +1409,33 @@ function writeHtmlReport(
     @media (max-width: 900px) {
       .compare-grid { grid-template-columns: 1fr; }
     }
+
+    /* Sticky navigation bar */
+    .report-nav { background: #1e3a5f; padding: 0 32px; display: flex; gap: 0; flex-wrap: nowrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 6px rgba(0,0,0,0.2); overflow-x: auto; }
+    .report-nav a { color: #93c5fd; text-decoration: none; font-size: 12px; font-weight: 600; white-space: nowrap; padding: 10px 14px; border-bottom: 3px solid transparent; display: block; }
+    .report-nav a:hover { color: #fff; border-bottom-color: #60a5fa; }
+    .report-nav .nav-sep { color: #334d6e; padding: 10px 4px; font-size: 14px; user-select: none; }
+
+    /* Findings dashboard */
+    .dashboard-panel { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 16px 20px; margin-bottom: 20px; }
+    .dashboard-panel > h2 { margin: 0 0 14px; font-size: 16px; color: #1e3a5f; }
+    .all-clear { background: #dcfce7; color: #166534; border-radius: 6px; padding: 12px 16px; font-size: 13px; font-weight: 600; border: 1px solid #86efac; }
+    .finding-group { border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+    .finding-group:last-child { margin-bottom: 0; }
+    .finding-group-title { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .finding-count { border-radius: 10px; padding: 1px 8px; font-size: 11px; font-weight: 700; color: #fff; }
+    .finding-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .finding-table td { padding: 5px 8px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+    .finding-table tr:last-child td { border-bottom: none; }
+    .finding-cat { display: inline-block; padding: 1px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; opacity: 0.9; }
+    .finding-link { font-weight: 600; font-family: 'Cascadia Code', monospace; font-size: 11px; color: #2563eb; }
+    .finding-detail { color: #6b7280; font-size: 11px; max-width: 500px; }
   </style>
 </head>
 <body>
 
 <div class="report-header">
-  <h1>Veeam Simulator — Lifecycle Contract Test Report</h1>
+  <h1>Veeam Simulator — Quality &amp; Validation Report</h1>
   <div class="run-meta">Generated ${timestamp} &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
   <div class="summary-row">
     <span class="count-badge" style="background:#166534;color:#fff">${passed} PASS</span>
@@ -1168,27 +1453,54 @@ function writeHtmlReport(
   <div class="metric"><span class="metric-value">${results.length}</span><span class="metric-label">Scenarios</span></div>
   <div class="metric"><span class="metric-value">${totalDaysSimulated.toLocaleString()}</span><span class="metric-label">Days Simulated</span></div>
   <div class="metric"><span class="metric-value">${(totalDurationMs / 1000).toFixed(1)}s</span><span class="metric-label">Total Duration</span></div>
-  <div class="metric"><span class="metric-value">${ruleCoverage.size}</span><span class="metric-label">Rules Covered</span></div>
-  <div class="metric"><span class="metric-value">${Object.keys(RULE_DESCRIPTIONS).length - ruleCoverage.size}</span><span class="metric-label">Rules Uncovered</span></div>
+  <div class="metric"><span class="metric-value">${coveredKnownRuleCount}</span><span class="metric-label">Rules Covered</span></div>
+  <div class="metric"><span class="metric-value">${uncoveredKnownRuleCount}</span><span class="metric-label">Rules Uncovered</span></div>
 </div>
 
-<div class="content">
+</div>
 
-<div class="coverage-section" style="margin-bottom:20px;">
-  <h2>How To Read This Report</h2>
-  <p>
+<nav class="report-nav">
+  <a href="#top">&uarr;&nbsp;Top</a>
+  <span class="nav-sep">|</span>
+  <a href="#section-dashboard">&#128202;&nbsp;Findings Dashboard</a>
+  <span class="nav-sep">|</span>
+  <a href="#section-mutations">Mutation Tests</a>
+  <span class="nav-sep">|</span>
+  <a href="#section-golden">Golden Snapshots</a>
+  <span class="nav-sep">|</span>
+  <a href="#section-scenarios">Scenarios</a>
+  <span class="nav-sep">|</span>
+  <a href="#section-rule-coverage">Rule Coverage</a>
+</nav>
+
+<div class="content" id="top">
+
+<div id="section-dashboard" class="dashboard-panel">
+  <h2>Findings Dashboard</h2>
+  ${dashboardHtml}
+</div>
+
+${mutationSection}
+
+${goldenOverviewHtml}
+
+<details class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;How To Read This Report</summary>
+  <div style="padding:0 20px 12px">
+  <p style="color:#6b7280;font-size:12px;margin:8px 0 4px">
     Confidence comes from comparing policy expectations to observed simulator behavior.
     For each scenario, read left-to-right: <strong>Expected Lifecycle</strong> defines what should happen,
     <strong>Actual Lifecycle</strong> shows what the engine did, and <strong>Lifecycle Timeline Samples</strong>
     provides day-index checkpoints (chains, point counts, GFS counts, and tier residency).
   </p>
-  <p>
-    Focus on three trust signals: (1) rule coverage for the scenario, (2) final GFS W/M/Y count match,
-    and (3) milestone/event progression alignment. Known gaps are explicitly labeled and excluded from failures.
+  <p style="color:#6b7280;font-size:12px;margin:4px 0 0">
+    Use the <strong>Findings Dashboard</strong> above to see everything that needs attention at a glance, with direct links to the relevant scenario or section.
+    Known engine gaps are explicitly labeled and excluded from failures.
   </p>
-</div>
+  </div>
+</details>
 
-<div class="report-controls">
+<div id="section-scenarios" class="report-controls">
   <button type="button" class="ctl-btn" id="expandAllBtn">Expand All</button>
   <button type="button" class="ctl-btn" id="collapseAllBtn">Collapse All</button>
   <input id="scenarioSearch" class="ctl-search" type="search" placeholder="Search scenarios (id, layer, rule e.g. R-ARCH-03, layer 2, od-sobr...)" />
@@ -1207,7 +1519,7 @@ function writeHtmlReport(
 
 ${layerSections}
 
-<div class="coverage-section">
+<div id="section-rule-coverage" class="coverage-section">
   <h2>Contract Rule Coverage</h2>
   <p>Each rule in the contract is listed below with which scenarios cover it. Hover over a rule tag in any scenario card to see the rule description.</p>
   <table class="ctable">
@@ -1221,7 +1533,7 @@ ${coverageRows}
 </div>
 
 <div class="report-footer">
-  Veeam Repos Simulator &nbsp;·&nbsp; Lifecycle Contract Test Suite &nbsp;·&nbsp; ${results.length} scenarios &nbsp;·&nbsp; ${totalDaysSimulated.toLocaleString()} simulation-days
+  Veeam Repos Simulator &nbsp;·&nbsp; Quality &amp; Validation Report &nbsp;·&nbsp; ${results.length} scenarios &nbsp;·&nbsp; ${totalDaysSimulated.toLocaleString()} simulation-days
 </div>
 
 <script>
@@ -1342,7 +1654,9 @@ function main() {
   const stripped = raw.replace(/\/\/[^\n]*/g, '');
   const data = JSON.parse(stripped) as { scenarios: LifecycleScenario[] };
 
-  const filterById = process.argv[2];
+  const args = process.argv.slice(2);
+  const updateSnapshots = args.includes('--update-snapshots');
+  const filterById = args.find((a) => !a.startsWith('--'));
   const scenarios = filterById
     ? data.scenarios.filter((s) => s.id === filterById)
     : data.scenarios;
@@ -1353,12 +1667,20 @@ function main() {
   }
 
   console.log(`\n=== Lifecycle Test Runner ===`);
+  if (updateSnapshots) {
+    console.log(`Golden snapshot mode: UPDATE`);
+  }
   console.log(`Running ${scenarios.length} scenario(s)...\n`);
+
+  const goldenSnapshots = new GoldenSnapshotManager(
+    join(process.cwd(), 'docs', 'golden-snapshots.json'),
+    updateSnapshots
+  );
 
   const results: RunResult[] = [];
   for (const sc of scenarios) {
     process.stdout.write(`  [${sc.layer}] ${sc.id.padEnd(48)} `);
-    const result = runScenario(sc);
+    const result = runScenario(sc, goldenSnapshots);
     results.push(result);
     if (result.passed && !result.skipped) {
       console.log(`PASS  (${result.days}d, ${result.durationMs}ms)`);
@@ -1377,9 +1699,15 @@ function main() {
   console.log(`\n─────────────────────────────────────────────────────`);
   console.log(`Results: ${passed} passed, ${skipped} skipped (known gaps), ${failed} failed`);
 
+  goldenSnapshots.saveIfDirty();
+  if (updateSnapshots) {
+    console.log(`Golden snapshots updated: docs/golden-snapshots.json`);
+  }
+
   // Write HTML report
   const reportPath = join(process.cwd(), 'docs', 'lifecycle-report.html');
-  writeHtmlReport(scenarios, results, reportPath);
+  const mutationReport = readMutationReport();
+  writeHtmlReport(scenarios, results, reportPath, mutationReport);
   console.log(`\nReport: docs/lifecycle-report.html`);
 
   if (failed > 0) {

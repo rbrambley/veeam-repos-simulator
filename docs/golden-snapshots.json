@@ -1,0 +1,290 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-05-05T11:41:58.135Z",
+  "snapshotDays": [
+    365,
+    730
+  ],
+  "scenarios": {
+    "lb-gfs-yearly-boundary": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 2,
+        "rpCount": 9,
+        "gfsWeeklyCount": 0,
+        "gfsMonthlyCount": 0,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.7
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 2,
+        "rpCount": 10,
+        "gfsWeeklyCount": 0,
+        "gfsMonthlyCount": 0,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.725
+      }
+    },
+    "ti-das-3yr-gfs-wmy": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 3,
+        "rpCount": 16,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.917
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 3,
+        "rpCount": 17,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.991
+      }
+    },
+    "ti-sobr-move-3yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 6,
+        "rpCount": 37,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 2,
+        "gfsYearlyCount": 0,
+        "storageTB": 1.832
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 7,
+        "rpCount": 45,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 0,
+        "storageTB": 3.183
+      }
+    },
+    "ti-sobr-copy-3yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 6,
+        "rpCount": 37,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 2,
+        "gfsYearlyCount": 0,
+        "storageTB": 3.428
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 7,
+        "rpCount": 45,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 0,
+        "storageTB": 4.033
+      }
+    },
+    "ti-sobr-gfs-archive-5yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 11,
+        "rpCount": 72,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 1,
+        "storageTB": 4.639
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 11,
+        "rpCount": 73,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 1,
+        "storageTB": 4.864
+      }
+    },
+    "ti-das-sla-minimum-5yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 3,
+        "rpCount": 16,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.917
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 3,
+        "rpCount": 17,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.991
+      }
+    },
+    "ti-das-chain-rp-drift-3yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 3,
+        "rpCount": 16,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.917
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 3,
+        "rpCount": 17,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.991
+      }
+    },
+    "ti-sobr-move-chain-rp-drift-3yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 6,
+        "rpCount": 37,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 2,
+        "gfsYearlyCount": 0,
+        "storageTB": 1.832
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 7,
+        "rpCount": 45,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 0,
+        "storageTB": 3.183
+      }
+    },
+    "ti-das-high-retention-drift-3yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 6,
+        "rpCount": 37,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 2,
+        "gfsYearlyCount": 0,
+        "storageTB": 1.465
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 5,
+        "rpCount": 31,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 1.374
+      }
+    },
+    "ix-short-retention-long-gfs": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 2,
+        "rpCount": 9,
+        "gfsWeeklyCount": 0,
+        "gfsMonthlyCount": 0,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.7
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 2,
+        "rpCount": 10,
+        "gfsWeeklyCount": 0,
+        "gfsMonthlyCount": 0,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.725
+      }
+    },
+    "od-monthly-yearly-cardinality-exact": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 3,
+        "rpCount": 16,
+        "gfsWeeklyCount": 0,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.875
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 3,
+        "rpCount": 17,
+        "gfsWeeklyCount": 0,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.9
+      }
+    },
+    "ix-high-change-rate-drift-2yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 3,
+        "rpCount": 16,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 3.5
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 3,
+        "rpCount": 17,
+        "gfsWeeklyCount": 3,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 3.7
+      }
+    },
+    "ix-short-retention-drift-3yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 2,
+        "rpCount": 9,
+        "gfsWeeklyCount": 2,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.7
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 2,
+        "rpCount": 10,
+        "gfsWeeklyCount": 2,
+        "gfsMonthlyCount": 1,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.725
+      }
+    },
+    "ix-gfs-only-policy": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 1,
+        "rpCount": 2,
+        "gfsWeeklyCount": 1,
+        "gfsMonthlyCount": 0,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.525
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 1,
+        "rpCount": 3,
+        "gfsWeeklyCount": 1,
+        "gfsMonthlyCount": 0,
+        "gfsYearlyCount": 0,
+        "storageTB": 0.55
+      }
+    }
+  }
+}
