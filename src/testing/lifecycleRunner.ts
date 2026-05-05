@@ -1254,9 +1254,44 @@ function writeHtmlReport(
   const warnItems  = actionItems.filter((i) => i.severity === 'warning');
   const infoItems  = actionItems.filter((i) => i.severity === 'info');
 
+  const matchedSnapshotCount = results.reduce((sum, r) => sum + r.goldenSnapshotChecks.filter((chk) => chk.status === 'match').length, 0);
+  const seededSnapshotCount = results.reduce((sum, r) => sum + r.goldenSnapshotChecks.filter((chk) => chk.status === 'seeded').length, 0);
+  const caughtMutationCount = mutationReport?.outcomes.filter((o) => o.caught).length ?? 0;
+  const qualitySignalItems = [
+    mutationReport
+      ? `<tr>
+          <td><span class="finding-cat" style="background:#ecfdf5;color:#166534">Mutation Coverage</span></td>
+          <td><a class="finding-link" href="#section-mutations">${caughtMutationCount}/${mutationReport.mutationCount} mutations caught</a></td>
+          <td class="finding-detail">Injected defects were detected by the current test and oracle suite.</td>
+        </tr>`
+      : '',
+    matchedSnapshotCount > 0
+      ? `<tr>
+          <td><span class="finding-cat" style="background:#ecfdf5;color:#166534">Golden Snapshots</span></td>
+          <td><a class="finding-link" href="#section-golden">${matchedSnapshotCount} checkpoint matches</a></td>
+          <td class="finding-detail">Stored long-run baselines matched the current engine output exactly.</td>
+        </tr>`
+      : '',
+    seededSnapshotCount > 0
+      ? `<tr>
+          <td><span class="finding-cat" style="background:#eff6ff;color:#1d4ed8">Snapshot Baseline</span></td>
+          <td><a class="finding-link" href="#section-golden">${seededSnapshotCount} checkpoints seeded</a></td>
+          <td class="finding-detail">New baseline checkpoints were captured during this run.</td>
+        </tr>`
+      : ''
+  ].filter(Boolean).join('');
+
+  const qualitySignalsHtml = qualitySignalItems
+    ? `<div class="signal-group">
+      <div class="finding-group-title"><span>&#10003;</span><strong>Quality Signals</strong></div>
+      <table class="finding-table"><tbody>${qualitySignalItems}</tbody></table>
+    </div>`
+    : '';
+
   const dashboardHtml = actionItems.length === 0
-    ? `<div class="all-clear">&#10003;&nbsp;No findings &mdash; all scenarios passed, all snapshots match, all mutations caught. Simulator output can be trusted for the tested configuration space.</div>`
-    : `${renderFindingGroup(errorItems, 'Must Fix', '#991b1b', '#fff5f5', '&#128308;')}
+    ? `${qualitySignalsHtml}<div class="all-clear">&#10003;&nbsp;No findings &mdash; all scenarios passed, all snapshots match, all mutations caught. Simulator output can be trusted for the tested configuration space.</div>`
+    : `${qualitySignalsHtml}
+       ${renderFindingGroup(errorItems, 'Must Fix', '#991b1b', '#fff5f5', '&#128308;')}
        ${renderFindingGroup(warnItems,  'Known Engine Gaps (tracked, not counted as failures)', '#92400e', '#fffbeb', '&#9888;')}
        ${renderFindingGroup(infoItems,  'Coverage Gaps (informational)', '#374151', '#f9fafb', '&#8505;')}`;
 
@@ -1420,6 +1455,7 @@ function writeHtmlReport(
     .dashboard-panel { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 16px 20px; margin-bottom: 20px; }
     .dashboard-panel > h2 { margin: 0 0 14px; font-size: 16px; color: #1e3a5f; }
     .all-clear { background: #dcfce7; color: #166534; border-radius: 6px; padding: 12px 16px; font-size: 13px; font-weight: 600; border: 1px solid #86efac; }
+    .signal-group { background: #f0fdf4; border: 1px solid #86efac; border-left: 4px solid #15803d; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
     .finding-group { border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
     .finding-group:last-child { margin-bottom: 0; }
     .finding-group-title { font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }

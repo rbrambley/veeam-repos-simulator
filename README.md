@@ -7,6 +7,7 @@ Simulator for backup repository behavior, retention, tiering, and GFS lifecycle 
 - Automated test runner guide: [docs/automated-test-runner.md](docs/automated-test-runner.md)
 - Scenario definitions: [docs/test-scenarios.json](docs/test-scenarios.json)
 - Verification reference scenarios: [docs/test-scenarios-verification.md](docs/test-scenarios-verification.md)
+- Quality improvement plan: [docs/test-improvement-plan.md](docs/test-improvement-plan.md)
 
 ## Run The Project
 
@@ -20,6 +21,30 @@ npm run dev
 ```bash
 npm test
 ```
+
+## Run Quality Validation
+
+```bash
+npm run test:mutation
+npm run test:lifecycle
+npm run test:quality
+```
+
+- `test:mutation` injects deliberate engine defects and verifies the suite catches them.
+- `test:lifecycle` runs the full lifecycle contract suite and generates the HTML report.
+- `test:quality` runs mutation testing first, then lifecycle validation, and writes the consolidated report.
+
+To reseed long-run golden baselines:
+
+```bash
+npm run test:quality:update-snapshots
+```
+
+Generated artifacts:
+
+- `docs/lifecycle-report.html` — `Veeam Simulator — Quality & Validation Report`
+- `docs/mutation-report.json` — mutation outcomes and blind-spot status
+- `docs/golden-snapshots.json` — fixed day-365/day-730 baselines for long-run scenarios
 
 ## Run Move/Retention Matrix Checks
 
@@ -43,10 +68,11 @@ npm run verify:known-veeam-deltas
 - Use `npm run compare:model` as the primary comparability gate. It should be zero-fail against the simulator-aligned baseline.
 - Use `npm run compare:veeam` as a directional comparison against captured Veeam calculator values. Non-zero failures can be expected for known structural deltas.
 - Use `npm run verify:known-veeam-deltas` as the CI enforcement check for calculator comparison drift (ensures only the approved known deltas remain).
+- Use `npm run test:quality` as the primary simulator behavior-confidence gate before pushing engine changes.
 
 Recommended CI policy:
 
-- Required pass: `npm test`, `npm run compare:model`, `npm run verify:known-veeam-deltas`
+- Required pass: `npm test`, `npm run compare:model`, `npm run verify:known-veeam-deltas`, `npm run test:quality`
 - Informational: `npm run compare:veeam`
 
 For SOBR move-only planning, the simulator now assumes: sealed chains offload when the newest restore point reaches the move threshold, and Performance pruning waits until offload is complete, the oldest point reaches retention, and a newer chain exists.

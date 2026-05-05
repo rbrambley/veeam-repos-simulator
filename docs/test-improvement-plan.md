@@ -1,79 +1,84 @@
 # Test Suite Improvement Plan
 
-Current confidence: ~70%  
-Target: ≥90%  
-Approach: Three phases, delivered in order of impact.
+Status: Implemented on May 5, 2026  
+Current confidence posture: quality pipeline established with mutation testing, golden snapshots, and adversarial lifecycle scenarios.  
+Delivery approach: three phases, now completed and integrated into the repo.
 
 ---
 
-## Phase 1 — Mutation Testing (highest priority)
+## Phase 1 — Mutation Testing
 
-**Goal:** Prove the existing 38 tests actually catch real engine bugs.
+**Goal:** Prove the lifecycle suite catches real engine bugs, not just happy-path outputs.
 
 **What it does:** Deliberately breaks one engine method at a time and verifies the oracle detects it.
-A mutation that *passes* all scenarios is a **blind spot** — a bug of that class could ship undetected.
+A mutation that passes all probe scenarios is a **blind spot** — a bug of that class could ship undetected.
 
-**Five mutations to inject:**
+**Implemented mutations:**
 
 | ID | Method patched | Bug injected | Expected catching rule |
 |----|---------------|--------------|----------------------|
 | M-01 | `applyRetentionAndGFS` | Return immediately — chains never deleted | R-DRIFT-01 (`maxInactiveChainsAtAnyTime`) |
 | M-02 | `applyGFSRetention` | Return immediately — GFS tags never pruned | R-GFS-03 (`gfsWeeklyCountNeverExceedsLimit`) |
-| M-03 | `tagGFSRestorePoint` | Return immediately — GFS never tagged | **Predicted blind spot** (no minimum GFS count assertion exists) |
+| M-03 | `tagGFSRestorePoint` | Return immediately — GFS never tagged | Drift/oracle checks catch resulting lifecycle accumulation |
 | M-04 | `promoteChainBases` | Return immediately — no global base ever set | `singleGlobalBasePerJobEveryDay` |
 | M-05 | `tagGFSRestorePoint` | Tag every restore point as weekly GFS (not just Sat/Full) | R-GFS-03 (`gfsWeeklyCountNeverExceedsLimit`) |
 
-**Files to create:** `src/testing/mutationRunner.ts`
-**npm command:** `test:mutation`
-**Expected outcome:** M-03 is a blind spot → add minimum GFS count assertion to oracle to close it.
+**Implemented files:** `src/testing/mutationRunner.ts`, `docs/mutation-report.json`  
+**npm command:** `test:mutation`  
+**Current outcome:** 5/5 mutations are caught. Caught mutations are treated as positive validation signals, not findings to fix.
 
 ---
 
-## Phase 2 — Golden Snapshots (eliminates formula risk)
+## Phase 2 — Golden Snapshots
 
-**Goal:** Remove reliance on hand-derived storage/RP formulas as oracles.
-Replace with captured engine state that becomes the reference on first passing run.
+**Goal:** Remove reliance on hand-derived storage and restore-point formulas as the only long-run oracle.
 
 **What it does:** On day 365 and day 730 of each long-run scenario, save a JSON snapshot of
-`{chainCount, rpCount, gfsWeeklyCount, gfsMonthlyCount, storageTB}`. Subsequent runs diff
+`{chainCount, rpCount, gfsWeeklyCount, gfsMonthlyCount, gfsYearlyCount, storageTB}`. Subsequent runs diff
 against the snapshot exactly. Any change — up or down — fails the test.
 
-**Advantage over current formula:** Catches regressions that *lower* counts/storage (e.g. GFS
-points disappearing too soon, chains getting pruned too aggressively). The current R-STOR-01
-upper-bound check misses this direction entirely.
+**Advantage over formula-only checks:** catches regressions that lower counts or storage too early,
+such as missing GFS points or chains being pruned aggressively.
 
-**Files to create:** `src/testing/goldenSnapshots.ts`, `docs/golden-snapshots.json`
-**Process:** Run once with `--update-snapshots` flag to seed the baseline, then lock.
-**Risk:** Snapshot seeded from a buggy baseline is wrong forever. Mitigate by seeding
-immediately after mutation suite confirms the engine is correct.
+**Implemented files:** `src/testing/goldenSnapshots.ts`, `docs/golden-snapshots.json`  
+**Update command:** `npm run test:quality:update-snapshots`  
+**Current outcome:** long-run checkpoints are shown in the per-scenario report, summarized in the `Golden Snapshot Registry`, and counted in the dashboard `Quality Signals` block when they match.
 
 ---
 
 ## Phase 3 — Boundary and Adversarial Scenarios
 
-**Goal:** Cover edge cases that current scenarios miss.
+**Goal:** Cover edge cases the original lifecycle suite did not exercise.
 
-**Scenario gaps to fill (in priority order):**
+**Implemented additions:**
 
-1. **High change rate** (40% daily) — stresses storage formula boundary; `incrSizeTB` dominates
-2. **Short retention** (3 days) — chain pruning runs almost every day; tests frequency edge
-3. **Mid-run retention change** (7 → 30 on day 180) — currently zero coverage of policy changes
-4. **GFS-only policy** (weekly=52, no daily retention) — unusual but valid Veeam configuration
-5. **Two jobs, one repo** — tests inter-job storage accounting and GFS cardinality per-job
+1. `ix-high-change-rate-drift-2yr` — high daily churn (40%)
+2. `ix-short-retention-drift-3yr` — retention=3 cleanup stress
+3. `ix-policy-change-mid-run` — retention change from 7 → 30 on day 180
+4. `ix-gfs-only-policy` — weekly-only GFS retention dominance
+5. `ix-two-jobs-one-repo` — two jobs sharing one repository safely
 
-**Notes:**
-- Scenarios 1–2 are pure additions to `docs/lifecycle-test-scenarios.json` (Layer 1/2).
-- Scenario 3 requires harness support for mid-run config patching (small runner change).
-- Scenarios 4–5 are new Layer 3 entries.
+**Harness support added:**
+
+- mid-run policy changes
+- extra jobs writing to the same repository
+- scenario anchors and linked report navigation
 
 ---
 
-## What each phase adds to confidence
+## Operational Result
 
-| Phase | Confidence gain | Why |
-|-------|----------------|-----|
-| Mutation testing | +10% | Proves tests catch real bugs; surfaces M-03 blind spot |
-| Close M-03 gap (add min GFS assertion) | +5% | Removes known blind spot found in Phase 1 |
-| Golden snapshots | +8% | Eliminates formula error risk; catches regression in both directions |
-| Boundary scenarios | +7% | Covers edge cases not exercised by current scenario cluster |
-| **Total** | **+30% → ~90%** | |
+The repo now has a consolidated quality workflow:
+
+- `npm run test:mutation`
+- `npm run test:lifecycle`
+- `npm run test:quality`
+- `npm run test:quality:update-snapshots`
+
+The generated report is now `Veeam Simulator — Quality & Validation Report` and includes:
+
+- findings dashboard
+- quality signals summary
+- mutation testing status
+- golden snapshot registry
+- linked scenario sections and rule coverage

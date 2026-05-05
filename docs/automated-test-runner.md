@@ -1,6 +1,9 @@
 # Automated Test Runner Guide
 
-This project includes an automated scenario runner so you can quickly check for regressions after making simulator changes.
+This project now has two layers of automated validation:
+
+- the original scenario runner for sizing and baseline comparisons
+- the lifecycle quality pipeline for contract, mutation, and snapshot validation
 
 ## Best File Location
 
@@ -14,6 +17,8 @@ Reason:
 
 ## What It Runs
 
+### Baseline scenario runner
+
 The test runner executes all scenarios defined in:
 
 - `docs/test-scenarios.json`
@@ -23,6 +28,21 @@ It uses:
 - `src/testing/scenarioRunner.ts`
 
 The runner uses a fixed simulation start date (`2026-05-02`) so results are deterministic across different days and machines.
+
+### Lifecycle quality pipeline
+
+The lifecycle quality pipeline executes the contract-validation suite defined in:
+
+- `docs/lifecycle-test-scenarios.json`
+
+It uses:
+
+- `src/testing/lifecycleRunner.ts`
+- `src/testing/mutationRunner.ts`
+- `src/testing/qualityRunner.ts`
+- `src/testing/goldenSnapshots.ts`
+
+The lifecycle runner also uses the fixed simulation start date `2026-05-02` for deterministic output.
 
 ## How To Run
 
@@ -35,6 +55,31 @@ npm test
 This runs:
 
 - `tsx src/testing/scenarioRunner.ts`
+
+For full simulator quality validation:
+
+```bash
+npm run test:quality
+```
+
+This runs:
+
+- `tsx src/testing/qualityRunner.ts`
+- `npm run test:mutation`
+- `npm run test:lifecycle`
+
+To run phases individually:
+
+```bash
+npm run test:mutation
+npm run test:lifecycle
+```
+
+To update the locked golden baselines after an intentional model change:
+
+```bash
+npm run test:quality:update-snapshots
+```
 
 To compare against stored Veeam Calculator baselines:
 
@@ -75,7 +120,21 @@ If all scenarios pass, the summary ends with:
 - `Passed: 7`
 - `Failed: 0`
 
-*(As of May 3, 2026, the suite contains 7 scenarios: 5 original + 2 new regression scenarios.)*
+*(As of May 3, 2026, the baseline suite contains 7 scenarios: 5 original + 2 new regression scenarios.)*
+
+For lifecycle quality validation, you will see:
+
+- mutation outcomes (`CAUGHT` or `BLIND SPOT`)
+- lifecycle scenario results grouped by layer
+- summary totals including `PASS`, `SKIP (known gaps)`, and `FAIL`
+- generated report path: `docs/lifecycle-report.html`
+
+The HTML report includes:
+
+- a sticky section nav
+- a findings dashboard for things that need investigation
+- a separate `Quality Signals` block for positive evidence such as caught mutations and matching golden checkpoints
+- a golden snapshot registry with links back to individual scenarios
 
 For baseline comparison, you will see:
 
@@ -231,10 +290,11 @@ Typical next steps:
 ## Fast Validation Workflow
 
 1. Make your code change.
-2. Run `npm test`.
-3. If failures occur, inspect scenario output.
-4. Fix logic or update expectations.
-5. Rerun until all scenarios pass.
+2. Run `npm test` for the baseline comparison suite.
+3. Run `npm run test:quality` for engine, lifecycle, retention, GFS, tiering, or report changes.
+4. If failures occur, inspect the CLI output and `docs/lifecycle-report.html`.
+5. Fix logic or update expectations.
+6. Rerun until all required checks pass.
 
 ## Notes
 
