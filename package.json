@@ -10,6 +10,7 @@
     "test": "tsx src/testing/scenarioRunner.ts",
     "test:matrix": "tsx src/testing/scenarioRunner.ts --id-prefix sobr-matrix-",
     "test:idealized-gfs": "tsx src/testing/validateIdealizedGfsModel.ts",
+    "test:gfs-sizing": "tsx src/testing/validateGfsSizingModel.ts",
     "test:live-weekly-gfs": "tsx src/testing/validateLiveWeeklyGfsHypothesis.ts",
     "test:live-period-gfs": "tsx src/testing/validateLivePeriodGfsModel.ts",
     "compare:veeam": "tsx src/testing/veeamBaselineComparator.ts",

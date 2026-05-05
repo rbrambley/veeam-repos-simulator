@@ -21,6 +21,7 @@ import type {
   SimulationState,
 } from '../models/veeam.ts';
 import { computeVeeamWorkingSpaceTB } from '../models/veeam.ts';
+import { computeForecastGfsStatsAtYear } from '../models/gfsSizing.ts';
 import {
   type DailyAssertionConfig,
   type ViolationReport,
@@ -235,6 +236,30 @@ interface MutationReport {
   outcomes: MutationOutcome[];
 }
 
+interface GfsSizingTestStatus {
+  status: 'pass' | 'fail' | 'unknown';
+  exitCode?: number;
+  ranAt?: string;
+}
+
+interface GfsSizingCaseResult {
+  id: string;
+  category: string;
+  status: 'pass' | 'fail';
+  description: string;
+  expected: string;
+  actual: string;
+}
+
+interface GfsSizingReport {
+  generatedAt: string;
+  status: 'PASS' | 'FAIL';
+  totalCases: number;
+  passedCases: number;
+  failedCases: number;
+  cases: GfsSizingCaseResult[];
+}
+
 interface ExpectedLifecycle {
   milestoneNarrative: string[];
   expectedPath: string;
@@ -344,10 +369,27 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   //   SF is still at incremental size + (retention-1) incrementals
   const activeChainPeakTB = cfg.retention * incrSizeTB;
   const gfsPointCount = gfs.weekly + gfs.monthly + gfs.yearly;
-  const gfsTB = gfsPointCount * fullSizeTB; // GFS points are always base fulls (full size)
-  // Copy mode keeps data in both perf and capacity tiers
+  // Copy mode keeps active/inactive chain data in both perf and capacity tiers.
   const tierMultiplier = cfg.copyEnabled ? 2 : 1;
-  const expectedMaxStorageTB = ((inactiveChainTB + activeChainPeakTB) * tierMultiplier) + gfsTB;
+  const gfsForecastStats = computeForecastGfsStatsAtYear({
+    sourceDataTB: sourceTB,
+    annualGrowthRatePct: cfg.annualGrowthRatePct ?? 0,
+    dailyChangeRatePct: cfg.dailyChangeRatePct ?? 0,
+    retentionDays: cfg.retention,
+    gfsPolicy: gfs,
+    startDate: START_DATE,
+    yearOffset: Math.max(0, sc.totalDays / 365),
+    copyEnabled: cfg.copyEnabled,
+    effectiveMoveEnabled: cfg.moveEnabled || !cfg.copyEnabled,
+    offloadAfterDays: cfg.offloadAfterDays,
+    archiveAfterDays: cfg.archiveAfterDays,
+    hasArchiveTier: cfg.hasArchiveTier,
+    sizingMode: 'legacy',
+  });
+  const gfsTotalTB = cfg.repositoryType === 'SOBR'
+    ? (gfsForecastStats.additionalPerfFullTB + gfsForecastStats.additionalCapFullTB + gfsForecastStats.additionalArchFullTB)
+    : gfsForecastStats.additionalFullTB;
+  const expectedMaxStorageTB = ((inactiveChainTB + activeChainPeakTB) * tierMultiplier) + gfsTotalTB;
   const workingSpaceReserveTB = computeVeeamWorkingSpaceTB(sourceTB);
 
   const storageSummary: string[] = [];
@@ -355,8 +397,13 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   storageSummary.push(`Incremental size ≈ ${incrSizeTB.toFixed(3)} TB (${cfg.dailyChangeRatePct}% daily change)`);
   storageSummary.push(`Inactive chain (global base full + incrementals) ≈ ${inactiveChainTB.toFixed(3)} TB (SF promoted to ${fullSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr)`);
   storageSummary.push(`Active chain at peak ≈ ${activeChainPeakTB.toFixed(3)} TB (SF at incr size ${incrSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr, base not yet promoted)`);
-  if (gfsPointCount > 0) storageSummary.push(`GFS long-term points: ${gfsPointCount} × ${fullSizeTB.toFixed(3)} TB ≈ ${gfsTB.toFixed(3)} TB (GFS are always base fulls)`);
-  if (cfg.copyEnabled) storageSummary.push(`Copy mode: data occupies both Performance and Capacity tiers (×2)`);
+  if (gfsPointCount > 0) {
+    storageSummary.push(`GFS period-slice estimate (${gfsPointCount} points): ${gfsTotalTB.toFixed(3)} TB`);
+    if (cfg.repositoryType === 'SOBR') {
+      storageSummary.push(`  Perf ${gfsForecastStats.additionalPerfFullTB.toFixed(3)} TB · Cap ${gfsForecastStats.additionalCapFullTB.toFixed(3)} TB · Arch ${gfsForecastStats.additionalArchFullTB.toFixed(3)} TB`);
+    }
+  }
+  if (cfg.copyEnabled) storageSummary.push(`Copy mode: active/inactive chain data occupies both Performance and Capacity tiers (×2)`);
   storageSummary.push(`Estimated max total storage ≈ ${expectedMaxStorageTB.toFixed(3)} TB`);
   storageSummary.push(`Veeam working space reserve ≈ ${workingSpaceReserveTB.toFixed(3)} TB`);
 
@@ -944,11 +991,43 @@ function readMutationReport(): MutationReport | null {
   }
 }
 
+function readGfsSizingTestStatusFromEnv(): GfsSizingTestStatus {
+  const rawExitCode = process.env.GFS_SIZING_TEST_EXIT_CODE;
+  const ranAt = process.env.GFS_SIZING_TEST_RAN_AT;
+  if (rawExitCode === undefined) {
+    return { status: 'unknown' };
+  }
+
+  const exitCode = Number(rawExitCode);
+  if (!Number.isFinite(exitCode)) {
+    return { status: 'unknown', ranAt };
+  }
+
+  return {
+    status: exitCode === 0 ? 'pass' : 'fail',
+    exitCode,
+    ranAt,
+  };
+}
+
+function readGfsSizingReport(): GfsSizingReport | null {
+  const path = join(process.cwd(), 'docs', 'gfs-sizing-report.json');
+  if (!existsSync(path)) return null;
+  try {
+    const raw = readFileSync(path, 'utf8');
+    return JSON.parse(raw) as GfsSizingReport;
+  } catch {
+    return null;
+  }
+}
+
 function writeHtmlReport(
   scenarios: LifecycleScenario[],
   results: RunResult[],
   outputPath: string,
-  mutationReport: MutationReport | null
+  mutationReport: MutationReport | null,
+  gfsSizingTestStatus: GfsSizingTestStatus,
+  gfsSizingReport: GfsSizingReport | null
 ): void {
   const timestamp = new Date().toLocaleString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -971,16 +1050,17 @@ function writeHtmlReport(
     : 'Significant failures detected. Simulator output should not be relied upon until failures are resolved.';
 
   const mutationSection = mutationReport
-    ? `<div id="section-mutations" class="coverage-section" style="margin-bottom:20px;">
-  <h2>Mutation Testing Status</h2>
-  <p>
+    ? `<details id="section-mutations" class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;Mutation Testing Status</summary>
+  <div style="padding:0 20px 12px">
+  <p style="margin:12px 0 4px;">
     Generated ${esc(new Date(mutationReport.generatedAt).toLocaleString('en-US'))} ·
     Probes: <strong>${mutationReport.probeScenarioCount}</strong> ·
     Mutations: <strong>${mutationReport.mutationCount}</strong> ·
     Caught: <strong>${mutationReport.caughtCount}</strong> ·
     Blind spots: <strong>${mutationReport.blindSpotCount}</strong>
   </p>
-  <table class="ctable">
+  <table class="ctable" style="margin-top:12px;">
     <thead><tr><th>ID</th><th>Target</th><th>Description</th><th>Expected Catch</th><th>Observed</th><th>Status</th></tr></thead>
     <tbody>
       ${mutationReport.outcomes.map((o) => {
@@ -1000,11 +1080,86 @@ function writeHtmlReport(
       }).join('')}
     </tbody>
   </table>
-</div>`
-    : `<div id="section-mutations" class="coverage-section" style="margin-bottom:20px;">
-  <h2>Mutation Testing Status</h2>
+  </div>
+</details>`
+    : `<details id="section-mutations" class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;Mutation Testing Status</summary>
+  <div style="padding:0 20px 12px;">
   <p>No mutation report found at <span class="mono">docs/mutation-report.json</span>. Run <span class="mono">npm run test:mutation</span> (or <span class="mono">npm run test:quality</span>) before generating this report.</p>
-</div>`;
+  </div>
+</details>`;
+
+  const gfsSizingColor = gfsSizingTestStatus.status === 'pass'
+    ? '#1a7f37'
+    : gfsSizingTestStatus.status === 'fail'
+    ? '#b91c1c'
+    : '#6b7280';
+  const gfsSizingLabel = gfsSizingTestStatus.status === 'pass'
+    ? 'PASS'
+    : gfsSizingTestStatus.status === 'fail'
+    ? 'FAIL'
+    : 'UNKNOWN';
+  const gfsSizingDetail = gfsSizingTestStatus.status === 'pass'
+    ? 'Standalone GFS sizing boundary and integration tests passed in this quality run.'
+    : gfsSizingTestStatus.status === 'fail'
+    ? `Standalone GFS sizing test failed (exit code ${gfsSizingTestStatus.exitCode ?? 'n/a'}).`
+    : 'Standalone GFS sizing test status not available in this run. Use npm run test:quality for full pipeline reporting.';
+  const gfsSizingWhen = gfsSizingTestStatus.ranAt
+    ? `Ran at ${esc(new Date(gfsSizingTestStatus.ranAt).toLocaleString('en-US'))}.`
+    : '';
+
+  const gfsCasePassCount = gfsSizingReport?.passedCases ?? 0;
+  const gfsCaseTotalCount = gfsSizingReport?.totalCases ?? 0;
+  const gfsCategorySummary = gfsSizingReport
+    ? Array.from(
+        gfsSizingReport.cases.reduce((m, c) => {
+          const cur = m.get(c.category) ?? { pass: 0, total: 0 };
+          cur.total += 1;
+          if (c.status === 'pass') cur.pass += 1;
+          m.set(c.category, cur);
+          return m;
+        }, new Map<string, { pass: number; total: number }>())
+      )
+        .map(([category, stats]) => `${category}: ${stats.pass}/${stats.total}`)
+        .join(' · ')
+    : '';
+
+  const gfsSizingRows = gfsSizingReport
+    ? gfsSizingReport.cases.map((c) => {
+        const color = c.status === 'pass' ? '#1a7f37' : '#b91c1c';
+        const label = c.status === 'pass' ? 'PASS' : 'FAIL';
+        return `<tr>
+          <td class="mono">${esc(c.id)}</td>
+          <td>${esc(c.category)}</td>
+          <td>${esc(c.description)}</td>
+          <td class="mono">${esc(c.expected)}</td>
+          <td class="mono">${esc(c.actual)}</td>
+          <td><span class="status-badge small" style="background:${color}">${label}</span></td>
+        </tr>`;
+      }).join('')
+    : '';
+
+  const gfsSizingSection = `<details id="section-gfs-sizing" class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;GFS Sizing Test Status</summary>
+  <div style="padding:0 20px 12px;">
+  <p style="margin:12px 0 4px;">
+    Standalone validation script: <span class="mono">npm run test:gfs-sizing</span>
+    &nbsp;·&nbsp;
+    Status: <span class="status-badge small" style="background:${gfsSizingColor}">${gfsSizingLabel}</span>
+  </p>
+  <p style="margin:4px 0;">${esc(gfsSizingDetail)}${gfsSizingWhen ? ` ${gfsSizingWhen}` : ''}</p>
+  ${gfsSizingReport
+    ? `<p style="margin:12px 0 4px;">
+      Case summary: <strong>${gfsCasePassCount}/${gfsCaseTotalCount}</strong> checks passed.
+      ${gfsCategorySummary ? `Categories: ${esc(gfsCategorySummary)}.` : ''}
+    </p>
+    <table class="ctable" style="margin-top:8px;">
+      <thead><tr><th>Case ID</th><th>Category</th><th>Description</th><th>Expected</th><th>Actual</th><th>Status</th></tr></thead>
+      <tbody>${gfsSizingRows}</tbody>
+    </table>`
+    : `<p style="margin:12px 0 0;">No detailed GFS sizing report found at <span class="mono">docs/gfs-sizing-report.json</span>. Run <span class="mono">npm run test:gfs-sizing</span> (or <span class="mono">npm run test:quality</span>) to populate case-level details.</p>`}
+  </div>
+</details>`;
 
   const resultMap = new Map(results.map((r) => [r.id, r]));
 
@@ -1260,6 +1415,15 @@ function writeHtmlReport(
   for (const r of results.filter((r) => !r.passed)) {
     actionItems.push({ severity: 'error', category: 'Test Failure', label: r.id, href: `#sc-${r.id}`, detail: `${r.violations.length} violation(s)` });
   }
+  if (gfsSizingTestStatus.status === 'fail') {
+    actionItems.push({
+      severity: 'error',
+      category: 'Standalone Test Failure',
+      label: 'test:gfs-sizing',
+      href: '#section-gfs-sizing',
+      detail: `exit code ${gfsSizingTestStatus.exitCode ?? 'n/a'}`,
+    });
+  }
   for (const r of results) {
     for (const chk of r.goldenSnapshotChecks.filter((c) => c.status === 'mismatch')) {
       actionItems.push({ severity: 'error', category: 'Snapshot Mismatch', label: `${r.id} · day ${chk.day}`, href: `#sc-${r.id}`, detail: chk.differences.join('; ') });
@@ -1318,7 +1482,16 @@ function writeHtmlReport(
           <td><a class="finding-link" href="#section-golden">${seededSnapshotCount} checkpoints seeded</a></td>
           <td class="finding-detail">New baseline checkpoints were captured during this run.</td>
         </tr>`
-      : ''
+      : '',
+    `<tr>
+      <td><span class="finding-cat" style="background:${
+        gfsSizingTestStatus.status === 'pass' ? '#ecfdf5;color:#166534' :
+        gfsSizingTestStatus.status === 'fail' ? '#fff5f5;color:#991b1b' :
+        '#f9fafb;color:#374151'
+      }">GFS Sizing Test</span></td>
+      <td><a class="finding-link" href="#section-gfs-sizing">${gfsSizingLabel}${gfsSizingReport ? ` (${gfsCasePassCount}/${gfsCaseTotalCount})` : ''}</a></td>
+      <td class="finding-detail">${esc(gfsSizingDetail)}${gfsSizingReport ? ` Case-level results are listed in the GFS section.` : ''}</td>
+    </tr>`
   ].filter(Boolean).join('');
 
   const qualitySignalsHtml = qualitySignalItems
@@ -1329,7 +1502,7 @@ function writeHtmlReport(
     : '';
 
   const dashboardHtml = actionItems.length === 0
-    ? `${qualitySignalsHtml}<div class="all-clear">&#10003;&nbsp;No findings &mdash; all scenarios passed, all snapshots match, all mutations caught. Simulator output can be trusted for the tested configuration space.</div>`
+    ? `${qualitySignalsHtml}<div class="all-clear">&#10003;&nbsp;No findings &mdash; all scenarios passed, all snapshots match, all mutations caught, and the standalone GFS sizing test passed. Simulator output can be trusted for the tested configuration space.</div>`
     : `${qualitySignalsHtml}
        ${renderFindingGroup(errorItems, 'Must Fix', '#991b1b', '#fff5f5', '&#128308;')}
        ${renderFindingGroup(warnItems,  'Known Engine Gaps (tracked, not counted as failures)', '#92400e', '#fffbeb', '&#9888;')}
@@ -1353,14 +1526,16 @@ function writeHtmlReport(
     }).join('');
 
   const goldenOverviewHtml = goldenOverviewRows
-    ? `<div id="section-golden" class="coverage-section" style="margin-bottom:20px;">
-  <h2>Golden Snapshot Registry</h2>
-  <p>Approved baseline state at fixed checkpoints (day 365 &amp; 730) for long-running scenarios. A MISMATCH appears in the Findings Dashboard above and must be reviewed &mdash; either re-seed the baseline (<span class="mono">npm run test:quality:update-snapshots</span>) or investigate a regression.</p>
-  <table class="ctable">
+    ? `<details id="section-golden" class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;Golden Snapshot Registry</summary>
+  <div style="padding:0 20px 12px;">
+  <p style="margin:12px 0 4px;font-size:12px;color:#6b7280;">Approved baseline state at fixed checkpoints (day 365 &amp; 730) for long-running scenarios. A MISMATCH appears in the Findings Dashboard above and must be reviewed &mdash; either re-seed the baseline (<span class="mono">npm run test:quality:update-snapshots</span>) or investigate a regression.</p>
+  <table class="ctable" style="margin-top:12px;">
     <thead><tr><th>Scenario ID</th><th>Name</th><th>Checkpoint Status</th></tr></thead>
     <tbody>${goldenOverviewRows}</tbody>
   </table>
-</div>`
+  </div>
+</details>`
     : '';
 
   // ── Full HTML ────────────────────────────────────────────────────────────
@@ -1540,6 +1715,8 @@ function writeHtmlReport(
   <span class="nav-sep">|</span>
   <a href="#section-dashboard">&#128202;&nbsp;Findings Dashboard</a>
   <span class="nav-sep">|</span>
+  <a href="#section-gfs-sizing">GFS Sizing Test</a>
+  <span class="nav-sep">|</span>
   <a href="#section-mutations">Mutation Tests</a>
   <span class="nav-sep">|</span>
   <a href="#section-golden">Golden Snapshots</a>
@@ -1556,55 +1733,68 @@ function writeHtmlReport(
   ${dashboardHtml}
 </div>
 
+<div id="section-guide" style="background:#f0fdf4;border-left:4px solid #1a7f37;border-radius:6px;padding:16px 20px;margin-bottom:20px;">
+  <h2 style="margin:0 0 12px;font-size:15px;color:#166534;">How To Read This Report</h2>
+  <div style="font-size:12px;color:#374151;line-height:1.6;">
+    <p style="margin:0 0 8px;">
+      This report presents simulator quality evidence across multiple dimensions, each collapsible for easy navigation:
+    </p>
+    <ul style="margin:8px 0;padding-left:20px;">
+      <li><strong>Findings Dashboard</strong> (above): High-level signal showing must-fix errors, known gaps, and coverage gaps with direct links.</li>
+      <li><strong>GFS Sizing Test Status</strong>: Standalone validation results with case-level boundary and integration checks across modifier boundaries, weekly/monthly/yearly ranges, and engine integration.</li>
+      <li><strong>Mutation Testing Status</strong>: Shows which logic mutations are caught by scenarios; blind spots indicate missing test coverage.</li>
+      <li><strong>Golden Snapshot Registry</strong>: Baseline state checkpoints (day 365 &amp; 730) for long-running scenarios; mismatches appear in the dashboard.</li>
+      <li><strong>Contract Rule Coverage</strong>: Lists all contract rules with which scenarios cover each; uncovered rules appear in the dashboard.</li>
+      <li><strong>Scenario Validation</strong> (organized by layer 1–4): Scenario-by-scenario validation with expected vs. actual lifecycle, plus timeline samples. Use the toolbar to expand/collapse all, search by scenario ID or rule, and filter by status or layer. For each scenario, read left-to-right: <strong>Expected Lifecycle</strong> defines what should happen, <strong>Actual Lifecycle</strong> shows engine behavior, <strong>Lifecycle Timeline Samples</strong> provides day-index checkpoints.</li>
+    </ul>
+    <p style="margin:8px 0 0;">
+      All sections expand on demand. Known engine gaps are explicitly labeled and excluded from failures.
+    </p>
+  </div>
+</div>
+
+${gfsSizingSection}
+
 ${mutationSection}
 
 ${goldenOverviewHtml}
 
-<details class="coverage-section" style="margin-bottom:20px;">
-  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;How To Read This Report</summary>
-  <div style="padding:0 20px 12px">
-  <p style="color:#6b7280;font-size:12px;margin:8px 0 4px">
-    Confidence comes from comparing policy expectations to observed simulator behavior.
-    For each scenario, read left-to-right: <strong>Expected Lifecycle</strong> defines what should happen,
-    <strong>Actual Lifecycle</strong> shows what the engine did, and <strong>Lifecycle Timeline Samples</strong>
-    provides day-index checkpoints (chains, point counts, GFS counts, and tier residency).
-  </p>
-  <p style="color:#6b7280;font-size:12px;margin:4px 0 0">
-    Use the <strong>Findings Dashboard</strong> above to see everything that needs attention at a glance, with direct links to the relevant scenario or section.
-    Known engine gaps are explicitly labeled and excluded from failures.
-  </p>
+<details id="section-scenarios" class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;Scenario Validation</summary>
+  <div style="padding:0 20px 12px;">
+  <div class="report-controls" style="margin-bottom:16px;">
+    <button type="button" class="ctl-btn" id="expandAllBtn">Expand All</button>
+    <button type="button" class="ctl-btn" id="collapseAllBtn">Collapse All</button>
+    <input id="scenarioSearch" class="ctl-search" type="search" placeholder="Search scenarios (id, layer, rule e.g. R-ARCH-03, layer 2, od-sobr...)" />
+    <div class="ctl-chips">
+      <button class="chip" data-filter-status="pass">PASS</button>
+      <button class="chip" data-filter-status="skip">SKIP</button>
+      <button class="chip" data-filter-status="fail">FAIL</button>
+      <button class="chip" data-filter-layer="1">Layer 1</button>
+      <button class="chip" data-filter-layer="2">Layer 2</button>
+      <button class="chip" data-filter-layer="3">Layer 3</button>
+      <button class="chip" data-filter-layer="4">Layer 4</button>
+    </div>
+    <span class="ctl-hint">Tip: search by rule ID, scenario ID, or layer.</span>
+    <span class="ctl-count" id="scenarioCount"></span>
+  </div>
+
+  ${layerSections}
   </div>
 </details>
 
-<div id="section-scenarios" class="report-controls">
-  <button type="button" class="ctl-btn" id="expandAllBtn">Expand All</button>
-  <button type="button" class="ctl-btn" id="collapseAllBtn">Collapse All</button>
-  <input id="scenarioSearch" class="ctl-search" type="search" placeholder="Search scenarios (id, layer, rule e.g. R-ARCH-03, layer 2, od-sobr...)" />
-  <div class="ctl-chips">
-    <button class="chip" data-filter-status="pass">PASS</button>
-    <button class="chip" data-filter-status="skip">SKIP</button>
-    <button class="chip" data-filter-status="fail">FAIL</button>
-    <button class="chip" data-filter-layer="1">Layer 1</button>
-    <button class="chip" data-filter-layer="2">Layer 2</button>
-    <button class="chip" data-filter-layer="3">Layer 3</button>
-    <button class="chip" data-filter-layer="4">Layer 4</button>
-  </div>
-  <span class="ctl-hint">Tip: search by rule ID, scenario ID, or layer.</span>
-  <span class="ctl-count" id="scenarioCount"></span>
-</div>
-
-${layerSections}
-
-<div id="section-rule-coverage" class="coverage-section">
-  <h2>Contract Rule Coverage</h2>
-  <p>Each rule in the contract is listed below with which scenarios cover it. Hover over a rule tag in any scenario card to see the rule description.</p>
-  <table class="ctable">
+<details id="section-rule-coverage" class="coverage-section" style="margin-bottom:20px;">
+  <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;Contract Rule Coverage</summary>
+  <div style="padding:0 20px 12px;">
+  <p style="margin:12px 0 4px;font-size:12px;color:#6b7280;">Each rule in the contract is listed below with which scenarios cover it. Hover over a rule tag in any scenario card to see the rule description.</p>
+  <table class="ctable" style="margin-top:12px;">
     <thead><tr><th>Rule</th><th>Description</th><th>Covered by</th><th>Status</th></tr></thead>
     <tbody>
 ${coverageRows}
     </tbody>
   </table>
-</div>
+  </div>
+</details>
 
 </div>
 
@@ -1783,7 +1973,9 @@ function main() {
   // Write HTML report
   const reportPath = join(process.cwd(), 'docs', 'lifecycle-report.html');
   const mutationReport = readMutationReport();
-  writeHtmlReport(scenarios, results, reportPath, mutationReport);
+  const gfsSizingTestStatus = readGfsSizingTestStatusFromEnv();
+  const gfsSizingReport = readGfsSizingReport();
+  writeHtmlReport(scenarios, results, reportPath, mutationReport, gfsSizingTestStatus, gfsSizingReport);
   console.log(`\nReport: docs/lifecycle-report.html`);
 
   if (failed > 0) {

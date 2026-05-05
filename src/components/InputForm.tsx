@@ -579,7 +579,9 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                 </tr>
                 {gfsForecastStats.distinctPoints > 0 && (
                   <tr>
-                    <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>GFS Total Storage ({gfsForecastStats.distinctPoints} pts)</td>
+                    <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>
+                      GFS Total Storage ({gfsForecastStats.distinctPoints} pts)
+                    </td>
                     {yearlyRequirements.map(row => (
                       <td key={`gfs-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.gfsTB)}</td>
                     ))}

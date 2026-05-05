@@ -3,8 +3,91 @@
 
 import { SimulationState, BackupJob, Repository, BackupChain, RestorePoint, BlockObject, SOBRTier, BackupGeneration } from '../models/veeam.ts';
 
+interface Modifier {
+  maxDays: number;
+  modifier: number;
+}
+
+const GFS_MODIFIERS: Modifier[] = [
+  { maxDays: 2, modifier: 1 },
+  { maxDays: 14, modifier: 3 },
+  { maxDays: 38, modifier: 5 },
+  { maxDays: 100, modifier: 9 },
+  { maxDays: 193, modifier: 12 },
+  { maxDays: 286, modifier: 15 },
+  { maxDays: 379, modifier: 18 },
+  { maxDays: 1095, modifier: 1000 },
+];
+
+export function CalculateGfsSize(baseSize: number, dailyChangeRate: number, ageInDays: number): number {
+  const safeBaseSize = Number.isFinite(baseSize) ? baseSize : 0;
+  const safeDailyChangeRate = Number.isFinite(dailyChangeRate) ? dailyChangeRate : 0;
+  const safeAgeInDays = Number.isFinite(ageInDays) ? Math.max(0, Math.floor(ageInDays)) : 0;
+
+  let modifier = 1;
+  for (let i = GFS_MODIFIERS.length - 1; i >= 0; i -= 1) {
+    const row = GFS_MODIFIERS[i];
+    if (row.maxDays < safeAgeInDays) {
+      modifier = row.modifier;
+      break;
+    }
+  }
+
+  return safeBaseSize * (1 + safeDailyChangeRate * modifier);
+}
+
 export class VeeamSimulator {
   state: SimulationState;
+
+  private setRestorePointSize(rp: RestorePoint, sizeTB: number) {
+    rp.sizeGB = sizeTB;
+    for (const blockId of rp.referencedBlockIds) {
+      const block = this.state.blocks.find(b => b.id === blockId);
+      if (block) {
+        block.sizeGB = sizeTB;
+      }
+    }
+  }
+
+  private computeStoredContributionTB(
+    pointSizeTB: number,
+    dailyChangeRate: number,
+    hasMonthly: boolean,
+    hasYearly: boolean,
+  ): number {
+    if (hasMonthly || hasYearly) {
+      const monthlyContribution = hasMonthly
+        ? Math.min(pointSizeTB, pointSizeTB * dailyChangeRate * 5)
+        : 0;
+      const yearlyContribution = hasYearly
+        ? Math.min(pointSizeTB, pointSizeTB * dailyChangeRate * 18)
+        : 0;
+      return Math.max(monthlyContribution, yearlyContribution);
+    }
+
+    return pointSizeTB;
+  }
+
+  private applyGfsSizing(job: BackupJob, rp: RestorePoint) {
+    if (!rp.isGFS) return;
+    const hasWeekly = !!rp.isWeeklyGFS;
+    const hasMonthly = !!rp.isMonthlyGFS;
+    const hasYearly = !!rp.isYearlyGFS;
+    const hasMonthlyOrYearlyPolicy = (job.gfsPolicy?.monthly ?? 0) > 0 || (job.gfsPolicy?.yearly ?? 0) > 0;
+
+    // In mixed policies, weekly-only tags are treated as anchors already represented
+    // by monthly/yearly preserved points and do not add standalone storage.
+    if (hasMonthlyOrYearlyPolicy && hasWeekly && !hasMonthly && !hasYearly) {
+      this.setRestorePointSize(rp, 0);
+      return;
+    }
+
+    // Keep simulator sizing aligned with Calculated Capacity Requirements (legacy mode).
+    const baseSize = Math.max(0, job.sourceDataTB || 0) * 0.5;
+    const dailyChangeRate = Math.max(0, (job.dailyChangeRatePct ?? 0) / 100);
+    const storedContributionTB = this.computeStoredContributionTB(baseSize, dailyChangeRate, hasMonthly, hasYearly);
+    this.setRestorePointSize(rp, storedContributionTB);
+  }
 
   private ensureGenerationState() {
     if (!this.state.generations) {
@@ -231,6 +314,7 @@ export class VeeamSimulator {
   }
 
   private getRestorePointSizeInTier(rp: RestorePoint, tier: SOBRTier): number {
+    if (rp.isGFS) return rp.sizeGB;
     if (rp.type !== 'SyntheticFull') return rp.sizeGB;
     const job = this.getJobForRestorePoint(rp);
     if (!job) return rp.sizeGB;
@@ -378,6 +462,7 @@ export class VeeamSimulator {
     }
     if (tags.length > 0) {
       rp.isGFS = true;
+      this.applyGfsSizing(job, rp);
       actions.push(`Restore point on ${rp.date} tagged as GFS: ${tags.join(' + ')}.`);
     }
   }
@@ -655,7 +740,7 @@ export class VeeamSimulator {
         basePoint.baseTiers = [...new Set([...(basePoint.baseTiers || []), tier])];
         basePoint.isTierSeed = true;
 
-        if (basePoint.type === 'SyntheticFull') {
+        if (basePoint.type === 'SyntheticFull' && !basePoint.isGFS) {
           const chain = this.state.chains.find(c => c.id === basePoint.chainId);
           const job = chain
             ? this.state.jobs.find(j => j.id === chain.jobId)
@@ -704,7 +789,7 @@ export class VeeamSimulator {
     if (candidate) {
       candidate.isTierSeed = true;
       candidate.baseTiers = [...new Set([...(candidate.baseTiers || []), tier])];
-      if (candidate.type === 'SyntheticFull') {
+      if (candidate.type === 'SyntheticFull' && !candidate.isGFS) {
         const promotedDate = this.parseISODate(candidate.date);
         const elapsedDays = this.state.startDate
           ? (promotedDate.getTime() - this.parseISODate(this.state.startDate).getTime()) / (1000 * 60 * 60 * 24)
@@ -1133,7 +1218,7 @@ export class VeeamSimulator {
       // Clear global base for all job points, then assign only one global base.
       for (const rp of jobPoints) {
         rp.isGlobalBase = false;
-        if (rp.type === 'SyntheticFull') {
+        if (rp.type === 'SyntheticFull' && !rp.isGFS) {
           const pointDate = this.parseISODate(rp.date);
           const elapsedDays = this.state.startDate
             ? (pointDate.getTime() - this.parseISODate(this.state.startDate).getTime()) / (1000 * 60 * 60 * 24)
@@ -1152,7 +1237,7 @@ export class VeeamSimulator {
       basePoint.isGlobalBase = true;
       basePoint.isTierSeed = true;
 
-      if (basePoint.type === 'SyntheticFull') {
+      if (basePoint.type === 'SyntheticFull' && !basePoint.isGFS) {
         const promotedDate = this.parseISODate(basePoint.date);
         const elapsedDays = this.state.startDate
           ? (promotedDate.getTime() - this.parseISODate(this.state.startDate).getTime()) / (1000 * 60 * 60 * 24)

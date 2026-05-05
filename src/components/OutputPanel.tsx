@@ -524,7 +524,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             const largestFullTB = workingSpaceByRepo[repo.id]?.largestFullTB ?? 0;
             const additionalWorkingSpaceTB = workingSpaceByRepo[repo.id]?.additionalTB ?? 0;
             const initialSourceTB = workingSpaceByRepo[repo.id]?.initialSourceTB ?? 0;
-            const pct = repo.capacityTB > 0 ? Math.min(100, (used / repo.capacityTB) * 100) : 0;
+            const pct = repo.capacityTB > 0 ? (used / repo.capacityTB) * 100 : 0;
             const isSobr = repo.type === 'SOBR' && repo.sobrConfig;
             const tierUsage = isSobr ? sim.getSOBRTierUsage(repo.id) : null;
             const tierColors: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
@@ -546,9 +546,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   <td>{formatTB(repo.capacityTB)}</td>
                   <td>
                     <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '12px', width: '68px', display: 'inline-block', verticalAlign: 'middle' }}>
-                      <div style={{ background: pct > 85 ? '#d32f2f' : '#1976d2', width: `${pct}%`, height: '100%', borderRadius: '3px' }} />
+                      <div style={{ background: pct > 100 ? '#7b1fa2' : pct > 85 ? '#d32f2f' : '#1976d2', width: `${Math.min(100, pct)}%`, height: '100%', borderRadius: '3px' }} />
                     </div>
-                    {' '}{pct.toFixed(1)}%
+                    {' '}<span style={{ color: pct > 100 ? '#7b1fa2' : pct > 85 ? '#d32f2f' : undefined, fontWeight: pct > 100 ? 'bold' : undefined }}>{pct.toFixed(1)}%</span>
                   </td>
                 </tr>
                 {isSobr && repo.sobrConfig && ['Performance', 'Capacity', ...(repo.sobrConfig.hasArchiveTier ? ['Archive'] : [])].map(tier => {
@@ -558,7 +558,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   const tierCap = tier === 'Performance' ? repo.sobrConfig!.performanceCapacityTB
                     : tier === 'Capacity' ? repo.sobrConfig!.capacityCapacityTB
                     : repo.sobrConfig!.archiveCapacityTB;
-                  const tierPct = tierCap > 0 ? Math.min(100, (tierUsed / tierCap) * 100) : 0;
+                  const tierPct = tierCap > 0 ? (tierUsed / tierCap) * 100 : 0;
                   return (
                     <tr key={tier} style={{ background: '#f9f9f9', fontSize: '0.85rem' }}>
                       <td style={{ paddingLeft: '1.5rem', color: tierColors[tier], fontWeight: 'bold' }}>↳ {tier}</td>
@@ -583,9 +583,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       <td>{formatTB(tierCap)}</td>
                       <td>
                         <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '9px', width: '58px', display: 'inline-block', verticalAlign: 'middle' }}>
-                          <div style={{ background: tierPct > 85 ? '#d32f2f' : tierColors[tier], width: `${tierPct}%`, height: '100%', borderRadius: '3px' }} />
+                          <div style={{ background: tierPct > 100 ? '#7b1fa2' : tierPct > 85 ? '#d32f2f' : tierColors[tier], width: `${Math.min(100, tierPct)}%`, height: '100%', borderRadius: '3px' }} />
                         </div>
-                        {' '}{tierPct.toFixed(1)}%
+                        {' '}<span style={{ color: tierPct > 100 ? '#7b1fa2' : tierPct > 85 ? '#d32f2f' : undefined, fontWeight: tierPct > 100 ? 'bold' : undefined }}>{tierPct.toFixed(1)}%</span>
                       </td>
                     </tr>
                   );
