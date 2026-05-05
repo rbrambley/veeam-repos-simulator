@@ -15,7 +15,8 @@
     "compare:veeam": "tsx src/testing/veeamBaselineComparator.ts",
     "verify:known-veeam-deltas": "tsx src/testing/verifyKnownCalculatorDeltas.ts",
     "compare:model": "tsx src/testing/veeamBaselineComparator.ts --baseline model",
-    "capture:veeam": "tsx src/testing/veeamCaptureGuide.ts"
+    "capture:veeam": "tsx src/testing/veeamCaptureGuide.ts",
+    "test:lifecycle": "tsx src/testing/lifecycleRunner.ts"
   },
   "dependencies": {
     "react": "^18.0.0",

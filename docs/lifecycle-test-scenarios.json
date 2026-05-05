@@ -1,0 +1,1184 @@
+{
+  "_comment": "Lifecycle behaviour test matrix. Each scenario is exercised by src/testing/lifecycleRunner.ts, which runs a full day-by-day oracle diff against the simulator. Rules referenced here are defined in the coverage ledger (docs/lifecycle-coverage-ledger.md).",
+  "scenarios": [
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LAYER 1 — Retention boundary tests (exact day before / on / after)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    {
+      "id": "lb-das-retention-count",
+      "layer": 1,
+      "name": "DAS retention count boundary",
+      "description": "Inactive chain must NOT be deleted on day (retentionCount-1) and MUST be deleted on day retentionCount when SLA also expired. Validates AND logic for count+SLA.",
+      "rules": ["R-RET-01", "R-RET-02"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 20,
+      "assertions": {
+        "chainMustExistOnDay": 13,
+        "chainMustBeGoneByDay": 15
+      }
+    },
+
+    {
+      "id": "lb-das-sla-overrides-count",
+      "layer": 1,
+      "name": "DAS SLA prevents deletion when count expired but SLA not expired",
+      "description": "Chain has > retentionCount total points (count-expired) but the newest point in the sealed chain is still within slaDays. Chain must be preserved.",
+      "rules": ["R-RET-01", "R-RET-03"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 18,
+      "assertions": {
+        "chainSealedOnDay": 7,
+        "chainMustExistOnDay": 13,
+        "chainMustBeGoneByDay": 16
+      }
+    },
+
+    {
+      "id": "lb-das-gfs-preserves-chain",
+      "layer": 1,
+      "name": "DAS GFS preserves chain past standard retention",
+      "description": "A chain whose newest point is a weekly GFS full must NOT be deleted when standard retention+SLA have both expired; it must survive for the full GFS window (2 weeks = 14 days from tagging).",
+      "rules": ["R-GFS-01", "R-GFS-02", "R-RET-04"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 42,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "weeklyGfsCountAtDays": [
+          {"day": 7,  "expectedCount": 1},
+          {"day": 14, "expectedCount": 2},
+          {"day": 21, "expectedCount": 2},
+          {"day": 28, "expectedCount": 2}
+        ]
+      }
+    },
+
+    {
+      "id": "lb-gfs-expiry-order",
+      "layer": 1,
+      "name": "GFS expiry order: oldest weekly removed first",
+      "description": "With weekly=2, when a 3rd weekly tag is applied the oldest (W3→W1 shift) must be untagged first. No point with weekly flag must exist beyond its retention window.",
+      "rules": ["R-GFS-03"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 35,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "weeklyGfsExpiryOrderCorrect": true
+      }
+    },
+
+    {
+      "id": "lb-gfs-monthly-boundary",
+      "layer": 1,
+      "name": "Monthly GFS lands only on last Saturday of month",
+      "description": "A monthly GFS tag must appear on the last Saturday of each calendar month and not on any other Saturday.",
+      "rules": ["R-GFS-04"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 100,
+      "assertions": {
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "gfsMonthlyCountNeverExceedsLimit": true
+      }
+    },
+
+    {
+      "id": "lb-gfs-yearly-boundary",
+      "layer": 1,
+      "name": "Yearly GFS lands only on last Saturday of December",
+      "description": "A yearly GFS tag must appear exactly on the last Saturday of December and never on any other Saturday.",
+      "rules": ["R-GFS-05"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 800,
+      "assertions": {
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "gfsYearlyCountNeverExceedsLimit": true
+      }
+    },
+
+    {
+      "id": "lb-gfs-stacking",
+      "layer": 1,
+      "name": "GFS tags stack on same Saturday restore point",
+      "description": "When weekly + monthly conditions are both true for the same Saturday, the single SyntheticFull must have both isWeeklyGFS and isMonthlyGFS set (no separate point created).",
+      "rules": ["R-GFS-06"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 400,
+      "assertions": {
+        "gfsTagsStackOnSameSaturday": true,
+        "noSeparatePointForEachGfsClass": true
+      }
+    },
+
+    {
+      "id": "lb-sobr-offload-threshold",
+      "layer": 1,
+      "name": "SOBR Move: offload fires on exact offloadAfterDays boundary",
+      "description": "Chain sealed at day D. Points must still be in Performance on day D+offloadAfterDays-1 and must be in Capacity on day D+offloadAfterDays.",
+      "rules": ["R-OFFLOAD-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 30,
+      "assertions": {
+        "chainOffloadNotBefore": 7,
+        "chainOffloadBy": 9
+      }
+    },
+
+    {
+      "id": "lb-sobr-archive-threshold-move",
+      "layer": 1,
+      "name": "SOBR Move: archive fires on exact capTierAge >= archiveAfterDays boundary",
+      "description": "After chain offloads to Capacity, a GFS-tagged point must NOT enter Archive until capTierAgeDays >= archiveAfterDays.",
+      "rules": ["R-ARCH-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 60,
+      "assertions": {
+        "noArchivePointBeforeCapTierAge": 14
+      }
+    },
+
+    {
+      "id": "lb-sobr-archive-threshold-copy",
+      "layer": 1,
+      "name": "SOBR Copy: archive fires only after pointAge >= offloadAfterDays + archiveAfterDays",
+      "description": "In copy mode the archive gate is total point age, not cap-tier age. Point must not appear in Archive before age = offloadAfterDays + archiveAfterDays.",
+      "rules": ["R-ARCH-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 7,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 45,
+      "assertions": {
+        "noArchivePointBeforePointAge": 21
+      }
+    },
+
+    {
+      "knownEngineGaps": ["R-ARCH-03"],
+      "id": "lb-sobr-capacity-residue-after-archive",
+      "layer": 1,
+      "name": "SOBR Copy: non-GFS Capacity residue pruned when GFS full archives",
+      "description": "When a GFS SyntheticFull in a chain archives (copy mode), non-GFS points in that chain must be pruned from Capacity. Performance copy must still remain accessible.",
+      "rules": ["R-ARCH-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 7,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 45,
+      "assertions": {
+        "noNonGfsCapacityResidue": true
+      }
+    },
+
+    {
+      "id": "lb-perf-prune-ordering",
+      "layer": 1,
+      "name": "SOBR Move: Performance pruning cannot precede offload completion",
+      "description": "On the day of offload completion chain.performancePrunedAt must still be null. Prune must not happen until offloadComplete=true AND retention/SLA expired AND GEN immutability cleared.",
+      "rules": ["R-PRUNE-01", "R-PRUNE-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 35,
+      "assertions": {
+        "pruneNeverBeforeOffload": true,
+        "noPerfDataAfterPrune": true
+      }
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LAYER 2 — Temporal invariants over multi-year runs (daily scanning)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    {
+      "id": "ti-das-3yr-gfs-wmy",
+      "layer": 2,
+      "name": "DAS 3-year soak: W+M+Y GFS invariants every day",
+      "description": "Over 3 years, daily assertions: weekly count ≤ limit, monthly count ≤ limit, yearly count ≤ limit, GFS tags only on SyntheticFull/Full, exactly one global base per job.",
+      "rules": ["R-GFS-01", "R-GFS-03", "R-GFS-04", "R-GFS-05", "R-GFS-06", "R-BASE-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "gfsTagsOnlyOnFullOrSyntheticFull": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "noActiveChainOffloadComplete": true
+      }
+    },
+
+    {
+      "id": "ti-sobr-move-3yr",
+      "layer": 2,
+      "name": "SOBR Move-only 3-year soak: tier ordering invariants every day",
+      "description": "No point may be in Archive without passing through Capacity. Prune before offload is forbidden. Active chains must never be offloadComplete.",
+      "rules": ["R-OFFLOAD-01", "R-PRUNE-01", "R-CHAIN-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "noArchiveWithoutCapacity": false,
+        "pruneNeverBeforeOffload": true,
+        "noPerfDataAfterPrune": true,
+        "noActiveChainOffloadComplete": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "knownEngineGaps": ["R-ARCH-03"],
+      "id": "ti-sobr-copy-3yr",
+      "layer": 2,
+      "name": "SOBR Copy-only 3-year soak: capacity residue and archive gate every day",
+      "description": "Scan every day: after any archive event for a chain the non-GFS Capacity residue must immediately be zero. Archive gate must never be violated.",
+      "rules": ["R-ARCH-02", "R-ARCH-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "noNonGfsCapacityResidue": true,
+        "noArchivePointBeforePointAge": 28,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "id": "ti-sobr-gfs-archive-5yr",
+      "layer": 2,
+      "name": "SOBR Move W+M+Y 5-year soak: full model over extended horizon",
+      "description": "5-year soak exercising the full policy stack: daily GFS count limits, tier ordering, prune sequencing, chain deletion gating, SLA minimum, and base identity.",
+      "rules": ["R-RET-01", "R-RET-02", "R-RET-03", "R-GFS-01", "R-GFS-03", "R-OFFLOAD-01", "R-PRUNE-01", "R-BASE-01", "R-CHAIN-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1825,
+      "assertions": {
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "gfsTagsOnlyOnFullOrSyntheticFull": true,
+        "pruneNeverBeforeOffload": true,
+        "noPerfDataAfterPrune": true,
+        "noActiveChainOffloadComplete": true,
+        "chainDeletionRequiresAllGensUnlocked": true
+      }
+    },
+
+    {
+      "id": "ti-das-sla-minimum-5yr",
+      "layer": 2,
+      "name": "DAS 5-year soak: SLA minimum guarantee never violated",
+      "description": "Over 5 years verify that no chain point dated within slaDays of current date is ever deleted, regardless of count-based expiry pressure.",
+      "rules": ["R-RET-01", "R-RET-03"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1825,
+      "assertions": {
+        "slaMinimumNeverViolated": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true
+      }
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LAYER 3 — GEN + Immutability interaction matrix
+    // ─────────────────────────────────────────────────────────────────────────
+
+    {
+      "id": "im-perf-immutability-blocks-prune",
+      "layer": 3,
+      "name": "Performance immutability blocks Performance prune",
+      "description": "Chain is retention+SLA expired and offloadComplete, but performanceImmutabilityDays has not elapsed since GEN window end. Prune must not fire until the lock expires.",
+      "rules": ["R-IMM-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 14,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 55,
+      "assertions": {
+        "pruneNeverBeforeOffload": true,
+        "noPruneWhilePerfImmutable": true,
+        "noPerfDataAfterPrune": true
+      }
+    },
+
+    {
+      "id": "im-cap-immutability-blocks-deletion",
+      "layer": 3,
+      "name": "Capacity immutability blocks chain deletion",
+      "description": "Chain's GEN deleteOn has been reached, but capacityImmutableUntil is in the future. Chain must not be deleted until lock clears.",
+      "rules": ["R-IMM-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 0,
+        "capacityImmutabilityDays": 21,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 70,
+      "assertions": {
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "noDeletionWhileCapImmutable": true
+      }
+    },
+
+    {
+      "id": "im-arch-immutability-blocks-deletion",
+      "layer": 3,
+      "name": "Archive immutability blocks chain deletion",
+      "description": "GFS point in Archive is within archiveImmutableUntil. Chain deletion must wait for Archive lock to clear even after deleteOn and Capacity immutability have both passed.",
+      "rules": ["R-IMM-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "capacityImmutabilityDays": 0,
+        "archiveImmutabilityDays": 30,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 100,
+      "assertions": {
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "noDeletionWhileArchImmutable": true
+      }
+    },
+
+    {
+      "id": "im-gen-window-boundary",
+      "layer": 3,
+      "name": "GEN window aligns to generationPeriodDays boundaries",
+      "description": "Points created in days 1-10 must belong to GEN-0 and points created in days 11-20 to GEN-1 when generationPeriodDays=10. deleteOn for each GEN must equal windowEnd + slaDays.",
+      "rules": ["R-GEN-01", "R-GEN-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 45,
+      "assertions": {
+        "genWindowBoundaryCorrect": true,
+        "genDeleteOnEqualsWindowEndPlusSla": true
+      }
+    },
+
+    {
+      "id": "im-gen-deleteon-extended-by-gfs",
+      "layer": 3,
+      "name": "GEN deleteOn extended when GFS point falls in window",
+      "description": "When a GFS weekly point belongs to a GEN, the GEN's deleteOn must be recalculated to max(default deleteOn, gfsDate + gfsWeeks*7). Standard non-GFS GENs must keep original deleteOn.",
+      "rules": ["R-GEN-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 60,
+      "assertions": {
+        "genDeleteOnExtendedByGfs": true
+      }
+    },
+
+    {
+      "id": "im-gen-state-transitions",
+      "layer": 3,
+      "name": "GEN lifecycle state is monotonic: Pending → WaitImmutability → Deletable",
+      "description": "A GEN must never go backwards through lifecycle states. Once Deletable it must not revert to Pending or WaitImmutability on a later day.",
+      "rules": ["R-GEN-04"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 80,
+      "assertions": {
+        "genStateTransitionsMonotonic": true
+      }
+    },
+
+    {
+      "id": "im-all-tiers-immutability",
+      "layer": 3,
+      "name": "All three tier immutability locks interact correctly",
+      "description": "With non-zero immutability on all three tiers, deletion must wait until ALL locks expire, even if only one tier contains data at deletion time.",
+      "rules": ["R-IMM-01", "R-IMM-02", "R-IMM-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 14,
+        "archiveImmutabilityDays": 21,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 120,
+      "assertions": {
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "pruneNeverBeforeOffload": true,
+        "noPruneWhilePerfImmutable": true,
+        "noDeletionWhileCapImmutable": true,
+        "noDeletionWhileArchImmutable": true
+      }
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LAYER 3 — Interaction matrix: cross-feature pairwise + targeted 3-way
+    // ─────────────────────────────────────────────────────────────────────────
+
+    {
+      "id": "ix-gfs-wmy-move-archive",
+      "layer": 3,
+      "name": "GFS W+M+Y × Move × Archive: cardinality and tier residency",
+      "description": "Mixed GFS with move mode and archive. Verify: weekly/monthly/yearly counts, tier residency per point, incremental-free Capacity after each chain archives, no premature archive entry.",
+      "rules": ["R-GFS-01", "R-GFS-03", "R-ARCH-01", "R-OFFLOAD-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 400,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "noArchivePointBeforeCapTierAge": 30,
+        "pruneNeverBeforeOffload": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "knownEngineGaps": ["R-ARCH-03"],
+      "id": "ix-gfs-wmy-copy-archive",
+      "layer": 3,
+      "name": "GFS W+M+Y × Copy × Archive: residue and gate",
+      "description": "Mixed GFS with copy mode and archive. Non-GFS Capacity residue must clear immediately after GFS point archives. Archive gate is point-age-based.",
+      "rules": ["R-GFS-01", "R-ARCH-02", "R-ARCH-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 400,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "noNonGfsCapacityResidue": true,
+        "noArchivePointBeforePointAge": 28,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "knownEngineGaps": ["R-ARCH-03"],
+      "id": "ix-gfs-wmy-copy-archive-immutability",
+      "layer": 3,
+      "name": "GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction",
+      "description": "High-risk 3-way: mixed GFS stacking, copy mode, archive, and all-tier immutability. Verify correct interlock between archive gating, capacity residue clearing, and GEN immutability locks.",
+      "rules": ["R-GFS-01", "R-ARCH-02", "R-ARCH-03", "R-IMM-01", "R-IMM-02", "R-IMM-03", "R-GEN-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 14,
+        "archiveImmutabilityDays": 21,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 500,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "noNonGfsCapacityResidue": true,
+        "noArchivePointBeforePointAge": 28,
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "noPruneWhilePerfImmutable": true,
+        "noDeletionWhileCapImmutable": true,
+        "noDeletionWhileArchImmutable": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "id": "ix-gfs-monthly-move-immutability",
+      "layer": 3,
+      "name": "GFS Monthly × Move × Perf Immutability: GEN deleteOn vs immutability interlock",
+      "description": "Monthly GFS extends GEN deleteOn. Combined with Perf immutability this requires both deleteOn and lock to clear before prune/delete. Neither alone should be sufficient.",
+      "rules": ["R-GEN-03", "R-IMM-01", "R-GFS-04"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 0, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 14,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 120,
+      "assertions": {
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "pruneNeverBeforeOffload": true,
+        "noPruneWhilePerfImmutable": true,
+        "genDeleteOnExtendedByGfs": true,
+        "chainDeletionRequiresAllGensUnlocked": true
+      }
+    },
+
+    {
+      "id": "ix-short-retention-long-gfs",
+      "layer": 3,
+      "name": "Short retention × long GFS yearly: chain outlives retention by years",
+      "description": "With retention=7 and yearly=5 (5 years), chains sealed early must survive for 5 years because of GFS tag. Verifies GFS protection overrides count+SLA expiry for the full GFS window.",
+      "rules": ["R-RET-04", "R-GFS-02"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 5},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1825,
+      "assertions": {
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "slaMinimumNeverViolated": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "id": "ix-high-gen-period",
+      "layer": 3,
+      "name": "Large generationPeriodDays with GFS and immutability",
+      "description": "generationPeriodDays=30: each GEN covers a full month. Verifies GEN window aligns correctly at 30-day boundaries and deleteOn is computed properly with monthly GFS extension.",
+      "rules": ["R-GEN-01", "R-GEN-02", "R-GEN-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 0, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 60,
+        "performanceImmutabilityDays": 14,
+        "generationPeriodDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 200,
+      "assertions": {
+        "genWindowBoundaryCorrect": true,
+        "genDeleteOnEqualsWindowEndPlusSla": true,
+        "genDeleteOnExtendedByGfs": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "chainDeletionRequiresAllGensUnlocked": true
+      }
+    },
+
+    {
+      "id": "ix-copy-move-combo",
+      "layer": 3,
+      "name": "Copy+Move mode with GFS W+M and archive",
+      "description": "copyEnabled+moveEnabled simultaneously. Verifies both copy semantics (Capacity stamped at creation) and move semantics (Performance removed after offloadAfterDays) apply correctly, with correct archive gating.",
+      "rules": ["R-OFFLOAD-01", "R-ARCH-01", "R-GFS-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 2, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": true
+      },
+      "totalDays": 120,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "noArchivePointBeforeCapTierAge": 30,
+        "pruneNeverBeforeOffload": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
+      "id": "ix-no-gfs-long-archive",
+      "layer": 3,
+      "name": "SOBR Move no-GFS: archive tier should remain empty",
+      "description": "With hasArchiveTier=true but no GFS policy, only GFS-tagged points may enter Archive. Archive tier must remain empty throughout the entire run.",
+      "rules": ["R-ARCH-04"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 200,
+      "assertions": {
+        "archiveTierAlwaysEmpty": true
+      }
+    },
+
+    {
+      "id": "ix-retention-variant-r7",
+      "layer": 3,
+      "name": "Retention variant retention=7 with W+M GFS",
+      "description": "Retention=7 paired with GFS to stress-test boundary interaction at the shortest practical retention. Chain should seal every 7 days and GFS must survive past that.",
+      "rules": ["R-RET-01", "R-GFS-01", "R-GFS-04"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 200,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "chainDeletionRequiresAllGensUnlocked": true
+      }
+    },
+
+    {
+      "id": "ix-retention-variant-r60",
+      "layer": 3,
+      "name": "Retention variant retention=60 with W+M+Y GFS",
+      "description": "Retention=60 with full GFS stack. Many chains coexist; verifies base identity remains oldest across all, GFS caps are respected across many active+inactive chains simultaneously.",
+      "rules": ["R-RET-01", "R-BASE-01", "R-GFS-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 400,
+      "assertions": {
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "pruneNeverBeforeOffload": true,
+        "noActiveChainOffloadComplete": true
+      }
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LAYER 4 — Oracle diff tests (daily state snapshot comparison)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    {
+      "id": "od-weekly-gfs-cardinality-exact",
+      "layer": 4,
+      "name": "Oracle diff: weekly GFS cardinality exact on every Saturday",
+      "description": "Every Saturday the weekly GFS count must equal min(weeks elapsed since start, gfsPolicy.weekly). Validated by oracle that computes expected count from dates, not from engine state.",
+      "rules": ["R-GFS-01", "R-GFS-03"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 100,
+      "assertions": {
+        "oracleDiff": true,
+        "oracleChecks": ["weeklyGfsCardinalityPerSaturday"]
+      }
+    },
+
+    {
+      "id": "od-monthly-yearly-cardinality-exact",
+      "layer": 4,
+      "name": "Oracle diff: monthly and yearly GFS cardinality across calendar",
+      "description": "Each last-Saturday-of-month count must equal min(months elapsed, gfsPolicy.monthly). Each last-Saturday-of-December count must equal min(years elapsed, gfsPolicy.yearly).",
+      "rules": ["R-GFS-04", "R-GFS-05"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 800,
+      "assertions": {
+        "oracleDiff": true,
+        "oracleChecks": ["monthlyGfsCardinalityPerMonth", "yearlyGfsCardinalityPerYear"]
+      }
+    },
+
+    {
+      "id": "od-tier-residency-per-point",
+      "layer": 4,
+      "name": "Oracle diff: per-point tier residency vs expected schedule",
+      "description": "Oracle computes expected tier set for each point on each day based on creation date, offloadAfterDays, archiveAfterDays, chain status, and GFS flag. Diffs against actual hasPerformanceData/hasCapacityData/hasArchiveData.",
+      "rules": ["R-OFFLOAD-01", "R-ARCH-01", "R-ARCH-02", "R-ARCH-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 90,
+      "assertions": {
+        "oracleDiff": true,
+        "oracleChecks": ["tierResidencyPerPoint"]
+      }
+    },
+
+    {
+      "id": "od-gen-lifecycle-states",
+      "layer": 4,
+      "name": "Oracle diff: GEN lifecycle state per day matches expected dates",
+      "description": "Oracle computes expected GEN state (Pending/WaitImmutability/Deletable) based on deleteOn and immutableUntil dates. Diffs against getCurrentGenerations() output each day.",
+      "rules": ["R-GEN-01", "R-GEN-02", "R-GEN-03", "R-GEN-04", "R-IMM-01", "R-IMM-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 10,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 100,
+      "assertions": {
+        "oracleDiff": true,
+        "oracleChecks": ["genLifecycleStatePerDay"]
+      }
+    },
+
+    {
+      "id": "od-chain-phase-transitions",
+      "layer": 4,
+      "name": "Oracle diff: chain phase transitions match expected schedule",
+      "description": "Oracle predicts chain phase per day: Active, Inactive, OffloadPending, OffloadComplete, PerfPruned, Deleted. Diffs against actual chain and restore-point state each day.",
+      "rules": ["R-CHAIN-01", "R-OFFLOAD-01", "R-PRUNE-01", "R-RET-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 21,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 80,
+      "assertions": {
+        "oracleDiff": true,
+        "oracleChecks": ["chainPhasePerDay"]
+      }
+    },
+
+    {
+      "knownEngineGaps": ["R-ARCH-03"],
+      "id": "od-sobr-copy-full-lifecycle",
+      "layer": 4,
+      "name": "Oracle diff: SOBR copy-only full lifecycle trace",
+      "description": "Copy mode: every new point immediately gets Capacity copy. Oracle tracks Perf+Cap dual occupancy per point, then Archive entry timing for GFS points, then Capacity residue clearing.",
+      "rules": ["R-ARCH-02", "R-ARCH-03", "R-CHAIN-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 0,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": false
+      },
+      "totalDays": 150,
+      "assertions": {
+        "oracleDiff": true,
+        "oracleChecks": ["tierResidencyPerPoint", "chainPhasePerDay"],
+        "noNonGfsCapacityResidue": true,
+        "noArchivePointBeforePointAge": 28
+      }
+    }
+  ]
+}

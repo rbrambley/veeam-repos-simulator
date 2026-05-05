@@ -256,7 +256,7 @@ export class VeeamSimulator {
       if (!activeChain || activeChain.restorePoints.length === 0) {
         const date = this.parseISODate(this.state.date);
         const rp = this.createRestorePoint(job, date, 'Full');
-        actions.push(`Job '${job.name}' created a Full restore point (${rp.sizeGB.toFixed(1)} TB) in Chain ${rp.chainId}.`);
+        actions.push(`Job '${job.name}' created a Full restore point (${rp.sizeGB.toFixed(3)} TB) in Chain ${rp.chainId}.`);
 
         const repo = this.state.repositories.find(r => r.id === job.repositoryId);
         if (repo?.type === 'SOBR' && repo.sobrConfig && this.isCopyEnabled(repo.sobrConfig)) {
@@ -286,7 +286,7 @@ export class VeeamSimulator {
       if (!activeChain || activeChain.restorePoints.length === 0) {
         // Always create a full on the very first day (if no chain exists)
         const rp = this.createRestorePoint(job, currentDate, 'Full');
-        actions.push(`Job '${job.name}' created a Full restore point (${rp.sizeGB.toFixed(1)} TB).`);
+        actions.push(`Job '${job.name}' created a Full restore point (${rp.sizeGB.toFixed(3)} TB).`);
         continue;
       }
 
@@ -305,7 +305,7 @@ export class VeeamSimulator {
           }
           rp = this.createRestorePoint(job, currentDate, 'SyntheticFull');
           this.tagGFSRestorePoint(job, rp, currentDate, actions);
-          actions.push(`Job '${job.name}' created a GFS SyntheticFull restore point (${rp.sizeGB.toFixed(1)} TB) in Chain ${rp.chainId}.`);
+          actions.push(`Job '${job.name}' created a GFS SyntheticFull restore point (${rp.sizeGB.toFixed(3)} TB) in Chain ${rp.chainId}.`);
         } else if (
           (job.type === 'SyntheticFull' || job.type === 'ForwardIncremental') &&
           this.isSyntheticFullDay(job, currentDate)
@@ -319,12 +319,12 @@ export class VeeamSimulator {
             activeChain.performancePrunedAt = undefined;
           }
           rp = this.createRestorePoint(job, currentDate, 'SyntheticFull');
-          actions.push(`Job '${job.name}' created a SyntheticFull restore point (${rp.sizeGB.toFixed(1)} TB) in Chain ${rp.chainId}. Previous chain closed and new chain started.`);
+          actions.push(`Job '${job.name}' created a SyntheticFull restore point (${rp.sizeGB.toFixed(3)} TB) in Chain ${rp.chainId}. Previous chain closed and new chain started.`);
           this.tagGFSRestorePoint(job, rp, currentDate, actions);
         } else {
           rp = this.createRestorePoint(job, currentDate);
           this.tagGFSRestorePoint(job, rp, currentDate, actions);
-          actions.push(`Job '${job.name}' created a ${rp.type} restore point (${rp.sizeGB.toFixed(1)} TB) in Chain ${rp.chainId}.`);
+          actions.push(`Job '${job.name}' created a ${rp.type} restore point (${rp.sizeGB.toFixed(3)} TB) in Chain ${rp.chainId}.`);
         }
       }
     }
