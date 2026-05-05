@@ -173,20 +173,10 @@ function computeStoredContributionTB(
   hasMonthly: boolean,
   hasYearly: boolean,
 ): number {
-  // Mixed captures indicate weekly points are effectively anchor labels when
-  // monthly/yearly retention exists; monthly/yearly drive net additional data.
-  if (hasMonthly || hasYearly) {
-    const monthlyContribution = hasMonthly
-      ? Math.min(pointSizeTB, pointSizeTB * dailyChangeRate * 5)
-      : 0;
-    const yearlyContribution = hasYearly
-      ? Math.min(pointSizeTB, pointSizeTB * dailyChangeRate * 18)
-      : 0;
-    return Math.max(monthlyContribution, yearlyContribution);
-  }
-
-  // Preserve weekly-only legacy behavior until dedicated weekly model capture.
-  void hasWeekly;
+  // Each GFS point is a full SyntheticFull storing all source data.
+  // distinctDates already deduplicates W+M and W+Y overlaps, so no
+  // additional deflation is needed here. Always return the full point size.
+  void dailyChangeRate; void hasWeekly; void hasMonthly; void hasYearly;
   return pointSizeTB;
 }
 

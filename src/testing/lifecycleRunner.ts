@@ -384,7 +384,7 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
     offloadAfterDays: cfg.offloadAfterDays,
     archiveAfterDays: cfg.archiveAfterDays,
     hasArchiveTier: cfg.hasArchiveTier,
-    sizingMode: 'legacy',
+    sizingMode: 'reverse',
   });
   const gfsTotalTB = cfg.repositoryType === 'SOBR'
     ? (gfsForecastStats.additionalPerfFullTB + gfsForecastStats.additionalCapFullTB + gfsForecastStats.additionalArchFullTB)
@@ -398,7 +398,7 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   storageSummary.push(`Inactive chain (global base full + incrementals) ≈ ${inactiveChainTB.toFixed(3)} TB (SF promoted to ${fullSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr)`);
   storageSummary.push(`Active chain at peak ≈ ${activeChainPeakTB.toFixed(3)} TB (SF at incr size ${incrSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr, base not yet promoted)`);
   if (gfsPointCount > 0) {
-    storageSummary.push(`GFS period-slice estimate (${gfsPointCount} points): ${gfsTotalTB.toFixed(3)} TB`);
+    storageSummary.push(`GFS estimate (${gfsPointCount} points): ${gfsTotalTB.toFixed(3)} TB`);
     if (cfg.repositoryType === 'SOBR') {
       storageSummary.push(`  Perf ${gfsForecastStats.additionalPerfFullTB.toFixed(3)} TB · Cap ${gfsForecastStats.additionalCapFullTB.toFixed(3)} TB · Arch ${gfsForecastStats.additionalArchFullTB.toFixed(3)} TB`);
     }

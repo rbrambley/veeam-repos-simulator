@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-05T20:08:15.162Z",
+  "generatedAt": "2026-05-05T20:32:38.128Z",
   "status": "PASS",
-  "totalCases": 22,
-  "passedCases": 22,
+  "totalCases": 23,
+  "passedCases": 23,
   "failedCases": 0,
   "cases": [
     {
@@ -161,9 +161,9 @@
       "id": "integration-monthly-size",
       "category": "engine-integration",
       "status": "pass",
-      "description": "Monthly integration uses expected inflated size",
-      "expected": "3.330000000",
-      "actual": "3.330000000"
+      "description": "Monthly integration uses full backup size",
+      "expected": "6.660000000",
+      "actual": "6.660000000"
     },
     {
       "id": "integration-yearly-flag",
@@ -177,9 +177,17 @@
       "id": "integration-yearly-size",
       "category": "engine-integration",
       "status": "pass",
-      "description": "Yearly integration uses expected inflated size",
+      "description": "Yearly integration uses full backup size",
       "expected": "6.660000000",
       "actual": "6.660000000"
+    },
+    {
+      "id": "integration-weekly-size-growth",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Weekly integration scales with annual growth at point date",
+      "expected": "7.337486953",
+      "actual": "7.337486953"
     }
   ]
 }

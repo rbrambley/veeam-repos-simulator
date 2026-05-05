@@ -49,33 +49,13 @@ export class VeeamSimulator {
     }
   }
 
-  private computeStoredContributionTB(
-    pointSizeTB: number,
-    dailyChangeRate: number,
-    hasMonthly: boolean,
-    hasYearly: boolean,
-  ): number {
-    if (hasMonthly || hasYearly) {
-      const monthlyContribution = hasMonthly
-        ? Math.min(pointSizeTB, pointSizeTB * dailyChangeRate * 5)
-        : 0;
-      const yearlyContribution = hasYearly
-        ? Math.min(pointSizeTB, pointSizeTB * dailyChangeRate * 18)
-        : 0;
-      return Math.max(monthlyContribution, yearlyContribution);
-    }
-
-    return pointSizeTB;
-  }
-
   private applyGfsSizing(job: BackupJob, rp: RestorePoint) {
     if (!rp.isGFS) return;
-    const hasMonthly = !!rp.isMonthlyGFS;
-    const hasYearly = !!rp.isYearlyGFS;
-    const baseSize = Math.max(0, job.sourceDataTB || 0) * 0.5;
-    const dailyChangeRate = Math.max(0, (job.dailyChangeRatePct ?? 0) / 100);
-    const storedContributionTB = this.computeStoredContributionTB(baseSize, dailyChangeRate, hasMonthly, hasYearly);
-    this.setRestorePointSize(rp, storedContributionTB);
+    // A GFS-tagged SyntheticFull is still a full backup storing all data.
+    // Monthly/yearly tags only extend retention lifetime; they do not reduce
+    // physical size. Size should follow source growth at the point date.
+    const fullSizeAtPointTB = this.getExpectedFullSizeTB(job, rp.date);
+    this.setRestorePointSize(rp, fullSizeAtPointTB);
   }
 
   private ensureGenerationState() {

@@ -218,8 +218,8 @@ function runEngineIntegrationTests(): void {
     const rp = sim.createRestorePoint(job, monthlyDate, 'SyntheticFull');
     sim.tagGFSRestorePoint(job, rp, monthlyDate, []);
     recordBooleanCase('integration-monthly-flag', 'engine-integration', 'Monthly integration applies monthly GFS tag', true, !!rp.isMonthlyGFS);
-    const expected = Math.min(6.66, 6.66 * 0.1 * 5);
-    recordNumericCase('integration-monthly-size', 'engine-integration', 'Monthly integration uses expected inflated size', expected, rp.sizeGB);
+    const expected = 6.66; // Full backup size - tag doesn't reduce physical size
+    recordNumericCase('integration-monthly-size', 'engine-integration', 'Monthly integration uses full backup size', expected, rp.sizeGB);
   }
 
   {
@@ -228,8 +228,28 @@ function runEngineIntegrationTests(): void {
     const rp = sim.createRestorePoint(job, yearlyDate, 'SyntheticFull');
     sim.tagGFSRestorePoint(job, rp, yearlyDate, []);
     recordBooleanCase('integration-yearly-flag', 'engine-integration', 'Yearly integration applies yearly GFS tag', true, !!rp.isYearlyGFS);
-    const expected = Math.min(6.66, 6.66 * 0.1 * 18);
-    recordNumericCase('integration-yearly-size', 'engine-integration', 'Yearly integration uses expected inflated size', expected, rp.sizeGB);
+    const expected = 6.66; // Full backup size - tag doesn't reduce physical size
+    recordNumericCase('integration-yearly-size', 'engine-integration', 'Yearly integration uses full backup size', expected, rp.sizeGB);
+  }
+
+  {
+    const sim = new VeeamSimulator(buildState({ weekly: 4, monthly: 0, yearly: 0 }));
+    const job = sim.state.jobs[0];
+    job.annualGrowthRatePct = 10;
+    const laterWeeklyDate = new Date('2027-05-08T00:00:00.000Z'); // Saturday ~1 year later
+    const rp = sim.createRestorePoint(job, laterWeeklyDate, 'SyntheticFull');
+    sim.tagGFSRestorePoint(job, rp, laterWeeklyDate, []);
+    const startDate = new Date(`${sim.state.startDate}T00:00:00.000Z`);
+    const elapsedDays = (laterWeeklyDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+    const expected = 13.32 * Math.pow(1 + 0.1, elapsedDays / 365) * 0.5;
+    recordNumericCase(
+      'integration-weekly-size-growth',
+      'engine-integration',
+      'Weekly integration scales with annual growth at point date',
+      expected,
+      rp.sizeGB,
+      1e-6,
+    );
   }
 }
 

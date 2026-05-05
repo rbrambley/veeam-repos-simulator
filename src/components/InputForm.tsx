@@ -85,7 +85,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
       offloadAfterDays: sobrOffloadDays,
       archiveAfterDays: sobrArchiveDays,
       hasArchiveTier: sobrHasArchive,
-      sizingMode: 'legacy',
+      // Use point-date sizing so forecast mirrors simulator restore-point growth.
+      sizingMode: 'reverse',
     });
 
     return stats;
