@@ -47,6 +47,14 @@ This runs:
 - `tsx src/testing/veeamBaselineComparator.ts`
 - Baseline file: `docs/veeam-calculator-baseline.json`
 
+To verify CI-safe calculator drift expectations:
+
+```bash
+npm run verify:known-veeam-deltas
+```
+
+This verifies that `compare:veeam` only fails for the approved known divergence set.
+
 To auto-create initial baseline values from current simulator logic:
 
 ```bash
@@ -75,7 +83,7 @@ For baseline comparison, you will see:
 - Delta and delta percentage per compared metric
 - Summary with Passed / Failed / Pending (missing expected values)
 
-Current baseline comparison result: **5/6 passing**. The one known failure (`sobr-gfs-archive` Cap Tier, -16.81%) is a structural gap — the 10-day block generation window is not yet modeled. See `docs/test-scenarios-verification.md` for full details.
+`compare:veeam` may be non-zero by design when known structural gaps are tracked. Use `verify:known-veeam-deltas` to enforce that only approved known deltas remain.
 
 ## Veeam Baseline — Guided Capture (Recommended)
 
@@ -135,6 +143,7 @@ Notes:
 
 - `compare:veeam` does **not** call Veeam website during test runs.
 - It compares simulator outputs to your stored baseline values only.
+- It is best treated as directional/informational, not a hard pass/fail gate by itself.
 - `--seed` writes baseline values from the simulator as a starting point.
 
 ## Veeam Baseline — Future Option: Playwright Automation

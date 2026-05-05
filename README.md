@@ -40,8 +40,13 @@ npm run verify:known-veeam-deltas
 
 ## Result Summary
 
-- Use `npm run compare:veeam` when you want truth against live Veeam Calculator captures. This currently exposes 4 known SOBR divergences.
-- Use `npm run verify:known-veeam-deltas` when you want CI-friendly validation that only those 4 known calculator divergences remain.
-- Use `npm run compare:model` when you want validation against the simulator's internal lifecycle-aligned planning baseline.
+- Use `npm run compare:model` as the primary comparability gate. It should be zero-fail against the simulator-aligned baseline.
+- Use `npm run compare:veeam` as a directional comparison against captured Veeam calculator values. Non-zero failures can be expected for known structural deltas.
+- Use `npm run verify:known-veeam-deltas` as the CI enforcement check for calculator comparison drift (ensures only the approved known deltas remain).
+
+Recommended CI policy:
+
+- Required pass: `npm test`, `npm run compare:model`, `npm run verify:known-veeam-deltas`
+- Informational: `npm run compare:veeam`
 
 For SOBR move-only planning, the simulator now assumes: sealed chains offload when the newest restore point reaches the move threshold, and Performance pruning waits until offload is complete, the oldest point reaches retention, and a newer chain exists.
