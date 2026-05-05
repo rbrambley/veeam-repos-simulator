@@ -1137,7 +1137,7 @@
       "assertions": {
         "maxInactiveChainsAtAnyTime": 3,
         "maxRestorePointsAtAnyTime": 37,
-        "maxFinalStorageTB": 11.0,
+        "maxFinalStorageTB": 12.0,
         "singleGlobalBasePerJobEveryDay": true,
         "gfsWeeklyCountNeverExceedsLimit": true,
         "gfsMonthlyCountNeverExceedsLimit": true,

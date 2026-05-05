@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-05T12:16:44.675Z",
-  "probeScenarioCount": 43,
+  "generatedAt": "2026-05-05T19:58:32.373Z",
+  "probeScenarioCount": 48,
   "mutationCount": 5,
   "caughtCount": 5,
   "blindSpotCount": 0,
@@ -27,11 +27,11 @@
       "expectedCatchingRule": "R-GFS-03 (gfsWeeklyCountNeverExceedsLimit)",
       "caught": true,
       "catchResult": {
-        "scenarioId": "ti-sobr-move-3yr",
-        "day": 35,
-        "date": "2026-06-06",
+        "scenarioId": "lb-das-gfs-preserves-chain",
+        "day": 21,
+        "date": "2026-05-23",
         "rule": "R-GFS-01",
-        "message": "expected: weeklyGFS count ≤ 4 | actual: weeklyGFS count = 5"
+        "message": "expected: weeklyGFS count ≤ 2 | actual: weeklyGFS count = 3"
       }
     },
     {

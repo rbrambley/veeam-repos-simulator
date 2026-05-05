@@ -1,0 +1,185 @@
+{
+  "generatedAt": "2026-05-05T19:58:26.461Z",
+  "status": "PASS",
+  "totalCases": 22,
+  "passedCases": 22,
+  "failedCases": 0,
+  "cases": [
+    {
+      "id": "modifier-boundary-2",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 2 uses expected modifier 1",
+      "expected": "110.000000000",
+      "actual": "110.000000000"
+    },
+    {
+      "id": "modifier-boundary-14",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 14 uses expected modifier 1",
+      "expected": "110.000000000",
+      "actual": "110.000000000"
+    },
+    {
+      "id": "modifier-boundary-38",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 38 uses expected modifier 3",
+      "expected": "130.000000000",
+      "actual": "130.000000000"
+    },
+    {
+      "id": "modifier-boundary-100",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 100 uses expected modifier 5",
+      "expected": "150.000000000",
+      "actual": "150.000000000"
+    },
+    {
+      "id": "modifier-boundary-193",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 193 uses expected modifier 9",
+      "expected": "190.000000000",
+      "actual": "190.000000000"
+    },
+    {
+      "id": "modifier-boundary-286",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 286 uses expected modifier 12",
+      "expected": "220.000000000",
+      "actual": "220.000000000"
+    },
+    {
+      "id": "modifier-boundary-379",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 379 uses expected modifier 15",
+      "expected": "250.000000000",
+      "actual": "250.000000000"
+    },
+    {
+      "id": "modifier-boundary-1095",
+      "category": "modifier-boundary",
+      "status": "pass",
+      "description": "Boundary age 1095 uses expected modifier 18",
+      "expected": "280.000000000",
+      "actual": "280.000000000"
+    },
+    {
+      "id": "weekly-age-7",
+      "category": "weekly-range",
+      "status": "pass",
+      "description": "Weekly range age 7",
+      "expected": "10.500000000",
+      "actual": "10.500000000"
+    },
+    {
+      "id": "weekly-age-21",
+      "category": "weekly-range",
+      "status": "pass",
+      "description": "Weekly range age 21",
+      "expected": "11.500000000",
+      "actual": "11.500000000"
+    },
+    {
+      "id": "weekly-age-28",
+      "category": "weekly-range",
+      "status": "pass",
+      "description": "Weekly range age 28",
+      "expected": "11.500000000",
+      "actual": "11.500000000"
+    },
+    {
+      "id": "monthly-age-30",
+      "category": "monthly-range",
+      "status": "pass",
+      "description": "Monthly range age 30",
+      "expected": "11.500000000",
+      "actual": "11.500000000"
+    },
+    {
+      "id": "monthly-age-60",
+      "category": "monthly-range",
+      "status": "pass",
+      "description": "Monthly range age 60",
+      "expected": "12.500000000",
+      "actual": "12.500000000"
+    },
+    {
+      "id": "monthly-age-90",
+      "category": "monthly-range",
+      "status": "pass",
+      "description": "Monthly range age 90",
+      "expected": "12.500000000",
+      "actual": "12.500000000"
+    },
+    {
+      "id": "yearly-age-365",
+      "category": "yearly-range",
+      "status": "pass",
+      "description": "Yearly range age 365",
+      "expected": "17.500000000",
+      "actual": "17.500000000"
+    },
+    {
+      "id": "extreme-age-1096",
+      "category": "extreme-case",
+      "status": "pass",
+      "description": "Extreme case age 1096 uses 1000 modifier tier",
+      "expected": "510.000000000",
+      "actual": "510.000000000"
+    },
+    {
+      "id": "integration-weekly-flag",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Weekly integration applies weekly GFS tag",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "id": "integration-weekly-size",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Weekly integration uses expected inflated size",
+      "expected": "6.660000000",
+      "actual": "6.660000000"
+    },
+    {
+      "id": "integration-monthly-flag",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Monthly integration applies monthly GFS tag",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "id": "integration-monthly-size",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Monthly integration uses expected inflated size",
+      "expected": "3.330000000",
+      "actual": "3.330000000"
+    },
+    {
+      "id": "integration-yearly-flag",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Yearly integration applies yearly GFS tag",
+      "expected": "true",
+      "actual": "true"
+    },
+    {
+      "id": "integration-yearly-size",
+      "category": "engine-integration",
+      "status": "pass",
+      "description": "Yearly integration uses expected inflated size",
+      "expected": "6.660000000",
+      "actual": "6.660000000"
+    }
+  ]
+}
