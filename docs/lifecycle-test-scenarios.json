@@ -274,7 +274,6 @@
     },
 
     {
-      "knownEngineGaps": ["R-ARCH-03"],
       "id": "lb-sobr-capacity-residue-after-archive",
       "layer": 1,
       "name": "SOBR Copy: non-GFS Capacity residue pruned when GFS full archives",
@@ -355,6 +354,7 @@
         "gfsWeeklyCountNeverExceedsLimit": true,
         "gfsMonthlyCountNeverExceedsLimit": true,
         "gfsYearlyCountNeverExceedsLimit": true,
+        "gfsCardinalityMatchesCalendar": true,
         "gfsTagsOnlyOnFullOrSyntheticFull": true,
         "singleGlobalBasePerJobEveryDay": true,
         "noActiveChainOffloadComplete": true,
@@ -399,7 +399,6 @@
     },
 
     {
-      "knownEngineGaps": ["R-ARCH-03"],
       "id": "ti-sobr-copy-3yr",
       "layer": 2,
       "name": "SOBR Copy-only 3-year soak: capacity residue and archive gate every day",
@@ -837,7 +836,6 @@
     },
 
     {
-      "knownEngineGaps": ["R-ARCH-03"],
       "id": "ix-gfs-wmy-copy-archive",
       "layer": 3,
       "name": "GFS W+M+Y × Copy × Archive: residue and gate",
@@ -869,7 +867,6 @@
     },
 
     {
-      "knownEngineGaps": ["R-ARCH-03"],
       "id": "ix-gfs-wmy-copy-archive-immutability",
       "layer": 3,
       "name": "GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction",
@@ -1424,7 +1421,6 @@
     },
 
     {
-      "knownEngineGaps": ["R-ARCH-03"],
       "id": "od-sobr-copy-full-lifecycle",
       "layer": 4,
       "name": "Oracle diff: SOBR copy-only full lifecycle trace",

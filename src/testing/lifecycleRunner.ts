@@ -55,6 +55,7 @@ interface ScenarioAssertions extends DailyAssertionConfig {
   chainMustExistOnDay?: number;
   chainMustBeGoneByDay?: number;
   chainSealedOnDay?: number;
+  gfsCardinalityMatchesCalendar?: boolean;
   weeklyGfsCountAtDays?: Array<{ day: number; expectedCount: number }>;
   weeklyGfsExpiryOrderCorrect?: boolean;
   monthlyGfsOnlyOnLastSaturdayOfMonth?: boolean;
@@ -296,10 +297,11 @@ function buildExpectedPath(cfg: ScenarioConfig): string {
 
 function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   const endDate = addDaysSimple(START_DATE, sc.totalDays);
-  const gfs = expectedGfsCardinality(START_DATE, endDate, sc.config.gfsPolicy);
-  const weeklyDates = weeklyGfsDates(START_DATE, endDate).slice(-5);
-  const monthlyDates = monthlyGfsDates(START_DATE, endDate).slice(-5);
-  const yearlyDates = yearlyGfsDates(START_DATE, endDate).slice(-5);
+  const firstBackupDate = addDaysSimple(START_DATE, 1);
+  const gfs = expectedGfsCardinality(firstBackupDate, endDate, sc.config.gfsPolicy);
+  const weeklyDates = weeklyGfsDates(firstBackupDate, endDate).slice(-5);
+  const monthlyDates = monthlyGfsDates(firstBackupDate, endDate).slice(-5);
+  const yearlyDates = yearlyGfsDates(firstBackupDate, endDate).slice(-5);
 
   const milestones: string[] = [];
   milestones.push(`Full backup chain starts on ${START_DATE}.`);
@@ -664,6 +666,43 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
       }
     }
 
+    // ── Daily exact cardinality: expected calendar W/M/Y counts ──────────
+    if (assertions.gfsCardinalityMatchesCalendar) {
+      const firstBackupDate = addDaysSimple(START_DATE, 1);
+      const expected = expectedGfsCardinality(firstBackupDate, currentDate, cfg.gfsPolicy);
+      const actualWeekly = sim.state.restorePoints.filter((r) => r.isWeeklyGFS).length;
+      const actualMonthly = sim.state.restorePoints.filter((r) => r.isMonthlyGFS).length;
+      const actualYearly = sim.state.restorePoints.filter((r) => r.isYearlyGFS).length;
+
+      if (actualWeekly !== expected.weekly) {
+        violations.push({
+          day,
+          date: currentDate,
+          violatedRule: 'R-GFS-01',
+          expected: `weekly GFS count = ${expected.weekly} on ${currentDate}`,
+          actual: `weekly GFS count = ${actualWeekly}`,
+        });
+      }
+      if (actualMonthly !== expected.monthly) {
+        violations.push({
+          day,
+          date: currentDate,
+          violatedRule: 'R-GFS-03',
+          expected: `monthly GFS count = ${expected.monthly} on ${currentDate}`,
+          actual: `monthly GFS count = ${actualMonthly}`,
+        });
+      }
+      if (actualYearly !== expected.yearly) {
+        violations.push({
+          day,
+          date: currentDate,
+          violatedRule: 'R-GFS-05',
+          expected: `yearly GFS count = ${expected.yearly} on ${currentDate}`,
+          actual: `yearly GFS count = ${actualYearly}`,
+        });
+      }
+    }
+
     // ── R-GEN-01/02: GEN window boundary correct ─────────────────────────
     if (assertions.genWindowBoundaryCorrect) {
       const genPeriod = cfg.generationPeriodDays ?? 10;
@@ -855,6 +894,7 @@ function getAssertionLabels(a: ScenarioAssertions): string[] {
   if (a.gfsWeeklyCountNeverExceedsLimit)       out.push('Weekly GFS count ≤ limit');
   if (a.gfsMonthlyCountNeverExceedsLimit)      out.push('Monthly GFS count ≤ limit');
   if (a.gfsYearlyCountNeverExceedsLimit)       out.push('Yearly GFS count ≤ limit');
+  if (a.gfsCardinalityMatchesCalendar)         out.push('GFS cardinality matches calendar-derived exact counts daily');
   if (a.gfsTagsOnlyOnFullOrSyntheticFull)      out.push('GFS tags on Full/SyntheticFull only');
   if (a.monthlyGfsOnlyOnLastSaturdayOfMonth)   out.push('Monthly GFS on last Saturday of month');
   if (a.yearlyGfsOnlyOnLastSaturdayOfDecember) out.push('Yearly GFS on last Saturday of December');
@@ -1749,7 +1789,18 @@ function main() {
   if (failed > 0) {
     console.log(`\n=== Failures ===\n`);
     for (const result of results.filter((r) => !r.passed)) {
+      const hasSnapshotViolations = result.violations.some((v) => v.violatedRule === 'R-SNAP-01');
+      const snapshotOnlyFailure = hasSnapshotViolations && result.violations.every((v) => v.violatedRule === 'R-SNAP-01');
+
       console.log(`SCENARIO: ${result.id} — ${result.name}`);
+      if (snapshotOnlyFailure) {
+        console.log(`  diagnosis: snapshot baseline drift only (R-SNAP-01).`);
+        console.log(`             If behavior change is intentional, run: npm run test:lifecycle -- --update-snapshots`);
+      } else if (hasSnapshotViolations) {
+        console.log(`  diagnosis: mixed failure (snapshot drift + logic assertions).`);
+      } else {
+        console.log(`  diagnosis: logic regression (non-snapshot assertions).`);
+      }
       for (const v of result.violations.slice(0, 20)) {
         console.log(
           `  day ${String(v.day).padStart(4)} | ${v.date} | ${v.chainId ?? v.rpId ?? v.genId ?? '-'} | rule ${v.violatedRule}`

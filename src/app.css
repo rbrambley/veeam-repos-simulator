@@ -25,6 +25,46 @@
   background: #fafbff;
 }
 
+.form-card-body.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.form-card-body.two-col .full-row {
+  grid-column: 1 / -1;
+}
+
+.card-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card-split-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.card-split-col > label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  color: #37474f;
+}
+
+.card-split-col-header {
+  display: flex;
+  align-items: center;
+  min-height: 1.875rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #455a64;
+}
+
 /* Direct-child labels get a flex row layout (text left, input right) */
 .form-card-body > label {
   display: flex;
@@ -32,6 +72,20 @@
   gap: 0.5rem;
   font-size: 0.84rem;
   color: #37474f;
+}
+
+.form-card-body.two-col > label {
+  justify-content: space-between;
+}
+
+@media (max-width: 840px) {
+  .form-card-body.two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .card-split {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ── Apply / action buttons ── */
@@ -111,4 +165,22 @@
   color: #455a64;
   border-bottom: 2px solid #1a237e;
   padding-bottom: 5px;
+}
+
+/* ── Scenario 2-column layout ── */
+.scenario-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.scenario-column {
+  min-width: 0;
+}
+
+@media (max-width: 1080px) {
+  .scenario-layout {
+    grid-template-columns: 1fr;
+  }
 }

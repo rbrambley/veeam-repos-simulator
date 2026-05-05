@@ -299,84 +299,161 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
         <span style={{ display: 'inline-block', width: '4px', height: '20px', background: '#1a237e', borderRadius: '2px', flexShrink: 0 }} />
         Configure Backup Scenario
       </h2>
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div className="scenario-layout">
         {/* ── Left column: inputs ── */}
-        <form onSubmit={e => { e.preventDefault(); handleApply(); }} style={{ flex: '1 1 340px', minWidth: '300px' }}>
+        <form
+          onSubmit={e => { e.preventDefault(); handleApply(); }}
+          className="scenario-column"
+        >
           <div className="form-card">
             <div className="form-card-header">Simulation Settings</div>
-            <div className="form-card-body">
+            <div className="form-card-body two-col">
             <label>
               Start Date:
               <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '150px' }} />
             </label>
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
-              <label>
-                Daily Change (%):
-                <input type="number" value={dailyChangeRate} min={0.1} max={100} step={0.1} onChange={e => setDailyChangeRate(Number(e.target.value))} style={compactNumberInputStyle} />
-              </label>
-              <label>
-                Annual Growth (%):
-                <input type="number" value={annualGrowthRate} min={0} max={100} step={1} onChange={e => setAnnualGrowthRate(Number(e.target.value))} style={compactNumberInputStyle} />
-              </label>
-              <label>
-                Forecast (y):
-                <input type="number" value={forecastYears} min={1} max={10} step={1} onChange={e => setForecastYears(Number(e.target.value))} style={compactNumberInputStyle} />
-              </label>
-            </div>
+            <label>
+              Forecast (y):
+              <input type="number" value={forecastYears} min={1} max={10} step={1} onChange={e => setForecastYears(Number(e.target.value))} style={compactNumberInputStyle} />
+            </label>
+            <label>
+              Daily Change (%):
+              <input type="number" value={dailyChangeRate} min={0.1} max={100} step={0.1} onChange={e => setDailyChangeRate(Number(e.target.value))} style={compactNumberInputStyle} />
+            </label>
+            <label>
+              Annual Growth (%):
+              <input type="number" value={annualGrowthRate} min={0} max={100} step={1} onChange={e => setAnnualGrowthRate(Number(e.target.value))} style={compactNumberInputStyle} />
+            </label>
             </div>
           </div>
           <div className="form-card">
             <div className="form-card-header">Backup Job</div>
-            <div className="form-card-body">
-            <label>
-              Name:
-              <input value={jobName} onChange={e => setJobName(e.target.value)} />
-            </label>
-            <label>
-              Source (TB):
-              <input type="number" value={sourceDataTB} min={0.1} step={0.1} onChange={e => setSourceDataTB(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
-            <label>
-              Type:
-              <select value={jobType} onChange={e => setJobType(e.target.value as BackupJobType)}>
-                <option value="ForwardIncremental">Forward Incremental</option>
-                <option value="ReverseIncremental">Reverse Incremental</option>
-                <option value="SyntheticFull">Synthetic Full</option>
-                <option value="ActiveFull">Active Full</option>
-                <option value="GFS">GFS</option>
-              </select>
-            </label>
-              <label>
-              Retention (d):
-              <input type="number" value={retention} min={1} onChange={e => setRetention(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
+            <div className="form-card-body two-col">
+            <div className="card-split full-row">
+              <div className="card-split-col">
+                <label>
+                  Name:
+                  <input value={jobName} onChange={e => setJobName(e.target.value)} />
+                </label>
+                <label>
+                  Type:
+                  <select value={jobType} onChange={e => setJobType(e.target.value as BackupJobType)}>
+                    <option value="ForwardIncremental">Forward Incremental</option>
+                    <option value="ReverseIncremental">Reverse Incremental</option>
+                    <option value="SyntheticFull">Synthetic Full</option>
+                    <option value="ActiveFull">Active Full</option>
+                    <option value="GFS">GFS</option>
+                  </select>
+                </label>
+                <label>
+                  Source (TB):
+                  <input type="number" value={sourceDataTB} min={0.1} step={0.1} onChange={e => setSourceDataTB(Number(e.target.value))} style={compactNumberInputStyle} />
+                </label>
+                <label>
+                  Retention (d):
+                  <input type="number" value={retention} min={1} onChange={e => setRetention(Number(e.target.value))} style={compactNumberInputStyle} />
+                </label>
+              </div>
+              <div className="card-split-col">
+                <div className="card-split-col-header">
+                  GFS Policy (optional)
+                </div>
+                <label>
+                  Weekly:
+                  <input type="number" value={gfsWeekly} min={0} onChange={e => setGfsWeekly(Number(e.target.value))} style={compactNumberInputStyle} />
+                </label>
+                <label>
+                  Monthly:
+                  <input type="number" value={gfsMonthly} min={0} onChange={e => setGfsMonthly(Number(e.target.value))} style={compactNumberInputStyle} />
+                </label>
+                <label>
+                  Yearly:
+                  <input type="number" value={gfsYearly} min={0} onChange={e => setGfsYearly(Number(e.target.value))} style={compactNumberInputStyle} />
+                </label>
+              </div>
+            </div>
             </div>
           </div>
           <div className="form-card">
             <div className="form-card-header">Repository</div>
-            <div className="form-card-body">
-            <label>
-              Name:
-              <input value={repoName} onChange={e => setRepoName(e.target.value)} />
-            </label>
-            <label>
-              Type:
-              <select value={repoType} onChange={e => setRepoType(e.target.value as RepositoryType)}>
-                <option value="DAS">DAS</option>
-                <option value="NAS">NAS</option>
-                <option value="DedupAppliance">Dedup Appliance</option>
-                <option value="ObjectStorage">Object Storage</option>
-                <option value="Tape">Tape</option>
-                <option value="SOBR">SOBR</option>
-              </select>
-            </label>
+            <div className="form-card-body two-col">
+            <div className="card-split full-row">
+              <div className="card-split-col">
+                <label>
+                  Name:
+                  <input value={repoName} onChange={e => setRepoName(e.target.value)} />
+                </label>
+                <label>
+                  Type:
+                  <select value={repoType} onChange={e => setRepoType(e.target.value as RepositoryType)}>
+                    <option value="DAS">DAS</option>
+                    <option value="NAS">NAS</option>
+                    <option value="DedupAppliance">Dedup Appliance</option>
+                    <option value="ObjectStorage">Object Storage</option>
+                    <option value="Tape">Tape</option>
+                    <option value="SOBR">SOBR</option>
+                  </select>
+                </label>
+              </div>
+              <div className="card-split-col">
+                <div className="card-split-col-header">
+                  Immutability Policy
+                </div>
+                <label>
+                  Primary / Performance immutability (d):
+                  <input
+                    type="number"
+                    value={sobrPerformanceImmutabilityDays}
+                    min={0}
+                    onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))}
+                    style={compactNumberInputStyle}
+                  />
+                </label>
+                <label>
+                  Capacity immutability (d):
+                  <input
+                    type="number"
+                    value={sobrCapacityImmutabilityDays}
+                    min={0}
+                    disabled={!supportsTieredImmutability}
+                    onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))}
+                    style={{ ...compactNumberInputStyle, opacity: supportsTieredImmutability ? 1 : 0.55 }}
+                  />
+                </label>
+                <label>
+                  Archive immutability (d):
+                  <input
+                    type="number"
+                    value={sobrArchiveImmutabilityDays}
+                    min={0}
+                    disabled={!supportsArchiveImmutability}
+                    onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))}
+                    style={{ ...compactNumberInputStyle, opacity: supportsArchiveImmutability ? 1 : 0.55 }}
+                  />
+                </label>
+                <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '0.45rem' }}>
+                  {repoType === 'SOBR'
+                    ? 'SOBR selected: all tier immutability controls are available based on enabled tiers.'
+                    : `${repoType} selected: primary immutability applies; Capacity/Archive controls are disabled.`}
+                </div>
+                <div style={{ marginTop: '0.45rem' }}>
+                  <span
+                    style={tooltipBadgeStyle}
+                    title="Primary/Performance immutability delays generation delete eligibility. Capacity and Archive immutability are only applicable when using SOBR tiers."
+                    aria-label="Immutability policy notes"
+                  >
+                    ?
+                  </span>
+                </div>
+              </div>
+            </div>
             </div>
           </div>
           {repoType === 'SOBR' && (
             <div className="form-card">
               <div className="form-card-header">SOBR Tier Policy</div>
-              <div className="form-card-body">
-              <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+              <div className="form-card-body two-col">
+              <div className="full-row" style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                   <input
                     type="checkbox"
@@ -402,7 +479,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   Capacity Tier Move
                 </label>
               </div>
-              <div style={{ fontSize: '0.76rem', color: '#666', marginBottom: '0.55rem' }}>
+              <div className="full-row" style={{ fontSize: '0.76rem', color: '#666', marginBottom: '0.55rem' }}>
                 Mode: {effectiveCopyEnabled && effectiveMoveEnabled ? 'Copy + Move' : effectiveCopyEnabled ? 'Copy only' : 'Move only'}
               </div>
               <label>Offload after (d):
@@ -411,7 +488,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               <label>GEN period (d):
                 <input type="number" value={sobrGenerationPeriodDays} min={1} onChange={e => setSobrGenerationPeriodDays(Number(e.target.value))} style={compactNumberInputStyle} />
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <label className="full-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-start' }}>
                 <input type="checkbox" checked={sobrHasArchive} onChange={e => setSobrHasArchive(e.target.checked)} />
                 Enable Archive Tier
               </label>
@@ -422,7 +499,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   </label>
                 </>
               )}
-              <div style={{ marginTop: '0.55rem' }}>
+              <div className="full-row" style={{ marginTop: '0.55rem' }}>
                 <span
                   style={tooltipBadgeStyle}
                   title="GEN period defines fixed object-generation windows (default 10 days). Performance immutability delays move/prune eligibility for sealed chains. Capacity and Archive immutability extend how long a GEN must stay before delete is allowed after DeleteOn is reached."
@@ -434,80 +511,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               </div>
             </div>
           )}
-          <div className="form-card">
-            <div className="form-card-header">GFS Policy (optional)</div>
-            <div className="form-card-body">
-            <label>
-              Weekly:
-              <input type="number" value={gfsWeekly} min={0} onChange={e => setGfsWeekly(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
-            <label>
-              Monthly:
-              <input type="number" value={gfsMonthly} min={0} onChange={e => setGfsMonthly(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
-            <label>
-              Yearly:
-              <input type="number" value={gfsYearly} min={0} onChange={e => setGfsYearly(Number(e.target.value))} style={compactNumberInputStyle} />
-            </label>
-            </div>
-          </div>
-          <div className="form-card">
-            <div className="form-card-header">Immutability Policy</div>
-            <div className="form-card-body">
-              <label>
-                Primary / Performance immutability (d):
-                <input
-                  type="number"
-                  value={sobrPerformanceImmutabilityDays}
-                  min={0}
-                  onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))}
-                  style={compactNumberInputStyle}
-                />
-              </label>
-              <label>
-                Capacity immutability (d):
-                <input
-                  type="number"
-                  value={sobrCapacityImmutabilityDays}
-                  min={0}
-                  disabled={!supportsTieredImmutability}
-                  onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))}
-                  style={{ ...compactNumberInputStyle, opacity: supportsTieredImmutability ? 1 : 0.55 }}
-                />
-              </label>
-              <label>
-                Archive immutability (d):
-                <input
-                  type="number"
-                  value={sobrArchiveImmutabilityDays}
-                  min={0}
-                  disabled={!supportsArchiveImmutability}
-                  onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))}
-                  style={{ ...compactNumberInputStyle, opacity: supportsArchiveImmutability ? 1 : 0.55 }}
-                />
-              </label>
-              <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '0.45rem' }}>
-                {repoType === 'SOBR'
-                  ? 'SOBR selected: all tier immutability controls are available based on enabled tiers.'
-                  : `${repoType} selected: primary immutability applies; Capacity/Archive controls are disabled.`}
-              </div>
-              <div style={{ marginTop: '0.45rem' }}>
-                <span
-                  style={tooltipBadgeStyle}
-                  title="Primary/Performance immutability delays generation delete eligibility. Capacity and Archive immutability are only applicable when using SOBR tiers."
-                  aria-label="Immutability policy notes"
-                >
-                  ?
-                </span>
-              </div>
-            </div>
-          </div>
           <button type="submit" className="apply-btn">Simulate</button>
         </form>
 
         {/* ── Right column: calculated capacity requirements ── */}
-        <div style={{
-          flex: '0 0 505px', width: '505px', maxWidth: '505px',
+        <div className="scenario-column" style={{
           background: '#f0f4ff', border: '1px solid #c5cae9',
           borderRadius: '6px', padding: '1rem',
           alignSelf: 'flex-start', position: 'sticky', top: '1rem',

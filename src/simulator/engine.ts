@@ -529,6 +529,20 @@ export class VeeamSimulator {
               }
             }
 
+            if (copyEnabled) {
+              let clearedNonGfsCapacity = 0;
+              for (const rp of points) {
+                if (!rp.isGFS && rp.hasCapacityData) {
+                  rp.baseTiers = (rp.baseTiers || []).filter(t => t !== 'Capacity');
+                  rp.hasCapacityData = false;
+                  clearedNonGfsCapacity += 1;
+                }
+              }
+              if (clearedNonGfsCapacity > 0) {
+                actions.push(`Chain ${chain.id}: cleared Capacity residue for ${clearedNonGfsCapacity} non-GFS restore point(s) after GFS archive.`);
+              }
+            }
+
             actions.push(`Inactive chain ${chain.id} offloaded in full Capacity -> Archive (${toArchive.length} points).`);
           }
         }
@@ -1009,11 +1023,24 @@ export class VeeamSimulator {
         }
 
         actions.push(`Chain ${chain.id} deleted: all GENs passed DeleteOn and immutability gates.`);
+        let preservedGfsPoints = 0;
         for (const rp of chain.restorePoints) {
+          if (rp.isGFS || rp.isWeeklyGFS || rp.isMonthlyGFS || rp.isYearlyGFS) {
+            // Preserve tagged GFS points beyond chain lifetime by detaching from the chain.
+            rp.chainId = `gfs-${job.id}`;
+            rp.isGlobalBase = false;
+            rp.isTierSeed = false;
+            preservedGfsPoints += 1;
+            continue;
+          }
+
           this.state.restorePoints = this.state.restorePoints.filter(r => r.id !== rp.id);
           for (const blockId of rp.referencedBlockIds) {
             this.state.blocks = this.state.blocks.filter(b => b.id !== blockId);
           }
+        }
+        if (preservedGfsPoints > 0) {
+          actions.push(`Chain ${chain.id}: preserved ${preservedGfsPoints} detached GFS point(s) after chain deletion.`);
         }
         this.state.generations = (this.state.generations || []).filter(g => g.chainId !== chain.id);
         this.state.chains = this.state.chains.filter(c => c.id !== chain.id);
@@ -1042,7 +1069,7 @@ export class VeeamSimulator {
         .filter(rp => rp[flag] && (
           // still in a chain belonging to this job, or a detached GFS orphan for this job
           this.state.chains.find(c => c.id === rp.chainId && c.jobId === job.id) ||
-          rp.chainId.startsWith('gfs-')
+          (rp.chainId === `gfs-${job.id}` && rp.id.startsWith(`${job.id}-`))
         ))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // newest first
       const excess = tagged.slice(maxKeep);
@@ -1060,6 +1087,21 @@ export class VeeamSimulator {
     deleteOldestGFS('isWeeklyGFS', 'Weekly', job.gfsPolicy.weekly);
     deleteOldestGFS('isMonthlyGFS', 'Monthly', job.gfsPolicy.monthly);
     deleteOldestGFS('isYearlyGFS', 'Yearly', job.gfsPolicy.yearly);
+
+    // Detached points that no longer carry any GFS tag are no longer protected.
+    const detachedWithoutGfs = this.state.restorePoints.filter(rp =>
+      rp.chainId === `gfs-${job.id}` &&
+      !rp.isWeeklyGFS &&
+      !rp.isMonthlyGFS &&
+      !rp.isYearlyGFS
+    );
+    for (const rp of detachedWithoutGfs) {
+      this.state.restorePoints = this.state.restorePoints.filter(r => r.id !== rp.id);
+      for (const blockId of rp.referencedBlockIds) {
+        this.state.blocks = this.state.blocks.filter(b => b.id !== blockId);
+      }
+      actions.push(`Detached GFS point ${rp.id} deleted after all GFS tags expired.`);
+    }
   }
 
   // Promote oldest full in each chain to be the chain base, and adjust sizing accordingly
