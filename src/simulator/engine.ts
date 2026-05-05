@@ -70,19 +70,8 @@ export class VeeamSimulator {
 
   private applyGfsSizing(job: BackupJob, rp: RestorePoint) {
     if (!rp.isGFS) return;
-    const hasWeekly = !!rp.isWeeklyGFS;
     const hasMonthly = !!rp.isMonthlyGFS;
     const hasYearly = !!rp.isYearlyGFS;
-    const hasMonthlyOrYearlyPolicy = (job.gfsPolicy?.monthly ?? 0) > 0 || (job.gfsPolicy?.yearly ?? 0) > 0;
-
-    // In mixed policies, weekly-only tags are treated as anchors already represented
-    // by monthly/yearly preserved points and do not add standalone storage.
-    if (hasMonthlyOrYearlyPolicy && hasWeekly && !hasMonthly && !hasYearly) {
-      this.setRestorePointSize(rp, 0);
-      return;
-    }
-
-    // Keep simulator sizing aligned with Calculated Capacity Requirements (legacy mode).
     const baseSize = Math.max(0, job.sourceDataTB || 0) * 0.5;
     const dailyChangeRate = Math.max(0, (job.dailyChangeRatePct ?? 0) / 100);
     const storedContributionTB = this.computeStoredContributionTB(baseSize, dailyChangeRate, hasMonthly, hasYearly);
@@ -1107,7 +1096,10 @@ export class VeeamSimulator {
           continue;
         }
 
-        actions.push(`Chain ${chain.id} deleted: all GENs passed DeleteOn and immutability gates.`);
+        const chainDeletionReason = chainGenerations.length > 0
+          ? `all GENs passed DeleteOn and immutability gates`
+          : `retention limit reached`;
+        actions.push(`Chain ${chain.id} deleted: ${chainDeletionReason}.`);
         let preservedGfsPoints = 0;
         for (const rp of chain.restorePoints) {
           if (rp.isGFS || rp.isWeeklyGFS || rp.isMonthlyGFS || rp.isYearlyGFS) {
