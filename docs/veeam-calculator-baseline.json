@@ -9,23 +9,32 @@
   "scenarios": [
     {
       "id": "das-basic",
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.6231
+        "plannedCapacityTB": 1.6231,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333
       }
     },
     {
       "id": "das-retention-14",
-      "notes": "captured-from-veeam-calculator-2026-05-03 [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-03 [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.856
+        "plannedCapacityTB": 1.856,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333
       }
     },
     {
       "id": "sobr-moveonly",
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
         "plannedCapacityTB": 39.0575,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 2.3219,
         "plannedCapacityTierTB": 36.7356,
         "plannedArchiveTierTB": 0
@@ -35,110 +44,152 @@
       "id": "sobr-copymove",
       "expected": {
         "plannedCapacityTB": 3.6529,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 2.0889,
         "plannedCapacityTierTB": 1.5639,
         "plannedArchiveTierTB": 0
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]"
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]"
     },
     {
       "id": "das-gfs",
       "expected": {
-        "plannedCapacityTB": 2.1231
+        "plannedCapacityTB": 2.1231,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]"
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]"
     },
     {
       "id": "sobr-gfs-archive",
       "expected": {
         "plannedCapacityTB": 39.2904,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 2.7877,
         "plannedCapacityTierTB": 36.5027,
         "plannedArchiveTierTB": 0
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]"
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]"
     },
     {
       "id": "das-monthly-2-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2M 0%-growth; storage-required=1.6TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2M 0%-growth; storage-required=1.6TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.6
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
       }
     },
     {
       "id": "das-yearly-2-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2Y 0%-growth; storage-required=2.3TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2Y 0%-growth; storage-required=2.3TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 2.25
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
       }
     },
     {
       "id": "das-monthly-2-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2M 0%-growth; storage-required=28.3TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2M 0%-growth; storage-required=28.3TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 28.3236
+        "plannedCapacityTB": 34.9836,
+        "fileTypeFullTB": 6.66,
+        "fileTypeIncrementalTB": 0.666,
+        "fileTypeSyntheticFullTB": 0.666
       }
     },
     {
       "id": "das-yearly-2-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2Y 0%-growth; storage-required=35.0TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2Y 0%-growth; storage-required=35.0TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 34.9836
+        "plannedCapacityTB": 34.9836,
+        "fileTypeFullTB": 6.66,
+        "fileTypeIncrementalTB": 0.666,
+        "fileTypeSyntheticFullTB": 0.666
       }
     },
     {
       "id": "das-mixed-2w1m-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M 0%-growth; storage-required=1.5TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M 0%-growth; storage-required=1.5TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.475
+        "plannedCapacityTB": 1.85,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
       }
     },
     {
       "id": "das-mixed-2w1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1Y 0%-growth; storage-required=1.8TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1Y 0%-growth; storage-required=1.8TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.8
+        "plannedCapacityTB": 1.85,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
       }
     },
     {
       "id": "das-mixed-1m1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 0W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 0W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.925
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
       }
     },
     {
       "id": "das-mixed-2w1m1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.925
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
       }
     },
     {
       "id": "das-mixed-2w1m1y-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2W+1M+1Y 0%-growth; storage-required=31.7TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2W+1M+1Y 0%-growth; storage-required=31.7TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 31.6536
+        "plannedCapacityTB": 34.9836,
+        "fileTypeFullTB": 6.66,
+        "fileTypeIncrementalTB": 0.666,
+        "fileTypeSyntheticFullTB": 0.666
       }
     },
     {
       "id": "sobr-mixed-2w1m1y-small-r60",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 2W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 2W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 39.8654,
-        "plannedPerformanceTierTB": 2.9127,
+        "plannedCapacityTB": 40.2904,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 3.2877,
         "plannedCapacityTierTB": 36.5027,
-        "plannedArchiveTierTB": 0.45
+        "plannedArchiveTierTB": 0.5
       }
     },
     {
       "id": "sobr-mixed-1m1y-small-r60",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 0W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 0W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 39.8654,
-        "plannedPerformanceTierTB": 2.9127,
+        "plannedCapacityTB": 40.2904,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 3.2877,
         "plannedCapacityTierTB": 36.5027,
-        "plannedArchiveTierTB": 0.45
+        "plannedArchiveTierTB": 0.5
       }
     }
   ]

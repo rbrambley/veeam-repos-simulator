@@ -108,6 +108,20 @@ npm run verify:known-veeam-deltas
 
 This verifies that `compare:veeam` only fails for the approved known divergence set.
 
+To run capture, validation, and full quality checks as a single sequence (timeout-safe):
+
+```bash
+npm run validate:all
+```
+
+This runs sequentially:
+1. `npm run capture:veeam` — Playwright scraper captures baseline
+2. `npm run compare:veeam` — Compares simulator to captured values
+3. `npm run verify:known-veeam-deltas` — Verifies only approved deltas exist
+4. `npm run test:quality` — Full quality pipeline (lifecycle + mutations + GFS sizing)
+
+The sequence stops at the first failure, preventing cascading errors. This is the recommended approach for end-to-end validation.
+
 To auto-create initial baseline values from current simulator logic:
 
 ```bash

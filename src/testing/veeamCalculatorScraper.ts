@@ -71,12 +71,11 @@ function prompt(question: string): Promise<string> {
 async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<BaselineExpected> | null> {
   let browser;
   try {
-    browser = await chromium.launch();
-    const context = await browser.createContext({
+    browser = await chromium.launch({ headless: true });
+    const page = await browser.newPage({
       // Use a viewport that matches typical calculator layout
       viewport: { width: 1920, height: 1080 },
     });
-    const page = await context.newPage();
 
     console.log(`\n  Navigating to Veeam Calculator for scenario: ${scenario.id}`);
     await page.goto('https://calculator.veeam.com', { waitUntil: 'networkidle', timeout: 30000 });
@@ -279,7 +278,6 @@ async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<Baselin
       return null;
     }
 
-    await context.close();
     await browser.close();
     return results;
   } catch (err) {
@@ -356,7 +354,10 @@ async function loadBaselineScenarios(): Promise<CalcScenario[]> {
 
   if (fs.existsSync(lifecycleScenariosPath)) {
     try {
-      const content = fs.readFileSync(lifecycleScenariosPath, 'utf-8');
+      let content = fs.readFileSync(lifecycleScenariosPath, 'utf-8');
+      // Strip JSON comments (// and /* */ style)
+      content = content.replace(/\/\*[\s\S]*?\*\//g, ''); // Remove /* */ comments
+      content = content.replace(/\/\/.*$/gm, ''); // Remove // comments
       const data = JSON.parse(content) as LifecycleScenarioFile;
       scenarios.push(...(data.scenarios || []));
     } catch (err) {

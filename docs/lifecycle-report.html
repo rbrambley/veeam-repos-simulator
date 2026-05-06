@@ -146,7 +146,7 @@
 
 <div class="report-header">
   <h1>Veeam Simulator — Quality &amp; Validation Report</h1>
-  <div class="run-meta">Generated May 6, 2026 at 02:10:31 AM &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
+  <div class="run-meta">Generated May 6, 2026 at 02:32:48 AM &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
   <div class="summary-row">
     <span class="count-badge" style="background:#166534;color:#fff">48 PASS</span>
     <span class="count-badge" style="background:#92400e;color:#fff">0 SKIP (known gaps)</span>
@@ -162,7 +162,7 @@
 <div class="metrics-bar">
   <div class="metric"><span class="metric-value">48</span><span class="metric-label">Scenarios</span></div>
   <div class="metric"><span class="metric-value">21,385</span><span class="metric-label">Days Simulated</span></div>
-  <div class="metric"><span class="metric-value">7.6s</span><span class="metric-label">Total Duration</span></div>
+  <div class="metric"><span class="metric-value">8.2s</span><span class="metric-label">Total Duration</span></div>
   <div class="metric"><span class="metric-value">28</span><span class="metric-label">Rules Covered</span></div>
   <div class="metric"><span class="metric-value">1</span><span class="metric-label">Rules Uncovered</span></div>
 </div>
@@ -267,7 +267,7 @@
     &nbsp;·&nbsp;
     Status: <span class="status-badge small" style="background:#1a7f37">PASS</span>
   </p>
-  <p style="margin:4px 0;">Standalone GFS sizing boundary and integration tests passed in this quality run. Ran at 5/6/2026, 2:10:23 AM.</p>
+  <p style="margin:4px 0;">Standalone GFS sizing boundary and integration tests passed in this quality run. Ran at 5/6/2026, 2:32:39 AM.</p>
   <p style="margin:12px 0 4px;">
       Case summary: <strong>23/23</strong> checks passed.
       Categories: modifier-boundary: 8/8 · weekly-range: 3/3 · monthly-range: 3/3 · yearly-range: 1/1 · extreme-case: 1/1 · engine-integration: 7/7.
@@ -444,7 +444,7 @@
   <summary style="padding:12px 20px;cursor:pointer;font-size:13px;font-weight:600;color:#1e3a5f;list-style:none;display:flex;align-items:center;gap:8px;"><span style="font-size:10px">&#9654;</span>&nbsp;Mutation Testing Status</summary>
   <div style="padding:0 20px 12px">
   <p style="margin:12px 0 4px;">
-    Generated 5/6/2026, 2:10:23 AM ·
+    Generated 5/6/2026, 2:32:39 AM ·
     Probes: <strong>48</strong> ·
     Mutations: <strong>5</strong> ·
     Caught: <strong>5</strong> ·
@@ -599,7 +599,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-das-retention-count</span>
         <span class="sc-name">DAS retention count boundary</span>
-        <span class="sc-meta">20d &nbsp;·&nbsp; 6ms &nbsp;·&nbsp; DAS · Ret:7</span>
+        <span class="sc-meta">20d &nbsp;·&nbsp; 5ms &nbsp;·&nbsp; DAS · Ret:7</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Inactive chain must NOT be deleted on day (retentionCount-1) and MUST be deleted on day retentionCount when SLA also expired. Validates AND logic for count+SLA.</p>
@@ -702,7 +702,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-das-sla-overrides-count</span>
         <span class="sc-name">DAS SLA prevents deletion when count expired but SLA not expired</span>
-        <span class="sc-meta">18d &nbsp;·&nbsp; 2ms &nbsp;·&nbsp; DAS · Ret:7</span>
+        <span class="sc-meta">18d &nbsp;·&nbsp; 1ms &nbsp;·&nbsp; DAS · Ret:7</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain has &gt; retentionCount total points (count-expired) but the newest point in the sealed chain is still within slaDays. Chain must be preserved.</p>
@@ -805,7 +805,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-das-gfs-preserves-chain</span>
         <span class="sc-name">DAS GFS preserves chain past standard retention</span>
-        <span class="sc-meta">42d &nbsp;·&nbsp; 4ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:2W/0M/0Y</span>
+        <span class="sc-meta">42d &nbsp;·&nbsp; 5ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:2W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A chain whose newest point is a weekly GFS full must NOT be deleted when standard retention+SLA have both expired; it must survive for the full GFS window (2 weeks = 14 days from tagging).</p>
@@ -1159,7 +1159,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-yearly-boundary</span>
         <span class="sc-name">Yearly GFS lands only on last Saturday of December</span>
-        <span class="sc-meta">800d &nbsp;·&nbsp; 60ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/2Y</span>
+        <span class="sc-meta">800d &nbsp;·&nbsp; 79ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A yearly GFS tag must appear exactly on the last Saturday of December and never on any other Saturday.</p>
@@ -1435,7 +1435,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-stacking</span>
         <span class="sc-name">GFS tags stack on same Saturday restore point</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 35ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 36ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When weekly + monthly conditions are both true for the same Saturday, the single SyntheticFull must have both isWeeklyGFS and isMonthlyGFS set (no separate point created).</p>
@@ -1767,7 +1767,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-archive-threshold-move</span>
         <span class="sc-name">SOBR Move: archive fires on exact capTierAge &gt;= archiveAfterDays boundary</span>
-        <span class="sc-meta">60d &nbsp;·&nbsp; 26ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
+        <span class="sc-meta">60d &nbsp;·&nbsp; 29ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">After chain offloads to Capacity, a GFS-tagged point must NOT enter Archive until capTierAgeDays &gt;= archiveAfterDays.</p>
@@ -1879,7 +1879,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-archive-threshold-copy</span>
         <span class="sc-name">SOBR Copy: archive fires only after pointAge &gt;= offloadAfterDays + archiveAfterDays</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 13ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 15ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">In copy mode the archive gate is total point age, not cap-tier age. Point must not appear in Archive before age = offloadAfterDays + archiveAfterDays.</p>
@@ -2103,7 +2103,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-perf-prune-ordering</span>
         <span class="sc-name">SOBR Move: Performance pruning cannot precede offload completion</span>
-        <span class="sc-meta">35d &nbsp;·&nbsp; 5ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d</span>
+        <span class="sc-meta">35d &nbsp;·&nbsp; 6ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">On the day of offload completion chain.performancePrunedAt must still be null. Prune must not happen until offloadComplete=true AND retention/SLA expired AND GEN immutability cleared.</p>
@@ -2228,7 +2228,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-3yr-gfs-wmy</span>
         <span class="sc-name">DAS 3-year soak: W+M+Y GFS invariants every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 801ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 827ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years, daily assertions: weekly count ≤ limit, monthly count ≤ limit, yearly count ≤ limit, GFS tags only on SyntheticFull/Full, exactly one global base per job.</p>
@@ -2504,7 +2504,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-move-3yr</span>
         <span class="sc-name">SOBR Move-only 3-year soak: tier ordering invariants every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 570ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 647ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">No point may be in Archive without passing through Capacity. Prune before offload is forbidden. Active chains must never be offloadComplete.</p>
@@ -2780,7 +2780,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-copy-3yr</span>
         <span class="sc-name">SOBR Copy-only 3-year soak: capacity residue and archive gate every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 644ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 676ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Scan every day: after any archive event for a chain the non-GFS Capacity residue must immediately be zero. Archive gate must never be violated.</p>
@@ -3056,7 +3056,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-gfs-archive-5yr</span>
         <span class="sc-name">SOBR Move W+M+Y 5-year soak: full model over extended horizon</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 1976ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 2083ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">5-year soak exercising the full policy stack: daily GFS count limits, tier ordering, prune sequencing, chain deletion gating, SLA minimum, and base identity.</p>
@@ -3332,7 +3332,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-sla-minimum-5yr</span>
         <span class="sc-name">DAS 5-year soak: SLA minimum guarantee never violated</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 160ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 171ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 5 years verify that no chain point dated within slaDays of current date is ever deleted, regardless of count-based expiry pressure.</p>
@@ -3608,7 +3608,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-chain-rp-drift-3yr</span>
         <span class="sc-name">DAS 3-year drift: inactive chains and RP count never accumulate</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 90ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 104ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years, assert every day that inactive chains never exceed 3 (steady-state max) and total restore points never exceed 42 (2×retention + GFS limits + buffer). Catches chain cleanup failures and pruning regressions that only manifest over long horizons.</p>
@@ -3884,7 +3884,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-move-chain-rp-drift-3yr</span>
         <span class="sc-name">SOBR Move 3-year drift: inactive chains and RP count never accumulate</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 515ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 605ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years with SOBR Move mode, assert that inactive chains never exceed 4 (offload + immutability extend chain lifetime but should still plateau) and total restore points never exceed 78 (2×retention=30 + GFS limits + buffer). Detects SOBR-specific chain lifecycle failures over extended runs.</p>
@@ -4160,7 +4160,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-high-retention-drift-3yr</span>
         <span class="sc-name">DAS high-retention 3-year drift: retention=30 with full GFS never accumulates</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 211ms &nbsp;·&nbsp; DAS · Ret:30 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 233ms &nbsp;·&nbsp; DAS · Ret:30 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Higher retention (30 days) with full W+M+Y GFS over 3 years. Max inactive chains ≤ 3, max restore points ≤ 75 (2×30 + 9 + buffer). Validates that the engine scales correctly with larger retention windows without drift.</p>
@@ -4449,7 +4449,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-perf-immutability-blocks-prune</span>
         <span class="sc-name">Performance immutability blocks Performance prune</span>
-        <span class="sc-meta">55d &nbsp;·&nbsp; 8ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:14d</span>
+        <span class="sc-meta">55d &nbsp;·&nbsp; 9ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain is retention+SLA expired and offloadComplete, but performanceImmutabilityDays has not elapsed since GEN window end. Prune must not fire until the lock expires.</p>
@@ -4561,7 +4561,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-cap-immutability-blocks-deletion</span>
         <span class="sc-name">Capacity immutability blocks chain deletion</span>
-        <span class="sc-meta">70d &nbsp;·&nbsp; 9ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · CapImm:21d</span>
+        <span class="sc-meta">70d &nbsp;·&nbsp; 12ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · CapImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain's GEN deleteOn has been reached, but capacityImmutableUntil is in the future. Chain must not be deleted until lock clears.</p>
@@ -4682,7 +4682,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-arch-immutability-blocks-deletion</span>
         <span class="sc-name">Archive immutability blocks chain deletion</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 26ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · ArchImm:30d</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 31ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · ArchImm:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">GFS point in Archive is within archiveImmutableUntil. Chain deletion must wait for Archive lock to clear even after deleteOn and Capacity immutability have both passed.</p>
@@ -4812,7 +4812,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-gen-window-boundary</span>
         <span class="sc-name">GEN window aligns to generationPeriodDays boundaries</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 7ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 8ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Points created in days 1-10 must belong to GEN-0 and points created in days 11-20 to GEN-1 when generationPeriodDays=10. deleteOn for each GEN must equal windowEnd + slaDays.</p>
@@ -4924,7 +4924,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-gen-deleteon-extended-by-gfs</span>
         <span class="sc-name">GEN deleteOn extended when GFS point falls in window</span>
-        <span class="sc-meta">60d &nbsp;·&nbsp; 11ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d</span>
+        <span class="sc-meta">60d &nbsp;·&nbsp; 12ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When a GFS weekly point belongs to a GEN, the GEN's deleteOn must be recalculated to max(default deleteOn, gfsDate + gfsWeeks*7). Standard non-GFS GENs must keep original deleteOn.</p>
@@ -5036,7 +5036,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-gen-state-transitions</span>
         <span class="sc-name">GEN lifecycle state is monotonic: Pending → WaitImmutability → Deletable</span>
-        <span class="sc-meta">80d &nbsp;·&nbsp; 20ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:2W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:7d</span>
+        <span class="sc-meta">80d &nbsp;·&nbsp; 13ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:2W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A GEN must never go backwards through lifecycle states. Once Deletable it must not revert to Pending or WaitImmutability on a later day.</p>
@@ -5157,7 +5157,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-all-tiers-immutability</span>
         <span class="sc-name">All three tier immutability locks interact correctly</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 54ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 40ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With non-zero immutability on all three tiers, deletion must wait until ALL locks expire, even if only one tier contains data at deletion time.</p>
@@ -5287,7 +5287,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-move-archive</span>
         <span class="sc-name">GFS W+M+Y × Move × Archive: cardinality and tier residency</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 341ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 385ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Mixed GFS with move mode and archive. Verify: weekly/monthly/yearly counts, tier residency per point, incremental-free Capacity after each chain archives, no premature archive entry.</p>
@@ -5516,7 +5516,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-copy-archive</span>
         <span class="sc-name">GFS W+M+Y × Copy × Archive: residue and gate</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 321ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 376ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Mixed GFS with copy mode and archive. Non-GFS Capacity residue must clear immediately after GFS point archives. Archive gate is point-age-based.</p>
@@ -5745,7 +5745,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-copy-archive-immutability</span>
         <span class="sc-name">GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction</span>
-        <span class="sc-meta">500d &nbsp;·&nbsp; 426ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
+        <span class="sc-meta">500d &nbsp;·&nbsp; 424ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">High-risk 3-way: mixed GFS stacking, copy mode, archive, and all-tier immutability. Verify correct interlock between archive gating, capacity residue clearing, and GEN immutability locks.</p>
@@ -5992,7 +5992,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-monthly-move-immutability</span>
         <span class="sc-name">GFS Monthly × Move × Perf Immutability: GEN deleteOn vs immutability interlock</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 38ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:0W/3M/0Y · Move · Offload:7d · PerfImm:14d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 39ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:0W/3M/0Y · Move · Offload:7d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Monthly GFS extends GEN deleteOn. Combined with Perf immutability this requires both deleteOn and lock to clear before prune/delete. Neither alone should be sufficient.</p>
@@ -6122,7 +6122,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-short-retention-long-gfs</span>
         <span class="sc-name">Short retention × long GFS yearly: chain outlives retention by years</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 104ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/5Y</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 115ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/5Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With retention=7 and yearly=5 (5 years), chains sealed early must survive for 5 years because of GFS tag. Verifies GFS protection overrides count+SLA expiry for the full GFS window.</p>
@@ -6398,7 +6398,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-high-gen-period</span>
         <span class="sc-name">Large generationPeriodDays with GFS and immutability</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 153ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:0W/3M/0Y · Move · Offload:14d · PerfImm:14d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 157ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:0W/3M/0Y · Move · Offload:14d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">generationPeriodDays=30: each GEN covers a full month. Verifies GEN window aligns correctly at 30-day boundaries and deleteOn is computed properly with monthly GFS extension.</p>
@@ -6555,7 +6555,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-copy-move-combo</span>
         <span class="sc-name">Copy+Move mode with GFS W+M and archive</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 39ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/2M/0Y · Copy · Offload:7d · Archive:30d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 47ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/2M/0Y · Copy · Offload:7d · Archive:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">copyEnabled+moveEnabled simultaneously. Verifies both copy semantics (Capacity stamped at creation) and move semantics (Performance removed after offloadAfterDays) apply correctly, with correct archive gating.</p>
@@ -6685,7 +6685,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-no-gfs-long-archive</span>
         <span class="sc-name">SOBR Move no-GFS: archive tier should remain empty</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 53ms &nbsp;·&nbsp; SOBR · Ret:30 · Move · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 62ms &nbsp;·&nbsp; SOBR · Ret:30 · Move · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With hasArchiveTier=true but no GFS policy, only GFS-tagged points may enter Archive. Archive tier must remain empty throughout the entire run.</p>
@@ -6842,7 +6842,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-retention-variant-r7</span>
         <span class="sc-name">Retention variant retention=7 with W+M GFS</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 62ms &nbsp;·&nbsp; SOBR · Ret:7 · GFS:4W/3M/0Y · Move · Offload:7d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 67ms &nbsp;·&nbsp; SOBR · Ret:7 · GFS:4W/3M/0Y · Move · Offload:7d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention=7 paired with GFS to stress-test boundary interaction at the shortest practical retention. Chain should seal every 7 days and GFS must survive past that.</p>
@@ -6999,7 +6999,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-retention-variant-r60</span>
         <span class="sc-name">Retention variant retention=60 with W+M+Y GFS</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 321ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 372ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention=60 with full GFS stack. Many chains coexist; verifies base identity remains oldest across all, GFS caps are respected across many active+inactive chains simultaneously.</p>
@@ -7228,7 +7228,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-high-change-rate-drift-2yr</span>
         <span class="sc-name">High change-rate adversarial: 40% daily delta over 2 years</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 57ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/1Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 61ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/1Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Stress scenario with extreme daily churn (40%) to catch storage or pruning behavior that appears stable at 5% but fails under heavy write amplification.</p>
@@ -7504,7 +7504,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-short-retention-drift-3yr</span>
         <span class="sc-name">Short retention adversarial: retention=3 over 3 years</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 52ms &nbsp;·&nbsp; DAS · Ret:3 · GFS:4W/3M/1Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 56ms &nbsp;·&nbsp; DAS · Ret:3 · GFS:4W/3M/1Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Very short retention with GFS enabled to stress frequent chain sealing/deletion. Ensures cleanup remains stable and restore points do not accumulate over long duration.</p>
@@ -7780,7 +7780,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-policy-change-mid-run</span>
         <span class="sc-name">Mid-run policy change: retention 7 → 30 on day 180</span>
-        <span class="sc-meta">365d &nbsp;·&nbsp; 41ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/0Y</span>
+        <span class="sc-meta">365d &nbsp;·&nbsp; 40ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention is expanded from 7 to 30 restore points partway through a 365-day run. Validates that the engine correctly grows the active chain toward the new limit, that old chains are not orphaned, and that GFS cardinality stays within limits throughout the transition.</p>
@@ -7991,7 +7991,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-only-policy</span>
         <span class="sc-name">GFS-only policy: weekly=52 with minimal daily retention</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 61ms &nbsp;·&nbsp; DAS · Ret:1 · GFS:52W/0M/0Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 58ms &nbsp;·&nbsp; DAS · Ret:1 · GFS:52W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Stress test where daily retention is set to 1 (near-zero daily RPs) while weekly GFS keeps 52 weeks. After 2 years the engine should hold exactly 52 weekly GFS snapshots and no more. Validates GFS dominance over retention-based pruning.</p>
@@ -8267,7 +8267,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-two-jobs-one-repo</span>
         <span class="sc-name">Two jobs sharing one repository</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 58ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/2M/0Y</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 63ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/2M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Two independent backup jobs (different retention and GFS policies) write to the same DAS repository. Validates that chains do not cross-contaminate between jobs, each job maintains its own global base, and storage accounts for both jobs. Checks that inactive chain drift stays bounded across both job lifecycles.</p>
@@ -8509,7 +8509,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-weekly-gfs-cardinality-exact</span>
         <span class="sc-name">Oracle diff: weekly GFS cardinality exact on every Saturday</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 9ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/0M/0Y</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 6ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Every Saturday the weekly GFS count must equal min(weeks elapsed since start, gfsPolicy.weekly). Validated by oracle that computes expected count from dates, not from engine state.</p>
@@ -8639,7 +8639,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-monthly-yearly-cardinality-exact</span>
         <span class="sc-name">Oracle diff: monthly and yearly GFS cardinality across calendar</span>
-        <span class="sc-meta">800d &nbsp;·&nbsp; 64ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:0W/3M/2Y</span>
+        <span class="sc-meta">800d &nbsp;·&nbsp; 70ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:0W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Each last-Saturday-of-month count must equal min(months elapsed, gfsPolicy.monthly). Each last-Saturday-of-December count must equal min(years elapsed, gfsPolicy.yearly).</p>
@@ -8915,7 +8915,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-tier-residency-per-point</span>
         <span class="sc-name">Oracle diff: per-point tier residency vs expected schedule</span>
-        <span class="sc-meta">90d &nbsp;·&nbsp; 32ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
+        <span class="sc-meta">90d &nbsp;·&nbsp; 26ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Oracle computes expected tier set for each point on each day based on creation date, offloadAfterDays, archiveAfterDays, chain status, and GFS flag. Diffs against actual hasPerformanceData/hasCapacityData/hasArchiveData.</p>
@@ -9036,7 +9036,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-gen-lifecycle-states</span>
         <span class="sc-name">Oracle diff: GEN lifecycle state per day matches expected dates</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 29ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:10d</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 27ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:10d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Oracle computes expected GEN state (Pending/WaitImmutability/Deletable) based on deleteOn and immutableUntil dates. Diffs against getCurrentGenerations() output each day.</p>
@@ -9166,7 +9166,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-chain-phase-transitions</span>
         <span class="sc-name">Oracle diff: chain phase transitions match expected schedule</span>
-        <span class="sc-meta">80d &nbsp;·&nbsp; 16ms &nbsp;·&nbsp; SOBR · Ret:21 · GFS:2W/0M/0Y · Move · Offload:7d · PerfImm:7d</span>
+        <span class="sc-meta">80d &nbsp;·&nbsp; 15ms &nbsp;·&nbsp; SOBR · Ret:21 · GFS:2W/0M/0Y · Move · Offload:7d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Oracle predicts chain phase per day: Active, Inactive, OffloadPending, OffloadComplete, PerfPruned, Deleted. Diffs against actual chain and restore-point state each day.</p>
@@ -9287,7 +9287,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-sobr-copy-full-lifecycle</span>
         <span class="sc-name">Oracle diff: SOBR copy-only full lifecycle trace</span>
-        <span class="sc-meta">150d &nbsp;·&nbsp; 63ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">150d &nbsp;·&nbsp; 67ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Copy mode: every new point immediately gets Capacity copy. Oracle tracks Perf+Cap dual occupancy per point, then Archive entry timing for GFS points, then Capacity residue clearing.</p>
