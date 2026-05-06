@@ -37,6 +37,9 @@ interface BaselineExpected {
   plannedPerformanceTierTB?: number;
   plannedCapacityTierTB?: number;
   plannedArchiveTierTB?: number;
+  fileTypeFullTB?: number;
+  fileTypeIncrementalTB?: number;
+  fileTypeSyntheticFullTB?: number;
 }
 
 interface BaselineScenario {
@@ -63,6 +66,9 @@ interface PlannedResult {
   plannedPerformanceTierTB: number;
   plannedCapacityTierTB: number;
   plannedArchiveTierTB: number;
+  fileTypeFullTB: number;
+  fileTypeIncrementalTB: number;
+  fileTypeSyntheticFullTB: number;
 }
 
 function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, forecastYears: number, gfsSizingMode: GfsSizingMode): PlannedResult {
@@ -120,6 +126,9 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
       plannedPerformanceTierTB: 0,
       plannedCapacityTierTB: 0,
       plannedArchiveTierTB: 0,
+      fileTypeFullTB: yearFullSizeTB,
+      fileTypeIncrementalTB: yearIncrSizeTB,
+      fileTypeSyntheticFullTB: yearIncrSizeTB,
     };
   }
 
@@ -161,6 +170,9 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     plannedPerformanceTierTB,
     plannedCapacityTierTB,
     plannedArchiveTierTB,
+    fileTypeFullTB: yearFullSizeTB,
+    fileTypeIncrementalTB: yearIncrSizeTB,
+    fileTypeSyntheticFullTB: yearIncrSizeTB,
   };
 }
 
@@ -217,6 +229,9 @@ async function run(): Promise<void> {
 
       const expected: BaselineExpected = {
         plannedCapacityTB: Number(actual.plannedCapacityTB.toFixed(4)),
+        fileTypeFullTB: Number(actual.fileTypeFullTB.toFixed(4)),
+        fileTypeIncrementalTB: Number(actual.fileTypeIncrementalTB.toFixed(4)),
+        fileTypeSyntheticFullTB: Number(actual.fileTypeSyntheticFullTB.toFixed(4)),
       };
 
       if (scenario.config.repositoryType === 'SOBR') {
@@ -282,6 +297,9 @@ async function run(): Promise<void> {
       { label: 'Planned Performance Tier', actual: actual.plannedPerformanceTierTB, expected: asNumberOrUndefined(entry.expected.plannedPerformanceTierTB) },
       { label: 'Planned Capacity Tier', actual: actual.plannedCapacityTierTB, expected: asNumberOrUndefined(entry.expected.plannedCapacityTierTB) },
       { label: 'Planned Archive Tier', actual: actual.plannedArchiveTierTB, expected: asNumberOrUndefined(entry.expected.plannedArchiveTierTB) },
+      { label: 'File Type Size - Full', actual: actual.fileTypeFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeFullTB) },
+      { label: 'File Type Size - Incremental', actual: actual.fileTypeIncrementalTB, expected: asNumberOrUndefined(entry.expected.fileTypeIncrementalTB) },
+      { label: 'File Type Size - SyntheticFull', actual: actual.fileTypeSyntheticFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeSyntheticFullTB) },
     ];
     void isSobr; // used for potential future tier-specific notes
 

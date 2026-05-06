@@ -1715,6 +1715,8 @@ function writeHtmlReport(
   <span class="nav-sep">|</span>
   <a href="#section-dashboard">&#128202;&nbsp;Findings Dashboard</a>
   <span class="nav-sep">|</span>
+  <a href="#section-workflow">Workflow Scope</a>
+  <span class="nav-sep">|</span>
   <a href="#section-gfs-sizing">GFS Sizing Test</a>
   <span class="nav-sep">|</span>
   <a href="#section-mutations">Mutation Tests</a>
@@ -1750,6 +1752,26 @@ function writeHtmlReport(
     <p style="margin:8px 0 0;">
       All sections expand on demand. Known engine gaps are explicitly labeled and excluded from failures.
     </p>
+  </div>
+</div>
+
+<div id="section-workflow" style="background:#fff;border:1px solid #e5e7eb;border-left:4px solid #1d4ed8;border-radius:6px;padding:16px 20px;margin-bottom:20px;">
+  <h2 style="margin:0 0 12px;font-size:15px;color:#1e3a8a;">Workflow Scope</h2>
+  <div style="font-size:12px;color:#374151;line-height:1.6;">
+    <p style="margin:0 0 8px;">Primary validation workflow (active gates):</p>
+    <ul style="margin:8px 0;padding-left:20px;">
+      <li><strong>npm test</strong> &mdash; deterministic scenario validation and core invariants.</li>
+      <li><strong>npm run compare:veeam</strong> &mdash; oracle comparison against captured Veeam Calculator Details values, including optional file-type size matching when baseline values are present.</li>
+      <li><strong>npm run verify:known-veeam-deltas</strong> &mdash; validates only approved calculator deltas remain.</li>
+      <li><strong>npm run test:quality</strong> &mdash; consolidated quality pipeline (GFS sizing, mutation testing, lifecycle contracts, and golden snapshots).</li>
+    </ul>
+    <p style="margin:8px 0;">Archived/exploratory tests (kept for research, not required CI gates):</p>
+    <ul style="margin:8px 0;padding-left:20px;">
+      <li><strong>archive:test:idealized-gfs</strong> &mdash; idealized clone-theory exploration.</li>
+      <li><strong>archive:test:live-weekly-gfs</strong> &mdash; historical weekly live-capture hypothesis exploration.</li>
+      <li><strong>archive:test:live-period-gfs</strong> &mdash; historical monthly/yearly live-capture hypothesis exploration.</li>
+    </ul>
+    <p style="margin:8px 0 0;">Timeout note: run these gates as separate commands to keep each execution bounded and resilient. If any approved behavior fix is applied, restart the workflow from scenario 1 and rerun all active gates.</p>
   </div>
 </div>
 

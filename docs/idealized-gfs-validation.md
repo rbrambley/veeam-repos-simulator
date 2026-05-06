@@ -33,7 +33,7 @@ The invariant `unique + cloned = 6.66 TB` passed for all matrix rows.
 
 ## Matrix Results
 
-The validation script `npm run test:idealized-gfs` compares the idealized formula against two current application behaviors:
+The validation script `npm run archive:test:idealized-gfs` compares the idealized formula against two current application behaviors:
 
 1. **Forecast/comparator behavior**
    - Current `InputForm.tsx` / `veeamBaselineComparator.ts` logic counts preserved GFS points as full-sized unique data.
@@ -165,8 +165,8 @@ After additional live captures (`1W`, `2W`, `3W`, `4W`, `5W` for the `1 TB / 5% 
 Prototype files:
 
 - `src/testing/liveWeeklyGfsHypothesis.ts`
-- `src/testing/validateLiveWeeklyGfsHypothesis.ts`
-- Run with: `npm run test:live-weekly-gfs`
+- `src/testing/archive/validateLiveWeeklyGfsHypothesis.ts`
+- Run with: `npm run archive:test:live-weekly-gfs`
 
 ### Hypothesis
 
@@ -591,9 +591,9 @@ An important nuance: monthly/yearly preserved points must contribute their perio
 
 | Command | Result |
 |---------|--------|
-| `npm run test:live-period-gfs` | 16/16 matches (small and large cases, retention=7 and retention=14) |
+| `npm run archive:test:live-period-gfs` | 16/16 matches (small and large cases, retention=7 and retention=14) |
 | `npm run compare:veeam` | 9/10 — all four new monthly/yearly scenarios pass; only `sobr-gfs-archive` fails (pre-existing block-generation-period gap) |
 
 ### New npm script
 
-`npm run test:live-period-gfs` — runs `src/testing/validateLivePeriodGfsModel.ts`, which validates the shared helper against the 16 monthly/yearly live-capture cases recorded in this document.
+`npm run archive:test:live-period-gfs` — runs `src/testing/archive/validateLivePeriodGfsModel.ts`, which validates the shared helper against the 16 monthly/yearly live-capture cases recorded in this document.

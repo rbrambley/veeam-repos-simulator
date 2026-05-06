@@ -66,6 +66,9 @@ interface BaselineEntry {
     plannedCapacityTierTB?: number | null;
     plannedArchiveTierTB?: number | null;
     veeamWorkingSpaceTB?: number | null;
+    fileTypeFullTB?: number | null;
+    fileTypeIncrementalTB?: number | null;
+    fileTypeSyntheticFullTB?: number | null;
   };
 }
 
@@ -134,6 +137,9 @@ function extractNumberAfterLabel(text: string, labels: string[], window = 40): n
 interface ParsedVeeamCapture {
   storageRequiredTB: number | null;
   workingSpaceTB: number | null;
+  fileTypeFullTB: number | null;
+  fileTypeIncrementalTB: number | null;
+  fileTypeSyntheticFullTB: number | null;
   sourceDataTB: number | null;
   dailyChangeRatePct: number | null;
   growthRatePct: number | null;
@@ -146,6 +152,9 @@ function parseVeeamCaptureText(raw: string): ParsedVeeamCapture {
   return {
     storageRequiredTB: extractNumberNearLabel(normalized, ['Storage required', 'Repository'], '(?:TB)', 120),
     workingSpaceTB: extractNumberNearLabel(normalized, ['Working space'], '(?:TB)', 80),
+    fileTypeFullTB: extractNumberNearLabel(normalized, ['Full backup', 'Full backup file size'], '(?:TB)', 80),
+    fileTypeIncrementalTB: extractNumberNearLabel(normalized, ['Incremental backup', 'Incremental backup file size'], '(?:TB)', 80),
+    fileTypeSyntheticFullTB: extractNumberNearLabel(normalized, ['Synthetic full backup', 'Synthetic full backup file size'], '(?:TB)', 80),
     sourceDataTB: extractNumberNearLabel(normalized, ['Source data'], '(?:TB)', 60),
     dailyChangeRatePct: extractNumberNearLabel(normalized, ['Daily change rate'], '(?:%)', 60),
     growthRatePct: extractNumberNearLabel(normalized, ['Growth rate'], '(?:%)', 60),
@@ -248,6 +257,9 @@ function buildCheatSheet(scenario: Scenario): string[] {
   lines.push('  (From the "Result detail" or "Restore Points Simulation" panel)');
   lines.push(hr());
   lines.push('  "Storage required"       → top-level TB value shown in results panel');
+  lines.push('  "Full backup"            → optional: file type size in TB from Details tab');
+  lines.push('  "Incremental backup"     → optional: file type size in TB from Details tab');
+  lines.push('  "Synthetic full backup"  → optional: file type size in TB from Details tab');
   if (isSobr) {
     lines.push('  Performance Tier (TB)    → performance tier size shown in tier breakdown');
     lines.push('                             (skip with ENTER if Veeam does not show tier detail)');
@@ -378,6 +390,22 @@ async function main(): Promise<void> {
       } else {
         console.log('  ⚠ Could not parse "Working space" from pasted text.');
       }
+
+      if (parsed.fileTypeFullTB !== null) {
+        entry.expected.fileTypeFullTB = parsed.fileTypeFullTB;
+        changesMade = true;
+        console.log(`  ✓ Parsed Full backup file size: ${parsed.fileTypeFullTB} TB`);
+      }
+      if (parsed.fileTypeIncrementalTB !== null) {
+        entry.expected.fileTypeIncrementalTB = parsed.fileTypeIncrementalTB;
+        changesMade = true;
+        console.log(`  ✓ Parsed Incremental backup file size: ${parsed.fileTypeIncrementalTB} TB`);
+      }
+      if (parsed.fileTypeSyntheticFullTB !== null) {
+        entry.expected.fileTypeSyntheticFullTB = parsed.fileTypeSyntheticFullTB;
+        changesMade = true;
+        console.log(`  ✓ Parsed Synthetic full backup file size: ${parsed.fileTypeSyntheticFullTB} TB`);
+      }
     }
 
     // ── Storage required (total) fallback/manual ───────────────────────────
@@ -421,6 +449,27 @@ async function main(): Promise<void> {
       const archVal = parseOptionalFloat(archRaw);
       if (archVal !== null) { entry.expected.plannedArchiveTierTB = archVal; changesMade = true; }
     }
+
+    const existingFullFile = entry.expected.fileTypeFullTB ?? null;
+    const fullFileHint = existingFullFile !== null ? ` [current: ${existingFullFile} TB]` : '';
+    const fullFileRaw = await ask(iface, `  Full backup file size (TB) — optional, from Details tab (ENTER to skip)${fullFileHint}: `);
+    if (fullFileRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
+    const fullFileVal = parseOptionalFloat(fullFileRaw);
+    if (fullFileVal !== null) { entry.expected.fileTypeFullTB = fullFileVal; changesMade = true; }
+
+    const existingIncFile = entry.expected.fileTypeIncrementalTB ?? null;
+    const incFileHint = existingIncFile !== null ? ` [current: ${existingIncFile} TB]` : '';
+    const incFileRaw = await ask(iface, `  Incremental backup file size (TB) — optional, from Details tab (ENTER to skip)${incFileHint}: `);
+    if (incFileRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
+    const incFileVal = parseOptionalFloat(incFileRaw);
+    if (incFileVal !== null) { entry.expected.fileTypeIncrementalTB = incFileVal; changesMade = true; }
+
+    const existingSfFile = entry.expected.fileTypeSyntheticFullTB ?? null;
+    const sfFileHint = existingSfFile !== null ? ` [current: ${existingSfFile} TB]` : '';
+    const sfFileRaw = await ask(iface, `  Synthetic full backup file size (TB) — optional, from Details tab (ENTER to skip)${sfFileHint}: `);
+    if (sfFileRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
+    const sfFileVal = parseOptionalFloat(sfFileRaw);
+    if (sfFileVal !== null) { entry.expected.fileTypeSyntheticFullTB = sfFileVal; changesMade = true; }
 
     // ── Veeam working space ────────────────────────────────────────────────
     if (entry.expected.veeamWorkingSpaceTB === undefined || entry.expected.veeamWorkingSpaceTB === null) {

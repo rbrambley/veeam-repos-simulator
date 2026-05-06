@@ -92,6 +92,14 @@ This runs:
 - `tsx src/testing/veeamBaselineComparator.ts`
 - Baseline file: `docs/veeam-calculator-baseline.json`
 
+The comparator now supports optional file-type size parity checks when present in the baseline:
+
+- `expected.fileTypeFullTB`
+- `expected.fileTypeIncrementalTB`
+- `expected.fileTypeSyntheticFullTB`
+
+If those values are filled for a scenario, `compare:veeam` will match simulator-vs-calculator file type sizes in addition to planned capacity metrics.
+
 To verify CI-safe calculator drift expectations:
 
 ```bash
@@ -144,35 +152,53 @@ For baseline comparison, you will see:
 
 `compare:veeam` may be non-zero by design when known structural gaps are tracked. Use `verify:known-veeam-deltas` to enforce that only approved known deltas remain.
 
-## Veeam Baseline — Guided Capture (Recommended)
+## Veeam Baseline — Browser Automation (Recommended)
 
-Use the interactive capture guide to walk through each scenario step by step.
-It shows exactly what inputs to set in the Veeam Calculator and prompts you for the result.
+The **preferred method** for capturing Veeam Calculator values is using Playwright browser automation.
+It automatically fills inputs, runs calculations, and extracts results with minimal manual intervention.
 
 ```bash
 npm run capture:veeam
 ```
 
-- Opens a step-by-step prompt for each scenario.
-- Shows the URL, and all input values to set in the Veeam Calculator.
+This runs the Playwright scraper, which:
+- Launches a headless browser
+- For each scenario, navigates to https://calculator.veeam.com
+- Automatically fills in all input fields (source data, change rate, retention, GFS, repo type, SOBR settings)
+- Waits for the calculator to compute results
+- Extracts planned capacity and tier values from the results panel
+- Falls back to interactive prompts if extraction fails (useful for calculator UI changes)
+- Saves directly to `docs/veeam-calculator-baseline.json`
+- Uses `ReFS/XFS = ON` as the current comparison assumption
+
+The scraper is non-destructive: it preserves existing baseline values and merges new captures incrementally.
+
+### Manual Capture (Fallback)
+
+If you need to manually enter values (calculator UI changed, network issues, etc.):
+
+```bash
+npm run capture:veeam:manual
+```
+
+This opens the step-by-step interactive guide:
+- Shows exactly what inputs to set in the Veeam Calculator.
 - Prompts for Total Capacity (and tier breakdown for SOBR scenarios).
-- Saves directly to `docs/veeam-calculator-baseline.json`.
 - Press ENTER to skip any value you do not have yet.
 - Type `exit` at any prompt to skip to the next scenario.
-- Uses `ReFS/XFS = ON` as the current comparison assumption.
 
 To paste raw Veeam Input/Result text and auto-parse fields:
 
 ```bash
-npm run capture:veeam -- --paste
+npm run capture:veeam:manual -- --paste
 ```
 
 - Paste one scenario block at a time.
 - Type `END` on its own line to finish each pasted block.
 - The guide auto-parses `Storage required` and `Working space` when found.
-- It also performs basic input mismatch checks (source data, change rate, growth, forecast period, retention days).
+- The guide also attempts to parse file-type sizes (`Full backup`, `Incremental backup`, `Synthetic full backup`) when present in pasted Details output.
 
-To capture a single scenario only:
+To capture a single scenario manually:
 
 ```bash
 npx tsx src/testing/veeamCaptureGuide.ts --id das-basic
@@ -205,47 +231,53 @@ Notes:
 - It is best treated as directional/informational, not a hard pass/fail gate by itself.
 - `--seed` writes baseline values from the simulator as a starting point.
 
-## Veeam Baseline — Future Option: Playwright Automation
+## Timeout-Safe Execution Pattern
 
-> **Not implemented.** Documented here for reference if the team wants to revisit.
+To reduce risk of long command sessions timing out in interactive environments, run the primary workflow as separate commands:
 
-The [Veeam Calculator](https://calculator.veeam.com) is a browser-based SPA with no public API.
-Values can theoretically be captured automatically using [Playwright](https://playwright.dev),
-a browser automation library.
+```bash
+npm test
+npm run compare:veeam
+npm run verify:known-veeam-deltas
+npm run test:quality
+```
 
-### How it would work
+If any model behavior fix is approved and applied, restart this sequence from step 1 (scenario 1) to avoid iterative regression drift.
 
-1. Install Playwright as a dev dependency: `npm install --save-dev @playwright/test`
-2. A script (`src/testing/veeamCalculatorScraper.ts`) would:
-   - Launch a headless Chromium browser
-   - Navigate to `https://calculator.veeam.com`
-   - For each scenario, fill in all input fields (source data, growth rate, change rate, retention, repo type, SOBR settings, GFS)
-   - Wait for the results panel to update
-   - Scrape the capacity values from the result DOM
-   - Write them to `docs/veeam-calculator-baseline.json`
-3. An npm script `capture:veeam:auto` would run this automatically.
+## Archived vs Active Tests
 
-### Why it was not implemented
+Active gates (required for workflow confidence):
 
-| Risk | Detail |
-|---|---|
-| **Brittleness** | Veeam can change their UI at any time with no notice, silently breaking the scraper |
-| **Input mapping** | Veeam's input labels may not map exactly to this simulator's field names; requires manual verification |
-| **Large dependency** | Playwright + Chromium adds ~300 MB to dev dependencies |
-| **CI/CD complexity** | Headless browser needs OS-level dependencies in CI environments |
-| **Maintenance cost** | Any Veeam Calculator update may require updating both field selectors and value mappings |
+- `npm test`
+- `npm run compare:veeam`
+- `npm run verify:known-veeam-deltas`
+- `npm run test:quality`
 
-### Scope caveat to keep in mind
+Archived/exploratory tests (kept for research, not CI-gating):
 
-- Veeam's `Block generation period` is tied to cloud object storage behavior.
-- This simulator does not yet model that behavior (and does not yet model Direct-to-Object repo type).
-- Until those features are implemented, baseline comparison should be treated as directional for affected scenarios.
+- `npm run archive:test:idealized-gfs`
+- `npm run archive:test:live-weekly-gfs`
+- `npm run archive:test:live-period-gfs`
 
-### When to revisit
+## Scope Caveat — Known Structural Limitations
 
-- If manual capture becomes a recurring friction point (many scenarios, frequent updates)
-- If Veeam publishes a public API or embeddable calculator with a stable interface
-- If the team adopts Playwright for other UI testing and the dependency cost is already paid
+This simulator does not yet model **Direct-to-Object (Object Repos) repository type**.
+
+For scenarios using Veeam Calculator baseline comparison:
+- DAS and SOBR scenarios: Baseline comparison is reliable for validation
+- Direct-to-Object scenarios: Baseline comparison should be treated as directional until the repo type is implemented
+
+### About Playwright automation
+
+The scraper uses [Playwright](https://playwright.dev) for browser automation because the [Veeam Calculator](https://calculator.veeam.com) is a browser-based SPA with no public API.
+
+**Potential risks to be aware of:**
+- **UI changes**: Veeam can update their calculator UI at any time, which may require updating CSS selectors in the scraper
+- **Network dependencies**: Requires network access to `calculator.veeam.com` during capture
+- **CI/CD considerations**: Headless browser in CI environments may need additional OS-level setup (handled automatically by Playwright in most cases)
+
+**Fallback strategy:**
+If the scraper encounters selector mismatches or extraction failures, it automatically falls back to interactive mode where you manually enter values from the calculator. This prevents capture runs from silently failing.
 
 ## When To Run It
 

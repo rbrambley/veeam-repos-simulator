@@ -93,8 +93,8 @@ This suggests weekly remains non-additive over monthly+yearly in SOBR total-capa
 ## How to Update This Document
 
 1. Take a new live capture from `https://www.veeam.com/calculators/simple/vbr/machines` for the scenario in question.
-2. Add the case to `src/testing/validateLivePeriodGfsModel.ts` (or a new equivalent validator).
+2. Add the case to `src/testing/archive/validateLivePeriodGfsModel.ts` (or a new equivalent validator).
 3. If the model needs updating, modify `src/models/gfsSizing.ts`.
 4. Add the scenario to `docs/veeam-calculator-baseline.json` and `docs/test-scenarios.json`.
-5. Run `npm run compare:veeam` and `npm run test:live-period-gfs` to confirm.
+5. Run `npm run compare:veeam` and `npm run archive:test:live-period-gfs` to confirm.
 6. Update the confidence tables above and move the relevant row from "Known Gaps" to a confidence tier.

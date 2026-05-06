@@ -9,14 +9,15 @@
     "preview": "vite preview",
     "test": "tsx src/testing/scenarioRunner.ts",
     "test:matrix": "tsx src/testing/scenarioRunner.ts --id-prefix sobr-matrix-",
-    "test:idealized-gfs": "tsx src/testing/validateIdealizedGfsModel.ts",
+    "archive:test:idealized-gfs": "tsx src/testing/archive/validateIdealizedGfsModel.ts",
     "test:gfs-sizing": "tsx src/testing/validateGfsSizingModel.ts",
-    "test:live-weekly-gfs": "tsx src/testing/validateLiveWeeklyGfsHypothesis.ts",
-    "test:live-period-gfs": "tsx src/testing/validateLivePeriodGfsModel.ts",
+    "archive:test:live-weekly-gfs": "tsx src/testing/archive/validateLiveWeeklyGfsHypothesis.ts",
+    "archive:test:live-period-gfs": "tsx src/testing/archive/validateLivePeriodGfsModel.ts",
     "compare:veeam": "tsx src/testing/veeamBaselineComparator.ts",
     "verify:known-veeam-deltas": "tsx src/testing/verifyKnownCalculatorDeltas.ts",
     "compare:model": "tsx src/testing/veeamBaselineComparator.ts --baseline model",
-    "capture:veeam": "tsx src/testing/veeamCaptureGuide.ts",
+    "capture:veeam": "tsx src/testing/veeamCalculatorScraper.ts",
+    "capture:veeam:manual": "tsx src/testing/veeamCaptureGuide.ts",
     "test:lifecycle": "tsx src/testing/lifecycleRunner.ts",
     "test:mutation": "tsx src/testing/mutationRunner.ts",
     "test:quality": "tsx src/testing/qualityRunner.ts",
@@ -28,12 +29,13 @@
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "vite": "^4.0.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^4.0.0"
   }
 }
