@@ -78,36 +78,42 @@ async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<Baselin
     });
 
     console.log(`\n  Navigating to Veeam Calculator for scenario: ${scenario.id}`);
-    await page.goto('https://calculator.veeam.com', { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto('https://www.veeam.com/calculators/simple/vbr/machines', { 
+      waitUntil: 'domcontentloaded', 
+      timeout: 60000 
+    });
 
-    // Wait for calculator to be interactive
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
+    // Wait for calculator to fully load and become interactive
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {
+      // Timeout is ok, page might still be usable
+    });
+    await page.waitForTimeout(3000);
 
-    // Fill in inputs - look for common calculator field patterns
+    // Fill in inputs - use flexible selector strategies
     console.log('  Filling input fields...');
 
-    // Repository Type selector
-    const repoTypeSelector = 'select[name*="repo"], select[name*="type"], [data-testid*="repo"], [data-testid*="type"]';
-    const repoTypeOptions = await page.locator(repoTypeSelector).first().isVisible().catch(() => false);
-    if (repoTypeOptions) {
-      await page.selectOption(repoTypeSelector, scenario.config.repositoryType);
-    }
-
-    // Source Data TB
-    const sourceInputSelectors = [
-      'input[name*="source"], input[name*="data"], input[placeholder*="Source"], input[placeholder*="TB"]',
-      '[data-testid*="source"] input',
-      'input[aria-label*="Source"]',
+    // Repository Type selector - try multiple strategies
+    const repoTypeSelectors = [
+      'select[name*="repo"], select[name*="type"]',
+      '[data-testid*="repo"] select, [data-testid*="type"] select',
+      'select#repositoryType, select.repository-type',
+      'input[name*="repo"], input[name*="type"]',
     ];
     
-    for (const selector of sourceInputSelectors) {
+    for (const selector of repoTypeSelectors) {
       try {
         const elem = page.locator(selector).first();
-        if (await elem.isVisible()) {
-          await elem.clear();
-          await elem.fill(scenario.config.sourceDataTB.toString());
-          console.log(`  ✓ Set Source Data: ${scenario.config.sourceDataTB} TB`);
+        if (await elem.isVisible().catch(() => false)) {
+          const tagName = await elem.evaluate((el: any) => el.tagName);
+          if (tagName === 'SELECT') {
+            await page.selectOption(selector, scenario.config.repositoryType);
+            console.log(`  ✓ Set Repository Type: ${scenario.config.repositoryType}`);
+          } else {
+            await elem.clear();
+            await elem.fill(scenario.config.repositoryType);
+            console.log(`  ✓ Set Repository Type: ${scenario.config.repositoryType}`);
+          }
+          await page.waitForTimeout(500);
           break;
         }
       } catch (e) {
@@ -115,20 +121,47 @@ async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<Baselin
       }
     }
 
-    // Daily Change Rate %
+    // Source Data TB - try multiple strategies
+    const sourceSelectors = [
+      'input[name*="source"], input[name*="data"]',
+      'input[placeholder*="Source"], input[placeholder*="Machines"]',
+      '[data-testid*="source"] input, [data-testid*="machines"] input',
+      'input#sourceData, input.source-data',
+    ];
+    
+    for (const selector of sourceSelectors) {
+      try {
+        const elem = page.locator(selector).first();
+        if (await elem.isVisible().catch(() => false)) {
+          await elem.clear({ force: true });
+          await elem.fill(scenario.config.sourceDataTB.toString());
+          await page.keyboard.press('Tab'); // Trigger change event
+          console.log(`  ✓ Set Source Data: ${scenario.config.sourceDataTB} TB`);
+          await page.waitForTimeout(500);
+          break;
+        }
+      } catch (e) {
+        // Continue to next selector
+      }
+    }
+
+    // Daily Change Rate % - try multiple strategies
     const changeRateSelectors = [
-      'input[name*="change"], input[placeholder*="Change"], input[placeholder*="%"]',
-      '[data-testid*="change"] input',
-      'input[aria-label*="Change"]',
+      'input[name*="change"], input[name*="rate"]',
+      'input[placeholder*="Change"], input[placeholder*="Rate"]',
+      '[data-testid*="change"] input, [data-testid*="rate"] input',
+      'input#changeRate, input.change-rate',
     ];
     
     for (const selector of changeRateSelectors) {
       try {
         const elem = page.locator(selector).first();
-        if (await elem.isVisible()) {
-          await elem.clear();
+        if (await elem.isVisible().catch(() => false)) {
+          await elem.clear({ force: true });
           await elem.fill(scenario.config.dailyChangeRatePct.toString());
+          await page.keyboard.press('Tab');
           console.log(`  ✓ Set Daily Change Rate: ${scenario.config.dailyChangeRatePct}%`);
+          await page.waitForTimeout(500);
           break;
         }
       } catch (e) {
@@ -136,20 +169,23 @@ async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<Baselin
       }
     }
 
-    // Retention (days)
+    // Retention (days) - try multiple strategies
     const retentionSelectors = [
-      'input[name*="retention"], input[placeholder*="Retention"], input[placeholder*="days"]',
+      'input[name*="retention"]',
+      'input[placeholder*="Retention"], input[placeholder*="days"]',
       '[data-testid*="retention"] input',
-      'input[aria-label*="Retention"]',
+      'input#retention, input.retention',
     ];
     
     for (const selector of retentionSelectors) {
       try {
         const elem = page.locator(selector).first();
-        if (await elem.isVisible()) {
-          await elem.clear();
+        if (await elem.isVisible().catch(() => false)) {
+          await elem.clear({ force: true });
           await elem.fill(scenario.config.retention.toString());
+          await page.keyboard.press('Tab');
           console.log(`  ✓ Set Retention: ${scenario.config.retention} days`);
+          await page.waitForTimeout(500);
           break;
         }
       } catch (e) {
@@ -213,62 +249,149 @@ async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<Baselin
       }
     }
 
-    // Wait for calculation/results to appear
-    console.log('  Waiting for results to calculate...');
-    await page.waitForTimeout(2000);
-
-    // Try to find and extract results from the DOM
-    // Look for common result panel patterns
-    const resultSelectors = [
-      'text=/Storage required|Planned capacity|Total capacity/',
-      '[data-testid*="result"]',
-      '.result',
-      '.summary',
-      '[class*="result"]',
+    // Click the Estimate button to trigger calculation
+    console.log('  Clicking Estimate button...');
+    const estimateButtonSelectors = [
+      'button:has-text("Estimate")',
+      'button:has-text("Calculate")',
+      'button[type="submit"]',
+      'button[name*="estimate"], button[name*="calculate"]',
+      '[data-testid*="estimate"] button, [data-testid*="calculate"] button',
+      'button#estimate, button.estimate, button.btn-estimate',
     ];
 
+    let estimateClicked = false;
+    for (const selector of estimateButtonSelectors) {
+      try {
+        const elem = page.locator(selector).first();
+        if (await elem.isVisible().catch(() => false)) {
+          await elem.click();
+          console.log('  ✓ Estimate button clicked');
+          estimateClicked = true;
+          await page.waitForTimeout(2000); // Wait for calculation to start
+          break;
+        }
+      } catch (e) {
+        // Continue to next selector
+      }
+    }
+
+    if (!estimateClicked) {
+      console.warn('  ⚠ Could not find Estimate button');
+    }
+
+    // Wait for results and then click Details link to view detailed breakdown
+    console.log('  Waiting for results panel...');
+    await page.waitForTimeout(2000);
+
+    // Look for Details link in the right sidebar
+    console.log('  Clicking Details link...');
+    const detailsLinkSelectors = [
+      'a:has-text("Details")',
+      'a:has-text("View Details")',
+      'a[href*="details"]',
+      'button:has-text("Details")',
+      '[data-testid*="details"] a, [data-testid*="details"] button',
+      'a#details, a.details, a.btn-details',
+    ];
+
+    let detailsClicked = false;
+    for (const selector of detailsLinkSelectors) {
+      try {
+        const elem = page.locator(selector).first();
+        if (await elem.isVisible().catch(() => false)) {
+          await elem.click();
+          console.log('  ✓ Details link clicked');
+          detailsClicked = true;
+          await page.waitForTimeout(2000); // Wait for details panel to load
+          break;
+        }
+      } catch (e) {
+        // Continue to next selector
+      }
+    }
+
+    if (!detailsClicked) {
+      console.warn('  ⚠ Could not find Details link, will extract from current view');
+    }
+
+    // Wait for calculation/results to appear
+    console.log('  Extracting calculation results...');
+    await page.waitForTimeout(2000);
+
+    // Try multiple times to extract results (calculator may take time to compute)
     let results: Partial<BaselineExpected> = {};
     let resultFound = false;
 
-    for (const selector of resultSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible()) {
-          const text = await elem.innerText();
-          console.log(`  Found results: ${text.substring(0, 100)}...`);
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      if (resultFound) break;
+      
+      console.log(`  Extraction attempt ${attempt}/3...`);
 
-          // Parse common patterns from result text
-          // Look for patterns like "1.234 TB", "2,345 TB", etc.
-          const tbMatches = text.match(/[\d,.]+ TB/g);
-          if (tbMatches && tbMatches.length > 0) {
-            const plannedCapacity = parseFloat(tbMatches[0].replace(/,/g, ''));
-            results.plannedCapacityTB = plannedCapacity;
+      // Get all text content from the page
+      const pageText = await page.evaluate(() => document.body.innerText);
+      
+      // Look for result patterns in Details tab format
+      // Common patterns in Veeam calculator Details:
+      // "Storage required: 1.23 TB", "Total: 1.23 TB", "Backup Storage: 1.23 TB"
+      // "Performance: 2.5 TB", "Capacity: 1.5 TB", "Archive: 0.5 TB"
+      const mainCapacityPatterns = [
+        /Storage required[:\s]+([0-9.,]+)\s*TB/gi,
+        /Total capacity[:\s]+([0-9.,]+)\s*TB/gi,
+        /Backup Storage[:\s]+([0-9.,]+)\s*TB/gi,
+        /Total[:\s]+([0-9.,]+)\s*TB/gi,
+      ];
+
+      for (const pattern of mainCapacityPatterns) {
+        const match = pattern.exec(pageText);
+        if (match) {
+          const value = parseFloat(match[1].replace(/,/g, ''));
+          if (value > 0) {
+            results.plannedCapacityTB = value;
             resultFound = true;
-            console.log(`  ✓ Extracted Planned Capacity: ${plannedCapacity} TB`);
-
-            // Try to extract tier values if SOBR
-            if (scenario.config.repositoryType === 'SOBR' && tbMatches.length > 1) {
-              const perfTier = parseFloat(tbMatches[1].replace(/,/g, ''));
-              results.plannedPerformanceTierTB = perfTier;
-              console.log(`  ✓ Extracted Performance Tier: ${perfTier} TB`);
-
-              if (tbMatches.length > 2) {
-                const capTier = parseFloat(tbMatches[2].replace(/,/g, ''));
-                results.plannedCapacityTierTB = capTier;
-                console.log(`  ✓ Extracted Capacity Tier: ${capTier} TB`);
-              }
-
-              if (tbMatches.length > 3) {
-                const archiveTier = parseFloat(tbMatches[3].replace(/,/g, ''));
-                results.plannedArchiveTierTB = archiveTier;
-                console.log(`  ✓ Extracted Archive Tier: ${archiveTier} TB`);
-              }
-            }
+            console.log(`  ✓ Extracted Planned Capacity: ${value} TB`);
             break;
           }
         }
-      } catch (e) {
-        // Continue
+      }
+
+      // For SOBR, look for tier breakdown in Details panel
+      if (scenario.config.repositoryType === 'SOBR' && resultFound) {
+        const tierPatterns = [
+          { regex: /Performance[:\s]+([0-9.,]+)\s*TB/gi, field: 'plannedPerformanceTierTB', label: 'Performance Tier' },
+          { regex: /Capacity Tier[:\s]+([0-9.,]+)\s*TB/gi, field: 'plannedCapacityTierTB', label: 'Capacity Tier' },
+          { regex: /Archive[:\s]+([0-9.,]+)\s*TB/gi, field: 'plannedArchiveTierTB', label: 'Archive Tier' },
+        ];
+
+        for (const { regex, field, label } of tierPatterns) {
+          const match = regex.exec(pageText);
+          if (match) {
+            const value = parseFloat(match[1].replace(/,/g, ''));
+            (results as any)[field] = value;
+            console.log(`  ✓ Extracted ${label}: ${value} TB`);
+          }
+        }
+      }
+
+      // Also try to extract file-type sizes if visible in Details
+      const fileTypePatterns = [
+        { regex: /Full backup[:\s]+([0-9.,]+)\s*TB/gi, field: 'fileTypeFullTB', label: 'Full Backup Size' },
+        { regex: /Incremental backup[:\s]+([0-9.,]+)\s*TB/gi, field: 'fileTypeIncrementalTB', label: 'Incremental Size' },
+        { regex: /Synthetic full[:\s]+([0-9.,]+)\s*TB/gi, field: 'fileTypeSyntheticFullTB', label: 'Synthetic Full Size' },
+      ];
+
+      for (const { regex, field, label } of fileTypePatterns) {
+        const match = regex.exec(pageText);
+        if (match) {
+          const value = parseFloat(match[1].replace(/,/g, ''));
+          (results as any)[field] = value;
+          console.log(`  ✓ Extracted ${label}: ${value} TB`);
+        }
+      }
+
+      if (!resultFound && attempt < 3) {
+        console.log('  Results not found yet, waiting...');
+        await page.waitForTimeout(2000);
       }
     }
 

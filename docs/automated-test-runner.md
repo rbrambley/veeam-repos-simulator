@@ -175,15 +175,16 @@ It automatically fills inputs, runs calculations, and extracts results with mini
 npm run capture:veeam
 ```
 
-This runs the Playwright scraper, which:
-- Launches a headless browser
-- For each scenario, navigates to https://calculator.veeam.com
-- Automatically fills in all input fields (source data, change rate, retention, GFS, repo type, SOBR settings)
-- Waits for the calculator to compute results
-- Extracts planned capacity and tier values from the results panel
-- Falls back to interactive prompts if extraction fails (useful for calculator UI changes)
-- Saves directly to `docs/veeam-calculator-baseline.json`
-- Uses `ReFS/XFS = ON` as the current comparison assumption
+This runs the Playwright scraper, which for each scenario:
+1. Navigates to https://www.veeam.com/calculators/simple/vbr/machines
+2. Automatically fills in all input fields (source data, change rate, retention, GFS settings, repo type, SOBR settings)
+3. Clicks the **Estimate** button to trigger the calculator
+4. Clicks the **Details** link in the results sidebar to view the detailed breakdown
+5. Extracts planned capacity and tier values from the Details panel
+6. Retries extraction up to 3 times to handle computation delays
+7. Falls back to interactive prompts if extraction fails (useful for calculator UI changes)
+8. Saves results directly to `docs/veeam-calculator-baseline.json`
+9. Uses `ReFS/XFS = ON` as the current comparison assumption
 
 The scraper is non-destructive: it preserves existing baseline values and merges new captures incrementally.
 
@@ -283,10 +284,12 @@ For scenarios using Veeam Calculator baseline comparison:
 
 ### About Playwright automation
 
-The scraper uses [Playwright](https://playwright.dev) for browser automation because the [Veeam Calculator](https://calculator.veeam.com) is a browser-based SPA with no public API.
+The scraper uses [Playwright](https://playwright.dev) for browser automation because the [Veeam Calculator](https://www.veeam.com/calculators/simple/vbr/machines) is a browser-based SPA with no public API.
+
+The automation fills in source data, change rate, retention, and GFS settings, then extracts the computed planned capacity and tier breakdown values. It uses flexible selectors and retry logic to handle DOM variations and computation delays.
 
 **Potential risks to be aware of:**
-- **UI changes**: Veeam can update their calculator UI at any time, which may require updating CSS selectors in the scraper
+- **UI changes**: Veeam can update their calculator UI at any time, which may require updating input selectors in the scraper
 - **Network dependencies**: Requires network access to `calculator.veeam.com` during capture
 - **CI/CD considerations**: Headless browser in CI environments may need additional OS-level setup (handled automatically by Playwright in most cases)
 
