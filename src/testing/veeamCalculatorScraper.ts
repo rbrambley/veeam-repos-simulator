@@ -92,6 +92,67 @@ async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<Baselin
     // Fill in inputs - use flexible selector strategies
     console.log('  Filling input fields...');
 
+      // Clear/reset the form before entering new inputs
+      console.log('  Clearing previous inputs...');
+    
+      // Try to find and click a Reset/Clear button
+      const resetButtonSelectors = [
+        'button:has-text("Reset")',
+        'button:has-text("Clear")',
+        'button[type="reset"]',
+        'button[name*="reset"], button[name*="clear"]',
+        '[data-testid*="reset"] button, [data-testid*="clear"] button',
+      ];
+
+      let resetClicked = false;
+      for (const selector of resetButtonSelectors) {
+        try {
+          const elem = page.locator(selector).first();
+          if (await elem.isVisible().catch(() => false)) {
+            await elem.click();
+            console.log('  ✓ Reset button clicked');
+            resetClicked = true;
+            await page.waitForTimeout(1000);
+            break;
+          }
+        } catch (e) {
+          // Continue to next selector
+        }
+      }
+
+      // If no reset button found, manually clear all input fields
+      if (!resetClicked) {
+        const inputSelectors = [
+          'input[type="text"]',
+          'input[type="number"]',
+          'input:not([type="hidden"])',
+          'select',
+        ];
+
+        for (const selector of inputSelectors) {
+          try {
+            const elements = await page.locator(selector).all();
+            for (const elem of elements) {
+              const isVisible = await elem.isVisible().catch(() => false);
+              if (isVisible) {
+                const tagName = await elem.evaluate((el: any) => el.tagName);
+                if (tagName === 'SELECT') {
+                  await elem.selectOption('').catch(() => {}); // Clear select
+                } else {
+                  await elem.clear({ force: true }).catch(() => {});
+                  await elem.fill('');
+                }
+              }
+            }
+          } catch (e) {
+            // Continue
+          }
+        }
+        console.log('  ✓ All input fields cleared');
+      }
+
+      await page.waitForTimeout(1000);
+
     // Repository Type selector - try multiple strategies
     const repoTypeSelectors = [
       'select[name*="repo"], select[name*="type"]',
