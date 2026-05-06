@@ -2,6 +2,7 @@
 // This module will handle day-by-day simulation of backup jobs, chains, retention, and storage usage.
 
 import { SimulationState, BackupJob, Repository, BackupChain, RestorePoint, BlockObject, SOBRTier, BackupGeneration } from '../models/veeam.ts';
+import { computeGfsStoredContributionTB } from '../models/gfsSizing.ts';
 
 interface Modifier {
   maxDays: number;
@@ -283,7 +284,21 @@ export class VeeamSimulator {
   }
 
   private getRestorePointSizeInTier(rp: RestorePoint, tier: SOBRTier): number {
-    if (rp.isGFS) return rp.sizeGB;
+    if (rp.isGFS) {
+      const job = this.getJobForRestorePoint(rp);
+      if (!job) return rp.sizeGB;
+
+      const fullSizeAtPointTB = this.getExpectedFullSizeTB(job, rp.date);
+      const changeRate = (job.dailyChangeRatePct ?? 5) / 100;
+      return computeGfsStoredContributionTB({
+        pointSizeTB: fullSizeAtPointTB,
+        dailyChangeRate: changeRate,
+        hasWeekly: !!rp.isWeeklyGFS,
+        hasMonthly: !!rp.isMonthlyGFS,
+        hasYearly: !!rp.isYearlyGFS,
+        weeklyPolicyCount: job.gfsPolicy?.weekly ?? 0,
+      });
+    }
     if (rp.type !== 'SyntheticFull') return rp.sizeGB;
     const job = this.getJobForRestorePoint(rp);
     if (!job) return rp.sizeGB;
@@ -1235,15 +1250,20 @@ export class VeeamSimulator {
   // Get current storage usage by repository
   getStorageUsage() {
     const usage: { [repoId: string]: number } = {};
-    for (const block of this.state.blocks) {
-      usage[block.storageLocation] = (usage[block.storageLocation] || 0) + block.sizeGB;
+    for (const repo of this.state.repositories) {
+      usage[repo.id] = 0;
     }
 
-    // For SOBR repos, usage must include duplicate occupancy when Copy mode is enabled.
-    for (const repo of this.state.repositories) {
-      if (repo.type !== 'SOBR' || !repo.sobrConfig) continue;
-      const tierUsage = this.getSOBRTierUsage(repo.id);
-      usage[repo.id] = (tierUsage.Performance || 0) + (tierUsage.Capacity || 0) + (tierUsage.Archive || 0);
+    for (const rp of this.state.restorePoints) {
+      const job = this.getJobForRestorePoint(rp);
+      if (!job) continue;
+
+      const repoId = job.repositoryId;
+      let rpTotal = 0;
+      if (this.hasTierData(rp, 'Performance')) rpTotal += this.getRestorePointSizeInTier(rp, 'Performance');
+      if (this.hasTierData(rp, 'Capacity')) rpTotal += this.getRestorePointSizeInTier(rp, 'Capacity');
+      if (this.hasTierData(rp, 'Archive')) rpTotal += this.getRestorePointSizeInTier(rp, 'Archive');
+      usage[repoId] = (usage[repoId] || 0) + rpTotal;
     }
 
     return usage;

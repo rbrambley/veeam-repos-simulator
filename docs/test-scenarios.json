@@ -128,6 +128,41 @@
       "finalState": {"expectedRPCount": 9}
     },
     {
+      "id": "das-monthly6-retention7-3y-regression",
+      "name": "DAS Monthly-6 Retention-7 3Y Regression",
+      "description": "Exact regression guard for DAS monthly GFS sizing consistency and usage percentage safety.",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "startDate": "2026-05-06",
+        "sourceDataTB": 2,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 6, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1096,
+      "checkpoints": [
+        {"day": 365, "description": "Year 1 reached"},
+        {"day": 730, "description": "Year 2 reached"},
+        {"day": 1096, "description": "Year 3 reached"}
+      ],
+      "finalState": {
+        "expectedRPCount": 14,
+        "expectedMonthlyGFSCount": 6,
+        "expectedGfsEffectiveTB": 1.95,
+        "gfsEffectiveToleranceTB": 0.03,
+        "usagePctCapacityTB": 5.2,
+        "expectedUsagePctAtMost": 100,
+        "requireDasUsageDisplayConsistency": true
+      }
+    },
+    {
       "id": "sobr-gfs-archive",
       "name": "SOBR Move-Only with GFS and Archive - Basic Operation",
       "description": "Verify complete SOBR tiering with GFS and Archive runs without crashing",

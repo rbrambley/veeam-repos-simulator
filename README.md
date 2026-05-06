@@ -65,14 +65,14 @@ npm run verify:known-veeam-deltas
 
 ## Result Summary
 
-- Use `npm run compare:model` as the primary comparability gate. It should be zero-fail against the simulator-aligned baseline.
-- Use `npm run compare:veeam` as a directional comparison against captured Veeam calculator values. Non-zero failures can be expected for known structural deltas.
-- Use `npm run verify:known-veeam-deltas` as the CI enforcement check for calculator comparison drift (ensures only the approved known deltas remain).
+- Use `npm run compare:veeam` as the primary calculator-parity gate. This is the source-of-truth comparison against live-captured Veeam calculator values.
+- Use `npm run verify:known-veeam-deltas` as the CI enforcement check for calculator comparison drift (currently zero expected deltas).
+- Use `npm run compare:model` as an internal directional check against the simulator-aligned baseline, not as the calculator-equivalence gate.
 - Use `npm run test:quality` as the primary simulator behavior-confidence gate before pushing engine changes.
 
 Recommended CI policy:
 
-- Required pass: `npm test`, `npm run compare:model`, `npm run verify:known-veeam-deltas`, `npm run test:quality`
-- Informational: `npm run compare:veeam`
+- Required pass: `npm test`, `npm run compare:veeam`, `npm run verify:known-veeam-deltas`, `npm run test:quality`
+- Informational: `npm run compare:model`
 
 For SOBR move-only planning, the simulator now assumes: sealed chains offload when the newest restore point reaches the move threshold, and Performance pruning waits until offload is complete, the oldest point reaches retention, and a newer chain exists.

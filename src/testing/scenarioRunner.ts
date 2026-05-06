@@ -14,6 +14,7 @@ interface TestScenario {
   config: {
     repositoryType: 'DAS' | 'SOBR';
     jobType: string;
+    startDate?: string;
     sourceDataTB: number;
     annualGrowthRatePct: number;
     dailyChangeRatePct: number;
@@ -39,6 +40,12 @@ interface TestScenario {
     expectedArchivePointCountAtLeast?: number;
     minArchivePointAgeDays?: number;
     noCapacityResidueInArchivedChains?: boolean;
+    expectedMonthlyGFSCount?: number;
+    expectedGfsEffectiveTB?: number;
+    gfsEffectiveToleranceTB?: number;
+    usagePctCapacityTB?: number;
+    expectedUsagePctAtMost?: number;
+    requireDasUsageDisplayConsistency?: boolean;
   };
 }
 
@@ -202,7 +209,7 @@ function createInitialState(config: TestScenario['config']): SimulationState {
     restorePoints: [],
   };
 
-  const startDate = DEFAULT_SCENARIO_START_DATE;
+  const startDate = config.startDate || DEFAULT_SCENARIO_START_DATE;
 
   return {
     repositories: [repository],
@@ -249,7 +256,7 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
     const growth = (scenario.config.annualGrowthRatePct ?? 10) / 100;
     const changeRate = (scenario.config.dailyChangeRatePct ?? 5) / 100;
     const nonBaseSyntheticFulls = sim.state.restorePoints.filter(
-      (rp) => rp.type === 'SyntheticFull' && !rp.isGlobalBase
+      (rp) => rp.type === 'SyntheticFull' && !rp.isGlobalBase && !rp.isGFS
     );
 
     const syntheticMismatches = nonBaseSyntheticFulls.filter((rp) => {
@@ -286,6 +293,20 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
       (!!rp.hasCapacityData || rp.sobrTier === 'Capacity') &&
       !rp.isGFS
     );
+    const monthlyGfsPoints = sim.state.restorePoints.filter((rp) => !!rp.isMonthlyGFS);
+    const gfsPoints = sim.state.restorePoints.filter((rp) => !!rp.isGFS);
+    const gfsEffectiveTB = gfsPoints.reduce((sum, rp) => {
+      const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
+      return sum + sim.getRestorePointSizeForTier(rp.id, currentTier);
+    }, 0);
+    const usageByRepo = sim.getStorageUsage();
+    const usagePctAtCapacity = scenario.finalState.usagePctCapacityTB && scenario.finalState.usagePctCapacityTB > 0
+      ? ((usageByRepo['repo-1'] || 0) / scenario.finalState.usagePctCapacityTB) * 100
+      : undefined;
+    const dasDisplaySizedTotal = sim.getCurrentRestorePoints().reduce((sum, rp) => {
+      const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
+      return sum + sim.getRestorePointSizeForTier(rp.id, currentTier);
+    }, 0);
 
     console.log(`      RP count: ${finalRpCount}${scenario.finalState.expectedRPCount !== undefined ? ` (expected ${scenario.finalState.expectedRPCount})` : ''}`);
     console.log(`      Base invariant count: ${baseInvariantCount} (expected 1)`);
@@ -303,6 +324,18 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
     }
     if (scenario.finalState.noCapacityResidueInArchivedChains) {
       console.log(`      Capacity residue in archived chains: ${capacityResiduePoints.length} point(s) (expected 0)`);
+    }
+    if (scenario.finalState.expectedMonthlyGFSCount !== undefined) {
+      console.log(`      Monthly GFS points: ${monthlyGfsPoints.length} (expected ${scenario.finalState.expectedMonthlyGFSCount})`);
+    }
+    if (scenario.finalState.expectedGfsEffectiveTB !== undefined) {
+      console.log(`      Effective GFS total: ${gfsEffectiveTB.toFixed(3)} TB (expected ${scenario.finalState.expectedGfsEffectiveTB.toFixed(3)} TB ± ${(scenario.finalState.gfsEffectiveToleranceTB ?? 0.05).toFixed(3)})`);
+    }
+    if (usagePctAtCapacity !== undefined && scenario.finalState.expectedUsagePctAtMost !== undefined) {
+      console.log(`      Usage % at ${scenario.finalState.usagePctCapacityTB} TB capacity: ${usagePctAtCapacity.toFixed(1)}% (expected <= ${scenario.finalState.expectedUsagePctAtMost.toFixed(1)}%)`);
+    }
+    if (scenario.finalState.requireDasUsageDisplayConsistency) {
+      console.log(`      DAS usage/display consistency: usage=${(usageByRepo['repo-1'] || 0).toFixed(3)} TB display=${dasDisplaySizedTotal.toFixed(3)} TB`);
     }
 
     if (scenario.finalState.expectedRPCount !== undefined && finalRpCount !== scenario.finalState.expectedRPCount) {
@@ -358,6 +391,41 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
       throw new Error(
         `Capacity residue mismatch: archived chain still has non-GFS Capacity points (first=${capacityResiduePoints[0].id})`
       );
+    }
+
+    if (
+      scenario.finalState.expectedMonthlyGFSCount !== undefined &&
+      monthlyGfsPoints.length !== scenario.finalState.expectedMonthlyGFSCount
+    ) {
+      throw new Error(
+        `Monthly GFS count mismatch: expected ${scenario.finalState.expectedMonthlyGFSCount}, got ${monthlyGfsPoints.length}`
+      );
+    }
+
+    if (scenario.finalState.expectedGfsEffectiveTB !== undefined) {
+      const tolerance = scenario.finalState.gfsEffectiveToleranceTB ?? 0.05;
+      if (Math.abs(gfsEffectiveTB - scenario.finalState.expectedGfsEffectiveTB) > tolerance) {
+        throw new Error(
+          `Effective GFS total mismatch: expected ${scenario.finalState.expectedGfsEffectiveTB.toFixed(3)} TB ± ${tolerance.toFixed(3)}, got ${gfsEffectiveTB.toFixed(3)} TB`
+        );
+      }
+    }
+
+    if (usagePctAtCapacity !== undefined && scenario.finalState.expectedUsagePctAtMost !== undefined) {
+      if (usagePctAtCapacity > scenario.finalState.expectedUsagePctAtMost) {
+        throw new Error(
+          `Usage %% mismatch: expected <= ${scenario.finalState.expectedUsagePctAtMost.toFixed(1)}%% at ${scenario.finalState.usagePctCapacityTB} TB, got ${usagePctAtCapacity.toFixed(1)}%%`
+        );
+      }
+    }
+
+    if (scenario.finalState.requireDasUsageDisplayConsistency) {
+      const usage = usageByRepo['repo-1'] || 0;
+      if (Math.abs(usage - dasDisplaySizedTotal) > 0.0001) {
+        throw new Error(
+          `DAS usage/display mismatch: usage=${usage.toFixed(6)} TB display=${dasDisplaySizedTotal.toFixed(6)} TB`
+        );
+      }
     }
 
     console.log(`✅ ${scenario.id}: All checks passed`);

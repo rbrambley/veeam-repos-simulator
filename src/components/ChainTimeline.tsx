@@ -14,6 +14,28 @@ const TYPE_COLOR: Record<string, string> = {
   SyntheticFull: '#6a1b9a',
 };
 
+// GFS flag colors — match the badge colors shown in the tooltip
+const GFS_FLAG_COLORS = {
+  yearly:  '#b71c1c',
+  monthly: '#6a1b9a',
+  weekly:  '#1565c0',
+};
+
+function getGfsDotColor(rp: RestorePoint): string {
+  if (rp.isYearlyGFS)  return GFS_FLAG_COLORS.yearly;
+  if (rp.isMonthlyGFS) return GFS_FLAG_COLORS.monthly;
+  if (rp.isWeeklyGFS)  return GFS_FLAG_COLORS.weekly;
+  return '#888';
+}
+
+function getGfsLabel(rp: RestorePoint): string {
+  const flags: string[] = [];
+  if (rp.isYearlyGFS)  flags.push('Y');
+  if (rp.isMonthlyGFS) flags.push('M');
+  if (rp.isWeeklyGFS)  flags.push('W');
+  return flags.join('');
+}
+
 const TYPE_SHAPE: Record<string, string> = {
   Full: 'diamond',
   Incremental: 'circle',
@@ -183,8 +205,10 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
 
   // Render a single restore point dot — click-enabled
   function renderDot(rp: RestorePoint, cx: number, cy: number, key: string) {
-    const color = TYPE_COLOR[rp.type] ?? '#888';
+    const color = rp.isGFS ? getGfsDotColor(rp) : (TYPE_COLOR[rp.type] ?? '#888');
     const isDialog = TYPE_SHAPE[rp.type] === 'diamond';
+    const gfsLabel = rp.isGFS ? getGfsLabel(rp) : '';
+    const gfsFontSize = gfsLabel.length >= 3 ? 5 : gfsLabel.length === 2 ? 6 : 7;
 
     const handleMouseEnter = (e: React.MouseEvent<SVGElement>) => setTooltip({ mouseX: e.clientX, mouseY: e.clientY, rp });
     const handleMouseMove  = (e: React.MouseEvent<SVGElement>) => setTooltip(prev => prev ? { ...prev, mouseX: e.clientX, mouseY: e.clientY } : null);
@@ -205,9 +229,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
           {rp.isGlobalBase && <polygon points={ptsO} fill="none" stroke="#37474f" strokeWidth={1.5} />}
           {rp.isGFS && <polygon points={pts} fill="none" stroke="#f9a825" strokeWidth={3} />}
           <polygon points={pts} fill={color} opacity={0.9} />
-          {rp.isWeeklyGFS  && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill="#fff" fontWeight="bold">W</text>}
-          {rp.isMonthlyGFS && !rp.isWeeklyGFS  && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill="#fff" fontWeight="bold">M</text>}
-          {rp.isYearlyGFS  && !rp.isMonthlyGFS && !rp.isWeeklyGFS && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill="#fff" fontWeight="bold">Y</text>}
+          {gfsLabel && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={gfsFontSize} fill="#fff" fontWeight="bold">{gfsLabel}</text>}
         </g>
       );
     }
@@ -220,6 +242,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
       >
         {rp.isGFS && <circle cx={cx} cy={cy} r={DOT_R + 3} fill="none" stroke="#f9a825" strokeWidth={2} />}
         <circle cx={cx} cy={cy} r={DOT_R} fill={color} opacity={0.85} />
+        {gfsLabel && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={gfsFontSize} fill="#fff" fontWeight="bold">{gfsLabel}</text>}
       </g>
     );
   }
@@ -289,9 +312,18 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
             {label}
           </span>
         ))}
+        {([['W', GFS_FLAG_COLORS.weekly], ['M', GFS_FLAG_COLORS.monthly], ['Y', GFS_FLAG_COLORS.yearly]] as const).map(([label, clr]) => (
+          <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <svg width={14} height={14}>
+              <polygon points="7,1 13,7 7,13 1,7" fill={clr} opacity={0.9} />
+              <text x={7} y={8} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill="#fff" fontWeight="bold">{label}</text>
+            </svg>
+            GFS-{label === 'W' ? 'Weekly' : label === 'M' ? 'Monthly' : 'Yearly'}
+          </span>
+        ))}
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <svg width={14} height={14}><circle cx={7} cy={7} r={6} fill="none" stroke="#f9a825" strokeWidth={2} /><circle cx={7} cy={7} r={3} fill="#888" /></svg>
-          GFS tagged
+          <svg width={14} height={14}><polygon points="7,1 13,7 7,13 1,7" fill={GFS_FLAG_COLORS.yearly} opacity={0.9} /><text x={7} y={8} textAnchor="middle" dominantBaseline="middle" fontSize={5} fill="#fff" fontWeight="bold">YM</text></svg>
+          Multi-flag
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {(['Performance', 'Capacity', 'Archive'] as const).map(t => (

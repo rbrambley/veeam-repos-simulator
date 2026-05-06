@@ -68,399 +68,436 @@ function prompt(question: string): Promise<string> {
   });
 }
 
-async function scrapeCalculator(scenario: CalcScenario): Promise<Partial<BaselineExpected> | null> {
+async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): Promise<Partial<BaselineExpected> | null> {
   let browser;
   try {
     browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage({
-      // Use a viewport that matches typical calculator layout
-      viewport: { width: 1920, height: 1080 },
-    });
+    const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 
     console.log(`\n  Navigating to Veeam Calculator for scenario: ${scenario.id}`);
-    await page.goto('https://www.veeam.com/calculators/simple/vbr/machines', { 
-      waitUntil: 'domcontentloaded', 
-      timeout: 60000 
+    await page.goto('https://www.veeam.com/calculators/simple/vbr/machines', {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
     });
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    await page.waitForTimeout(2000);
 
-    // Wait for calculator to fully load and become interactive
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {
-      // Timeout is ok, page might still be usable
-    });
-    await page.waitForTimeout(3000);
-
-    // Fill in inputs - use flexible selector strategies
-    console.log('  Filling input fields...');
-
-      // Clear/reset the form before entering new inputs
-      console.log('  Clearing previous inputs...');
-    
-      // Try to find and click a Reset/Clear button
-      const resetButtonSelectors = [
-        'button:has-text("Reset")',
-        'button:has-text("Clear")',
-        'button[type="reset"]',
-        'button[name*="reset"], button[name*="clear"]',
-        '[data-testid*="reset"] button, [data-testid*="clear"] button',
-      ];
-
-      let resetClicked = false;
-      for (const selector of resetButtonSelectors) {
-        try {
-          const elem = page.locator(selector).first();
-          if (await elem.isVisible().catch(() => false)) {
-            await elem.click();
-            console.log('  ✓ Reset button clicked');
-            resetClicked = true;
-            await page.waitForTimeout(1000);
-            break;
-          }
-        } catch (e) {
-          // Continue to next selector
-        }
-      }
-
-      // If no reset button found, manually clear all input fields
-      if (!resetClicked) {
-        const inputSelectors = [
-          'input[type="text"]',
-          'input[type="number"]',
-          'input:not([type="hidden"])',
-          'select',
-        ];
-
-        for (const selector of inputSelectors) {
-          try {
-            const elements = await page.locator(selector).all();
-            for (const elem of elements) {
-              const isVisible = await elem.isVisible().catch(() => false);
-              if (isVisible) {
-                const tagName = await elem.evaluate((el: any) => el.tagName);
-                if (tagName === 'SELECT') {
-                  await elem.selectOption('').catch(() => {}); // Clear select
-                } else {
-                  await elem.clear({ force: true }).catch(() => {});
-                  await elem.fill('');
+    // Label-based input filler (TreeWalker: immune to DOM reordering from SOBR toggle expansions)
+    const fillInputByLabel = async (labelText: string, value: number, nth = 1): Promise<boolean> =>
+      page.evaluate(({ text, val, occNth }: { text: string; val: number; occNth: number }) => {
+        let found = 0;
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+          if ((node.textContent || '').trim() === text) {
+            found++;
+            if (found === occNth) {
+              let el: HTMLElement | null = (node as Text).parentElement;
+              for (let i = 0; i < 8 && el; i++) {
+                const input = el.querySelector('input') as HTMLInputElement | null;
+                if (input && input.type !== 'checkbox') {
+                  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+                  if (setter) {
+                    setter.call(input, String(val));
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+                  return true;
                 }
+                el = el.parentElement;
               }
             }
-          } catch (e) {
-            // Continue
           }
         }
-        console.log('  ✓ All input fields cleared');
-      }
+        return false;
+      }, { text: labelText, val: value, occNth: nth });
 
-      await page.waitForTimeout(1000);
-
-    // Repository Type selector - try multiple strategies
-    const repoTypeSelectors = [
-      'select[name*="repo"], select[name*="type"]',
-      '[data-testid*="repo"] select, [data-testid*="type"] select',
-      'select#repositoryType, select.repository-type',
-      'input[name*="repo"], input[name*="type"]',
-    ];
-    
-    for (const selector of repoTypeSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible().catch(() => false)) {
-          const tagName = await elem.evaluate((el: any) => el.tagName);
-          if (tagName === 'SELECT') {
-            await page.selectOption(selector, scenario.config.repositoryType);
-            console.log(`  ✓ Set Repository Type: ${scenario.config.repositoryType}`);
-          } else {
-            await elem.clear();
-            await elem.fill(scenario.config.repositoryType);
-            console.log(`  ✓ Set Repository Type: ${scenario.config.repositoryType}`);
-          }
-          await page.waitForTimeout(500);
-          break;
-        }
-      } catch (e) {
-        // Continue to next selector
-      }
-    }
-
-    // Source Data TB - try multiple strategies
-    const sourceSelectors = [
-      'input[name*="source"], input[name*="data"]',
-      'input[placeholder*="Source"], input[placeholder*="Machines"]',
-      '[data-testid*="source"] input, [data-testid*="machines"] input',
-      'input#sourceData, input.source-data',
-    ];
-    
-    for (const selector of sourceSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible().catch(() => false)) {
-          await elem.clear({ force: true });
-          await elem.fill(scenario.config.sourceDataTB.toString());
-          await page.keyboard.press('Tab'); // Trigger change event
-          console.log(`  ✓ Set Source Data: ${scenario.config.sourceDataTB} TB`);
-          await page.waitForTimeout(500);
-          break;
-        }
-      } catch (e) {
-        // Continue to next selector
-      }
-    }
-
-    // Daily Change Rate % - try multiple strategies
-    const changeRateSelectors = [
-      'input[name*="change"], input[name*="rate"]',
-      'input[placeholder*="Change"], input[placeholder*="Rate"]',
-      '[data-testid*="change"] input, [data-testid*="rate"] input',
-      'input#changeRate, input.change-rate',
-    ];
-    
-    for (const selector of changeRateSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible().catch(() => false)) {
-          await elem.clear({ force: true });
-          await elem.fill(scenario.config.dailyChangeRatePct.toString());
-          await page.keyboard.press('Tab');
-          console.log(`  ✓ Set Daily Change Rate: ${scenario.config.dailyChangeRatePct}%`);
-          await page.waitForTimeout(500);
-          break;
-        }
-      } catch (e) {
-        // Continue to next selector
-      }
-    }
-
-    // Retention (days) - try multiple strategies
-    const retentionSelectors = [
-      'input[name*="retention"]',
-      'input[placeholder*="Retention"], input[placeholder*="days"]',
-      '[data-testid*="retention"] input',
-      'input#retention, input.retention',
-    ];
-    
-    for (const selector of retentionSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible().catch(() => false)) {
-          await elem.clear({ force: true });
-          await elem.fill(scenario.config.retention.toString());
-          await page.keyboard.press('Tab');
-          console.log(`  ✓ Set Retention: ${scenario.config.retention} days`);
-          await page.waitForTimeout(500);
-          break;
-        }
-      } catch (e) {
-        // Continue to next selector
-      }
-    }
-
-    // GFS settings (if present)
-    if (scenario.config.gfsPolicy) {
-      const { weekly = 0, monthly = 0, yearly = 0 } = scenario.config.gfsPolicy;
-
-      if (weekly > 0) {
-        const weeklySelectors = ['input[name*="gfs-weekly"], input[placeholder*="Weekly"]', '[data-testid*="gfs-weekly"] input'];
-        for (const selector of weeklySelectors) {
-          try {
-            const elem = page.locator(selector).first();
-            if (await elem.isVisible()) {
-              await elem.clear();
-              await elem.fill(weekly.toString());
-              console.log(`  ✓ Set GFS Weekly: ${weekly}`);
-              break;
+    // Toggle expansion via evaluate (checkboxes are tabindex=-1, not directly clickable)
+    const expandToggle = async (labelContainsText: string, enable: boolean): Promise<boolean> => {
+      return page.evaluate(({ text, shouldEnable }: { text: string; shouldEnable: boolean }) => {
+        const allLabels = Array.from(document.querySelectorAll('label'));
+        for (const label of allLabels) {
+          if ((label.textContent || '').trim().includes(text)) {
+            const cb = label.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+            if (cb) {
+              if (cb.checked !== shouldEnable) {
+                cb.click();
+              }
+              return true;
             }
-          } catch (e) {
-            // Continue
           }
         }
-      }
-
-      if (monthly > 0) {
-        const monthlySelectors = ['input[name*="gfs-monthly"], input[placeholder*="Monthly"]', '[data-testid*="gfs-monthly"] input'];
-        for (const selector of monthlySelectors) {
-          try {
-            const elem = page.locator(selector).first();
-            if (await elem.isVisible()) {
-              await elem.clear();
-              await elem.fill(monthly.toString());
-              console.log(`  ✓ Set GFS Monthly: ${monthly}`);
-              break;
+        // Fallback: look for toggle near span/div text node
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node: Text | null;
+        while ((node = walker.nextNode() as Text | null)) {
+          if ((node.textContent || '').trim() === text) {
+            const parent = node.parentElement;
+            if (!parent) continue;
+            let el: HTMLElement | null = parent;
+            for (let i = 0; i < 4 && el; i++) {
+              const cb = el.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+              if (cb) {
+                if (cb.checked !== shouldEnable) cb.click();
+                return true;
+              }
+              el = el.parentElement;
             }
-          } catch (e) {
-            // Continue
           }
         }
-      }
+        return false;
+      }, { text: labelContainsText, shouldEnable: enable });
+    };
 
-      if (yearly > 0) {
-        const yearlySelectors = ['input[name*="gfs-yearly"], input[placeholder*="Yearly"]', '[data-testid*="gfs-yearly"] input'];
-        for (const selector of yearlySelectors) {
-          try {
-            const elem = page.locator(selector).first();
-            if (await elem.isVisible()) {
-              await elem.clear();
-              await elem.fill(yearly.toString());
-              console.log(`  ✓ Set GFS Yearly: ${yearly}`);
-              break;
-            }
-          } catch (e) {
-            // Continue
-          }
-        }
-      }
+    console.log('  Expanding required input sections...');
+    // Expand Advanced first so Growth rate + Forecast period inputs appear
+    const advExpanded = await expandToggle('Advanced', true);
+    if (advExpanded) {
+      await page.waitForTimeout(400);
     }
 
-    // Click the Estimate button to trigger calculation
+    // Expand SOBR policy sections. Always expand Move policy? if copy or move is enabled
+    // because the Capacity Tier "Move period" field is shared by both policies.
+    if (scenario.config.repositoryType === 'SOBR') {
+      await expandToggle('Capacity Tier?', true);
+      await page.waitForTimeout(250);
+      if (scenario.config.copyEnabled) await expandToggle('Copy policy?', true);
+      if (scenario.config.copyEnabled || scenario.config.moveEnabled) await expandToggle('Move policy?', true);
+      if (scenario.config.hasArchiveTier) await expandToggle('Archive tier?', true);
+      await page.waitForTimeout(250);
+    }
+
+    const weekly = scenario.config.gfsPolicy?.weekly ?? 0;
+    const monthly = scenario.config.gfsPolicy?.monthly ?? 0;
+    const yearly = scenario.config.gfsPolicy?.yearly ?? 0;
+
+    const totalInputs = await page.locator('input.rz-numeric-input').count();
+    console.log(`  Total visible numeric inputs after expansion: ${totalInputs}`);
+
+    console.log('  Filling input fields by label...');
+    await fillInputByLabel('Source data', scenario.config.sourceDataTB);
+    await fillInputByLabel('Daily change rate', scenario.config.dailyChangeRatePct);
+    // Backup window – leave at default 8 hours
+    await fillInputByLabel('Days', scenario.config.retention);
+    await fillInputByLabel('Weeks', weekly);
+    await fillInputByLabel('Months', monthly);
+    await fillInputByLabel('Years', yearly);
+    await fillInputByLabel('Growth rate', scenario.config.annualGrowthRatePct ?? 0);
+
+    // Forecast period uses a non-rz-numeric-input – set via proximity evaluate
+    const forecastSet = await page.evaluate((years: number) => {
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        if ((node.textContent || '').trim() === 'Forecast period') {
+          let el: HTMLElement | null = (node as Text).parentElement;
+          for (let i = 0; i < 8 && el; i++) {
+            const input = el.querySelector('input') as HTMLInputElement | null;
+            if (input && input.type !== 'checkbox') {
+              const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+              if (nativeSetter) {
+                nativeSetter.call(input, String(years));
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+              return true;
+            }
+            el = el.parentElement;
+          }
+        }
+      }
+      return false;
+    }, forecastYears);
+    if (!forecastSet) {
+      console.warn('  ⚠ Could not set Forecast period via evaluate; using calculator default');
+    }
+
+    // SOBR period fields: "Move period" appears twice — 1st = Capacity Tier, 2nd = Archive Tier
+    if (scenario.config.repositoryType === 'SOBR') {
+      if ((scenario.config.copyEnabled || scenario.config.moveEnabled) && typeof scenario.config.offloadAfterDays === 'number') {
+        const ok = await fillInputByLabel('Move period', scenario.config.offloadAfterDays, 1);
+        if (!ok) console.warn(`  ⚠ Could not set Move period (capacity tier) (${scenario.config.offloadAfterDays})`);
+      }
+      if (scenario.config.hasArchiveTier && typeof scenario.config.archiveAfterDays === 'number') {
+        const ok = await fillInputByLabel('Move period', scenario.config.archiveAfterDays, 2);
+        if (!ok) console.warn(`  ⚠ Could not set Move period (archive tier) (${scenario.config.archiveAfterDays})`);
+      }
+      await page.waitForTimeout(150);
+    }
+
+    await page.keyboard.press('Tab').catch(() => {});
+    await page.waitForTimeout(300);
+
+    // Read back key values to verify binding succeeded
+    const readLabelVal = async (text: string): Promise<string> => {
+      return page.evaluate((t: string) => {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+          if ((node.textContent || '').trim() === t) {
+            let el: HTMLElement | null = (node as Text).parentElement;
+            for (let i = 0; i < 8 && el; i++) {
+              const input = el.querySelector('input') as HTMLInputElement | null;
+              if (input && input.type !== 'checkbox') return input.value;
+              el = el.parentElement;
+            }
+          }
+        }
+        return '?';
+      }, text);
+    };
+    const applied = {
+      source: await readLabelVal('Source data'),
+      dailyChange: await readLabelVal('Daily change rate'),
+      retention: await readLabelVal('Days'),
+      weeks: await readLabelVal('Weeks'),
+      months: await readLabelVal('Months'),
+      years: await readLabelVal('Years'),
+      growth: await readLabelVal('Growth rate'),
+    };
+    console.log(`  ✓ Inputs applied: source=${applied.source}, change=${applied.dailyChange}, days=${applied.retention}, gfs=${applied.weeks}/${applied.months}/${applied.years}, growth=${applied.growth}, forecastSet=${forecastSet}`);
+
+    // Sequence step 1: click Estimate
+    const estimateButton = page.locator('button:has-text("ESTIMATE")').first();
+    if (!(await estimateButton.isVisible().catch(() => false))) {
+      throw new Error('Estimate button not found');
+    }
     console.log('  Clicking Estimate button...');
-    const estimateButtonSelectors = [
-      'button:has-text("Estimate")',
-      'button:has-text("Calculate")',
-      'button[type="submit"]',
-      'button[name*="estimate"], button[name*="calculate"]',
-      '[data-testid*="estimate"] button, [data-testid*="calculate"] button',
-      'button#estimate, button.estimate, button.btn-estimate',
-    ];
-
-    let estimateClicked = false;
-    for (const selector of estimateButtonSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible().catch(() => false)) {
-          await elem.click();
-          console.log('  ✓ Estimate button clicked');
-          estimateClicked = true;
-          await page.waitForTimeout(2000); // Wait for calculation to start
-          break;
-        }
-      } catch (e) {
-        // Continue to next selector
-      }
-    }
-
-    if (!estimateClicked) {
-      console.warn('  ⚠ Could not find Estimate button');
-    }
-
-    // Wait for results and then click Details link to view detailed breakdown
-    console.log('  Waiting for results panel...');
+    await estimateButton.click();
     await page.waitForTimeout(2000);
 
-    // Look for Details link in the right sidebar
+    // Sequence step 2: click Details in right results sidebar
+    const detailsButton = page.locator('button:has-text("[Details]")').first();
+    if (!(await detailsButton.isVisible().catch(() => false))) {
+      throw new Error('Details button not found after estimate');
+    }
     console.log('  Clicking Details link...');
-    const detailsLinkSelectors = [
-      'a:has-text("Details")',
-      'a:has-text("View Details")',
-      'a[href*="details"]',
-      'button:has-text("Details")',
-      '[data-testid*="details"] a, [data-testid*="details"] button',
-      'a#details, a.details, a.btn-details',
-    ];
+    await detailsButton.click();
 
-    let detailsClicked = false;
-    for (const selector of detailsLinkSelectors) {
-      try {
-        const elem = page.locator(selector).first();
-        if (await elem.isVisible().catch(() => false)) {
-          await elem.click();
-          console.log('  ✓ Details link clicked');
-          detailsClicked = true;
-          await page.waitForTimeout(2000); // Wait for details panel to load
-          break;
+    // Sequence step 3: extract from details dialog only
+    const detailsDialog = page.locator('div[role="dialog"]').first();
+    await detailsDialog.waitFor({ state: 'visible', timeout: 15000 });
+
+    // ── TOP HALF: capture immediately before any scrolling ──────────────────
+    const topHalfText = await detailsDialog.innerText();
+    console.log('  ── Top-Half Details (raw) ─────────────────────────────');
+    console.log(topHalfText.slice(0, 2000)); // Print up to 2000 chars of top-half
+    console.log('  ───────────────────────────────────────────────────────');
+
+    // ── BOTTOM HALF: scroll through dialog to expose Restore Points rows ─────
+    const capturedChunks = new Set<string>([topHalfText]);
+    for (let step = 1; step <= 12; step++) {
+      await detailsDialog.evaluate((dialog: Element, s: number) => {
+        const nodes = Array.from(dialog.querySelectorAll('*')) as HTMLElement[];
+        const scrollables = nodes.filter((n) => n.scrollHeight > n.clientHeight + 8);
+        for (const el of scrollables) {
+          const target = Math.min(el.scrollHeight, (s / 12) * el.scrollHeight);
+          el.scrollTop = target;
         }
-      } catch (e) {
-        // Continue to next selector
+      }, step);
+      await page.waitForTimeout(120);
+      const chunk = await detailsDialog.innerText();
+      capturedChunks.add(chunk);
+    }
+    // Full combined text covers both top and scrolled-in restore point rows
+    const detailsText = Array.from(capturedChunks).join('\n');
+
+    const extractNumberFrom = (sourceText: string, pattern: RegExp): number | undefined => {
+      const match = sourceText.match(pattern);
+      if (!match) {
+        return undefined;
+      }
+      const parsed = parseFloat(match[1].replace(/,/g, ''));
+      return Number.isFinite(parsed) ? parsed : undefined;
+    };
+
+    const extractTextFrom = (sourceText: string, pattern: RegExp): string | undefined => {
+      const match = sourceText.match(pattern);
+      return match ? match[1].trim() : undefined;
+    };
+
+    const results: Partial<BaselineExpected> = {};
+    const storageMatch = topHalfText.match(/Storage required\s*\n\s*([0-9.,]+)\s*TB/i)
+      ?? detailsText.match(/Storage required\s*\n\s*([0-9.,]+)\s*TB/i);
+    if (!storageMatch) {
+      throw new Error('Could not parse Storage required value from Details dialog');
+    }
+    results.plannedCapacityTB = parseFloat(storageMatch[1].replace(/,/g, ''));
+    console.log(`  ✓ Extracted Planned Capacity: ${results.plannedCapacityTB} TB`);
+
+    // Only parse restore points from below the "Restore Points Simulation" header
+    // to avoid matching Y1/D14 etc from the top-half tier-summary section.
+    const rpSectionIdx = detailsText.search(/Restore Points Simulation/i);
+    const rpText = rpSectionIdx >= 0 ? detailsText.slice(rpSectionIdx) : '';
+
+    const restorePoints: Array<{ point: string; sizeTB: number }> = [];
+    const pointRegex = /\b(LATEST|D\d+|W\d+|M\d+|Y\d+)\b[\s\S]{0,30}?([0-9]+(?:\.[0-9]+)?)\s*TB\b/gi;
+    let pointMatch: RegExpExecArray | null = null;
+    while ((pointMatch = pointRegex.exec(rpText)) !== null) {
+      const size = parseFloat(pointMatch[2]);
+      if (Number.isFinite(size)) {
+        restorePoints.push({ point: pointMatch[1], sizeTB: size });
+      }
+    }
+    const uniquePointMap = new Map<string, number>();
+    for (const rp of restorePoints) {
+      uniquePointMap.set(rp.point, rp.sizeTB);
+    }
+    const uniqueRestorePoints = Array.from(uniquePointMap.entries()).map(([point, sizeTB]) => ({ point, sizeTB }));
+
+    const restorePointCounts = {
+      total: uniqueRestorePoints.length,
+      daily: uniqueRestorePoints.filter((x) => x.point.startsWith('D')).length,
+      weekly: uniqueRestorePoints.filter((x) => x.point.startsWith('W')).length,
+      monthly: uniqueRestorePoints.filter((x) => x.point.startsWith('M')).length,
+      yearly: uniqueRestorePoints.filter((x) => x.point.startsWith('Y')).length,
+      latest: uniqueRestorePoints.filter((x) => x.point === 'LATEST').length,
+    };
+
+    const scrapedPayload: Record<string, string | number | boolean | undefined> = {
+      scenarioId: scenario.id,
+      repositoryType: scenario.config.repositoryType,
+      storageRequiredTB: results.plannedCapacityTB,
+
+      sourceDataTB: extractNumberFrom(topHalfText, /Source data\s*\n\s*([0-9.,]+)\s*TB/i),
+      dailyChangeRatePct: extractNumberFrom(topHalfText, /Daily change rate\s*\n\s*([0-9.,]+)\s*%/i),
+      backupWindowHours: extractNumberFrom(topHalfText, /Backup window\s*\n\s*([0-9.,]+)\s*hours/i),
+
+      retentionDays: extractTextFrom(topHalfText, /Days\s*\n\s*([^\n]+)/i),
+      retentionWeeks: extractTextFrom(topHalfText, /Weeks\s*\n\s*([^\n]+)/i),
+      retentionMonths: extractTextFrom(topHalfText, /Months\s*\n\s*([^\n]+)/i),
+      retentionYears: extractTextFrom(topHalfText, /Years\s*\n\s*([^\n]+)/i),
+
+      refsXfsEnabled: extractTextFrom(topHalfText, /ReFS\/XFS\?\s*\n\s*([^\n]+)/i),
+      perfTierImmutable: extractTextFrom(topHalfText, /Performance tier immutable\?\s*\n\s*([^\n]+)/i),
+      compressionPct: extractNumberFrom(topHalfText, /Compress by\s*\n\s*([0-9.,]+)\s*%/i),
+      blockGenerationPeriodDays: extractNumberFrom(topHalfText, /Block generation period\s*\n\s*([0-9.,]+)\s*days/i),
+      growthRatePct: extractNumberFrom(topHalfText, /Growth rate\s*\n\s*([0-9.,]+)\s*%/i),
+      forecastYears: extractNumberFrom(topHalfText, /Forecast period\s*\n\s*([0-9.,]+)\s*years/i),
+
+      proxyCores: extractNumberFrom(topHalfText, /Proxy\s*[\s\S]*?Cores required\s*\n\s*([0-9.,]+)/i),
+      proxyRamGB: extractNumberFrom(topHalfText, /Proxy\s*[\s\S]*?RAM required\s*\n\s*([0-9.,]+)\s*GB/i),
+      repoGatewayCores: extractNumberFrom(topHalfText, /Repository\/Gateway\s*[\s\S]*?Cores required\s*\n\s*([0-9.,]+)/i),
+      repoGatewayRamGB: extractNumberFrom(topHalfText, /Repository\/Gateway\s*[\s\S]*?RAM required\s*\n\s*([0-9.,]+)\s*GB/i),
+
+      // Tier capacities: prefer explicit top-half tier-storage labels.
+      // Fallback to Y1 timeline capture only if storage labels are unavailable.
+      performanceTierY1TB:
+        extractNumberFrom(topHalfText, /Performance tier\s*[\s\S]*?Storage required\s*\n\s*([0-9.,]+)\s*TB/i)
+        ?? extractNumberFrom(topHalfText, /Performance Tier[\s\S]*?Y1\s*\n\s*([0-9.,]+)\s*TB/i),
+      capacityTierY1TB:
+        extractNumberFrom(topHalfText, /Capacity tier\s*[\s\S]*?Capacity tier storage\s*\n\s*([0-9.,]+)\s*TB/i)
+        ?? extractNumberFrom(topHalfText, /Capacity Tier[\s\S]*?Y1\s*\n\s*([0-9.,]+)\s*TB/i),
+      archiveTierY1TB:
+        extractNumberFrom(topHalfText, /Archive tier\s*[\s\S]*?Archive tier storage\s*\n\s*([0-9.,]+)\s*TB/i)
+        ?? extractNumberFrom(topHalfText, /Archive Tier[\s\S]*?Y1\s*\n\s*([0-9.,]+)\s*TB/i),
+      workingSpaceTB: extractNumberFrom(topHalfText, /Working space\s*\n\s*([0-9.,]+)\s*TB/i),
+
+      fullBackupTB: extractNumberFrom(topHalfText, /Full backup\s*\n\s*([0-9.,]+)\s*TB/i),
+      incrementalBackupTB: extractNumberFrom(topHalfText, /Incremental backup\s*\n\s*([0-9.,]+)\s*TB/i),
+      syntheticFullBackupTB: extractNumberFrom(topHalfText, /Synthetic full backup\s*\n\s*([0-9.,]+)\s*TB/i),
+      restorePointCountTotal: restorePointCounts.total,
+      restorePointCountDaily: restorePointCounts.daily,
+      restorePointCountWeekly: restorePointCounts.weekly,
+      restorePointCountMonthly: restorePointCounts.monthly,
+      restorePointCountYearly: restorePointCounts.yearly,
+      restorePointCountLatest: restorePointCounts.latest,
+    };
+
+    const fullMatch = detailsText.match(/Full backup\s*\n\s*([0-9.,]+)\s*TB/i);
+    if (fullMatch) {
+      results.fileTypeFullTB = parseFloat(fullMatch[1].replace(/,/g, ''));
+    }
+    const incMatch = detailsText.match(/Incremental backup\s*\n\s*([0-9.,]+)\s*TB/i);
+    if (incMatch) {
+      results.fileTypeIncrementalTB = parseFloat(incMatch[1].replace(/,/g, ''));
+    }
+    const synthMatch = detailsText.match(/Synthetic full backup\s*\n\s*([0-9.,]+)\s*TB/i);
+    if (synthMatch) {
+      results.fileTypeSyntheticFullTB = parseFloat(synthMatch[1].replace(/,/g, ''));
+    }
+
+    if (typeof scrapedPayload.performanceTierY1TB === 'number') {
+      results.plannedPerformanceTierTB = scrapedPayload.performanceTierY1TB;
+    }
+    if (typeof scrapedPayload.capacityTierY1TB === 'number') {
+      results.plannedCapacityTierTB = scrapedPayload.capacityTierY1TB;
+    }
+    if (typeof scrapedPayload.archiveTierY1TB === 'number') {
+      results.plannedArchiveTierTB = scrapedPayload.archiveTierY1TB;
+    }
+
+    console.log('  Scraped Details Payload:');
+    console.log(JSON.stringify(scrapedPayload, null, 2));
+    if (uniqueRestorePoints.length > 0) {
+      console.log('  Restore Points Snapshot (point:sizeTB):');
+      console.log(uniqueRestorePoints.map((x) => `${x.point}:${x.sizeTB}`).join(', '));
+    } else {
+      console.log('  Restore Points Snapshot: none parsed from details text');
+    }
+
+    // Sequence step 4: close details window
+    console.log('  Closing Details window...');
+    let closed = false;
+
+    // Primary close path: Escape often dismisses this dialog immediately.
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.waitForTimeout(250);
+    closed = !(await detailsDialog.isVisible().catch(() => false));
+
+    if (!closed) {
+      // Fallback: click a close-like button from DOM regardless of transient visibility state.
+      const clickedByDom = await page.evaluate(() => {
+        const dialog = document.querySelector('div[role="dialog"]');
+        if (!dialog) {
+          return false;
+        }
+        const buttons = Array.from(dialog.querySelectorAll('button')) as HTMLButtonElement[];
+        const candidate = buttons.find((b) => {
+          const text = (b.textContent || '').toLowerCase();
+          const aria = (b.getAttribute('aria-label') || '').toLowerCase();
+          const title = (b.getAttribute('title') || '').toLowerCase();
+          return text.includes('close') || aria.includes('close') || title.includes('close');
+        }) || buttons[0];
+        if (!candidate) {
+          return false;
+        }
+        candidate.click();
+        return true;
+      });
+      if (clickedByDom) {
+        await page.waitForTimeout(300);
+        closed = !(await detailsDialog.isVisible().catch(() => false));
       }
     }
 
-    if (!detailsClicked) {
-      console.warn('  ⚠ Could not find Details link, will extract from current view');
+    if (!closed) {
+      // Do not fail capture solely on dialog-close detection; continue to reset attempt.
+      console.warn('  ⚠ Could not confidently confirm dialog close; continuing to reset.');
+    } else {
+      console.log('  ✓ Details window closed');
     }
 
-    // Wait for calculation/results to appear
-    console.log('  Extracting calculation results...');
-    await page.waitForTimeout(2000);
-
-    // Try multiple times to extract results (calculator may take time to compute)
-    let results: Partial<BaselineExpected> = {};
-    let resultFound = false;
-
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      if (resultFound) break;
-      
-      console.log(`  Extraction attempt ${attempt}/3...`);
-
-      // Get all text content from the page
-      const pageText = await page.evaluate(() => document.body.innerText);
-      
-      // Look for result patterns in Details tab format
-      // Common patterns in Veeam calculator Details:
-      // "Storage required: 1.23 TB", "Total: 1.23 TB", "Backup Storage: 1.23 TB"
-      // "Performance: 2.5 TB", "Capacity: 1.5 TB", "Archive: 0.5 TB"
-      const mainCapacityPatterns = [
-        /Storage required[:\s]+([0-9.,]+)\s*TB/gi,
-        /Total capacity[:\s]+([0-9.,]+)\s*TB/gi,
-        /Backup Storage[:\s]+([0-9.,]+)\s*TB/gi,
-        /Total[:\s]+([0-9.,]+)\s*TB/gi,
-      ];
-
-      for (const pattern of mainCapacityPatterns) {
-        const match = pattern.exec(pageText);
-        if (match) {
-          const value = parseFloat(match[1].replace(/,/g, ''));
-          if (value > 0) {
-            results.plannedCapacityTB = value;
-            resultFound = true;
-            console.log(`  ✓ Extracted Planned Capacity: ${value} TB`);
-            break;
-          }
-        }
+    // Sequence step 5: click Reset fields after reading result
+    console.log('  Clicking Reset fields...');
+    const resetClicked = await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button')) as HTMLButtonElement[];
+      const reset = buttons.find((b) => (b.textContent || '').includes('[Reset fields]'));
+      if (!reset) {
+        return false;
       }
-
-      // For SOBR, look for tier breakdown in Details panel
-      if (scenario.config.repositoryType === 'SOBR' && resultFound) {
-        const tierPatterns = [
-          { regex: /Performance[:\s]+([0-9.,]+)\s*TB/gi, field: 'plannedPerformanceTierTB', label: 'Performance Tier' },
-          { regex: /Capacity Tier[:\s]+([0-9.,]+)\s*TB/gi, field: 'plannedCapacityTierTB', label: 'Capacity Tier' },
-          { regex: /Archive[:\s]+([0-9.,]+)\s*TB/gi, field: 'plannedArchiveTierTB', label: 'Archive Tier' },
-        ];
-
-        for (const { regex, field, label } of tierPatterns) {
-          const match = regex.exec(pageText);
-          if (match) {
-            const value = parseFloat(match[1].replace(/,/g, ''));
-            (results as any)[field] = value;
-            console.log(`  ✓ Extracted ${label}: ${value} TB`);
-          }
-        }
-      }
-
-      // Also try to extract file-type sizes if visible in Details
-      const fileTypePatterns = [
-        { regex: /Full backup[:\s]+([0-9.,]+)\s*TB/gi, field: 'fileTypeFullTB', label: 'Full Backup Size' },
-        { regex: /Incremental backup[:\s]+([0-9.,]+)\s*TB/gi, field: 'fileTypeIncrementalTB', label: 'Incremental Size' },
-        { regex: /Synthetic full[:\s]+([0-9.,]+)\s*TB/gi, field: 'fileTypeSyntheticFullTB', label: 'Synthetic Full Size' },
-      ];
-
-      for (const { regex, field, label } of fileTypePatterns) {
-        const match = regex.exec(pageText);
-        if (match) {
-          const value = parseFloat(match[1].replace(/,/g, ''));
-          (results as any)[field] = value;
-          console.log(`  ✓ Extracted ${label}: ${value} TB`);
-        }
-      }
-
-      if (!resultFound && attempt < 3) {
-        console.log('  Results not found yet, waiting...');
-        await page.waitForTimeout(2000);
+      reset.click();
+      return true;
+    });
+    if (!resetClicked) {
+      // Secondary reset path via Playwright locator for cases where text is wrapped differently.
+      const resetButton = page.locator('button:has-text("[Reset fields]")').first();
+      if (await resetButton.isVisible().catch(() => false)) {
+        await resetButton.click().catch(() => {});
       }
     }
-
-    if (!resultFound) {
-      console.warn(`  ⚠ Could not automatically extract results for ${scenario.id}`);
-      console.log('  Manual capture may be needed. Falling back to interactive mode.');
-      return null;
-    }
+    await page.waitForTimeout(800);
+    console.log('  ✓ Reset complete');
 
     await browser.close();
     return results;
@@ -561,6 +598,15 @@ async function loadBaselineScenarios(): Promise<CalcScenario[]> {
 }
 
 async function main() {
+  const idArgIndex = process.argv.indexOf('--id');
+  const idFilterArg = idArgIndex >= 0 ? process.argv[idArgIndex + 1] : undefined;
+  const idFilterSet = new Set(
+    (idFilterArg ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0),
+  );
+
   const baselinePath = path.join(process.cwd(), 'docs', 'veeam-calculator-baseline.json');
   
   // Load existing baseline
@@ -586,10 +632,15 @@ async function main() {
     };
   }
 
+  const baselineForecastYears = baseline.defaults?.forecastYears ?? 3;
+
   // Load scenarios
-  const scenarios = await loadBaselineScenarios();
+  const allScenarios = await loadBaselineScenarios();
+  const scenarios = idFilterSet.size > 0
+    ? allScenarios.filter((s) => idFilterSet.has(s.id))
+    : allScenarios;
   console.log(`\n📊 Veeam Calculator Scraper`);
-  console.log(`Loaded ${scenarios.length} scenarios for capture.\n`);
+  console.log(`Loaded ${scenarios.length} scenarios for capture${idFilterSet.size > 0 ? ` (filtered from ${allScenarios.length})` : ''}.\n`);
 
   let capturedCount = 0;
   let skippedCount = 0;
@@ -609,7 +660,7 @@ async function main() {
     console.log(`\n▶ Processing: ${scenario.id}`);
 
     // Try automatic scraping first
-    let results = await scrapeCalculator(scenario);
+    let results = await scrapeCalculator(scenario, baselineForecastYears);
 
     // If scraping failed or returned null, fall back to interactive capture
     if (!results) {

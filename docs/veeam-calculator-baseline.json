@@ -9,9 +9,9 @@
   "scenarios": [
     {
       "id": "das-basic",
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 1.6231,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333
@@ -19,9 +19,9 @@
     },
     {
       "id": "das-retention-14",
-      "notes": "captured-from-veeam-calculator-2026-05-03 [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 1.856,
+        "plannedCapacityTB": 1.9,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333
@@ -29,58 +29,58 @@
     },
     {
       "id": "sobr-moveonly",
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 39.0575,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333,
-        "plannedPerformanceTierTB": 2.3219,
-        "plannedCapacityTierTB": 36.7356,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 1.3,
         "plannedArchiveTierTB": 0
       }
     },
     {
       "id": "sobr-copymove",
       "expected": {
-        "plannedCapacityTB": 3.6529,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333,
-        "plannedPerformanceTierTB": 2.0889,
-        "plannedCapacityTierTB": 1.5639,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 1.6,
         "plannedArchiveTierTB": 0
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]"
+      "notes": "captured-from-playwright-2026-05-06"
     },
     {
       "id": "das-gfs",
       "expected": {
-        "plannedCapacityTB": 2.1231,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]"
+      "notes": "captured-from-playwright-2026-05-06"
     },
     {
       "id": "sobr-gfs-archive",
       "expected": {
-        "plannedCapacityTB": 39.2904,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333,
-        "plannedPerformanceTierTB": 2.7877,
-        "plannedCapacityTierTB": 36.5027,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 3,
         "plannedArchiveTierTB": 0
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]"
+      "notes": "captured-from-playwright-2026-05-06"
     },
     {
       "id": "das-monthly-2-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2M 0%-growth; storage-required=1.6TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 2.35,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
         "fileTypeSyntheticFullTB": 0.025
@@ -88,19 +88,20 @@
     },
     {
       "id": "das-yearly-2-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2Y 0%-growth; storage-required=2.3TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 2.35,
+        "plannedCapacityTB": 2.3,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
-        "fileTypeSyntheticFullTB": 0.025
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 0.45
       }
     },
     {
       "id": "das-monthly-2-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2M 0%-growth; storage-required=28.3TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 34.9836,
+        "plannedCapacityTB": 28.3,
         "fileTypeFullTB": 6.66,
         "fileTypeIncrementalTB": 0.666,
         "fileTypeSyntheticFullTB": 0.666
@@ -108,19 +109,20 @@
     },
     {
       "id": "das-yearly-2-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2Y 0%-growth; storage-required=35.0TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 34.9836,
+        "plannedCapacityTB": 35,
         "fileTypeFullTB": 6.66,
         "fileTypeIncrementalTB": 0.666,
-        "fileTypeSyntheticFullTB": 0.666
+        "fileTypeSyntheticFullTB": 0.666,
+        "plannedPerformanceTierTB": 6.66
       }
     },
     {
       "id": "das-mixed-2w1m-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M 0%-growth; storage-required=1.5TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 1.85,
+        "plannedCapacityTB": 1.5,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
         "fileTypeSyntheticFullTB": 0.025
@@ -128,68 +130,540 @@
     },
     {
       "id": "das-mixed-2w1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1Y 0%-growth; storage-required=1.8TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 1.85,
+        "plannedCapacityTB": 1.8,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
-        "fileTypeSyntheticFullTB": 0.025
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 0.5
       }
     },
     {
       "id": "das-mixed-1m1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 0W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 2.35,
+        "plannedCapacityTB": 1.9,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
-        "fileTypeSyntheticFullTB": 0.025
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 0.5
       }
     },
     {
       "id": "das-mixed-2w1m1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 2.35,
+        "plannedCapacityTB": 1.9,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
-        "fileTypeSyntheticFullTB": 0.025
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 0.5
       }
     },
     {
       "id": "das-mixed-2w1m1y-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2W+1M+1Y 0%-growth; storage-required=31.7TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 34.9836,
+        "plannedCapacityTB": 31.7,
         "fileTypeFullTB": 6.66,
         "fileTypeIncrementalTB": 0.666,
-        "fileTypeSyntheticFullTB": 0.666
+        "fileTypeSyntheticFullTB": 0.666,
+        "plannedPerformanceTierTB": 6.66
       }
     },
     {
       "id": "sobr-mixed-2w1m1y-small-r60",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 2W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 40.2904,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333,
-        "plannedPerformanceTierTB": 3.2877,
-        "plannedCapacityTierTB": 36.5027,
-        "plannedArchiveTierTB": 0.5
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 3,
+        "plannedArchiveTierTB": 0.7
       }
     },
     {
       "id": "sobr-mixed-1m1y-small-r60",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 60d 0W+1M+1Y 10%-growth with Capacity Tier on; storage-required=4.1TB [seeded-from-simulator] [seeded-from-simulator]",
+      "notes": "captured-from-playwright-2026-05-06",
       "expected": {
-        "plannedCapacityTB": 40.2904,
+        "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
         "fileTypeSyntheticFullTB": 0.0333,
-        "plannedPerformanceTierTB": 3.2877,
-        "plannedCapacityTierTB": 36.5027,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 3,
+        "plannedArchiveTierTB": 0.7
+      }
+    },
+    {
+      "id": "sobr-copyonly-archive-gating",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.6,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 2,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "sobr-matrix-move-lt-retention",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.6,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 1.6
+      }
+    },
+    {
+      "id": "sobr-matrix-move-eq-retention",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.6,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 1.3
+      }
+    },
+    {
+      "id": "sobr-matrix-move-gt-retention",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.9,
+        "plannedPerformanceTierTB": 1.9,
+        "plannedCapacityTierTB": 1.3
+      }
+    },
+    {
+      "id": "sobr-matrix-move-zero",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.6,
+        "plannedPerformanceTierTB": 1.6,
+        "plannedCapacityTierTB": 1.3
+      }
+    },
+    {
+      "id": "lb-das-retention-count",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4
+      }
+    },
+    {
+      "id": "lb-das-sla-overrides-count",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4
+      }
+    },
+    {
+      "id": "lb-das-gfs-preserves-chain",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4
+      }
+    },
+    {
+      "id": "lb-gfs-expiry-order",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4
+      }
+    },
+    {
+      "id": "lb-gfs-monthly-boundary",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.7
+      }
+    },
+    {
+      "id": "lb-gfs-yearly-boundary",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 2.3,
+        "plannedPerformanceTierTB": 0.45
+      }
+    },
+    {
+      "id": "lb-gfs-stacking",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 2.7,
+        "plannedPerformanceTierTB": 0.45
+      }
+    },
+    {
+      "id": "lb-sobr-offload-threshold",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1
+      }
+    },
+    {
+      "id": "lb-sobr-archive-threshold-move",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "lb-sobr-archive-threshold-copy",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "lb-sobr-capacity-residue-after-archive",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "lb-perf-prune-ordering",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1
+      }
+    },
+    {
+      "id": "ti-das-3yr-gfs-wmy",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 3.1,
+        "plannedPerformanceTierTB": 0.52
+      }
+    },
+    {
+      "id": "ti-sobr-move-3yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.5,
+        "plannedPerformanceTierTB": 1.5,
+        "plannedCapacityTierTB": 1.8,
+        "plannedArchiveTierTB": 0.7
+      }
+    },
+    {
+      "id": "ti-sobr-copy-3yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.5,
+        "plannedPerformanceTierTB": 1.5,
+        "plannedCapacityTierTB": 1.8,
+        "plannedArchiveTierTB": 0.7
+      }
+    },
+    {
+      "id": "ti-sobr-gfs-archive-5yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.5,
+        "plannedPerformanceTierTB": 1.5,
+        "plannedCapacityTierTB": 2.6,
+        "plannedArchiveTierTB": 1.5
+      }
+    },
+    {
+      "id": "ti-das-sla-minimum-5yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 3.1,
+        "plannedPerformanceTierTB": 0.52
+      }
+    },
+    {
+      "id": "ti-das-chain-rp-drift-3yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 3.1,
+        "plannedPerformanceTierTB": 0.52
+      }
+    },
+    {
+      "id": "ti-sobr-move-chain-rp-drift-3yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.5,
+        "plannedPerformanceTierTB": 1.5,
+        "plannedCapacityTierTB": 1.8,
+        "plannedArchiveTierTB": 0.7
+      }
+    },
+    {
+      "id": "ti-das-high-retention-drift-3yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 3.5,
+        "plannedPerformanceTierTB": 0.52
+      }
+    },
+    {
+      "id": "im-perf-immutability-blocks-prune",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1
+      }
+    },
+    {
+      "id": "im-cap-immutability-blocks-deletion",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1
+      }
+    },
+    {
+      "id": "im-arch-immutability-blocks-deletion",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "im-gen-window-boundary",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1
+      }
+    },
+    {
+      "id": "im-gen-deleteon-extended-by-gfs",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.1
+      }
+    },
+    {
+      "id": "im-gen-state-transitions",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1
+      }
+    },
+    {
+      "id": "im-all-tiers-immutability",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "ix-gfs-wmy-move-archive",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 1.3
+      }
+    },
+    {
+      "id": "ix-gfs-wmy-copy-archive",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 1.3
+      }
+    },
+    {
+      "id": "ix-gfs-wmy-copy-archive-immutability",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 1.3
+      }
+    },
+    {
+      "id": "ix-gfs-monthly-move-immutability",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.8
+      }
+    },
+    {
+      "id": "ix-short-retention-long-gfs",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 3.6,
+        "plannedPerformanceTierTB": 0.45
+      }
+    },
+    {
+      "id": "ix-high-gen-period",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.4
+      }
+    },
+    {
+      "id": "ix-copy-move-combo",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
         "plannedArchiveTierTB": 0.5
+      }
+    },
+    {
+      "id": "ix-no-gfs-long-archive",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "ix-retention-variant-r7",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0.8
+      }
+    },
+    {
+      "id": "ix-retention-variant-r60",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 1.3
+      }
+    },
+    {
+      "id": "ix-high-change-rate-drift-2yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 7.5,
+        "plannedPerformanceTierTB": 0.5
+      }
+    },
+    {
+      "id": "ix-short-retention-drift-3yr",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 2.2,
+        "plannedPerformanceTierTB": 0.5
+      }
+    },
+    {
+      "id": "ix-policy-change-mid-run",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.8
+      }
+    },
+    {
+      "id": "ix-gfs-only-policy",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 5.1
+      }
+    },
+    {
+      "id": "ix-two-jobs-one-repo",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.8
+      }
+    },
+    {
+      "id": "od-weekly-gfs-cardinality-exact",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.6
+      }
+    },
+    {
+      "id": "od-monthly-yearly-cardinality-exact",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 2.7,
+        "plannedPerformanceTierTB": 0.45
+      }
+    },
+    {
+      "id": "od-tier-residency-per-point",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0
+      }
+    },
+    {
+      "id": "od-gen-lifecycle-states",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5
+      }
+    },
+    {
+      "id": "od-chain-phase-transitions",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.2
+      }
+    },
+    {
+      "id": "od-sobr-copy-full-lifecycle",
+      "notes": "captured-from-playwright-2026-05-06",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0.6
       }
     }
   ]

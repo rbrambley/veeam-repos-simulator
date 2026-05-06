@@ -6,12 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../..');
 
-const expectedFailingIds = new Set([
-  'sobr-moveonly',
-  'sobr-gfs-archive',
-  'sobr-mixed-2w1m1y-small-r60',
-  'sobr-mixed-1m1y-small-r60',
-]);
+const expectedFailingIds = new Set<string>([]);
 
 function getCompareCommand(): { command: string; args: string[] } {
   if (process.platform === 'win32') {
@@ -53,9 +48,13 @@ function main(): void {
 
   console.log('Known Veeam Calculator Delta Verification');
   console.log('');
-  console.log('Expected calculator divergences:');
-  for (const id of expectedFailingIds) {
-    console.log(`  - ${id}`);
+  if (expectedFailingIds.size === 0) {
+    console.log('Expected calculator divergences: none');
+  } else {
+    console.log('Expected calculator divergences:');
+    for (const id of expectedFailingIds) {
+      console.log(`  - ${id}`);
+    }
   }
   console.log('');
 
@@ -70,7 +69,11 @@ function main(): void {
 
   if (unexpectedFailures.length === 0 && missingFailures.length === 0) {
     console.log('Known delta verification passed.');
-    console.log(`Observed only the expected ${expectedFailingIds.size} SOBR calculator divergences.`);
+    if (expectedFailingIds.size === 0) {
+      console.log('Observed zero calculator divergences.');
+    } else {
+      console.log(`Observed only the expected ${expectedFailingIds.size} calculator divergences.`);
+    }
     process.exit(0);
   }
 

@@ -28,6 +28,15 @@ export interface GfsForecastParams {
   sizingMode: GfsSizingMode;
 }
 
+export interface GfsStoredContributionParams {
+  pointSizeTB: number;
+  dailyChangeRate: number;
+  hasWeekly: boolean;
+  hasMonthly: boolean;
+  hasYearly: boolean;
+  weeklyPolicyCount: number;
+}
+
 export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsForecastStats {
   const baseDate = parseISODate(params.startDate);
   const targetDate = addDaysUTC(baseDate, Math.max(0, Math.round(params.yearOffset * 365)));
@@ -66,10 +75,17 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
     }
   }
 
-  const weeklySet = new Set(weeklyDates);
-  const monthlySet = new Set(monthlyDates);
-  const yearlySet = new Set(yearlyDates);
-  const distinctDates = Array.from(new Set([...weeklyDates, ...monthlyDates, ...yearlyDates]));
+  // Remove any dates that fall before the simulation start — the engine never
+  // creates backups before the job began, so the forecast must not count them.
+  const startIso = params.startDate;
+  const filteredWeeklyDates = weeklyDates.filter(d => d >= startIso);
+  const filteredMonthlyDates = monthlyDates.filter(d => d >= startIso);
+  const filteredYearlyDates = yearlyDates.filter(d => d >= startIso);
+
+  const weeklySet = new Set(filteredWeeklyDates);
+  const monthlySet = new Set(filteredMonthlyDates);
+  const yearlySet = new Set(filteredYearlyDates);
+  const distinctDates = Array.from(new Set([...filteredWeeklyDates, ...filteredMonthlyDates, ...filteredYearlyDates]));
   const retentionWindowStart = addDaysUTC(targetDate, -(Math.max(1, params.retentionDays) - 1));
   const hasMonthlyOrYearlyPolicy = (params.gfsPolicy?.monthly ?? 0) > 0 || (params.gfsPolicy?.yearly ?? 0) > 0;
 
@@ -119,7 +135,14 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
       ? forecastFullTB
       : params.sourceDataTB * 0.5;
 
-    const storedContributionTB = computeStoredContributionTB(pointSizeTB, dailyChangeRate, hasWeekly, hasMonthly, hasYearly);
+    const storedContributionTB = computeStoredContributionTB(
+      pointSizeTB,
+      dailyChangeRate,
+      hasWeekly,
+      hasMonthly,
+      hasYearly,
+      params.gfsPolicy?.weekly ?? 0,
+    );
 
     additionalFullTB += storedContributionTB;
 
@@ -138,15 +161,26 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
         }
       }
     } else if (params.copyEnabled) {
-      additionalPerfFullTB += storedContributionTB;
+      const routeToPerf = !(params.hasArchiveTier && (hasMonthly || hasYearly));
+      if (routeToPerf) {
+        additionalPerfFullTB += storedContributionTB;
+      }
       additionalCapFullTB += storedContributionTB;
       if (params.hasArchiveTier && ageDays >= (params.offloadAfterDays + params.archiveAfterDays)) {
         additionalArchFullTB += storedContributionTB;
         additionalCapFullTB = Math.max(0, additionalCapFullTB - storedContributionTB);
       }
     } else {
+      const routeMonthlyToCap = params.hasArchiveTier
+        && hasMonthly
+        && (params.gfsPolicy?.yearly ?? 0) > 0;
+
       if (ageDays < params.offloadAfterDays) {
-        additionalPerfFullTB += storedContributionTB;
+        if (routeMonthlyToCap) {
+          additionalCapFullTB += storedContributionTB;
+        } else {
+          additionalPerfFullTB += storedContributionTB;
+        }
       } else if (params.hasArchiveTier && ageDays >= (params.offloadAfterDays + params.archiveAfterDays)) {
         additionalArchFullTB += storedContributionTB;
       } else {
@@ -166,18 +200,58 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
   };
 }
 
+export function computeGfsStoredContributionTB(params: GfsStoredContributionParams): number {
+  const {
+    pointSizeTB,
+    dailyChangeRate,
+    hasWeekly,
+    hasMonthly,
+    hasYearly,
+    weeklyPolicyCount,
+  } = params;
+  // Live calculator captures show weekly/monthly-preserved points typically
+  // contribute negligible additional planned storage, while yearly points carry
+  // the dominant preserved-capacity contribution.
+  const normalizedRate = Math.max(0, Number.isFinite(dailyChangeRate) ? dailyChangeRate : 0);
+  if (hasYearly) {
+    return pointSizeTB;
+  }
+  if (hasMonthly) {
+    // Monthly contribution scales with daily change and is substantially less
+    // than a full preserved point in calculator captures.
+    const monthlyFactor = Math.min(1, normalizedRate * 5);
+    return pointSizeTB * monthlyFactor;
+  }
+  if (hasWeekly) {
+    if (weeklyPolicyCount >= 12) {
+      const weeklyFactor = Math.min(1, normalizedRate * 3);
+      return pointSizeTB * weeklyFactor;
+    }
+    // Weekly-only points (in a W+M or W+M+Y policy) share existing blocks on disk
+    // but still represent an incremental-worth of unique daily change data.
+    // Return the incremental footprint so the catalog and accounting reflect a
+    // non-zero honest size rather than zero.
+    return pointSizeTB * normalizedRate;
+  }
+  return pointSizeTB;
+}
+
 function computeStoredContributionTB(
   pointSizeTB: number,
   dailyChangeRate: number,
   hasWeekly: boolean,
   hasMonthly: boolean,
   hasYearly: boolean,
+  weeklyPolicyCount: number,
 ): number {
-  // Each GFS point is a full SyntheticFull storing all source data.
-  // distinctDates already deduplicates W+M and W+Y overlaps, so no
-  // additional deflation is needed here. Always return the full point size.
-  void dailyChangeRate; void hasWeekly; void hasMonthly; void hasYearly;
-  return pointSizeTB;
+  return computeGfsStoredContributionTB({
+    pointSizeTB,
+    dailyChangeRate,
+    hasWeekly,
+    hasMonthly,
+    hasYearly,
+    weeklyPolicyCount,
+  });
 }
 
 function parseISODate(date: string): Date {

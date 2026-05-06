@@ -61,6 +61,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
   const [showChainTimeline, setShowChainTimeline] = useState(true);
   const [showRestoreCatalog, setShowRestoreCatalog] = useState(true);
   const [showTierContents, setShowTierContents] = useState(true);
+  const [activityLogFilter, setActivityLogFilter] = useState<number | null>(null);
 
   function formatTB(val: number) {
     return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TB';
@@ -85,6 +86,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       if (sawCapacity && step.tier === 'Performance') return true;
     }
     return false;
+  }
+
+  function computeDaysToYear(year: number): number {
+    const start = sim.state.startDate || currentDate;
+    const target = new Date(`${start}T00:00:00.000Z`);
+    target.setUTCFullYear(target.getUTCFullYear() + year);
+    const now = new Date(`${currentDate}T00:00:00.000Z`);
+    return Math.floor((target.getTime() - now.getTime()) / 86400000);
   }
 
   function getSimulationDayLabel(date: string) {
@@ -488,15 +497,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#555' }}>
           📅 {currentDate}
         </span>
-        <button onClick={() => onNextDay(1)} style={{ padding: '6px 16px', fontWeight: 'bold' }}>
-          ▶ +1 Day
-        </button>
-        <button onClick={() => onNextDay(7)} style={{ padding: '6px 16px', fontWeight: 'bold' }}>
-          ▶ +7 Days
-        </button>
-        <button onClick={() => onNextDay(30)} style={{ padding: '6px 16px', fontWeight: 'bold' }}>
-          ▶ +30 Days
-        </button>
       </div>
 
       {/* Storage Usage per Repository + Summary Stats */}
@@ -707,6 +707,61 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         </div>
       </div>
 
+      {/* Simulation advance + year-jump controls */}
+      <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '0.55rem' }}>
+        {([1, 7, 30] as const).map(days => (
+          <button
+            key={days}
+            onClick={() => { setActivityLogFilter(null); onNextDay(days); }}
+            style={{
+              padding: '3px 13px',
+              borderRadius: '999px',
+              border: '1px solid #90caf9',
+              background: '#e3f2fd',
+              color: '#1565c0',
+              fontWeight: 700,
+              fontSize: '0.81rem',
+              cursor: 'pointer',
+              lineHeight: '1.6',
+            }}
+          >
+            ▶ +{days} Day{days > 1 ? 's' : ''}
+          </button>
+        ))}
+        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+        {([1, 2, 3] as const).map(yr => {
+          const daysLeft = computeDaysToYear(yr);
+          const disabled = daysLeft <= 0;
+          return (
+            <button
+              key={yr}
+              disabled={disabled}
+              title={disabled ? `Already at or past Year ${yr}` : `Jump to Year ${yr} (${daysLeft} days from now)`}
+              onClick={() => { setActivityLogFilter(30); onNextDay(daysLeft); }}
+              style={{
+                padding: '3px 13px',
+                borderRadius: '999px',
+                border: `1px solid ${disabled ? '#e0e0e0' : '#ffcc80'}`,
+                background: disabled ? '#f5f5f5' : '#fff3e0',
+                color: disabled ? '#bbb' : '#bf360c',
+                fontWeight: 700,
+                fontSize: '0.81rem',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                lineHeight: '1.6',
+                opacity: disabled ? 0.55 : 1,
+              }}
+            >
+              ⏩ Year {yr}
+            </button>
+          );
+        })}
+        {activityLogFilter !== null && (
+          <span style={{ fontSize: '0.76rem', color: '#bf360c', fontStyle: 'italic', marginLeft: '0.3rem' }}>
+            Activity Log: last {activityLogFilter} days only
+          </span>
+        )}
+      </div>
+
       {/* Section toggle buttons — above the flex row so the sidebar aligns with content */}
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
         <button
@@ -758,12 +813,12 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         <tbody>
           {sortedRestorePoints.map((rp) => {
             const isSelected = selectedRestorePointId === rp.id;
-            const isSobr = !!rp.sobrTier;
+            const isSobr = !!rp.sobrTier || !!rp.hasPerformanceData || !!rp.hasCapacityData || !!rp.hasArchiveData;
             const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
             const isGlobalBase = !!rp.isGlobalBase;
             const role = isGlobalBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
             const displayType = rp.type;
-            const displaySizeTB = isSobr ? sim.getRestorePointSizeForTier(rp.id, currentTier) : rp.sizeGB;
+            const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, currentTier);
             const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
             const chain = chainById[rp.chainId];
             return (
@@ -1033,9 +1088,30 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
                     const groupedDays = Array.from(grouped.keys()).sort((a, b) => b.localeCompare(a));
 
+                    const cutoffDate = activityLogFilter !== null
+                      ? (() => {
+                          const d = new Date(`${currentDate}T00:00:00.000Z`);
+                          d.setUTCDate(d.getUTCDate() - activityLogFilter + 1);
+                          return d.toISOString().slice(0, 10);
+                        })()
+                      : null;
+                    const filteredGroupedDays = cutoffDate
+                      ? groupedDays.filter(day => day >= cutoffDate)
+                      : groupedDays;
+                    const hiddenDayCount = groupedDays.length - filteredGroupedDays.length;
+
                     return (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.2rem' }}>
-                        {groupedDays.map((day) => {
+                        {hiddenDayCount > 0 && (
+                          <div style={{ fontSize: '0.74rem', color: '#888', fontStyle: 'italic', padding: '0.2rem 0.35rem', borderRadius: '4px', background: '#f5f5f5' }}>
+                            {hiddenDayCount} earlier day{hiddenDayCount > 1 ? 's' : ''} hidden — showing last {activityLogFilter} days only.{' '}
+                            <span
+                              style={{ color: '#1565c0', cursor: 'pointer', textDecoration: 'underline' }}
+                              onClick={() => setActivityLogFilter(null)}
+                            >Show all</span>
+                          </div>
+                        )}
+                        {filteredGroupedDays.map((day) => {
                           const dayItems = grouped.get(day) || [];
                           const summaryCounts = new Map<string, number>();
                           for (const entry of dayItems) {
@@ -1084,9 +1160,8 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
               const selectedChain = chainById[selected.chainId];
               const selectedWasPrunedFromCapacity = wasPrunedFromCapacity(selected);
-              const isSobr = !!selected.sobrTier;
               const currentTier = (selected.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
-              const sizeTB = isSobr ? sim.getRestorePointSizeForTier(selected.id, currentTier) : selected.sizeGB;
+              const sizeTB = sim.getRestorePointSizeForTier(selected.id, currentTier);
               const currentDateObj = parseISODate(currentDate);
               const pointDateObj = parseISODate(selected.date);
               const ageDays = Math.floor((currentDateObj.getTime() - pointDateObj.getTime()) / 86400000);
@@ -1095,6 +1170,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               const selJob = sim.state.jobs.find(j => selectedChain ? j.id === selectedChain.jobId : false)
                           ?? sim.state.jobs[0];
               const selRepo = selJob ? sim.state.repositories.find(r => r.id === selJob.repositoryId) : undefined;
+              const isSobr = selRepo?.type === 'SOBR' && !!selRepo.sobrConfig;
               const sobrCfg = selRepo?.sobrConfig;
               const retentionDays = selJob?.retention?.restorePoints || 0;
 

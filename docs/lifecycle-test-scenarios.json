@@ -1447,6 +1447,34 @@
         "noNonGfsCapacityResidue": true,
         "noArchivePointBeforePointAge": 28
       }
+    },
+    {
+      "id": "od-das-wmy-weekly-size-nonzero",
+      "layer": 4,
+      "name": "Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage",
+      "description": "Regression guard for bug fix: weekly-only GFS SyntheticFull points in a W+M+Y policy must contribute their incremental footprint (fullSize * changeRate) to used storage, not zero. Also validates GFS cardinality matches calendar expectations. Matches the exact user-reported scenario: 2TB source, 5% change, 10% growth, 14d retention, W4+M8+Y2 DAS.",
+      "rules": ["R-GFS-01", "R-GFS-03"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 2,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 10,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 8, "yearly": 2},
+        "offloadAfterDays": 0,
+        "archiveAfterDays": 0,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 730,
+      "assertions": {
+        "gfsCardinalityMatchesCalendar": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "gfsTagsStackOnSameSaturday": true,
+        "maxFinalStorageTB": 8.5
+      }
     }
   ]
 }
