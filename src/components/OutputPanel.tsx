@@ -492,7 +492,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+      <div className="output-panel-header">
         <h2 style={{ margin: 0 }}>Simulation Output</h2>
         <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#555' }}>
           📅 {currentDate}
@@ -500,7 +500,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       </div>
 
       {/* Storage Usage per Repository + Summary Stats */}
-      <h3 className="section-heading">Repository Storage Usage</h3>
+      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Repository Storage Usage</h3>
       {hasGenerationUi && <StateLegend />}
       <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'stretch', flexWrap: 'nowrap', marginBottom: '1.2rem' }}>
         <div style={{ flex: '1 1 0', minWidth: 0, overflowX: 'hidden', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)', display: 'flex', flexDirection: 'column' }}>
