@@ -203,6 +203,8 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
 // ─────────────────────────────────────────────────────────────────────────────
 // GFS POINT SIZING — VEEAM CALCULATOR BRACKET TABLE
 //
+// CANONICAL SOURCE: this file. A duplicate exists in src/simulator/engine.ts
+// — GFS_MODIFIERS. Both copies MUST stay IDENTICAL.
 // DO NOT MODIFY this table without a confirmed change in the Veeam Calculator
 // source code. This table is transcribed directly from the Veeam Calculator's
 // internal Modifier[] mods array (verified May 2026). Any approximation or

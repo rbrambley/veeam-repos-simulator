@@ -159,16 +159,20 @@ export interface SimulationState {
   startDate: string; // simulation start date (for growth calculations)
 }
 
-/**
- * Compute Veeam-aligned working space (TB) using the progressive tiered scale.
- * Brackets are applied to source data TB then multiplied by compressionRatio.
- *   < 10 TB → ×1.05
- *   10–20 TB → ×0.66
- *   20–100 TB → ×0.40
- *   100–500 TB → ×0.25
- *   > 500 TB → ×0.10
- * e.g. 15 TB @ 50% compression = (10×1.05 + 5×0.66) × 0.5 = 6.9 TB
- */
+// ─────────────────────────────────────────────────────────────────────────────
+// WORKING SPACE — VEEAM CALCULATOR PROGRESSIVE TIERED BRACKETS (R-WS-01)
+//
+// DO NOT MODIFY these brackets without a confirmed change in the Veeam
+// Calculator. Transcribed from Veeam Calculator source (verified May 2026).
+// Rule R-WS-01: WS = Σ(chunk × rate × compressionRatio) across brackets.
+// Default compressionRatio = 0.5 (50% compression assumed by calculator).
+//   < 10 TB    → ×1.05
+//   10–20 TB   → ×0.66
+//   20–100 TB  → ×0.40
+//   100–500 TB → ×0.25
+//   > 500 TB   → ×0.10
+// e.g. 15 TB @ 50% compression = (10×1.05 + 5×0.66) × 0.5 = 6.9 TB
+// ─────────────────────────────────────────────────────────────────────────────
 export function computeVeeamWorkingSpaceTB(sourceTB: number, compressionRatio = 0.5): number {
   const brackets = [
     { limit: 10,       rate: 1.05 },

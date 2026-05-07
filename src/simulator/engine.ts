@@ -46,14 +46,25 @@ interface Modifier {
   modifier: number;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GFS POINT SIZING — FROZEN BRACKET TABLE
+//
+// DUPLICATE: canonical source is src/models/gfsSizing.ts — GFS_MODIFIERS.
+// Both copies MUST stay IDENTICAL. DO NOT modify either without updating
+// the other and citing the Veeam Calculator source change that drove it.
+// Transcribed from Veeam Calculator internal Modifier[] mods array (May 2026).
+//
+// Algorithm: loop backwards; use first entry where maxDays < ageInDays.
+// modifier=1000 row: changeRate × 1000 > 1 → collapses to full backup size.
+// ─────────────────────────────────────────────────────────────────────────────
 const GFS_MODIFIERS: Modifier[] = [
-  { maxDays: 2, modifier: 1 },
-  { maxDays: 14, modifier: 3 },
-  { maxDays: 38, modifier: 5 },
-  { maxDays: 100, modifier: 9 },
-  { maxDays: 193, modifier: 12 },
-  { maxDays: 286, modifier: 15 },
-  { maxDays: 379, modifier: 18 },
+  { maxDays: 2,    modifier: 1    },
+  { maxDays: 14,   modifier: 3    },
+  { maxDays: 38,   modifier: 5    },
+  { maxDays: 100,  modifier: 9    },
+  { maxDays: 193,  modifier: 12   },
+  { maxDays: 286,  modifier: 15   },
+  { maxDays: 379,  modifier: 18   },
   { maxDays: 1095, modifier: 1000 },
 ];
 

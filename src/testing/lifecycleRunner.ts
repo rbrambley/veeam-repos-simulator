@@ -1029,6 +1029,17 @@ const RULE_DESCRIPTIONS: Record<string, string> = {
   'R-DT-14': 'Open GEN blocks deletion but NOT COPY or MOVE (GEN is a Capacity-tier construct)',
   // Row 16: GEN is the atomic deletion unit in SOBR and Direct-to-Object.
   'R-DT-16': 'GEN is the atomic deletion unit — entire GEN deleted when all RPs expired and non-immutable',
+  // ── Doomed-chain rules (tier transition impossible; chain expires before becoming eligible) ──
+  // Perf-doomed: offloadAfterDays >= effectiveRetentionDays → chain dies in Performance, never reaches Capacity.
+  'R-OFFLOAD-02': 'Perf-doomed chain: offloadAfterDays >= effectiveRetention — chain expires in Performance before offload eligibility',
+  // Cap-doomed: archiveAfterDays >= remainingRetentionInCap → chain dies in Capacity, never reaches Archive.
+  'R-OFFLOAD-03': 'Cap-doomed chain: archiveAfterDays >= remainingRetentionInCap — chain expires in Capacity before archive eligibility',
+  // ── Parity date algorithm ──
+  // All storage assertions (R-STOR-03, R-STOR-04) use last Saturday on or before run end as parity date.
+  'R-PARITY-01': 'Storage assertions use the last Saturday on or before run end as the parity date',
+  // ── Working space brackets ──
+  // See src/models/veeam.ts computeVeeamWorkingSpaceTB for the frozen bracket table.
+  'R-WS-01': 'Working space uses progressive tiered brackets × compressionRatio (frozen table in veeam.ts)',
 };
 
 const LAYER_INFO: Record<number, { name: string; description: string }> = {
