@@ -912,7 +912,7 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
         date: paritySnapshot.date,
         violatedRule: 'R-STOR-03',
         expected: `simulator = forecast exactly (${forecastTB.toFixed(3)} TB) at parity date ${expectedLifecycle.parityDate}`,
-        actual: `simulator = ${parityStorageTB.toFixed(3)} TB (delta ${(parityStorageTB - forecastTB).toFixed(3)} TB)`,
+        actual: `simulator = ${parityStorageTB.toFixed(3)} TB [perf=${paritySnapshot.perfStorageTB.toFixed(3)} cap=${paritySnapshot.capStorageTB.toFixed(3)} arch=${paritySnapshot.archStorageTB.toFixed(3)}] (delta ${(parityStorageTB - forecastTB).toFixed(3)} TB)`,
       });
     }
   }
@@ -1016,6 +1016,19 @@ const RULE_DESCRIPTIONS: Record<string, string> = {
   'R-IMM-02': 'No chain deleted while Capacity tier immutable',
   'R-IMM-03': 'No chain deleted while Archive tier immutable',
   'R-SNAP-01': 'Golden snapshot state (day 365/730) matches approved baseline',
+  // ── Unified Decision Tree rule codes (canonical tree, adopted May 2026) ──
+  // Row 4: MOVE gated by chain sealing (Inactive status), NOT by GEN state.
+  'R-MOVE-01': 'MOVE requires sealed chain (status=Inactive); open/active chain must not be offloaded',
+  // Row 5: MOVE blocked by Performance immutability.
+  'R-MOVE-04': 'MOVE cannot occur while Performance tier immutability is active',
+  // Row 6: MOVE age gate.
+  'R-MOVE-05': 'MOVE age gate — chain newest point must be >= offloadAfterDays old before offload',
+  // Row 11 (critical correction): GFS does NOT block MOVE; GFS only blocks deletion.
+  'R-MOVE-03': 'GFS tags do NOT block MOVE — GFS points offload normally with their chain',
+  // Row 14 (critical correction): Open GEN blocks deletion ONLY, not COPY or MOVE.
+  'R-DT-14': 'Open GEN blocks deletion but NOT COPY or MOVE (GEN is a Capacity-tier construct)',
+  // Row 16: GEN is the atomic deletion unit in SOBR and Direct-to-Object.
+  'R-DT-16': 'GEN is the atomic deletion unit — entire GEN deleted when all RPs expired and non-immutable',
 };
 
 const LAYER_INFO: Record<number, { name: string; description: string }> = {

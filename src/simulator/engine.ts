@@ -1,3 +1,40 @@
+// ============================================================================
+// UNIFIED VEEAM RETENTION ENGINE — CANONICAL DECISION TREE
+// Source: Rich's verified decision tree (adopted May 2026). UNCHANGEABLE.
+// Every change to this file MUST be justified against a row in this table.
+// ============================================================================
+//
+// Storage type summary:
+//   DAS              — No GEN, no SOBR, file-level deletion
+//   SOBR             — GEN + SOBR offload + GEN-level deletion
+//   Direct-to-Object — GEN only, GEN-level deletion, no COPY/MOVE
+//
+// Hierarchy: Immutability → COPY/MOVE → GFS → Job Retention → Deletion → Orphan
+//
+// Row | Scope                  | IF                                              | THEN                        | Rule
+//  1  | All                    | RP.IsImmutable = TRUE                           | Do NOT delete               | R-IMM-*
+//  2  | SOBR                   | Policy=COPY AND RP.IsNew = TRUE                 | COPY to Capacity Tier       | R-MOVE-02
+//  3  | SOBR                   | Policy=COPY AND RP.AlreadyCopied = TRUE          | Skip COPY (idempotent)      | R-MOVE-02
+//  4  | SOBR                   | Policy=MOVE AND Chain.IsOpen = TRUE             | Do NOT MOVE                 | R-MOVE-01 ← chain sealing, NOT GEN
+//  5  | SOBR                   | Policy=MOVE AND RP.IsImmutable = TRUE           | Do NOT MOVE                 | R-MOVE-04
+//  6  | SOBR                   | Policy=MOVE AND RP.Age < MovePeriodDays         | Do NOT MOVE                 | R-MOVE-05
+//  7  | SOBR                   | Policy=MOVE AND CapacityTier.Offline            | Do NOT MOVE                 | (not simulated)
+//  8  | SOBR                   | Policy=MOVE AND OffloadWindow.Closed            | Do NOT MOVE                 | (not simulated)
+//  9  | SOBR                   | Policy=MOVE AND AllAboveFalse                   | MOVE to Capacity Tier       | R-OFFLOAD-01
+// 10  | SOBR                   | MOVE Completed AND LocalCopy eligible           | Delete local Perf copy      | R-PRUNE-02
+// 11  | All                    | RP.IsGFS = TRUE                                 | Do NOT delete               | R-GFS-*  ← GFS does NOT block MOVE
+// 12  | All                    | RP.Age < JobRetentionDays                       | Do NOT delete               | R-RET-*
+// 13  | DAS                    | Age>=Ret AND NOT Immutable AND NOT GFS          | Delete file (file-level)    | R-RET-04
+// 14  | SOBR/Direct-to-Object  | GEN.IsOpen = TRUE                               | Do NOT delete               | R-DT-14  ← GEN does NOT block COPY/MOVE
+// 15  | SOBR/Direct-to-Object  | Age>=Ret AND NOT Immutable AND NOT GFS AND GEN Closed | Mark RP expired       | R-RET-01
+// 16  | SOBR/Direct-to-Object  | AllObjectsInGEN.Expired AND NotImmutable        | Delete entire GEN (atomic)  | R-DT-16
+// 17  | All                    | RP.IsOrphan = TRUE                              | Delete (background cleanup) | (background)
+//
+// CRITICAL: Row 4 — MOVE is gated by Chain.IsOpen (Inactive status), NOT by GEN state.
+// CRITICAL: Row 11 — GFS does NOT block MOVE. GFS only blocks deletion.
+// CRITICAL: Row 14 — Open GEN blocks DELETION only, not COPY or MOVE.
+// ============================================================================
+
 // Simulation engine for Veeam Backup Simulator
 // This module will handle day-by-day simulation of backup jobs, chains, retention, and storage usage.
 

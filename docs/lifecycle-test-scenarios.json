@@ -1509,6 +1509,44 @@
         "veeamCalculatorReferenceTB": 1269.925,
         "forecastMustMatchSimulator": true
       }
+    },
+
+    {
+      "id": "od-calculator-parity-347tb-wmy-sobr-move",
+      "layer": 4,
+      "name": "Oracle diff: 347TB W4+M6+Y2 SOBR Move storage — forecast must equal simulator",
+      "description": "Parity guard for SOBR Move mode. Same source config as DAS parity scenario (347TB / 5% change / 0% growth / 21d retention / W4+M6+Y2) but with SOBR Move, offload after 30 days, no archive tier. Forecast and simulator must agree exactly at the last Saturday of run (parity date). No Veeam Calculator reference yet — added once forecast=simulator is confirmed.",
+      "rules": ["R-GFS-01", "R-GFS-03", "R-STOR-03"],
+      "knownEngineGaps": ["R-STOR-01", "R-STOR-03"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 347,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 21,
+        "gfsPolicy": {"weekly": 4, "monthly": 6, "yearly": 2},
+        "offloadAfterDays": 30,
+        "archiveAfterDays": 0,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true,
+        "performanceImmutabilityDays": 0,
+        "capacityImmutabilityDays": 0,
+        "archiveImmutabilityDays": 0,
+        "generationPeriodDays": 10
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "gfsCardinalityMatchesCalendar": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "minFinalStorageTB": 1000,
+        "maxFinalStorageTB": 1400,
+        "forecastMustMatchSimulator": true
+      }
     }
   ]
 }
