@@ -294,8 +294,10 @@ export class VeeamSimulator {
       const jobChainIds = new Set(
         this.state.chains.filter(c => c.jobId === job.id).map(c => c.id)
       );
+      // Include detached GFS points (chain was deleted but point is preserved)
+      // by falling back to the same ID-prefix convention as getJobForRestorePoint.
       const jobGfsPoints = this.state.restorePoints.filter(
-        p => p.isGFS && jobChainIds.has(p.chainId)
+        p => p.isGFS && (jobChainIds.has(p.chainId) || p.id.startsWith(`${job.id}-`))
       );
       const oldestWeeklyDate = jobGfsPoints
         .filter(p => p.isWeeklyGFS && !p.isMonthlyGFS && !p.isYearlyGFS)

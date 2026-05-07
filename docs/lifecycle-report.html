@@ -146,7 +146,7 @@
 
 <div class="report-header">
   <h1>Veeam Simulator — Quality &amp; Validation Report</h1>
-  <div class="run-meta">Generated May 6, 2026 at 08:13:19 PM &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
+  <div class="run-meta">Generated May 6, 2026 at 08:30:49 PM &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
   <div class="summary-row">
     <span class="count-badge" style="background:#166534;color:#fff">50 PASS</span>
     <span class="count-badge" style="background:#92400e;color:#fff">0 SKIP (known gaps)</span>
@@ -162,7 +162,7 @@
 <div class="metrics-bar">
   <div class="metric"><span class="metric-value">50</span><span class="metric-label">Scenarios</span></div>
   <div class="metric"><span class="metric-value">23,210</span><span class="metric-label">Days Simulated</span></div>
-  <div class="metric"><span class="metric-value">10.2s</span><span class="metric-label">Total Duration</span></div>
+  <div class="metric"><span class="metric-value">11.2s</span><span class="metric-label">Total Duration</span></div>
   <div class="metric"><span class="metric-value">28</span><span class="metric-label">Rules Covered</span></div>
   <div class="metric"><span class="metric-value">1</span><span class="metric-label">Rules Uncovered</span></div>
 </div>
@@ -198,9 +198,9 @@
           <td><a class="finding-link" href="#section-mutations">5/5 mutations caught</a></td>
           <td class="finding-detail">Injected defects were detected by the current test and oracle suite.</td>
         </tr><tr>
-          <td><span class="finding-cat" style="background:#ecfdf5;color:#166534">Golden Snapshots</span></td>
-          <td><a class="finding-link" href="#section-golden">32 checkpoint matches</a></td>
-          <td class="finding-detail">Stored long-run baselines matched the current engine output exactly.</td>
+          <td><span class="finding-cat" style="background:#eff6ff;color:#1d4ed8">Snapshot Baseline</span></td>
+          <td><a class="finding-link" href="#section-golden">32 checkpoints seeded</a></td>
+          <td class="finding-detail">New baseline checkpoints were captured during this run.</td>
         </tr><tr>
       <td><span class="finding-cat" style="background:#f9fafb;color:#374151">GFS Sizing Test</span></td>
       <td><a class="finding-link" href="#section-gfs-sizing">UNKNOWN (23/23)</a></td>
@@ -503,67 +503,67 @@
     <tbody><tr>
         <td><a href="#sc-lb-gfs-yearly-boundary" class="mono" style="font-size:12px">lb-gfs-yearly-boundary</a></td>
         <td style="color:#374151;font-size:12px">Yearly GFS lands only on last Saturday of December</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-das-3yr-gfs-wmy" class="mono" style="font-size:12px">ti-das-3yr-gfs-wmy</a></td>
         <td style="color:#374151;font-size:12px">DAS 3-year soak: W+M+Y GFS invariants every day</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-sobr-move-3yr" class="mono" style="font-size:12px">ti-sobr-move-3yr</a></td>
         <td style="color:#374151;font-size:12px">SOBR Move-only 3-year soak: tier ordering invariants every day</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-sobr-copy-3yr" class="mono" style="font-size:12px">ti-sobr-copy-3yr</a></td>
         <td style="color:#374151;font-size:12px">SOBR Copy-only 3-year soak: capacity residue and archive gate every day</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-sobr-gfs-archive-5yr" class="mono" style="font-size:12px">ti-sobr-gfs-archive-5yr</a></td>
         <td style="color:#374151;font-size:12px">SOBR Move W+M+Y 5-year soak: full model over extended horizon</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-das-sla-minimum-5yr" class="mono" style="font-size:12px">ti-das-sla-minimum-5yr</a></td>
         <td style="color:#374151;font-size:12px">DAS 5-year soak: SLA minimum guarantee never violated</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-das-chain-rp-drift-3yr" class="mono" style="font-size:12px">ti-das-chain-rp-drift-3yr</a></td>
         <td style="color:#374151;font-size:12px">DAS 3-year drift: inactive chains and RP count never accumulate</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-sobr-move-chain-rp-drift-3yr" class="mono" style="font-size:12px">ti-sobr-move-chain-rp-drift-3yr</a></td>
         <td style="color:#374151;font-size:12px">SOBR Move 3-year drift: inactive chains and RP count never accumulate</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ti-das-high-retention-drift-3yr" class="mono" style="font-size:12px">ti-das-high-retention-drift-3yr</a></td>
         <td style="color:#374151;font-size:12px">DAS high-retention 3-year drift: retention=30 with full GFS never accumulates</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ix-short-retention-long-gfs" class="mono" style="font-size:12px">ix-short-retention-long-gfs</a></td>
         <td style="color:#374151;font-size:12px">Short retention × long GFS yearly: chain outlives retention by years</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ix-high-change-rate-drift-2yr" class="mono" style="font-size:12px">ix-high-change-rate-drift-2yr</a></td>
         <td style="color:#374151;font-size:12px">High change-rate adversarial: 40% daily delta over 2 years</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ix-short-retention-drift-3yr" class="mono" style="font-size:12px">ix-short-retention-drift-3yr</a></td>
         <td style="color:#374151;font-size:12px">Short retention adversarial: retention=3 over 3 years</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-ix-gfs-only-policy" class="mono" style="font-size:12px">ix-gfs-only-policy</a></td>
         <td style="color:#374151;font-size:12px">GFS-only policy: weekly=52 with minimal daily retention</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-od-monthly-yearly-cardinality-exact" class="mono" style="font-size:12px">od-monthly-yearly-cardinality-exact</a></td>
         <td style="color:#374151;font-size:12px">Oracle diff: monthly and yearly GFS cardinality across calendar</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-od-das-wmy-weekly-size-nonzero" class="mono" style="font-size:12px">od-das-wmy-weekly-size-nonzero</a></td>
         <td style="color:#374151;font-size:12px">Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr><tr>
         <td><a href="#sc-od-calculator-parity-347tb-wmy" class="mono" style="font-size:12px">od-calculator-parity-347tb-wmy</a></td>
         <td style="color:#374151;font-size:12px">Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance</td>
-        <td><span class="status-badge small" style="background:#166534" title="Day 365">MATCH&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#166534" title="Day 730">MATCH&nbsp;d730</span></td>
+        <td><span class="status-badge small" style="background:#1d4ed8" title="Day 365">SEEDED&nbsp;d365</span>&nbsp; <span class="status-badge small" style="background:#1d4ed8" title="Day 730">SEEDED&nbsp;d730</span></td>
       </tr></tbody>
   </table>
   </div>
@@ -710,7 +710,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-das-sla-overrides-count</span>
         <span class="sc-name">DAS SLA prevents deletion when count expired but SLA not expired</span>
-        <span class="sc-meta">18d &nbsp;·&nbsp; 2ms &nbsp;·&nbsp; DAS · Ret:7</span>
+        <span class="sc-meta">18d &nbsp;·&nbsp; 1ms &nbsp;·&nbsp; DAS · Ret:7</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain has &gt; retentionCount total points (count-expired) but the newest point in the sealed chain is still within slaDays. Chain must be preserved.</p>
@@ -1037,7 +1037,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-monthly-boundary</span>
         <span class="sc-name">Monthly GFS lands only on last Saturday of month</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 11ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/3M/0Y</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 10ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/3M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A monthly GFS tag must appear on the last Saturday of each calendar month and not on any other Saturday.</p>
@@ -1067,10 +1067,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">1.100 TB</span> ≤ estimate</div>
-            <div class="path-line">1.100 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">1.275 TB</span> ≤ estimate</div>
+            <div class="path-line">1.275 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 1.625 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 1.800 TB</div>
           </div>
         </div>
 
@@ -1151,7 +1151,7 @@
         <td>0/8/5</td>
         <td>0/3/0</td>
         <td>0/0/0</td>
-        <td>1.100</td>
+        <td>1.275</td>
       </tr></tbody>
           </table>
         </div>
@@ -1419,15 +1419,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=2, rp=10, gfs=0/0/1, storage=1.200 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=2, rp=10, gfs=0/0/1, storage=1.200 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=2, rp=12, gfs=0/0/2, storage=1.725 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=2, rp=12, gfs=0/0/2, storage=1.725 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -1443,7 +1443,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-stacking</span>
         <span class="sc-name">GFS tags stack on same Saturday restore point</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 47ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 50ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When weekly + monthly conditions are both true for the same Saturday, the single SyntheticFull must have both isWeeklyGFS and isMonthlyGFS set (no separate point created).</p>
@@ -1575,7 +1575,7 @@
         <td>0/11/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.800</td>
+        <td>0.975</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -1593,7 +1593,7 @@
         <td>0/8/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.075</td>
+        <td>1.250</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -1602,7 +1602,7 @@
         <td>0/10/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.150</td>
+        <td>1.325</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -1611,7 +1611,7 @@
         <td>0/12/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.175</td>
+        <td>1.350</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -1647,7 +1647,7 @@
         <td>0/11/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.300</td>
+        <td>1.475</td>
       </tr><tr>
         <td>400</td>
         <td class="mono">2027-06-06</td>
@@ -1672,7 +1672,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-offload-threshold</span>
         <span class="sc-name">SOBR Move: offload fires on exact offloadAfterDays boundary</span>
-        <span class="sc-meta">30d &nbsp;·&nbsp; 8ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d</span>
+        <span class="sc-meta">30d &nbsp;·&nbsp; 9ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain sealed at day D. Points must still be in Performance on day D+offloadAfterDays-1 and must be in Capacity on day D+offloadAfterDays.</p>
@@ -1775,7 +1775,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-archive-threshold-move</span>
         <span class="sc-name">SOBR Move: archive fires on exact capTierAge &gt;= archiveAfterDays boundary</span>
-        <span class="sc-meta">60d &nbsp;·&nbsp; 25ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
+        <span class="sc-meta">60d &nbsp;·&nbsp; 31ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">After chain offloads to Capacity, a GFS-tagged point must NOT enter Archive until capTierAgeDays &gt;= archiveAfterDays.</p>
@@ -1887,7 +1887,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-archive-threshold-copy</span>
         <span class="sc-name">SOBR Copy: archive fires only after pointAge &gt;= offloadAfterDays + archiveAfterDays</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 13ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 16ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">In copy mode the archive gate is total point age, not cap-tier age. Point must not appear in Archive before age = offloadAfterDays + archiveAfterDays.</p>
@@ -1999,7 +1999,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-capacity-residue-after-archive</span>
         <span class="sc-name">SOBR Copy: non-GFS Capacity residue pruned when GFS full archives</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 12ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 14ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When a GFS SyntheticFull in a chain archives (copy mode), non-GFS points in that chain must be pruned from Capacity. Performance copy must still remain accessible.</p>
@@ -2236,7 +2236,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-3yr-gfs-wmy</span>
         <span class="sc-name">DAS 3-year soak: W+M+Y GFS invariants every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 761ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 819ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years, daily assertions: weekly count ≤ limit, monthly count ≤ limit, yearly count ≤ limit, GFS tags only on SyntheticFull/Full, exactly one global base per job.</p>
@@ -2266,10 +2266,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.324 TB</span> ≤ estimate</div>
-            <div class="path-line">2.324 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.322 TB</span> ≤ estimate</div>
+            <div class="path-line">2.322 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 2.849 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 2.847 TB</div>
           </div>
         </div>
 
@@ -2332,7 +2332,7 @@
         <td>0/16/5</td>
         <td>4/2/0</td>
         <td>0/0/0</td>
-        <td>0.956</td>
+        <td>0.955</td>
       </tr><tr>
         <td>90</td>
         <td class="mono">2026-07-31</td>
@@ -2341,7 +2341,7 @@
         <td>0/18/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.136</td>
+        <td>1.134</td>
       </tr><tr>
         <td>120</td>
         <td class="mono">2026-08-30</td>
@@ -2350,7 +2350,7 @@
         <td>0/13/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.014</td>
+        <td>1.012</td>
       </tr><tr>
         <td>150</td>
         <td class="mono">2026-09-29</td>
@@ -2359,7 +2359,7 @@
         <td>0/15/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.069</td>
+        <td>1.067</td>
       </tr><tr>
         <td>180</td>
         <td class="mono">2026-10-29</td>
@@ -2368,7 +2368,7 @@
         <td>0/17/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.969</td>
+        <td>1.146</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -2377,7 +2377,7 @@
         <td>0/12/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.001</td>
+        <td>0.999</td>
       </tr><tr>
         <td>240</td>
         <td class="mono">2026-12-28</td>
@@ -2386,7 +2386,7 @@
         <td>0/14/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.263</td>
+        <td>1.442</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -2395,7 +2395,7 @@
         <td>0/16/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.342</td>
+        <td>1.521</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -2404,7 +2404,7 @@
         <td>0/18/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.372</td>
+        <td>1.552</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -2413,7 +2413,7 @@
         <td>0/13/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.559</td>
+        <td>1.558</td>
       </tr><tr>
         <td>360</td>
         <td class="mono">2027-04-27</td>
@@ -2422,7 +2422,7 @@
         <td>0/15/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.615</td>
+        <td>1.614</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -2431,7 +2431,7 @@
         <td>0/13/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.564</td>
+        <td>1.562</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -2440,7 +2440,7 @@
         <td>0/17/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.513</td>
+        <td>1.695</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -2449,7 +2449,7 @@
         <td>0/12/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.545</td>
+        <td>1.544</td>
       </tr><tr>
         <td>450</td>
         <td class="mono">2027-07-26</td>
@@ -2458,7 +2458,7 @@
         <td>0/14/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.442</td>
+        <td>1.625</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -2467,7 +2467,7 @@
         <td>0/16/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.472</td>
+        <td>1.656</td>
       </tr></tbody>
           </table>
         </div>
@@ -2488,16 +2488,16 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=1.564 TB</td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=1.564 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=20, gfs=4/3/1, storage=1.562 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=22, gfs=4/3/2, storage=2.185 TB</td>
-        <td>chain=3, rp=22, gfs=4/3/2, storage=2.185 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=22, gfs=4/3/2, storage=2.184 TB</td>
         <td>none</td>
       </tr></tbody>
           </table>
@@ -2512,7 +2512,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-move-3yr</span>
         <span class="sc-name">SOBR Move-only 3-year soak: tier ordering invariants every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 656ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 612ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">No point may be in Archive without passing through Capacity. Prune before offload is forbidden. Active chains must never be offloadComplete.</p>
@@ -2644,7 +2644,7 @@
         <td>0/35/7</td>
         <td>4/3/0</td>
         <td>34/20/2</td>
-        <td>2.116</td>
+        <td>2.115</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -2662,7 +2662,7 @@
         <td>0/32/7</td>
         <td>4/3/0</td>
         <td>31/21/1</td>
-        <td>2.726</td>
+        <td>2.545</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -2671,7 +2671,7 @@
         <td>0/40/9</td>
         <td>4/3/0</td>
         <td>33/28/2</td>
-        <td>2.990</td>
+        <td>2.808</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -2680,7 +2680,7 @@
         <td>0/36/7</td>
         <td>4/3/0</td>
         <td>35/27/2</td>
-        <td>2.850</td>
+        <td>2.849</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -2698,7 +2698,7 @@
         <td>0/33/7</td>
         <td>4/3/0</td>
         <td>32/21/1</td>
-        <td>2.795</td>
+        <td>2.612</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -2707,7 +2707,7 @@
         <td>0/37/8</td>
         <td>4/3/0</td>
         <td>30/28/1</td>
-        <td>2.640</td>
+        <td>2.639</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -2716,7 +2716,7 @@
         <td>0/41/8</td>
         <td>4/3/0</td>
         <td>34/27/2</td>
-        <td>2.854</td>
+        <td>2.853</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -2734,7 +2734,7 @@
         <td>0/32/8</td>
         <td>4/3/0</td>
         <td>31/21/2</td>
-        <td>2.828</td>
+        <td>2.641</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -2743,7 +2743,7 @@
         <td>0/40/9</td>
         <td>4/3/0</td>
         <td>33/28/2</td>
-        <td>3.527</td>
+        <td>3.339</td>
       </tr></tbody>
           </table>
         </div>
@@ -2764,15 +2764,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=2.640 TB</td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=2.640 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=7, rp=45, gfs=4/3/0, storage=2.639 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=2.773 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=7, rp=45, gfs=4/3/0, storage=2.773 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -2788,7 +2788,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-copy-3yr</span>
         <span class="sc-name">SOBR Copy-only 3-year soak: capacity residue and archive gate every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 704ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 661ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Scan every day: after any archive event for a chain the non-GFS Capacity residue must immediately be zero. Archive gate must never be violated.</p>
@@ -2920,7 +2920,7 @@
         <td>0/35/7</td>
         <td>4/3/0</td>
         <td>42/27/3</td>
-        <td>2.905</td>
+        <td>2.904</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -2938,7 +2938,7 @@
         <td>0/32/7</td>
         <td>4/3/0</td>
         <td>39/24/3</td>
-        <td>3.754</td>
+        <td>3.752</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -2947,7 +2947,7 @@
         <td>0/40/9</td>
         <td>4/3/0</td>
         <td>49/26/5</td>
-        <td>4.122</td>
+        <td>4.119</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -2956,7 +2956,7 @@
         <td>0/36/7</td>
         <td>4/3/0</td>
         <td>43/28/3</td>
-        <td>3.005</td>
+        <td>3.003</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -2974,7 +2974,7 @@
         <td>0/33/7</td>
         <td>4/3/0</td>
         <td>40/25/3</td>
-        <td>3.866</td>
+        <td>3.865</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -2983,7 +2983,7 @@
         <td>0/37/8</td>
         <td>4/3/0</td>
         <td>45/23/4</td>
-        <td>3.972</td>
+        <td>3.971</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -2992,7 +2992,7 @@
         <td>0/41/8</td>
         <td>4/3/0</td>
         <td>49/27/4</td>
-        <td>4.187</td>
+        <td>4.185</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -3010,7 +3010,7 @@
         <td>0/32/8</td>
         <td>4/3/0</td>
         <td>40/24/4</td>
-        <td>3.910</td>
+        <td>3.907</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -3019,7 +3019,7 @@
         <td>0/40/9</td>
         <td>4/3/0</td>
         <td>49/26/5</td>
-        <td>4.240</td>
+        <td>4.237</td>
       </tr></tbody>
           </table>
         </div>
@@ -3040,15 +3040,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=3.972 TB</td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=3.972 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=7, rp=45, gfs=4/3/0, storage=3.971 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=3.130 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=7, rp=45, gfs=4/3/0, storage=3.130 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -3064,7 +3064,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-gfs-archive-5yr</span>
         <span class="sc-name">SOBR Move W+M+Y 5-year soak: full model over extended horizon</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 2402ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 2453ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">5-year soak exercising the full policy stack: daily GFS count limits, tier ordering, prune sequencing, chain deletion gating, SLA minimum, and base identity.</p>
@@ -3196,7 +3196,7 @@
         <td>0/53/10</td>
         <td>4/3/0</td>
         <td>62/41/2</td>
-        <td>4.125</td>
+        <td>3.947</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -3223,7 +3223,7 @@
         <td>0/58/11</td>
         <td>4/3/1</td>
         <td>61/48/2</td>
-        <td>5.102</td>
+        <td>4.921</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -3232,7 +3232,7 @@
         <td>0/54/10</td>
         <td>4/3/1</td>
         <td>63/48/2</td>
-        <td>4.322</td>
+        <td>4.502</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -3268,7 +3268,7 @@
         <td>0/65/12</td>
         <td>4/3/1</td>
         <td>62/54/3</td>
-        <td>5.095</td>
+        <td>4.911</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -3286,7 +3286,7 @@
         <td>0/62/12</td>
         <td>4/3/1</td>
         <td>66/54/3</td>
-        <td>5.738</td>
+        <td>5.553</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -3295,7 +3295,7 @@
         <td>0/64/12</td>
         <td>4/3/1</td>
         <td>61/54/3</td>
-        <td>5.069</td>
+        <td>4.883</td>
       </tr></tbody>
           </table>
         </div>
@@ -3316,15 +3316,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=11, rp=72, gfs=4/3/1, storage=5.136 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=11, rp=72, gfs=4/3/1, storage=5.136 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=12, rp=81, gfs=4/3/2, storage=6.113 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=12, rp=81, gfs=4/3/2, storage=6.113 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -3340,7 +3340,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-sla-minimum-5yr</span>
         <span class="sc-name">DAS 5-year soak: SLA minimum guarantee never violated</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 237ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 263ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 5 years verify that no chain point dated within slaDays of current date is ever deleted, regardless of count-based expiry pressure.</p>
@@ -3370,10 +3370,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.626 TB</span> ≤ estimate</div>
-            <div class="path-line">2.626 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.624 TB</span> ≤ estimate</div>
+            <div class="path-line">2.624 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 3.151 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 3.149 TB</div>
           </div>
         </div>
 
@@ -3436,7 +3436,7 @@
         <td>0/16/5</td>
         <td>4/2/0</td>
         <td>0/0/0</td>
-        <td>0.956</td>
+        <td>0.955</td>
       </tr><tr>
         <td>90</td>
         <td class="mono">2026-07-31</td>
@@ -3445,7 +3445,7 @@
         <td>0/18/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.136</td>
+        <td>1.134</td>
       </tr><tr>
         <td>120</td>
         <td class="mono">2026-08-30</td>
@@ -3454,7 +3454,7 @@
         <td>0/13/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.014</td>
+        <td>1.012</td>
       </tr><tr>
         <td>150</td>
         <td class="mono">2026-09-29</td>
@@ -3463,7 +3463,7 @@
         <td>0/15/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.069</td>
+        <td>1.067</td>
       </tr><tr>
         <td>180</td>
         <td class="mono">2026-10-29</td>
@@ -3472,7 +3472,7 @@
         <td>0/17/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.969</td>
+        <td>1.146</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -3481,7 +3481,7 @@
         <td>0/12/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.001</td>
+        <td>0.999</td>
       </tr><tr>
         <td>240</td>
         <td class="mono">2026-12-28</td>
@@ -3490,7 +3490,7 @@
         <td>0/14/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.263</td>
+        <td>1.442</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -3499,7 +3499,7 @@
         <td>0/16/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.342</td>
+        <td>1.521</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -3508,7 +3508,7 @@
         <td>0/18/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.372</td>
+        <td>1.552</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -3517,7 +3517,7 @@
         <td>0/13/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.559</td>
+        <td>1.558</td>
       </tr><tr>
         <td>360</td>
         <td class="mono">2027-04-27</td>
@@ -3526,7 +3526,7 @@
         <td>0/15/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.615</td>
+        <td>1.614</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -3535,7 +3535,7 @@
         <td>0/13/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.564</td>
+        <td>1.562</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -3544,7 +3544,7 @@
         <td>0/17/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.513</td>
+        <td>1.695</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -3553,7 +3553,7 @@
         <td>0/12/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.545</td>
+        <td>1.544</td>
       </tr><tr>
         <td>450</td>
         <td class="mono">2027-07-26</td>
@@ -3562,7 +3562,7 @@
         <td>0/14/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.442</td>
+        <td>1.625</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -3571,7 +3571,7 @@
         <td>0/16/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.472</td>
+        <td>1.656</td>
       </tr></tbody>
           </table>
         </div>
@@ -3592,16 +3592,16 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=1.564 TB</td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=1.564 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=20, gfs=4/3/1, storage=1.562 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=22, gfs=4/3/2, storage=2.185 TB</td>
-        <td>chain=3, rp=22, gfs=4/3/2, storage=2.185 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=22, gfs=4/3/2, storage=2.184 TB</td>
         <td>none</td>
       </tr></tbody>
           </table>
@@ -3616,7 +3616,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-chain-rp-drift-3yr</span>
         <span class="sc-name">DAS 3-year drift: inactive chains and RP count never accumulate</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 134ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 150ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years, assert every day that inactive chains never exceed 3 (steady-state max) and total restore points never exceed 42 (2×retention + GFS limits + buffer). Catches chain cleanup failures and pruning regressions that only manifest over long horizons.</p>
@@ -3646,10 +3646,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.324 TB</span> ≤ estimate</div>
-            <div class="path-line">2.324 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.322 TB</span> ≤ estimate</div>
+            <div class="path-line">2.322 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 2.849 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 2.847 TB</div>
           </div>
         </div>
 
@@ -3712,7 +3712,7 @@
         <td>0/16/5</td>
         <td>4/2/0</td>
         <td>0/0/0</td>
-        <td>0.956</td>
+        <td>0.955</td>
       </tr><tr>
         <td>90</td>
         <td class="mono">2026-07-31</td>
@@ -3721,7 +3721,7 @@
         <td>0/18/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.136</td>
+        <td>1.134</td>
       </tr><tr>
         <td>120</td>
         <td class="mono">2026-08-30</td>
@@ -3730,7 +3730,7 @@
         <td>0/13/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.014</td>
+        <td>1.012</td>
       </tr><tr>
         <td>150</td>
         <td class="mono">2026-09-29</td>
@@ -3739,7 +3739,7 @@
         <td>0/15/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.069</td>
+        <td>1.067</td>
       </tr><tr>
         <td>180</td>
         <td class="mono">2026-10-29</td>
@@ -3748,7 +3748,7 @@
         <td>0/17/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.969</td>
+        <td>1.146</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -3757,7 +3757,7 @@
         <td>0/12/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.001</td>
+        <td>0.999</td>
       </tr><tr>
         <td>240</td>
         <td class="mono">2026-12-28</td>
@@ -3766,7 +3766,7 @@
         <td>0/14/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.263</td>
+        <td>1.442</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -3775,7 +3775,7 @@
         <td>0/16/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.342</td>
+        <td>1.521</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -3784,7 +3784,7 @@
         <td>0/18/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.372</td>
+        <td>1.552</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -3793,7 +3793,7 @@
         <td>0/13/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.559</td>
+        <td>1.558</td>
       </tr><tr>
         <td>360</td>
         <td class="mono">2027-04-27</td>
@@ -3802,7 +3802,7 @@
         <td>0/15/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.615</td>
+        <td>1.614</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -3811,7 +3811,7 @@
         <td>0/13/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.564</td>
+        <td>1.562</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -3820,7 +3820,7 @@
         <td>0/17/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.513</td>
+        <td>1.695</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -3829,7 +3829,7 @@
         <td>0/12/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.545</td>
+        <td>1.544</td>
       </tr><tr>
         <td>450</td>
         <td class="mono">2027-07-26</td>
@@ -3838,7 +3838,7 @@
         <td>0/14/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.442</td>
+        <td>1.625</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -3847,7 +3847,7 @@
         <td>0/16/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.472</td>
+        <td>1.656</td>
       </tr></tbody>
           </table>
         </div>
@@ -3868,16 +3868,16 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=1.564 TB</td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=1.564 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=20, gfs=4/3/1, storage=1.562 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=22, gfs=4/3/2, storage=2.185 TB</td>
-        <td>chain=3, rp=22, gfs=4/3/2, storage=2.185 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=22, gfs=4/3/2, storage=2.184 TB</td>
         <td>none</td>
       </tr></tbody>
           </table>
@@ -3892,7 +3892,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-move-chain-rp-drift-3yr</span>
         <span class="sc-name">SOBR Move 3-year drift: inactive chains and RP count never accumulate</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 615ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 605ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years with SOBR Move mode, assert that inactive chains never exceed 4 (offload + immutability extend chain lifetime but should still plateau) and total restore points never exceed 78 (2×retention=30 + GFS limits + buffer). Detects SOBR-specific chain lifecycle failures over extended runs.</p>
@@ -4024,7 +4024,7 @@
         <td>0/35/7</td>
         <td>4/3/0</td>
         <td>34/20/2</td>
-        <td>2.116</td>
+        <td>2.115</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -4042,7 +4042,7 @@
         <td>0/32/7</td>
         <td>4/3/0</td>
         <td>31/21/1</td>
-        <td>2.726</td>
+        <td>2.545</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -4051,7 +4051,7 @@
         <td>0/40/9</td>
         <td>4/3/0</td>
         <td>33/28/2</td>
-        <td>2.990</td>
+        <td>2.808</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -4060,7 +4060,7 @@
         <td>0/36/7</td>
         <td>4/3/0</td>
         <td>35/27/2</td>
-        <td>2.850</td>
+        <td>2.849</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -4078,7 +4078,7 @@
         <td>0/33/7</td>
         <td>4/3/0</td>
         <td>32/21/1</td>
-        <td>2.795</td>
+        <td>2.612</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -4087,7 +4087,7 @@
         <td>0/37/8</td>
         <td>4/3/0</td>
         <td>30/28/1</td>
-        <td>2.640</td>
+        <td>2.639</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -4096,7 +4096,7 @@
         <td>0/41/8</td>
         <td>4/3/0</td>
         <td>34/27/2</td>
-        <td>2.854</td>
+        <td>2.853</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -4114,7 +4114,7 @@
         <td>0/32/8</td>
         <td>4/3/0</td>
         <td>31/21/2</td>
-        <td>2.828</td>
+        <td>2.641</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -4123,7 +4123,7 @@
         <td>0/40/9</td>
         <td>4/3/0</td>
         <td>33/28/2</td>
-        <td>3.527</td>
+        <td>3.339</td>
       </tr></tbody>
           </table>
         </div>
@@ -4144,15 +4144,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=2.640 TB</td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=2.640 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=7, rp=45, gfs=4/3/0, storage=2.639 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=7, rp=45, gfs=4/3/0, storage=2.773 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=7, rp=45, gfs=4/3/0, storage=2.773 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -4168,7 +4168,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-high-retention-drift-3yr</span>
         <span class="sc-name">DAS high-retention 3-year drift: retention=30 with full GFS never accumulates</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 223ms &nbsp;·&nbsp; DAS · Ret:30 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 269ms &nbsp;·&nbsp; DAS · Ret:30 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Higher retention (30 days) with full W+M+Y GFS over 3 years. Max inactive chains ≤ 3, max restore points ≤ 75 (2×30 + 9 + buffer). Validates that the engine scales correctly with larger retention windows without drift.</p>
@@ -4198,10 +4198,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.669 TB</span> ≤ estimate</div>
-            <div class="path-line">2.669 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">2.668 TB</span> ≤ estimate</div>
+            <div class="path-line">2.668 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 3.194 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 3.193 TB</div>
           </div>
         </div>
 
@@ -4273,7 +4273,7 @@
         <td>0/30/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.438</td>
+        <td>1.437</td>
       </tr><tr>
         <td>120</td>
         <td class="mono">2026-08-30</td>
@@ -4282,7 +4282,7 @@
         <td>0/31/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.494</td>
+        <td>1.493</td>
       </tr><tr>
         <td>150</td>
         <td class="mono">2026-09-29</td>
@@ -4291,7 +4291,7 @@
         <td>0/27/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.373</td>
+        <td>1.372</td>
       </tr><tr>
         <td>180</td>
         <td class="mono">2026-10-29</td>
@@ -4300,7 +4300,7 @@
         <td>0/29/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.454</td>
+        <td>1.452</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -4309,7 +4309,7 @@
         <td>0/30/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>1.973</td>
+        <td>1.972</td>
       </tr><tr>
         <td>240</td>
         <td class="mono">2026-12-28</td>
@@ -4327,7 +4327,7 @@
         <td>0/28/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.652</td>
+        <td>1.831</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -4336,7 +4336,7 @@
         <td>0/30/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>2.383</td>
+        <td>2.381</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -4345,7 +4345,7 @@
         <td>0/31/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>2.547</td>
+        <td>2.546</td>
       </tr><tr>
         <td>360</td>
         <td class="mono">2027-04-27</td>
@@ -4354,7 +4354,7 @@
         <td>0/27/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.929</td>
+        <td>1.928</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -4363,7 +4363,7 @@
         <td>0/31/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>2.060</td>
+        <td>2.059</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -4372,7 +4372,7 @@
         <td>0/29/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>2.011</td>
+        <td>2.010</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -4390,7 +4390,7 @@
         <td>0/26/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.944</td>
+        <td>1.943</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -4399,7 +4399,7 @@
         <td>0/28/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>2.508</td>
+        <td>2.506</td>
       </tr></tbody>
           </table>
         </div>
@@ -4420,16 +4420,16 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=6, rp=39, gfs=4/3/1, storage=2.060 TB</td>
-        <td>chain=6, rp=39, gfs=4/3/1, storage=2.060 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=6, rp=39, gfs=4/3/1, storage=2.059 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=5, rp=35, gfs=4/3/2, storage=3.064 TB</td>
-        <td>chain=5, rp=35, gfs=4/3/2, storage=3.064 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=5, rp=35, gfs=4/3/2, storage=3.063 TB</td>
         <td>none</td>
       </tr></tbody>
           </table>
@@ -4457,7 +4457,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-perf-immutability-blocks-prune</span>
         <span class="sc-name">Performance immutability blocks Performance prune</span>
-        <span class="sc-meta">55d &nbsp;·&nbsp; 7ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:14d</span>
+        <span class="sc-meta">55d &nbsp;·&nbsp; 8ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain is retention+SLA expired and offloadComplete, but performanceImmutabilityDays has not elapsed since GEN window end. Prune must not fire until the lock expires.</p>
@@ -4569,7 +4569,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-cap-immutability-blocks-deletion</span>
         <span class="sc-name">Capacity immutability blocks chain deletion</span>
-        <span class="sc-meta">70d &nbsp;·&nbsp; 10ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · CapImm:21d</span>
+        <span class="sc-meta">70d &nbsp;·&nbsp; 11ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · CapImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain's GEN deleteOn has been reached, but capacityImmutableUntil is in the future. Chain must not be deleted until lock clears.</p>
@@ -4690,7 +4690,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-arch-immutability-blocks-deletion</span>
         <span class="sc-name">Archive immutability blocks chain deletion</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 28ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · ArchImm:30d</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 31ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · ArchImm:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">GFS point in Archive is within archiveImmutableUntil. Chain deletion must wait for Archive lock to clear even after deleteOn and Capacity immutability have both passed.</p>
@@ -4820,7 +4820,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-gen-window-boundary</span>
         <span class="sc-name">GEN window aligns to generationPeriodDays boundaries</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 6ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 7ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Points created in days 1-10 must belong to GEN-0 and points created in days 11-20 to GEN-1 when generationPeriodDays=10. deleteOn for each GEN must equal windowEnd + slaDays.</p>
@@ -4932,7 +4932,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-gen-deleteon-extended-by-gfs</span>
         <span class="sc-name">GEN deleteOn extended when GFS point falls in window</span>
-        <span class="sc-meta">60d &nbsp;·&nbsp; 11ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d</span>
+        <span class="sc-meta">60d &nbsp;·&nbsp; 12ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When a GFS weekly point belongs to a GEN, the GEN's deleteOn must be recalculated to max(default deleteOn, gfsDate + gfsWeeks*7). Standard non-GFS GENs must keep original deleteOn.</p>
@@ -5165,7 +5165,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-all-tiers-immutability</span>
         <span class="sc-name">All three tier immutability locks interact correctly</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 37ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 38ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With non-zero immutability on all three tiers, deletion must wait until ALL locks expire, even if only one tier contains data at deletion time.</p>
@@ -5295,7 +5295,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-move-archive</span>
         <span class="sc-name">GFS W+M+Y × Move × Archive: cardinality and tier residency</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 378ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 444ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Mixed GFS with move mode and archive. Verify: weekly/monthly/yearly counts, tier residency per point, incremental-free Capacity after each chain archives, no premature archive entry.</p>
@@ -5427,7 +5427,7 @@
         <td>0/53/10</td>
         <td>4/3/0</td>
         <td>62/41/2</td>
-        <td>4.050</td>
+        <td>3.875</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -5454,7 +5454,7 @@
         <td>0/58/11</td>
         <td>4/3/1</td>
         <td>61/48/2</td>
-        <td>4.950</td>
+        <td>4.775</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -5463,7 +5463,7 @@
         <td>0/54/10</td>
         <td>4/3/1</td>
         <td>63/48/2</td>
-        <td>4.175</td>
+        <td>4.350</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -5499,7 +5499,7 @@
         <td>0/65/12</td>
         <td>4/3/1</td>
         <td>62/54/3</td>
-        <td>4.875</td>
+        <td>4.700</td>
       </tr><tr>
         <td>400</td>
         <td class="mono">2027-06-06</td>
@@ -5524,7 +5524,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-copy-archive</span>
         <span class="sc-name">GFS W+M+Y × Copy × Archive: residue and gate</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 405ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 422ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Mixed GFS with copy mode and archive. Non-GFS Capacity residue must clear immediately after GFS point archives. Archive gate is point-age-based.</p>
@@ -5692,7 +5692,7 @@
         <td>0/54/10</td>
         <td>4/3/1</td>
         <td>64/28/6</td>
-        <td>3.900</td>
+        <td>4.250</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -5753,7 +5753,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-copy-archive-immutability</span>
         <span class="sc-name">GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction</span>
-        <span class="sc-meta">500d &nbsp;·&nbsp; 574ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
+        <span class="sc-meta">500d &nbsp;·&nbsp; 557ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">High-risk 3-way: mixed GFS stacking, copy mode, archive, and all-tier immutability. Verify correct interlock between archive gating, capacity residue clearing, and GEN immutability locks.</p>
@@ -5921,7 +5921,7 @@
         <td>0/54/10</td>
         <td>4/3/1</td>
         <td>64/28/6</td>
-        <td>3.900</td>
+        <td>4.250</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -6000,7 +6000,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-monthly-move-immutability</span>
         <span class="sc-name">GFS Monthly × Move × Perf Immutability: GEN deleteOn vs immutability interlock</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 49ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:0W/3M/0Y · Move · Offload:7d · PerfImm:14d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 45ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:0W/3M/0Y · Move · Offload:7d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Monthly GFS extends GEN deleteOn. Combined with Perf immutability this requires both deleteOn and lock to clear before prune/delete. Neither alone should be sufficient.</p>
@@ -6130,7 +6130,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-short-retention-long-gfs</span>
         <span class="sc-name">Short retention × long GFS yearly: chain outlives retention by years</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 143ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/5Y</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 155ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/5Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With retention=7 and yearly=5 (5 years), chains sealed early must survive for 5 years because of GFS tag. Verifies GFS protection overrides count+SLA expiry for the full GFS window.</p>
@@ -6382,15 +6382,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=2, rp=10, gfs=0/0/1, storage=1.200 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=2, rp=10, gfs=0/0/1, storage=1.200 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=2, rp=12, gfs=0/0/2, storage=1.725 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=2, rp=12, gfs=0/0/2, storage=1.725 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -6406,7 +6406,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-high-gen-period</span>
         <span class="sc-name">Large generationPeriodDays with GFS and immutability</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 169ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:0W/3M/0Y · Move · Offload:14d · PerfImm:14d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 159ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:0W/3M/0Y · Move · Offload:14d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">generationPeriodDays=30: each GEN covers a full month. Verifies GEN window aligns correctly at 30-day boundaries and deleteOn is computed properly with monthly GFS extension.</p>
@@ -6538,7 +6538,7 @@
         <td>0/53/10</td>
         <td>0/3/0</td>
         <td>62/43/0</td>
-        <td>3.475</td>
+        <td>3.300</td>
       </tr><tr>
         <td>200</td>
         <td class="mono">2026-11-18</td>
@@ -6563,7 +6563,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-copy-move-combo</span>
         <span class="sc-name">Copy+Move mode with GFS W+M and archive</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 41ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/2M/0Y · Copy · Offload:7d · Archive:30d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 51ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/2M/0Y · Copy · Offload:7d · Archive:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">copyEnabled+moveEnabled simultaneously. Verifies both copy semantics (Capacity stamped at creation) and move semantics (Performance removed after offloadAfterDays) apply correctly, with correct archive gating.</p>
@@ -6850,7 +6850,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-retention-variant-r7</span>
         <span class="sc-name">Retention variant retention=7 with W+M GFS</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 63ms &nbsp;·&nbsp; SOBR · Ret:7 · GFS:4W/3M/0Y · Move · Offload:7d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 74ms &nbsp;·&nbsp; SOBR · Ret:7 · GFS:4W/3M/0Y · Move · Offload:7d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention=7 paired with GFS to stress-test boundary interaction at the shortest practical retention. Chain should seal every 7 days and GFS must survive past that.</p>
@@ -7007,7 +7007,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-retention-variant-r60</span>
         <span class="sc-name">Retention variant retention=60 with W+M+Y GFS</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 367ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 378ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention=60 with full GFS stack. Many chains coexist; verifies base identity remains oldest across all, GFS caps are respected across many active+inactive chains simultaneously.</p>
@@ -7139,7 +7139,7 @@
         <td>0/53/10</td>
         <td>4/3/0</td>
         <td>62/41/2</td>
-        <td>4.050</td>
+        <td>3.875</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -7166,7 +7166,7 @@
         <td>0/58/11</td>
         <td>4/3/1</td>
         <td>61/48/2</td>
-        <td>4.950</td>
+        <td>4.775</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -7175,7 +7175,7 @@
         <td>0/54/10</td>
         <td>4/3/1</td>
         <td>63/48/2</td>
-        <td>4.175</td>
+        <td>4.350</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -7211,7 +7211,7 @@
         <td>0/65/12</td>
         <td>4/3/1</td>
         <td>62/54/3</td>
-        <td>4.875</td>
+        <td>4.700</td>
       </tr><tr>
         <td>400</td>
         <td class="mono">2027-06-06</td>
@@ -7236,7 +7236,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-high-change-rate-drift-2yr</span>
         <span class="sc-name">High change-rate adversarial: 40% daily delta over 2 years</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 82ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/1Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 96ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/1Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Stress scenario with extreme daily churn (40%) to catch storage or pruning behavior that appears stable at 5% but fails under heavy write amplification.</p>
@@ -7488,15 +7488,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=20, gfs=4/3/1, storage=5.500 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=3, rp=20, gfs=4/3/1, storage=5.500 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=21, gfs=4/3/1, storage=5.700 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=3, rp=21, gfs=4/3/1, storage=5.700 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -7512,7 +7512,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-short-retention-drift-3yr</span>
         <span class="sc-name">Short retention adversarial: retention=3 over 3 years</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 90ms &nbsp;·&nbsp; DAS · Ret:3 · GFS:4W/3M/1Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 105ms &nbsp;·&nbsp; DAS · Ret:3 · GFS:4W/3M/1Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Very short retention with GFS enabled to stress frequent chain sealing/deletion. Ensures cleanup remains stable and restore points do not accumulate over long duration.</p>
@@ -7542,10 +7542,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">1.200 TB</span> ≤ estimate</div>
-            <div class="path-line">1.200 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">1.250 TB</span> ≤ estimate</div>
+            <div class="path-line">1.250 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 1.725 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 1.775 TB</div>
           </div>
         </div>
 
@@ -7608,7 +7608,7 @@
         <td>0/4/5</td>
         <td>4/2/0</td>
         <td>0/0/0</td>
-        <td>0.600</td>
+        <td>0.650</td>
       </tr><tr>
         <td>90</td>
         <td class="mono">2026-07-31</td>
@@ -7617,7 +7617,7 @@
         <td>0/6/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.775</td>
+        <td>0.825</td>
       </tr><tr>
         <td>120</td>
         <td class="mono">2026-08-30</td>
@@ -7635,7 +7635,7 @@
         <td>0/3/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.700</td>
+        <td>0.750</td>
       </tr><tr>
         <td>180</td>
         <td class="mono">2026-10-29</td>
@@ -7644,7 +7644,7 @@
         <td>0/5/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.650</td>
+        <td>0.825</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -7662,7 +7662,7 @@
         <td>0/8/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.075</td>
+        <td>1.250</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -7671,7 +7671,7 @@
         <td>0/4/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.000</td>
+        <td>1.175</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -7680,7 +7680,7 @@
         <td>0/6/6</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.025</td>
+        <td>1.200</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -7698,7 +7698,7 @@
         <td>0/3/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.200</td>
+        <td>1.250</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -7716,7 +7716,7 @@
         <td>0/5/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.150</td>
+        <td>1.325</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -7734,7 +7734,7 @@
         <td>0/8/8</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.225</td>
+        <td>1.400</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -7743,7 +7743,7 @@
         <td>0/4/7</td>
         <td>4/3/1</td>
         <td>0/0/0</td>
-        <td>1.100</td>
+        <td>1.275</td>
       </tr></tbody>
           </table>
         </div>
@@ -7764,15 +7764,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=2, rp=14, gfs=4/3/1, storage=1.350 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=2, rp=14, gfs=4/3/1, storage=1.350 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=2, rp=15, gfs=4/3/1, storage=1.375 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=2, rp=15, gfs=4/3/1, storage=1.375 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -7788,7 +7788,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-policy-change-mid-run</span>
         <span class="sc-name">Mid-run policy change: retention 7 → 30 on day 180</span>
-        <span class="sc-meta">365d &nbsp;·&nbsp; 61ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/0Y</span>
+        <span class="sc-meta">365d &nbsp;·&nbsp; 62ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention is expanded from 7 to 30 restore points partway through a 365-day run. Validates that the engine correctly grows the active chain toward the new limit, that old chains are not orphaned, and that GFS cardinality stays within limits throughout the transition.</p>
@@ -7920,7 +7920,7 @@
         <td>0/11/7</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>0.800</td>
+        <td>0.975</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -7999,7 +7999,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-only-policy</span>
         <span class="sc-name">GFS-only policy: weekly=52 with minimal daily retention</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 207ms &nbsp;·&nbsp; DAS · Ret:1 · GFS:52W/0M/0Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 721ms &nbsp;·&nbsp; DAS · Ret:1 · GFS:52W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Stress test where daily retention is set to 1 (near-zero daily RPs) while weekly GFS keeps 52 weeks. After 2 years the engine should hold exactly 52 weekly GFS snapshots and no more. Validates GFS dominance over retention-based pruning.</p>
@@ -8251,15 +8251,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=1, rp=53, gfs=52/0/0, storage=3.925 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=1, rp=53, gfs=52/0/0, storage=3.925 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=1, rp=54, gfs=52/0/0, storage=3.950 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=1, rp=54, gfs=52/0/0, storage=3.950 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -8275,7 +8275,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-two-jobs-one-repo</span>
         <span class="sc-name">Two jobs sharing one repository</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 57ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/2M/0Y</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 78ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/2M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Two independent backup jobs (different retention and GFS policies) write to the same DAS repository. Validates that chains do not cross-contaminate between jobs, each job maintains its own global base, and storage accounts for both jobs. Checks that inactive chain drift stays bounded across both job lifecycles.</p>
@@ -8407,7 +8407,7 @@
         <td>0/28/9</td>
         <td>6/3/0</td>
         <td>0/0/0</td>
-        <td>1.075</td>
+        <td>1.337</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -8434,7 +8434,7 @@
         <td>0/26/9</td>
         <td>6/3/0</td>
         <td>0/0/0</td>
-        <td>1.037</td>
+        <td>1.300</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -8443,7 +8443,7 @@
         <td>0/30/8</td>
         <td>6/3/0</td>
         <td>0/0/0</td>
-        <td>1.087</td>
+        <td>1.350</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -8479,7 +8479,7 @@
         <td>0/28/9</td>
         <td>6/3/0</td>
         <td>0/0/0</td>
-        <td>1.075</td>
+        <td>1.337</td>
       </tr><tr>
         <td>400</td>
         <td class="mono">2027-06-06</td>
@@ -8517,7 +8517,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-weekly-gfs-cardinality-exact</span>
         <span class="sc-name">Oracle diff: weekly GFS cardinality exact on every Saturday</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 8ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/0M/0Y</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 10ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Every Saturday the weekly GFS count must equal min(weeks elapsed since start, gfsPolicy.weekly). Validated by oracle that computes expected count from dates, not from engine state.</p>
@@ -8647,7 +8647,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-monthly-yearly-cardinality-exact</span>
         <span class="sc-name">Oracle diff: monthly and yearly GFS cardinality across calendar</span>
-        <span class="sc-meta">800d &nbsp;·&nbsp; 102ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:0W/3M/2Y</span>
+        <span class="sc-meta">800d &nbsp;·&nbsp; 99ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:0W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Each last-Saturday-of-month count must equal min(months elapsed, gfsPolicy.monthly). Each last-Saturday-of-December count must equal min(years elapsed, gfsPolicy.yearly).</p>
@@ -8779,7 +8779,7 @@
         <td>0/17/6</td>
         <td>0/3/0</td>
         <td>0/0/0</td>
-        <td>1.350</td>
+        <td>1.525</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -8797,7 +8797,7 @@
         <td>0/14/5</td>
         <td>0/3/1</td>
         <td>0/0/0</td>
-        <td>1.625</td>
+        <td>1.800</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -8806,7 +8806,7 @@
         <td>0/16/6</td>
         <td>0/3/1</td>
         <td>0/0/0</td>
-        <td>1.700</td>
+        <td>1.875</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -8815,7 +8815,7 @@
         <td>0/18/6</td>
         <td>0/3/1</td>
         <td>0/0/0</td>
-        <td>1.750</td>
+        <td>1.925</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -8851,7 +8851,7 @@
         <td>0/17/7</td>
         <td>0/3/1</td>
         <td>0/0/0</td>
-        <td>1.850</td>
+        <td>2.025</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -8869,7 +8869,7 @@
         <td>0/14/7</td>
         <td>0/3/1</td>
         <td>0/0/0</td>
-        <td>1.775</td>
+        <td>1.950</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -8878,7 +8878,7 @@
         <td>0/16/7</td>
         <td>0/3/1</td>
         <td>0/0/0</td>
-        <td>1.825</td>
+        <td>2.000</td>
       </tr></tbody>
           </table>
         </div>
@@ -8899,15 +8899,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=19, gfs=0/3/1, storage=1.900 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=3, rp=19, gfs=0/3/1, storage=1.900 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=21, gfs=0/3/2, storage=2.425 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=3, rp=21, gfs=0/3/2, storage=2.425 TB</td>
         <td>none</td>
       </tr></tbody>
@@ -8923,7 +8923,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-tier-residency-per-point</span>
         <span class="sc-name">Oracle diff: per-point tier residency vs expected schedule</span>
-        <span class="sc-meta">90d &nbsp;·&nbsp; 31ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
+        <span class="sc-meta">90d &nbsp;·&nbsp; 35ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Oracle computes expected tier set for each point on each day based on creation date, offloadAfterDays, archiveAfterDays, chain status, and GFS flag. Diffs against actual hasPerformanceData/hasCapacityData/hasArchiveData.</p>
@@ -9044,7 +9044,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-gen-lifecycle-states</span>
         <span class="sc-name">Oracle diff: GEN lifecycle state per day matches expected dates</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 35ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:10d</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 34ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:10d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Oracle computes expected GEN state (Pending/WaitImmutability/Deletable) based on deleteOn and immutableUntil dates. Diffs against getCurrentGenerations() output each day.</p>
@@ -9295,7 +9295,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-sobr-copy-full-lifecycle</span>
         <span class="sc-name">Oracle diff: SOBR copy-only full lifecycle trace</span>
-        <span class="sc-meta">150d &nbsp;·&nbsp; 75ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">150d &nbsp;·&nbsp; 78ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Copy mode: every new point immediately gets Capacity copy. Oracle tracks Perf+Cap dual occupancy per point, then Archive entry timing for GFS points, then Capacity residue clearing.</p>
@@ -9434,7 +9434,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-das-wmy-weekly-size-nonzero</span>
         <span class="sc-name">Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 362ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/8M/2Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 444ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/8M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Regression guard for bug fix: weekly-only GFS SyntheticFull points in a W+M+Y policy must contribute their incremental footprint (fullSize * changeRate) to used storage, not zero. Also validates GFS cardinality matches calendar expectations. Matches the exact user-reported scenario: 2TB source, 5% change, 10% growth, 14d retention, W4+M8+Y2 DAS.</p>
@@ -9464,10 +9464,10 @@
           </div>
           <div class="compare-col actual-col">
             <h3>Actual Storage</h3>
-            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">5.863 TB</span> ≤ estimate</div>
-            <div class="path-line">5.863 TB (DAS)</div>
+            <div class="path-line"><strong>Final total used:</strong> <span style="font-weight:700;color:#15803d">5.840 TB</span> ≤ estimate</div>
+            <div class="path-line">5.840 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 1.050 TB</div>
-            <div class="path-line"><strong>Total incl. reserve:</strong> 6.913 TB</div>
+            <div class="path-line"><strong>Total incl. reserve:</strong> 6.890 TB</div>
           </div>
         </div>
 
@@ -9530,7 +9530,7 @@
         <td>0/16/5</td>
         <td>4/2/0</td>
         <td>0/0/0</td>
-        <td>1.924</td>
+        <td>1.921</td>
       </tr><tr>
         <td>90</td>
         <td class="mono">2026-07-31</td>
@@ -9539,7 +9539,7 @@
         <td>0/18/6</td>
         <td>4/3/0</td>
         <td>0/0/0</td>
-        <td>2.293</td>
+        <td>2.287</td>
       </tr><tr>
         <td>120</td>
         <td class="mono">2026-08-30</td>
@@ -9548,7 +9548,7 @@
         <td>0/13/7</td>
         <td>4/4/0</td>
         <td>0/0/0</td>
-        <td>2.306</td>
+        <td>2.298</td>
       </tr><tr>
         <td>150</td>
         <td class="mono">2026-09-29</td>
@@ -9557,7 +9557,7 @@
         <td>0/15/8</td>
         <td>4/5/0</td>
         <td>0/0/0</td>
-        <td>2.680</td>
+        <td>2.668</td>
       </tr><tr>
         <td>180</td>
         <td class="mono">2026-10-29</td>
@@ -9566,7 +9566,7 @@
         <td>0/17/9</td>
         <td>4/5/0</td>
         <td>0/0/0</td>
-        <td>2.481</td>
+        <td>2.833</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -9575,7 +9575,7 @@
         <td>0/12/10</td>
         <td>4/7/0</td>
         <td>0/0/0</td>
-        <td>3.071</td>
+        <td>3.053</td>
       </tr><tr>
         <td>240</td>
         <td class="mono">2026-12-28</td>
@@ -9584,7 +9584,7 @@
         <td>0/14/11</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>3.878</td>
+        <td>4.230</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -9593,7 +9593,7 @@
         <td>0/16/12</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.046</td>
+        <td>4.399</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -9602,7 +9602,7 @@
         <td>0/18/11</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.126</td>
+        <td>4.481</td>
       </tr><tr>
         <td>330</td>
         <td class="mono">2027-03-28</td>
@@ -9611,7 +9611,7 @@
         <td>0/13/11</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.279</td>
+        <td>4.259</td>
       </tr><tr>
         <td>360</td>
         <td class="mono">2027-04-27</td>
@@ -9620,7 +9620,7 @@
         <td>0/15/11</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.416</td>
+        <td>4.395</td>
       </tr><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
@@ -9629,7 +9629,7 @@
         <td>0/13/11</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.308</td>
+        <td>4.287</td>
       </tr><tr>
         <td>390</td>
         <td class="mono">2027-05-27</td>
@@ -9638,7 +9638,7 @@
         <td>0/17/12</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.206</td>
+        <td>4.569</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -9647,7 +9647,7 @@
         <td>0/12/11</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.307</td>
+        <td>4.286</td>
       </tr><tr>
         <td>450</td>
         <td class="mono">2027-07-26</td>
@@ -9656,7 +9656,7 @@
         <td>0/14/12</td>
         <td>4/8/1</td>
         <td>0/0/0</td>
-        <td>4.092</td>
+        <td>4.461</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -9686,16 +9686,16 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=24, gfs=4/8/1, storage=4.308 TB</td>
-        <td>chain=3, rp=24, gfs=4/8/1, storage=4.308 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=24, gfs=4/8/1, storage=4.287 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=3, rp=26, gfs=4/8/2, storage=5.863 TB</td>
-        <td>chain=3, rp=26, gfs=4/8/2, storage=5.863 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
+        <td>chain=3, rp=26, gfs=4/8/2, storage=5.840 TB</td>
         <td>none</td>
       </tr></tbody>
           </table>
@@ -9710,7 +9710,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-calculator-parity-347tb-wmy</span>
         <span class="sc-name">Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 823ms &nbsp;·&nbsp; DAS · Ret:21 · GFS:4W/6M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 908ms &nbsp;·&nbsp; DAS · Ret:21 · GFS:4W/6M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Regression guard for block-absorption model (feature/gfs-block-absorption-model). The live Veeam Calculator shows 1,267.8 TB total repo usage for 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 (including ~55 TB working space). Simulator reports used storage separately; target is ≥1,000 TB (confirms outermost point absorption) and ≤1,400 TB (guards against over-counting). This bounds the simulator within ±15% of calculator repository storage (excluding working space).</p>
@@ -9842,7 +9842,7 @@
         <td>0/23/9</td>
         <td>4/5/0</td>
         <td>0/0/0</td>
-        <td>468.450</td>
+        <td>529.175</td>
       </tr><tr>
         <td>210</td>
         <td class="mono">2026-11-28</td>
@@ -9860,7 +9860,7 @@
         <td>0/20/9</td>
         <td>4/6/1</td>
         <td>0/0/0</td>
-        <td>607.250</td>
+        <td>667.975</td>
       </tr><tr>
         <td>270</td>
         <td class="mono">2027-01-27</td>
@@ -9869,7 +9869,7 @@
         <td>0/22/10</td>
         <td>4/6/1</td>
         <td>0/0/0</td>
-        <td>633.275</td>
+        <td>694.000</td>
       </tr><tr>
         <td>300</td>
         <td class="mono">2027-02-26</td>
@@ -9914,7 +9914,7 @@
         <td>0/23/10</td>
         <td>4/6/1</td>
         <td>0/0/0</td>
-        <td>641.950</td>
+        <td>702.675</td>
       </tr><tr>
         <td>420</td>
         <td class="mono">2027-06-26</td>
@@ -9932,7 +9932,7 @@
         <td>0/20/11</td>
         <td>4/6/1</td>
         <td>0/0/0</td>
-        <td>659.300</td>
+        <td>720.025</td>
       </tr><tr>
         <td>480</td>
         <td class="mono">2027-08-25</td>
@@ -9962,15 +9962,15 @@
             <tbody><tr>
         <td>365</td>
         <td class="mono">2027-05-02</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=4, rp=28, gfs=4/6/1, storage=659.300 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=4, rp=28, gfs=4/6/1, storage=659.300 TB</td>
         <td>none</td>
       </tr><tr>
         <td>730</td>
         <td class="mono">2028-05-01</td>
-        <td><span class="status-badge small" style="background:#166534">MATCH</span></td>
-        <td>chain=4, rp=30, gfs=4/6/2, storage=841.475 TB</td>
+        <td><span class="status-badge small" style="background:#1d4ed8">SEEDED</span></td>
+        <td>new baseline captured</td>
         <td>chain=4, rp=30, gfs=4/6/2, storage=841.475 TB</td>
         <td>none</td>
       </tr></tbody>
