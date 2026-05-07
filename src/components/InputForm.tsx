@@ -115,9 +115,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const estimateTierChainDataTB = (windowDays: number) => {
     if (windowDays <= 0) return 0;
     const chainsInWindow = Math.max(1, Math.ceil(windowDays / Math.max(1, fullIntervalDays)));
-    // Synthetic fulls are incremental-sized on DAS/ReFS. The base full (oldest chain)
-    // persists until the next chain completes, adding one extra chain interval.
-    const effectiveDays = (chainsInWindow + 1) * fullIntervalDays - 1;
+    // EXACT VEEAM MODEL: One promoted full (oldest SyntheticFull = base) +
+    // (chainsInWindow * fullIntervalDays - 1) incrementals.
+    // The active chain being built = working space, NOT stored data.
+    // DO NOT add an extra chain interval here — that double-counts working space.
+    const effectiveDays = chainsInWindow * fullIntervalDays - 1;
     return fullSizeTB + effectiveDays * incrSizeTB;
   };
 
@@ -145,9 +147,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     const estimateTierChainDataForYearTB = (windowDays: number) => {
       if (windowDays <= 0) return 0;
       const chainsInWindow = Math.max(1, Math.ceil(windowDays / Math.max(1, fullIntervalDays)));
-      // Synthetic fulls are incremental-sized on DAS/ReFS. The base full persists
-      // until the next chain completes, adding one extra chain interval.
-      const effectiveDays = (chainsInWindow + 1) * fullIntervalDays - 1;
+      // EXACT VEEAM MODEL: One promoted full (oldest SyntheticFull = base) +
+      // (chainsInWindow * fullIntervalDays - 1) incrementals.
+      // The active chain being built = working space, NOT stored data.
+      // DO NOT add an extra chain interval here — that double-counts working space.
+      const effectiveDays = chainsInWindow * fullIntervalDays - 1;
       return yearFullSizeTB + effectiveDays * yearIncrSizeTB;
     };
 

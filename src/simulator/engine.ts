@@ -284,7 +284,14 @@ export class VeeamSimulator {
   }
 
   private getRestorePointSizeInTier(rp: RestorePoint, tier: SOBRTier): number {
-    if (rp.isGFS) {
+    // The bracket table applies to:
+    //   1. Detached GFS points (chainId === `gfs-<jobId>`) — long-term storage orphans.
+    //   2. In-chain monthly/yearly GFS points — the Veeam Calculator sizes these via
+    //      the period-slice bracket table even while still inside the retention window.
+    //      Weekly-only in-chain GFS points fall through to normal chain sizing.
+    const isDetachedGfs = rp.isGFS && rp.chainId.startsWith('gfs-');
+    const isMonthlyOrYearlyGfs = rp.isGFS && (rp.isMonthlyGFS || rp.isYearlyGFS);
+    if (isDetachedGfs || isMonthlyOrYearlyGfs) {
       const job = this.getJobForRestorePoint(rp);
       if (!job) return rp.sizeGB;
 

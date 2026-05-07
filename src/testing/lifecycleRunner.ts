@@ -74,18 +74,18 @@ interface ScenarioAssertions extends DailyAssertionConfig {
   /** (used + working space reserve) / capacityTB must not exceed this fraction (0–1) */
   maxUtilizationFraction?: number;
   /**
-   * Simulator final storage must be within this % of the forecast estimate.
-   * Guards that forecast and simulator use the same sizing model.
-   * E.g. 15 means ±15% tolerance.
+   * If true: simulator final stored data must exactly equal the forecast stored data.
+   * Uses identical GFS bracket-table code and same start/end dates — zero tolerance.
+   * A difference is a bug. DO NOT change to a numeric tolerance to make tests pass.
    */
-  forecastVsSimulatorTolerancePct?: number;
+  forecastMustMatchSimulator?: boolean;
   /**
-   * Known Veeam Calculator output (TB) for this exact scenario configuration.
-   * Simulator final storage must be within veeamCalculatorTolerancePct of this value.
+   * Known Veeam Calculator total repository size (TB) for this exact scenario.
+   * Enforces: simulator stored data + Veeam working space reserve = this value exactly.
+   * Zero tolerance. A difference is a bug in the GFS model or chain formula.
+   * DO NOT add a tolerance field — the formulas must be correct, not approximated.
    */
   veeamCalculatorReferenceTB?: number;
-  /** Tolerance % for veeamCalculatorReferenceTB comparison. Defaults to 15 if not set. */
-  veeamCalculatorTolerancePct?: number;
 }
 interface ScenarioConfig {
   repositoryType: 'DAS' | 'SOBR';
@@ -288,6 +288,10 @@ interface ExpectedLifecycle {
   expectedStorageSummary: string[];
   expectedMaxStorageTB: number;
   workingSpaceReserveTB: number;
+  // The last Saturday on or before the run end — the reference date for all
+  // storage comparisons (forecast, simulator, Veeam Calculator all target this
+  // completed-chain boundary).
+  parityDate: string;
 }
 
 interface DailySnapshot {
@@ -336,7 +340,13 @@ function buildExpectedPath(cfg: ScenarioConfig): string {
 }
 
 function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
-  const endDate = addDaysSimple(START_DATE, sc.totalDays);
+  // Use the last Saturday on or before the run end as the reference date.
+  // The Veeam Calculator models the completed-chain state (a Saturday, after
+  // the new SyntheticFull is created). Forecast and simulator must target the
+  // same moment for the comparison to be structurally valid.
+  const runEndDate = addDaysSimple(START_DATE, sc.totalDays);
+  const parityDate = lastSaturdayOnOrBefore(runEndDate);
+  const endDate = parityDate;
   const firstBackupDate = addDaysSimple(START_DATE, 1);
   const gfs = expectedGfsCardinality(firstBackupDate, endDate, sc.config.gfsPolicy);
   const weeklyDates = weeklyGfsDates(firstBackupDate, endDate).slice(-5);
@@ -379,13 +389,17 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   const fullSizeTB = sourceTB * compression;
   const incrSizeTB = sourceTB * changeRate * compression;
   // Inactive chain: SF promoted to base full size + (retention-1) incrementals
+  // EXACT VEEAM MODEL: Steady-state stored chain data = one completed chain:
+  // one promoted full (the base SyntheticFull) + (retention-1) incrementals.
+  // The active chain being built is WORKING SPACE — not stored data.
+  // DO NOT add an activeChainPeak term here; that double-counts working space.
   const inactiveChainTB = fullSizeTB + (cfg.retention - 1) * incrSizeTB;
-  // Active chain at peak just before SyntheticFull day:
-  //   SF is still at incremental size + (retention-1) incrementals
-  const activeChainPeakTB = cfg.retention * incrSizeTB;
   const gfsPointCount = gfs.weekly + gfs.monthly + gfs.yearly;
   // Copy mode keeps active/inactive chain data in both perf and capacity tiers.
   const tierMultiplier = cfg.copyEnabled ? 2 : 1;
+  const parityStartDate = new Date(`${START_DATE}T00:00:00.000Z`);
+  const parityEndDate = new Date(`${parityDate}T00:00:00.000Z`);
+  const parityDays = Math.round((parityEndDate.getTime() - parityStartDate.getTime()) / 86400000);
   const gfsForecastStats = computeForecastGfsStatsAtYear({
     sourceDataTB: sourceTB,
     annualGrowthRatePct: cfg.annualGrowthRatePct ?? 0,
@@ -393,7 +407,7 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
     retentionDays: cfg.retention,
     gfsPolicy: gfs,
     startDate: START_DATE,
-    yearOffset: Math.max(0, sc.totalDays / 365),
+    yearOffset: Math.max(0, parityDays / 365),
     copyEnabled: cfg.copyEnabled,
     effectiveMoveEnabled: cfg.moveEnabled || !cfg.copyEnabled,
     offloadAfterDays: cfg.offloadAfterDays,
@@ -404,14 +418,14 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
   const gfsTotalTB = cfg.repositoryType === 'SOBR'
     ? (gfsForecastStats.additionalPerfFullTB + gfsForecastStats.additionalCapFullTB + gfsForecastStats.additionalArchFullTB)
     : gfsForecastStats.additionalFullTB;
-  const expectedMaxStorageTB = ((inactiveChainTB + activeChainPeakTB) * tierMultiplier) + gfsTotalTB;
+  const expectedMaxStorageTB = (inactiveChainTB * tierMultiplier) + gfsTotalTB;
   const workingSpaceReserveTB = computeVeeamWorkingSpaceTB(sourceTB);
 
   const storageSummary: string[] = [];
   storageSummary.push(`Source data: ${sourceTB} TB → compressed full backup ≈ ${fullSizeTB.toFixed(3)} TB`);
   storageSummary.push(`Incremental size ≈ ${incrSizeTB.toFixed(3)} TB (${cfg.dailyChangeRatePct}% daily change)`);
-  storageSummary.push(`Inactive chain (global base full + incrementals) ≈ ${inactiveChainTB.toFixed(3)} TB (SF promoted to ${fullSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr)`);
-  storageSummary.push(`Active chain at peak ≈ ${activeChainPeakTB.toFixed(3)} TB (SF at incr size ${incrSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incr, base not yet promoted)`);
+  storageSummary.push(`Stored chain data ≈ ${inactiveChainTB.toFixed(3)} TB (1 promoted full ${fullSizeTB.toFixed(3)} TB + ${cfg.retention - 1} incrementals @ ${incrSizeTB.toFixed(3)} TB each)`);
+  storageSummary.push(`Working space (active chain being built) ≈ ${workingSpaceReserveTB.toFixed(3)} TB — reserved free space, not stored data`);
   if (gfsPointCount > 0) {
     storageSummary.push(`GFS estimate (${gfsPointCount} points): ${gfsTotalTB.toFixed(3)} TB`);
     if (cfg.repositoryType === 'SOBR') {
@@ -434,6 +448,7 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
     expectedStorageSummary: storageSummary,
     expectedMaxStorageTB,
     workingSpaceReserveTB,
+    parityDate,
   };
 }
 
@@ -831,7 +846,23 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
   }
 
   // ── Storage assertions (end-of-run) ──────────────────────────────────────
+  //
+  // ZERO TOLERANCE POLICY — DO NOT ADD TOLERANCE TO ANY ASSERTION BELOW.
+  //
+  // The forecast, simulator, and Veeam Calculator use identical formulas.
+  // Any numeric difference between them is a BUG TO FIX, not a tolerance to widen.
+  // Tolerance hides real model errors. If a test fails, find and fix the root cause.
+  // The only legitimate exception is sub-GB floating-point rounding (< 0.001 TB).
+  //
+  // PARITY DATE: all three are compared at the last Saturday on or before the
+  // run end — the completed-chain boundary. This is what the Veeam Calculator
+  // models. Mid-week snapshots have a partially-built active chain which will
+  // always differ from the completed-chain forecast. DO NOT change this.
+  //
+  const paritySnapshot = allSnapshots.find(s => s.date === expectedLifecycle.parityDate)
+    ?? finalSnapshot;
   const finalStorageTB = finalSnapshot.totalStorageTB;
+  const parityStorageTB = paritySnapshot.totalStorageTB;
   if (assertions.maxFinalStorageTB !== undefined) {
     if (finalStorageTB > assertions.maxFinalStorageTB + 0.001) {
       violations.push({
@@ -870,33 +901,36 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
       });
     }
   }
-  if (assertions.forecastVsSimulatorTolerancePct !== undefined) {
+  if (assertions.forecastMustMatchSimulator) {
+    // Forecast and simulator use identical GFS bracket-table code and the same dates.
+    // Both are evaluated at parityDate (last Saturday of run) — the completed-chain
+    // boundary. Any difference is a bug in the formulas. DO NOT add tolerance.
     const forecastTB = expectedLifecycle.expectedMaxStorageTB;
-    const toleranceFrac = assertions.forecastVsSimulatorTolerancePct / 100;
-    const deltaTB = Math.abs(finalStorageTB - forecastTB);
-    const deltaFrac = forecastTB > 0 ? deltaTB / forecastTB : 0;
-    if (deltaFrac > toleranceFrac + 0.0001) {
+    if (Math.abs(parityStorageTB - forecastTB) > 0.001) {
       violations.push({
-        day: sc.totalDays,
-        date: finalSnapshot.date,
+        day: paritySnapshot.day,
+        date: paritySnapshot.date,
         violatedRule: 'R-STOR-03',
-        expected: `simulator within ${assertions.forecastVsSimulatorTolerancePct}% of forecast (${forecastTB.toFixed(3)} TB)`,
-        actual: `simulator = ${finalStorageTB.toFixed(3)} TB (delta ${(deltaFrac * 100).toFixed(1)}%)`,
+        expected: `simulator = forecast exactly (${forecastTB.toFixed(3)} TB) at parity date ${expectedLifecycle.parityDate}`,
+        actual: `simulator = ${parityStorageTB.toFixed(3)} TB (delta ${(parityStorageTB - forecastTB).toFixed(3)} TB)`,
       });
     }
   }
   if (assertions.veeamCalculatorReferenceTB !== undefined) {
+    // Simulator stored data + Veeam working space reserve must equal the Veeam Calculator's
+    // repository size figure exactly. Both evaluated at parityDate (last Saturday of run).
+    // The calculator includes working space in its total.
+    // Any difference is a bug in the GFS bracket table or chain storage formula. DO NOT add tolerance.
     const refTB = assertions.veeamCalculatorReferenceTB;
-    const tolerancePct = assertions.veeamCalculatorTolerancePct ?? 15;
-    const toleranceFrac = tolerancePct / 100;
-    const deltaFrac = Math.abs(finalStorageTB - refTB) / refTB;
-    if (deltaFrac > toleranceFrac + 0.0001) {
+    const workingSpaceReserveTB = expectedLifecycle.workingSpaceReserveTB;
+    const totalWithWorkingSpace = parityStorageTB + workingSpaceReserveTB;
+    if (Math.abs(totalWithWorkingSpace - refTB) > 0.001) {
       violations.push({
-        day: sc.totalDays,
-        date: finalSnapshot.date,
+        day: paritySnapshot.day,
+        date: paritySnapshot.date,
         violatedRule: 'R-STOR-04',
-        expected: `simulator within ${tolerancePct}% of Veeam Calculator reference (${refTB.toFixed(1)} TB)`,
-        actual: `simulator = ${finalStorageTB.toFixed(3)} TB (delta ${(deltaFrac * 100).toFixed(1)}%)`,
+        expected: `simulator + working space = Veeam Calculator exactly (${refTB.toFixed(1)} TB) at parity date ${expectedLifecycle.parityDate}`,
+        actual: `simulator ${parityStorageTB.toFixed(3)} TB + working space ${workingSpaceReserveTB.toFixed(3)} TB = ${totalWithWorkingSpace.toFixed(3)} TB`,
       });
     }
   }
@@ -936,6 +970,15 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
 function addDaysSimple(isoDate: string, n: number): string {
   const d = new Date(`${isoDate}T00:00:00.000Z`);
   d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Returns the ISO date of the last Saturday on or before the given date. */
+function lastSaturdayOnOrBefore(isoDate: string): string {
+  const d = new Date(`${isoDate}T00:00:00.000Z`);
+  // getUTCDay(): 0=Sun … 6=Sat
+  const daysBack = d.getUTCDay() === 6 ? 0 : (d.getUTCDay() + 1);
+  d.setUTCDate(d.getUTCDate() - daysBack);
   return d.toISOString().slice(0, 10);
 }
 

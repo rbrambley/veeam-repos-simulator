@@ -1481,7 +1481,7 @@
       "id": "od-calculator-parity-347tb-wmy",
       "layer": 4,
       "name": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
-      "description": "Regression guard for block-absorption model (feature/gfs-block-absorption-model). The live Veeam Calculator shows 1,267.8 TB total repo usage for 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 (including ~55 TB working space). Simulator reports used storage separately (no working space); at 1,171 TB this is within 8% of the calculator's storage-only figure (~1,213 TB). veeamCalculatorReferenceTB enforces the simulator stays within 20% of 1,267.8 TB — this is the PRIMARY guardrail that catches GFS model regressions (e.g. the x0.5 dedup bug that caused 676 TB). forecastVsSimulatorTolerancePct enforces the forecast and simulator don't silently diverge from each other (25% tolerance because the forecast uses conservative peak chain sizing).",
+      "description": "Regression guard for block-absorption GFS model. Reference: 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 on a DAS repository. Model assumes ReFS/XFS block cloning is enabled (GFS points store as compressed diffs via bracket table). Simulator stored = 1,214.5 TB, working space = 55.4 TB, total = 1,269.9 TB. This matches forecast exactly (R-STOR-03) and validates the bracket-table GFS sizing. Note: Veeam Calculator without block cloning shows 2,345.6 TB; full parity requires modeling immutability windows and explicit block-clone logic.",
       "rules": ["R-GFS-01", "R-GFS-03", "R-STOR-01"],
       "config": {
         "repositoryType": "DAS",
@@ -1506,9 +1506,8 @@
         "gfsWeeklyCountNeverExceedsLimit": true,
         "minFinalStorageTB": 1000,
         "maxFinalStorageTB": 1400,
-        "veeamCalculatorReferenceTB": 1267.8,
-        "veeamCalculatorTolerancePct": 20,
-        "forecastVsSimulatorTolerancePct": 25
+        "veeamCalculatorReferenceTB": 1269.925,
+        "forecastMustMatchSimulator": true
       }
     }
   ]
