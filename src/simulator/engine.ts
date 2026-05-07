@@ -288,6 +288,24 @@ export class VeeamSimulator {
       const job = this.getJobForRestorePoint(rp);
       if (!job) return rp.sizeGB;
 
+      // Determine if this point is the outermost (oldest) of its GFS class for
+      // this job — outermost points absorb extra blocks from the uncovered period
+      // before them and receive a higher storage contribution factor.
+      const jobChainIds = new Set(
+        this.state.chains.filter(c => c.jobId === job.id).map(c => c.id)
+      );
+      const jobGfsPoints = this.state.restorePoints.filter(
+        p => p.isGFS && jobChainIds.has(p.chainId)
+      );
+      const oldestWeeklyDate = jobGfsPoints
+        .filter(p => p.isWeeklyGFS && !p.isMonthlyGFS && !p.isYearlyGFS)
+        .map(p => p.date)
+        .sort()[0] ?? null;
+      const oldestMonthlyDate = jobGfsPoints
+        .filter(p => p.isMonthlyGFS)
+        .map(p => p.date)
+        .sort()[0] ?? null;
+
       const fullSizeAtPointTB = this.getExpectedFullSizeTB(job, rp.date);
       const changeRate = (job.dailyChangeRatePct ?? 5) / 100;
       return computeGfsStoredContributionTB({
@@ -297,6 +315,8 @@ export class VeeamSimulator {
         hasMonthly: !!rp.isMonthlyGFS,
         hasYearly: !!rp.isYearlyGFS,
         weeklyPolicyCount: job.gfsPolicy?.weekly ?? 0,
+        isOutermostWeekly: rp.isWeeklyGFS && !rp.isMonthlyGFS && !rp.isYearlyGFS && rp.date === oldestWeeklyDate,
+        isOutermostMonthly: !!rp.isMonthlyGFS && rp.date === oldestMonthlyDate,
       });
     }
     if (rp.type !== 'SyntheticFull') return rp.sizeGB;

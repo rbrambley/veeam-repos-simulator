@@ -1475,6 +1475,38 @@
         "gfsTagsStackOnSameSaturday": true,
         "maxFinalStorageTB": 8.5
       }
+    },
+
+    {
+      "id": "od-calculator-parity-347tb-wmy",
+      "layer": 4,
+      "name": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
+      "description": "Regression guard for block-absorption model (feature/gfs-block-absorption-model). The live Veeam Calculator shows 1,267.8 TB total repo usage for 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 (including ~55 TB working space). Simulator reports used storage separately; target is ≥1,000 TB (confirms outermost point absorption) and ≤1,400 TB (guards against over-counting). This bounds the simulator within ±15% of calculator repository storage (excluding working space).",
+      "rules": ["R-GFS-01", "R-GFS-03", "R-STOR-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 347,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 21,
+        "gfsPolicy": {"weekly": 4, "monthly": 6, "yearly": 2},
+        "offloadAfterDays": 0,
+        "archiveAfterDays": 0,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "gfsCardinalityMatchesCalendar": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "minFinalStorageTB": 780,
+        "maxFinalStorageTB": 1200
+      }
     }
   ]
 }

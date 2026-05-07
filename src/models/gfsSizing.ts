@@ -35,6 +35,10 @@ export interface GfsStoredContributionParams {
   hasMonthly: boolean;
   hasYearly: boolean;
   weeklyPolicyCount: number;
+  /** True when this is the oldest/outermost weekly GFS point (W_n where n = weekly policy count) */
+  isOutermostWeekly?: boolean;
+  /** True when this is the oldest/outermost monthly GFS point (M_n where n = monthly policy count) */
+  isOutermostMonthly?: boolean;
 }
 
 export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsForecastStats {
@@ -86,6 +90,10 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
   const monthlySet = new Set(filteredMonthlyDates);
   const yearlySet = new Set(filteredYearlyDates);
   const distinctDates = Array.from(new Set([...filteredWeeklyDates, ...filteredMonthlyDates, ...filteredYearlyDates]));
+
+  // Outermost = oldest surviving point in its class (last in the date-descending arrays).
+  const outermostWeeklyDate  = filteredWeeklyDates.length  > 0 ? filteredWeeklyDates[filteredWeeklyDates.length - 1]   : null;
+  const outermostMonthlyDate = filteredMonthlyDates.length > 0 ? filteredMonthlyDates[filteredMonthlyDates.length - 1] : null;
   const retentionWindowStart = addDaysUTC(targetDate, -(Math.max(1, params.retentionDays) - 1));
   const hasMonthlyOrYearlyPolicy = (params.gfsPolicy?.monthly ?? 0) > 0 || (params.gfsPolicy?.yearly ?? 0) > 0;
 
@@ -142,6 +150,8 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
       hasMonthly,
       hasYearly,
       params.gfsPolicy?.weekly ?? 0,
+      iso === outermostWeeklyDate,
+      iso === outermostMonthlyDate,
     );
 
     additionalFullTB += storedContributionTB;
@@ -200,6 +210,17 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
   };
 }
 
+// Block-absorption multipliers reverse-engineered from live Veeam Calculator captures.
+// Each GFS point absorbs the unique blocks from its covered period that no other
+// surviving restore point holds. The outermost point of each GFS class carries the
+// heaviest absorbed load because the chain segment it covers has no other reference.
+//
+// Multipliers (applied to fullSize × changeRate to get stored TB contribution):
+//   Weekly inner  (W1 .. W(n-1), inside or near retention):  ×1
+//   Weekly outer  (Wn, outermost):                            ×3
+//   Monthly inner (M1 .. M(n-1)):                            ×5
+//   Monthly outer (Mn, outermost):                           ×12
+//   Yearly:        full backup size at point date             ×1 (no multiplier needed)
 export function computeGfsStoredContributionTB(params: GfsStoredContributionParams): number {
   const {
     pointSizeTB,
@@ -208,30 +229,30 @@ export function computeGfsStoredContributionTB(params: GfsStoredContributionPara
     hasMonthly,
     hasYearly,
     weeklyPolicyCount,
+    isOutermostWeekly = false,
+    isOutermostMonthly = false,
   } = params;
-  // Live calculator captures show weekly/monthly-preserved points typically
-  // contribute negligible additional planned storage, while yearly points carry
-  // the dominant preserved-capacity contribution.
   const normalizedRate = Math.max(0, Number.isFinite(dailyChangeRate) ? dailyChangeRate : 0);
+
   if (hasYearly) {
+    // Yearly points hold the full backup — no factor needed.
     return pointSizeTB;
   }
   if (hasMonthly) {
-    // Monthly contribution scales with daily change and is substantially less
-    // than a full preserved point in calculator captures.
-    const monthlyFactor = Math.min(1, normalizedRate * 5);
-    return pointSizeTB * monthlyFactor;
+    // Outermost monthly absorbs the full open-ended period before it (no older GFS).
+    // Inner monthlies absorb only their own period slice.
+    const factor = isOutermostMonthly ? 12 : 5;
+    return pointSizeTB * Math.min(1, normalizedRate * factor);
   }
   if (hasWeekly) {
     if (weeklyPolicyCount >= 12) {
-      const weeklyFactor = Math.min(1, normalizedRate * 3);
-      return pointSizeTB * weeklyFactor;
+      // High weekly count — use inner factor regardless of position.
+      return pointSizeTB * Math.min(1, normalizedRate * 3);
     }
-    // Weekly-only points (in a W+M or W+M+Y policy) share existing blocks on disk
-    // but still represent an incremental-worth of unique daily change data.
-    // Return the incremental footprint so the catalog and accounting reflect a
-    // non-zero honest size rather than zero.
-    return pointSizeTB * normalizedRate;
+    // Outermost weekly absorbs the chain segment beyond regular retention.
+    // Inner weeklies sit inside (or near) retention and contribute ~1 incremental.
+    const factor = isOutermostWeekly ? 3 : 1;
+    return pointSizeTB * Math.min(1, normalizedRate * factor);
   }
   return pointSizeTB;
 }
@@ -243,6 +264,8 @@ function computeStoredContributionTB(
   hasMonthly: boolean,
   hasYearly: boolean,
   weeklyPolicyCount: number,
+  isOutermostWeekly = false,
+  isOutermostMonthly = false,
 ): number {
   return computeGfsStoredContributionTB({
     pointSizeTB,
@@ -251,6 +274,8 @@ function computeStoredContributionTB(
     hasMonthly,
     hasYearly,
     weeklyPolicyCount,
+    isOutermostWeekly,
+    isOutermostMonthly,
   });
 }
 

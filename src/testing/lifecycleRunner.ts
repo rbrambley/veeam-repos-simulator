@@ -69,6 +69,8 @@ interface ScenarioAssertions extends DailyAssertionConfig {
   // Storage assertions
   /** Total repo storage used at end of run must not exceed this TB value */
   maxFinalStorageTB?: number;
+  /** Total repo storage used at end of run must be at least this TB value */
+  minFinalStorageTB?: number;
   /** (used + working space reserve) / capacityTB must not exceed this fraction (0–1) */
   maxUtilizationFraction?: number;
 }
@@ -824,6 +826,17 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
         date: finalSnapshot.date,
         violatedRule: 'R-STOR-01',
         expected: `total storage ≤ ${assertions.maxFinalStorageTB.toFixed(3)} TB`,
+        actual: `total storage = ${finalStorageTB.toFixed(3)} TB`,
+      });
+    }
+  }
+  if (assertions.minFinalStorageTB !== undefined) {
+    if (finalStorageTB < assertions.minFinalStorageTB - 0.001) {
+      violations.push({
+        day: sc.totalDays,
+        date: finalSnapshot.date,
+        violatedRule: 'R-STOR-01',
+        expected: `total storage ≥ ${assertions.minFinalStorageTB.toFixed(3)} TB (block-absorption model parity)`,
         actual: `total storage = ${finalStorageTB.toFixed(3)} TB`,
       });
     }
