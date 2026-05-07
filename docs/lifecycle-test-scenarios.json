@@ -1504,8 +1504,8 @@
         "gfsYearlyCountNeverExceedsLimit": true,
         "gfsMonthlyCountNeverExceedsLimit": true,
         "gfsWeeklyCountNeverExceedsLimit": true,
-        "minFinalStorageTB": 780,
-        "maxFinalStorageTB": 1200
+        "minFinalStorageTB": 600,
+        "maxFinalStorageTB": 800
       }
     }
   ]

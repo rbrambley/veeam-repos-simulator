@@ -31,14 +31,11 @@ export interface GfsForecastParams {
 export interface GfsStoredContributionParams {
   pointSizeTB: number;
   dailyChangeRate: number;
-  hasWeekly: boolean;
-  hasMonthly: boolean;
-  hasYearly: boolean;
-  weeklyPolicyCount: number;
-  /** True when this is the oldest/outermost weekly GFS point (W_n where n = weekly policy count) */
-  isOutermostWeekly?: boolean;
-  /** True when this is the oldest/outermost monthly GFS point (M_n where n = monthly policy count) */
-  isOutermostMonthly?: boolean;
+  /**
+   * Age of the GFS point in days from the current/target date.
+   * Used by the Veeam Calculator bracket lookup to determine stored contribution.
+   */
+  ageDays: number;
 }
 
 export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsForecastStats {
@@ -91,9 +88,6 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
   const yearlySet = new Set(filteredYearlyDates);
   const distinctDates = Array.from(new Set([...filteredWeeklyDates, ...filteredMonthlyDates, ...filteredYearlyDates]));
 
-  // Outermost = oldest surviving point in its class (last in the date-descending arrays).
-  const outermostWeeklyDate  = filteredWeeklyDates.length  > 0 ? filteredWeeklyDates[filteredWeeklyDates.length - 1]   : null;
-  const outermostMonthlyDate = filteredMonthlyDates.length > 0 ? filteredMonthlyDates[filteredMonthlyDates.length - 1] : null;
   const retentionWindowStart = addDaysUTC(targetDate, -(Math.max(1, params.retentionDays) - 1));
   const hasMonthlyOrYearlyPolicy = (params.gfsPolicy?.monthly ?? 0) > 0 || (params.gfsPolicy?.yearly ?? 0) > 0;
 
@@ -143,20 +137,16 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
       ? forecastFullTB
       : params.sourceDataTB * 0.5;
 
+    const ageDays = Math.round(
+      (targetDate.getTime() - pointDate.getTime()) / 86400000
+    );
     const storedContributionTB = computeStoredContributionTB(
       pointSizeTB,
       dailyChangeRate,
-      hasWeekly,
-      hasMonthly,
-      hasYearly,
-      params.gfsPolicy?.weekly ?? 0,
-      iso === outermostWeeklyDate,
-      iso === outermostMonthlyDate,
+      ageDays,
     );
 
     additionalFullTB += storedContributionTB;
-
-    const ageDays = (targetDate.getTime() - pointDate.getTime()) / 86400000;
 
     if (params.copyEnabled && params.effectiveMoveEnabled) {
       additionalCapFullTB += storedContributionTB;
@@ -210,73 +200,56 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
   };
 }
 
-// Block-absorption multipliers reverse-engineered from live Veeam Calculator captures.
-// Each GFS point absorbs the unique blocks from its covered period that no other
-// surviving restore point holds. The outermost point of each GFS class carries the
-// heaviest absorbed load because the chain segment it covers has no other reference.
+// ─────────────────────────────────────────────────────────────────────────────
+// GFS POINT SIZING — VEEAM CALCULATOR BRACKET TABLE
 //
-// Multipliers (applied to fullSize × changeRate to get stored TB contribution):
-//   Weekly inner  (W1 .. W(n-1), inside or near retention):  ×1
-//   Weekly outer  (Wn, outermost):                            ×3
-//   Monthly inner (M1 .. M(n-1)):                            ×5
-//   Monthly outer (Mn, outermost):                           ×12
-//   Yearly:        full backup size at point date             ×1 (no multiplier needed)
+// DO NOT MODIFY this table without a confirmed change in the Veeam Calculator
+// source code. This table is transcribed directly from the Veeam Calculator's
+// internal Modifier[] mods array (verified May 2026). Any approximation or
+// "improvement" here will cause the simulator to diverge from calculator output.
+//
+// Algorithm (from Veeam Calculator source):
+//   Loop backwards through mods; find first entry where maxDays < ageDays.
+//   stored = pointSizeTB × min(1, dailyChangeRate × modifier)
+//
+// The modifier=1000 bracket (yearly points, age up to ~3yr) causes the
+// changeRate × 1000 term to exceed 1.0, so min(1, ...) collapses it to
+// full backup size — matching the calculator's yearly full-size behaviour.
+// ─────────────────────────────────────────────────────────────────────────────
+const GFS_MODIFIERS: ReadonlyArray<{ maxDays: number; modifier: number }> = [
+  { maxDays: 2,    modifier: 1    },
+  { maxDays: 14,   modifier: 3    },
+  { maxDays: 38,   modifier: 5    },
+  { maxDays: 100,  modifier: 9    },
+  { maxDays: 193,  modifier: 12   },
+  { maxDays: 286,  modifier: 15   },
+  { maxDays: 379,  modifier: 18   },
+  { maxDays: 1095, modifier: 1000 },
+];
+
 export function computeGfsStoredContributionTB(params: GfsStoredContributionParams): number {
-  const {
-    pointSizeTB,
-    dailyChangeRate,
-    hasWeekly,
-    hasMonthly,
-    hasYearly,
-    weeklyPolicyCount,
-    isOutermostWeekly = false,
-    isOutermostMonthly = false,
-  } = params;
+  const { pointSizeTB, dailyChangeRate, ageDays } = params;
   const normalizedRate = Math.max(0, Number.isFinite(dailyChangeRate) ? dailyChangeRate : 0);
 
-  if (hasYearly) {
-    // Yearly points hold the full backup — no factor needed.
-    return pointSizeTB;
-  }
-  if (hasMonthly) {
-    // Outermost monthly absorbs the full open-ended period before it (no older GFS).
-    // Inner monthlies absorb only their own period slice.
-    const factor = isOutermostMonthly ? 12 : 5;
-    return pointSizeTB * Math.min(1, normalizedRate * factor);
-  }
-  if (hasWeekly) {
-    if (weeklyPolicyCount >= 12) {
-      // High weekly count — use inner factor regardless of position.
-      return pointSizeTB * Math.min(1, normalizedRate * 3);
+  // Loop backwards through the modifier table; use the first entry whose
+  // maxDays is strictly less than ageDays (Veeam Calculator algorithm).
+  let modifier = 1;
+  for (let i = GFS_MODIFIERS.length - 1; i >= 0; i--) {
+    if (GFS_MODIFIERS[i].maxDays < ageDays) {
+      modifier = GFS_MODIFIERS[i].modifier;
+      break;
     }
-    // Outermost weekly absorbs the chain segment beyond regular retention.
-    // Inner weeklies sit inside (or near) retention and contribute ~1 incremental.
-    const factor = isOutermostWeekly ? 3 : 1;
-    return pointSizeTB * Math.min(1, normalizedRate * factor);
   }
-  return pointSizeTB;
+
+  return pointSizeTB * Math.min(1, normalizedRate * modifier);
 }
 
 function computeStoredContributionTB(
   pointSizeTB: number,
   dailyChangeRate: number,
-  hasWeekly: boolean,
-  hasMonthly: boolean,
-  hasYearly: boolean,
-  weeklyPolicyCount: number,
-  isOutermostWeekly = false,
-  isOutermostMonthly = false,
+  ageDays: number,
 ): number {
-  return computeGfsStoredContributionTB({
-    pointSizeTB,
-    dailyChangeRate,
-    hasWeekly,
-    hasMonthly,
-    hasYearly,
-    weeklyPolicyCount,
-    isOutermostWeekly,
-    isOutermostMonthly,
-  });
+  return computeGfsStoredContributionTB({ pointSizeTB, dailyChangeRate, ageDays });
 }
 
 function parseISODate(date: string): Date {
