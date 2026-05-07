@@ -1481,7 +1481,7 @@
       "id": "od-calculator-parity-347tb-wmy",
       "layer": 4,
       "name": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
-      "description": "Regression guard for block-absorption model (feature/gfs-block-absorption-model). The live Veeam Calculator shows 1,267.8 TB total repo usage for 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 (including ~55 TB working space). Simulator reports used storage separately; target is ≥1,000 TB (confirms outermost point absorption) and ≤1,400 TB (guards against over-counting). This bounds the simulator within ±15% of calculator repository storage (excluding working space).",
+      "description": "Regression guard for block-absorption model (feature/gfs-block-absorption-model). The live Veeam Calculator shows 1,267.8 TB total repo usage for 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 (including ~55 TB working space). Simulator reports used storage separately (no working space); at 1,171 TB this is within 8% of the calculator's storage-only figure (~1,213 TB). veeamCalculatorReferenceTB enforces the simulator stays within 20% of 1,267.8 TB — this is the PRIMARY guardrail that catches GFS model regressions (e.g. the x0.5 dedup bug that caused 676 TB). forecastVsSimulatorTolerancePct enforces the forecast and simulator don't silently diverge from each other (25% tolerance because the forecast uses conservative peak chain sizing).",
       "rules": ["R-GFS-01", "R-GFS-03", "R-STOR-01"],
       "config": {
         "repositoryType": "DAS",
@@ -1505,7 +1505,10 @@
         "gfsMonthlyCountNeverExceedsLimit": true,
         "gfsWeeklyCountNeverExceedsLimit": true,
         "minFinalStorageTB": 1000,
-        "maxFinalStorageTB": 1400
+        "maxFinalStorageTB": 1400,
+        "veeamCalculatorReferenceTB": 1267.8,
+        "veeamCalculatorTolerancePct": 20,
+        "forecastVsSimulatorTolerancePct": 25
       }
     }
   ]

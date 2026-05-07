@@ -73,6 +73,19 @@ interface ScenarioAssertions extends DailyAssertionConfig {
   minFinalStorageTB?: number;
   /** (used + working space reserve) / capacityTB must not exceed this fraction (0–1) */
   maxUtilizationFraction?: number;
+  /**
+   * Simulator final storage must be within this % of the forecast estimate.
+   * Guards that forecast and simulator use the same sizing model.
+   * E.g. 15 means ±15% tolerance.
+   */
+  forecastVsSimulatorTolerancePct?: number;
+  /**
+   * Known Veeam Calculator output (TB) for this exact scenario configuration.
+   * Simulator final storage must be within veeamCalculatorTolerancePct of this value.
+   */
+  veeamCalculatorReferenceTB?: number;
+  /** Tolerance % for veeamCalculatorReferenceTB comparison. Defaults to 15 if not set. */
+  veeamCalculatorTolerancePct?: number;
 }
 interface ScenarioConfig {
   repositoryType: 'DAS' | 'SOBR';
@@ -854,6 +867,36 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
         violatedRule: 'R-STOR-02',
         expected: `utilization (used + working space) ≤ ${(assertions.maxUtilizationFraction * 100).toFixed(0)}% of ${capacityTB} TB`,
         actual: `utilization = ${(utilFraction * 100).toFixed(1)}% (${combinedTB.toFixed(3)} TB / ${capacityTB} TB)`,
+      });
+    }
+  }
+  if (assertions.forecastVsSimulatorTolerancePct !== undefined) {
+    const forecastTB = expectedLifecycle.expectedMaxStorageTB;
+    const toleranceFrac = assertions.forecastVsSimulatorTolerancePct / 100;
+    const deltaTB = Math.abs(finalStorageTB - forecastTB);
+    const deltaFrac = forecastTB > 0 ? deltaTB / forecastTB : 0;
+    if (deltaFrac > toleranceFrac + 0.0001) {
+      violations.push({
+        day: sc.totalDays,
+        date: finalSnapshot.date,
+        violatedRule: 'R-STOR-03',
+        expected: `simulator within ${assertions.forecastVsSimulatorTolerancePct}% of forecast (${forecastTB.toFixed(3)} TB)`,
+        actual: `simulator = ${finalStorageTB.toFixed(3)} TB (delta ${(deltaFrac * 100).toFixed(1)}%)`,
+      });
+    }
+  }
+  if (assertions.veeamCalculatorReferenceTB !== undefined) {
+    const refTB = assertions.veeamCalculatorReferenceTB;
+    const tolerancePct = assertions.veeamCalculatorTolerancePct ?? 15;
+    const toleranceFrac = tolerancePct / 100;
+    const deltaFrac = Math.abs(finalStorageTB - refTB) / refTB;
+    if (deltaFrac > toleranceFrac + 0.0001) {
+      violations.push({
+        day: sc.totalDays,
+        date: finalSnapshot.date,
+        violatedRule: 'R-STOR-04',
+        expected: `simulator within ${tolerancePct}% of Veeam Calculator reference (${refTB.toFixed(1)} TB)`,
+        actual: `simulator = ${finalStorageTB.toFixed(3)} TB (delta ${(deltaFrac * 100).toFixed(1)}%)`,
       });
     }
   }
