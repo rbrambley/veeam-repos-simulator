@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-07T10:20:39.949Z",
+  "generatedAt": "2026-05-07T11:00:19.420Z",
   "snapshotDays": [
     365,
     730
@@ -324,6 +324,26 @@
         "gfsMonthlyCount": 6,
         "gfsYearlyCount": 2,
         "storageTB": 1231.85
+      }
+    },
+    "od-calculator-parity-347tb-wmy-sobr-move": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 9,
+        "rpCount": 60,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 6,
+        "gfsYearlyCount": 1,
+        "storageTB": 1188.475
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 10,
+        "rpCount": 67,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 6,
+        "gfsYearlyCount": 2,
+        "storageTB": 1552.825
       }
     }
   }

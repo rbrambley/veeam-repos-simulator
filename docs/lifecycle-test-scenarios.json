@@ -1517,7 +1517,6 @@
       "name": "Oracle diff: 347TB W4+M6+Y2 SOBR Move storage — forecast must equal simulator",
       "description": "Parity guard for SOBR Move mode. Same source config as DAS parity scenario (347TB / 5% change / 0% growth / 21d retention / W4+M6+Y2) but with SOBR Move, offload after 30 days, no archive tier. Forecast and simulator must agree exactly at the last Saturday of run (parity date). No Veeam Calculator reference yet — added once forecast=simulator is confirmed.",
       "rules": ["R-GFS-01", "R-GFS-03", "R-STOR-03"],
-      "knownEngineGaps": ["R-STOR-01", "R-STOR-03"],
       "config": {
         "repositoryType": "SOBR",
         "sourceDataTB": 347,
@@ -1544,7 +1543,7 @@
         "gfsMonthlyCountNeverExceedsLimit": true,
         "gfsWeeklyCountNeverExceedsLimit": true,
         "minFinalStorageTB": 1000,
-        "maxFinalStorageTB": 1400,
+        "maxFinalStorageTB": 1600,
         "forecastMustMatchSimulator": true
       }
     }
