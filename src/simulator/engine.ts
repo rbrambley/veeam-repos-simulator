@@ -293,7 +293,10 @@ export class VeeamSimulator {
       const ageDays = Math.round(
         (currentDate.getTime() - pointDate.getTime()) / 86400000
       );
-      const fullSizeAtPointTB = this.getExpectedFullSizeTB(job, rp.date);
+      // Veeam Calculator bracket table uses raw source size (no dedup factor).
+      const pointElapsedDays = (pointDate.getTime() - this.parseISODate(this.state.startDate ?? rp.date).getTime()) / 86400000;
+      const annualGrowth = (job.annualGrowthRatePct ?? 10) / 100;
+      const fullSizeAtPointTB = (job.sourceDataTB || 1) * Math.pow(1 + annualGrowth, Math.max(0, pointElapsedDays) / 365);
       const changeRate = (job.dailyChangeRatePct ?? 5) / 100;
       return computeGfsStoredContributionTB({
         pointSizeTB: fullSizeAtPointTB,

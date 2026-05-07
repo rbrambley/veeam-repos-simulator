@@ -1473,7 +1473,7 @@
         "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
         "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
         "gfsTagsStackOnSameSaturday": true,
-        "maxFinalStorageTB": 8.5
+        "maxFinalStorageTB": 15.0
       }
     },
 
@@ -1504,8 +1504,8 @@
         "gfsYearlyCountNeverExceedsLimit": true,
         "gfsMonthlyCountNeverExceedsLimit": true,
         "gfsWeeklyCountNeverExceedsLimit": true,
-        "minFinalStorageTB": 600,
-        "maxFinalStorageTB": 800
+        "minFinalStorageTB": 1000,
+        "maxFinalStorageTB": 1400
       }
     }
   ]

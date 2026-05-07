@@ -98,8 +98,8 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
     const pointDate = parseISODate(iso);
     const daysSinceStart = (pointDate.getTime() - baseDate.getTime()) / 86400000;
     const yearsElapsed = Math.max(0, daysSinceStart / 365);
-    const sourceAtPoint = params.sourceDataTB * Math.pow(annualGrowthFactor, yearsElapsed);
-    return sourceAtPoint * 0.5;
+    // Veeam Calculator bracket table uses raw source size (no dedup factor).
+    return params.sourceDataTB * Math.pow(annualGrowthFactor, yearsElapsed);
   };
 
   let inChainPoints = 0;
