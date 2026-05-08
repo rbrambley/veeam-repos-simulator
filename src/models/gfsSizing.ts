@@ -181,13 +181,22 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
       if (!allowThrough) continue;
     }
 
-    // In oracle mode, also skip out-of-chain weekly-only points (keeps forecast=simulator).
-    // In calculator mode this condition is never true — out-of-chain weekly always contribute.
+    // Oracle mode: always skip out-of-chain weekly-only points (forecast=simulator).
+    // Calculator mode: also skip for full W+M+Y policies — the Veeam Calculator
+    // subsumes out-of-chain weekly-only footprint into monthly/yearly preservation
+    // and does not count it separately. Exception: SOBR move+archive scenarios that
+    // explicitly enable allowWeeklyInChainContribution.
+    const hasFullMixedGfsPolicy = (params.gfsPolicy?.weekly ?? 0) > 0
+      && (params.gfsPolicy?.monthly ?? 0) > 0
+      && (params.gfsPolicy?.yearly ?? 0) > 0;
     const skipWeeklyOutOfChain = hasMonthlyOrYearlyPolicy
       && hasWeekly
       && !hasMonthly
       && !hasYearly
-      && !(params.applyCalculatorCalibration ?? true);
+      && (
+        !(params.applyCalculatorCalibration ?? true)
+        || (hasFullMixedGfsPolicy && !(params.allowWeeklyInChainContribution ?? false))
+      );
     if (skipWeeklyOutOfChain) {
       continue;
     }
@@ -305,8 +314,9 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
       // Monthly+yearly mixed (no weekly): small=1.46 (only data point)
       dasPolicyFactor = Math.max(1.0, 1.46 - 0.18 * logSource);
     } else if (weeklyCount > 0 && monthlyCount > 0 && yearlyCount > 0) {
-      // Full mixed (weekly+monthly+yearly): small=1.31, large=1.015 → log-linear fit
-      dasPolicyFactor = Math.max(1.0, 1.31 - 0.262 * logSource);
+      // Full mixed (weekly+monthly+yearly): out-of-chain weekly-only points are
+      // suppressed (see skipWeeklyOutOfChain above), so no calibration factor needed.
+      dasPolicyFactor = 1;
     }
   }
 
