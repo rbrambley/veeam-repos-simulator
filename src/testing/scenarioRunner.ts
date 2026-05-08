@@ -403,7 +403,22 @@ async function runScenario(scenario: TestScenario): Promise<boolean> {
     }
 
     if (scenario.finalState.expectedGfsEffectiveTB !== undefined) {
-      const tolerance = scenario.finalState.gfsEffectiveToleranceTB ?? 0.05;
+      const tolerance = scenario.finalState.gfsEffectiveToleranceTB ?? 0;
+
+      // ── ZERO-TOLERANCE POLICY ──────────────────────────────────────────────
+      // GFS effective TB assertions must match exactly. A non-zero tolerance
+      // hides real math errors. If a future scenario genuinely cannot produce
+      // an exact value, explain why and get explicit approval before setting
+      // gfsEffectiveToleranceTB above 0 in the scenario JSON.
+      if (tolerance > 0) {
+        throw new Error(
+          `[POLICY VIOLATION] Scenario "${scenario.id}" sets gfsEffectiveToleranceTB=${tolerance} TB.\n` +
+          `  Tolerance-based acceptance is not allowed. Tests must match exact values.\n` +
+          `  To use a tolerance, explain why and get explicit approval first.\n` +
+          `  See docs/automated-test-runner.md for the policy details.`
+        );
+      }
+
       if (Math.abs(gfsEffectiveTB - scenario.finalState.expectedGfsEffectiveTB) > tolerance) {
         throw new Error(
           `Effective GFS total mismatch: expected ${scenario.finalState.expectedGfsEffectiveTB.toFixed(3)} TB ± ${tolerance.toFixed(3)}, got ${gfsEffectiveTB.toFixed(3)} TB`

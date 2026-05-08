@@ -12,13 +12,13 @@ function getCompareCommand(): { command: string; args: string[] } {
   if (process.platform === 'win32') {
     return {
       command: 'cmd.exe',
-      args: ['/d', '/s', '/c', 'npm run compare:veeam'],
+      args: ['/d', '/s', '/c', 'npm run compare:veeam:raw'],
     };
   }
 
   return {
     command: 'npm',
-    args: ['run', 'compare:veeam'],
+    args: ['run', 'compare:veeam:raw'],
   };
 }
 

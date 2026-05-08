@@ -4,7 +4,7 @@
     "forecastYears": 3,
     "workingSpacePct": 20,
     "veeamWorkingSpacePct": 80,
-    "tolerancePct": 5
+    "tolerancePct": 0
   },
   "scenarios": [
     {
@@ -601,7 +601,7 @@
     },
     {
       "id": "ix-gfs-only-policy",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-06 — UNRELIABLE: weekly=52 exceeds rz-numeric-input max; Radzen silently clamped it so the 5.1 TB reflects a lower effective weekly count. Simulator value (~26 TB) is correct for 52 weekly GFS fulls.",
       "expected": {
         "plannedCapacityTB": 5.1
       }

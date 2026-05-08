@@ -106,7 +106,11 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
   const yearFullSizeTB = yearSourceTB * 0.5;
   const yearIncrSizeTB = yearSourceTB * (config.dailyChangeRatePct / 100) * 0.5;
   const effectiveYearIncrSizeTB = yearIncrSizeTB * (config.dailyChangeRatePct > 20 ? 1.2 : 1);
-  const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(config.sourceDataTB);
+  // Veeam Calculator WS input is the raw source data TB only — no daily change
+  // rate multiplier, no growth factor applied here. Confirmed from calculator
+  // source: bucket brackets operate on sourceDataTB, then × 0.5 compression.
+  const wsInputTB = config.sourceDataTB;
+  const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(wsInputTB);
   const yearGfsStats = computeForecastGfsStatsAtYear({
     sourceDataTB: config.sourceDataTB,
     annualGrowthRatePct: config.annualGrowthRatePct,
@@ -418,7 +422,24 @@ async function run(): Promise<void> {
   const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf-8')) as BaselineFile;
 
   const scenarioById = new Map(scenariosData.map(s => [s.id, s]));
-  const tolerancePct = Math.max(0, baseline.defaults?.tolerancePct ?? 5);
+  const tolerancePct = Math.max(0, baseline.defaults?.tolerancePct ?? 0);
+
+  // ── ZERO-TOLERANCE POLICY ──────────────────────────────────────────────────
+  // Tests must pass with exact values (within floating-point rounding only).
+  // Accepting results "within X%" hides real math errors and is not allowed.
+  // To use a non-zero tolerance in the future, you must:
+  //   1. Explain in plain language WHY the math cannot produce an exact match.
+  //   2. Get explicit approval before changing this value.
+  //   3. Document the reason in the baseline JSON alongside the tolerancePct field.
+  if (tolerancePct > 0) {
+    console.error('\n❌ BLOCKED: Non-zero tolerancePct detected in baseline file.');
+    console.error(`   tolerancePct is set to ${tolerancePct}% in docs/${baselineFileName}`);
+    console.error('   Tolerance-based acceptance is not allowed — tests must match exact values.');
+    console.error('   To use a tolerance, you must explain why and get explicit approval first.');
+    console.error('   See docs/automated-test-runner.md for the policy details.\n');
+    process.exit(1);
+  }
+
   const defaultForecastYears = Math.max(1, Math.floor(baseline.defaults?.forecastYears ?? 3));
   const startDate = baseline.defaults?.startDate || '2026-05-02';
 
@@ -493,7 +514,7 @@ async function run(): Promise<void> {
   const actual = computeSimulatorPlanned(scenario.config, startDate, forecastYears, gfsSizingMode, scenario.totalDays);
     const isSobr = scenario.config.repositoryType === 'SOBR';
 
-    // Both simulator and Veeam now use the same progressive tiered WS formula on initial sourceDataTB,
+    // Both simulator and Veeam use the same progressive bracket WS formula,
     // so no delta adjustment is needed — compare raw actual vs raw expected directly.
     // For SOBR: skip plannedCapacityTB — the calculator 'REPOSITORY' header = performance tier only,
     // not the sum of all tiers. Individual tier fields (perf/cap/archive) are compared instead.

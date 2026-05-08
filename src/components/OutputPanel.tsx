@@ -232,18 +232,20 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
       const forecastYears = Math.max(0, repoJob.forecastYears ?? 0);
       const annualGrowth = (repoJob.annualGrowthRatePct ?? 10) / 100;
+      const dailyChange = (repoJob.dailyChangeRatePct ?? 5) / 100;
       const effectiveSourceTB = (repoJob.sourceDataTB || 1) * Math.pow(1 + annualGrowth, forecastYears);
       const largestFullTB = effectiveSourceTB * 0.5;
-      // Working space: Veeam progressive tiered scale on initial source TB (no growth factor)
-      const initialSourceTB = repoJob.sourceDataTB || 1;
-      const reserveTB = computeVeeamWorkingSpaceTB(initialSourceTB);
+      // Working space: Veeam bracket scale on raw source data only — no growth, no daily change.
+      // Confirmed from Veeam Calculator source: brackets operate on sourceDataTB × 0.5 compression.
+      const wsInputTB = repoJob.sourceDataTB || 1;
+      const reserveTB = computeVeeamWorkingSpaceTB(wsInputTB);
 
       if (repo.type === 'SOBR' && repo.sobrConfig) {
         return [repo.id, {
           totalTB: reserveTB,
           additionalTB: reserveTB,
           largestFullTB,
-          initialSourceTB,
+          initialSourceTB: wsInputTB,
           byTier: { Performance: reserveTB, Capacity: 0, Archive: 0 },
           byTierAdditional: { Performance: reserveTB, Capacity: 0, Archive: 0 },
         }];
@@ -253,7 +255,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         totalTB: reserveTB,
         additionalTB: reserveTB,
         largestFullTB,
-        initialSourceTB,
+        initialSourceTB: wsInputTB,
         byTier: { Performance: 0, Capacity: 0, Archive: 0 },
         byTierAdditional: { Performance: 0, Capacity: 0, Archive: 0 },
       }];
@@ -362,7 +364,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     if (moveEnabled && !riskyWindow && overdueInactiveCount === 0 && oldestInactiveDays < offloadDays) {
       infoNotes.push(`Oldest inactive chain is ${oldestInactiveDays}d old; offload starts at ${offloadDays}d.`);
     }
-    if (moveEnabled && (job.type === 'ForwardIncremental' || job.type === 'SyntheticFull') && retentionDays <= offloadDays) {
+    if (moveEnabled && !riskyWindow && (job.type === 'ForwardIncremental' || job.type === 'SyntheticFull') && retentionDays <= offloadDays) {
       recommendations.push(`Chains are not offloading to Capacity — retention (${retentionDays}d) must be greater than the offload threshold (${offloadDays}d).`);
     }
     if (job.gfsPolicy && hasArchiveTier === false) {
@@ -380,10 +382,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       (job.gfsPolicy.monthly ?? 0) > 0 ||
       (job.gfsPolicy.yearly ?? 0) > 0
     );
-    const hasMixedMonthlyYearly = !!job.gfsPolicy && (
-      (job.gfsPolicy.monthly ?? 0) > 0 && (job.gfsPolicy.yearly ?? 0) > 0
-    );
-
     // Detect orphan starter chain: GFS is active but job starts on a non-Saturday.
     // The first chain will accumulate points until the next Saturday, then expire
     // through normal retention with no GFS tag — it will never reach Archive.
@@ -400,9 +398,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
     if (hasArchiveTier && hasAnyGfs) {
       recommendations.push(
-        hasMixedMonthlyYearly
-          ? 'Forecast confidence note: SOBR + Archive + mixed GFS (W/M/Y) can overestimate total capacity versus the Veeam Calculator. Treat this as directional until block-generation-period modeling is implemented.'
-          : 'Forecast confidence note: SOBR + Archive + GFS can overestimate total capacity versus the Veeam Calculator. Treat this as directional until block-generation-period modeling is implemented.'
+        'Forecast confidence note: SOBR + Archive + GFS sizing is directional — no confirmed Veeam Calculator parity reference exists yet for archive-tier scenarios.'
       );
     }
 
@@ -418,7 +414,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     const title = invalidArchiveOrdering
       ? `Archive waits until the ${offloadDays}d offload window is met, then ${archiveDays}d more before Archive.`
       : riskyWindow
-      ? `Offload risk: retention (${retentionDays}d) is too short for the ${offloadDays}d offload threshold.`
+      ? (retentionDays === offloadDays
+          ? `Offload risk: retention (${retentionDays}d) equals the offload threshold — chains expire before they can be offloaded.`
+          : `Offload risk: retention (${retentionDays}d) is shorter than the ${offloadDays}d offload threshold.`)
       : moveEnabled && overdueInactiveCount > 0
         ? `Action needed: ${overdueInactiveCount} inactive chain(s) are past threshold and still in Performance.`
         : moveEnabled && offloadedInactiveCount > 0
@@ -523,7 +521,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             const neededWorkingSpaceTB = workingSpaceByRepo[repo.id]?.totalTB ?? 0;
             const largestFullTB = workingSpaceByRepo[repo.id]?.largestFullTB ?? 0;
             const additionalWorkingSpaceTB = workingSpaceByRepo[repo.id]?.additionalTB ?? 0;
-            const initialSourceTB = workingSpaceByRepo[repo.id]?.initialSourceTB ?? 0;
+            const wsInputTB = workingSpaceByRepo[repo.id]?.initialSourceTB ?? 0;
             const pct = repo.capacityTB > 0 ? (used / repo.capacityTB) * 100 : 0;
             const isSobr = repo.type === 'SOBR' && repo.sobrConfig;
             const tierUsage = isSobr ? sim.getSOBRTierUsage(repo.id) : null;
@@ -540,7 +538,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   <td>{repo.name}</td>
                   <td>{repo.type}</td>
                   <td>{formatTB(used)}</td>
-                  <td title={`${formatTB(additionalWorkingSpaceTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)`}>{formatTB(neededWorkingSpaceTB)}</td>
+                  <td title={`${formatTB(additionalWorkingSpaceTB)} (progressive bracket scale input: ${formatTB(wsInputTB)})`}>{formatTB(neededWorkingSpaceTB)}</td>
                   {hasGenerationUi && <td>{renderGenTotals(repoLockedGenerations, repoWaitingGenerations, repoDeletableGenerations)}</td>}
                   {hasGenerationUi && <td>{repoNextDeleteOn || '-'}</td>}
                   <td>{formatTB(repo.capacityTB)}</td>
@@ -564,7 +562,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       <td style={{ paddingLeft: '1.5rem', color: tierColors[tier], fontWeight: 'bold' }}>↳ {tier}</td>
                       <td style={{ color: '#999' }}>SOBR Tier</td>
                       <td>{formatTB(tierUsed)}</td>
-                      <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)` : 'No working-space requirement on this tier'}>{formatTB(tierWorkingSpaceNeededTB)}</td>
+                      <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} (progressive bracket scale input: ${formatTB(wsInputTB)})` : 'No working-space requirement on this tier'}>{formatTB(tierWorkingSpaceNeededTB)}</td>
                       {hasGenerationUi && <td>{renderGenTotals(
                         repoGenerations.filter(g => {
                           const inTier = tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData;
@@ -671,7 +669,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: '0.35rem', fontWeight: 600 }}>
                 {immutabilitySummary}
               </div>
-              {hasSobrRepo && (
+              {hasSobrRepo && genSummary.total > 0 && (
                 <div style={{ marginBottom: '0.35rem' }}>
                   <StateLegend />
                 </div>
@@ -681,11 +679,13 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   <div style={{ fontSize: '0.82rem', color: '#607d8b', marginBottom: '0.25rem', fontWeight: 600 }}>
                     Retention: {policyInsight.retentionDays}d | Offload: {policyInsight.offloadDays}d | Oldest inactive chain: {policyInsight.oldestInactiveDays}d
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: policyInsight.recommendations.length > 0 ? '0.45rem' : 0 }}>
-                    GENs: {genSummary.total} total, {genSummary.locked} locked, {genSummary.deletable} deletable
-                    {genSummary.nextDeleteOn ? ` | Next DeleteOn: ${genSummary.nextDeleteOn}` : ''}
-                    {genSummary.nextImmutabilityExpiry ? ` | Next immutability expiry: ${genSummary.nextImmutabilityExpiry}` : ''}
-                  </div>
+                  {genSummary.total > 0 && (
+                    <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: policyInsight.recommendations.length > 0 ? '0.45rem' : 0 }}>
+                      GENs: {genSummary.total} total, {genSummary.locked} locked, {genSummary.deletable} deletable
+                      {genSummary.nextDeleteOn ? ` | Next DeleteOn: ${genSummary.nextDeleteOn}` : ''}
+                      {genSummary.nextImmutabilityExpiry ? ` | Next immutability expiry: ${genSummary.nextImmutabilityExpiry}` : ''}
+                    </div>
+                  )}
                 </>
               )}
               {policyInsight.recommendations.length > 0 && (

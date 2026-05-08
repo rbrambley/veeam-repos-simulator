@@ -20,7 +20,7 @@ These rules are global and must remain stable across DAS/SOBR and policy combina
 2. Base identity is the oldest Full/SyntheticFull across all chains for the job
 3. Retention SLA is a minimum guarantee (count expiry never overrides SLA)
 4. Base SyntheticFull is full-sized; non-base SyntheticFull is incremental-sized
-5. Working space is included only in planned capacity values, and is calculated as a percentage of the largest full backup size for that year
+5. Working space is included only in planned capacity values, and is calculated using the progressive bucket scale (0-10 TB x1.05, 10-20 TB x0.66, 20-100 TB x0.40, 100-500 TB x0.25, >500 TB x0.10, then x compression)
 6. In SOBR Copy mode, all restore points receive a Capacity copy at creation time (synchronous at day resolution)
 7. In SOBR Move mode, only sealed (Inactive) chains are eligible for offload; entire chain offloads as a unit
 8. In SOBR Copy mode, archive requires `pointAgeDays >= offloadAfterDays + archiveAfterDays` (total age from backup date)

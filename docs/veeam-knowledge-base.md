@@ -12,7 +12,8 @@ Use this classification when implementing or reviewing changes.
 	- Base identity is the oldest Full/SyntheticFull across all chains in the job storage set.
 	- Retention SLA is a minimum guarantee (count expiry cannot override SLA).
 	- Base SyntheticFull is full-sized; non-base SyntheticFull is incremental-sized.
-	- Planned capacity includes working space sized as a percentage of the largest full backup for the forecast year; projected used values exclude working space.
+	- Planned capacity includes working space computed with the progressive bucket scale (0-10 TB x1.05, 10-20 TB x0.66, 20-100 TB x0.40, 100-500 TB x0.25, >500 TB x0.10, then x compression); projected used values exclude working space.
+	- **WS INPUT IS RAW `sourceDataTB` ONLY** — confirmed directly from Veeam Calculator source code. Do NOT multiply by `(1 + dailyChangeRate/100)`, do NOT apply growth factor, do NOT use year-end source size. The bracket scale always operates on the unmodified `sourceDataTB` value. Violating this breaks all planned capacity calculations.
 
 ### 0.2 Feature-Specific Behaviors
 - Apply only when the corresponding feature is enabled/selected.

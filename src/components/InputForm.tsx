@@ -140,8 +140,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     const yearSourceTB = sourceDataTB * Math.pow(1 + annualGrowthRate / 100, year);
     const yearFullSizeTB = yearSourceTB * 0.5;
     const yearIncrSizeTB = yearSourceTB * (dailyChangeRate / 100) * 0.5;
-    // Working space uses initial sourceDataTB (no growth) — matches Veeam Calculator behaviour
-    const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(sourceDataTB);
+    // Working space uses the Veeam progressive bracket scale on raw source data only.
+    // No daily change rate or growth factor — confirmed from Veeam Calculator source.
+    const wsInputTB = sourceDataTB;
+    const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(wsInputTB);
     const yearGfsStats = computeGfsStatsAtYear(year);
 
     const estimateTierChainDataForYearTB = (windowDays: number) => {
@@ -529,7 +531,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             📐 Calculated Capacity Requirements
             <span
               style={tooltipBadgeStyle}
-              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${clampedForecast > 5 ? `Years 1-4 plus year ${clampedForecast} are shown.` : `Years 1-${visibleYears} are shown.`} ★ marks the applied forecast year.`}
+              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam progressive bracket scale on WS input = grown source x (1 + daily change) (<10 x1.05, 10-20 x0.66, 20-100 x0.40, 100-500 x0.25, >500 x0.10, then x50% compression). ${clampedForecast > 5 ? `Years 1-4 plus year ${clampedForecast} are shown.` : `Years 1-${visibleYears} are shown.`} ★ marks the applied forecast year.`}
               aria-label="Capacity assumptions"
             >
               ?
@@ -572,7 +574,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     Working Space (tiered){' '}
                     <span
                       style={tooltipBadgeStyle}
-                      title="Working Space uses the Veeam progressive tiered scale on initial source TB (<10 x1.05, 10-20 x0.66, 20-100 x0.40, 100-500 x0.25, >500 x0.10, then x50% compression). Planned Capacity includes working space. SOBR tier rows are planning recommendations, not live utilization."
+                      title="Working Space uses the Veeam progressive bracket scale on WS input = grown source x (1 + daily change) (<10 x1.05, 10-20 x0.66, 20-100 x0.40, 100-500 x0.25, >500 x0.10, then x50% compression). Planned Capacity includes working space. SOBR tier rows are planning recommendations, not live utilization."
                       aria-label="Working-space details"
                     >
                       ?

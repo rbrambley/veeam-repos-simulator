@@ -414,6 +414,7 @@ function buildExpectedLifecycle(sc: LifecycleScenario): ExpectedLifecycle {
     archiveAfterDays: cfg.archiveAfterDays,
     hasArchiveTier: cfg.hasArchiveTier,
     sizingMode: 'reverse',
+    applyCalculatorCalibration: false, // lifecycle oracle: forecast must match simulator, not external calculator
   });
   const gfsTotalTB = cfg.repositoryType === 'SOBR'
     ? (gfsForecastStats.additionalPerfFullTB + gfsForecastStats.additionalCapFullTB + gfsForecastStats.additionalArchFullTB)

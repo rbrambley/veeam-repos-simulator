@@ -46,6 +46,92 @@ The lifecycle runner also uses the fixed simulation start date `2026-05-02` for 
 
 ## How To Run
 
+## Internal Troubleshooting Rule (Mandatory)
+
+## Zero-Tolerance Policy (Enforced)
+
+Tests in this project must pass with exact values. Accepting results "within X%" or "within Y TB" hides real math errors and is **not allowed**.
+
+### What this means
+
+- `tolerancePct` in `docs/veeam-calculator-baseline.json` and `docs/veeam-model-baseline.json` must stay at `0`.
+- `gfsEffectiveToleranceTB` in `docs/test-scenarios.json` must not be set above `0`.
+- If either value is increased, the test runner **blocks the run and exits with an error**.
+
+### If you think you need a tolerance in the future
+
+Before changing any tolerance value, you must:
+
+1. **Explain in plain language** why the math cannot produce an exact match.
+2. **Get explicit approval** before making the change.
+3. **Document the reason** in the relevant baseline JSON file alongside the value.
+
+This rule exists because we have been burned before by tolerances hiding real regressions that should have been caught immediately.
+
+---
+
+## Internal Troubleshooting Rule (Mandatory)
+
+When investigating any sizing or retention anomaly (including 52-week scenarios), use this order:
+
+1. **Internal lifecycle validation first**
+2. **Internal model-baseline comparison second**
+3. **External Veeam calculator comparison last**
+
+Do **not** start by reverse-engineering Veeam Calculator behavior if internal checks already explain the result.
+
+### Step 1: Lifecycle truth check (engine behavior)
+
+Run the lifecycle suite:
+
+```bash
+npm run test:lifecycle
+```
+
+For a single scenario, run:
+
+```bash
+npm run test:lifecycle -- --id ix-gfs-only-policy
+```
+
+This validates chain lifecycle invariants and scenario assertions from `docs/lifecycle-test-scenarios.json`.
+
+### Step 2: Forecast truth check (internal model drift)
+
+Run model baseline comparison:
+
+```bash
+npm run compare:model
+```
+
+This compares current simulator forecast output to the repository's internal model baseline (`docs/veeam-model-baseline.json`) without relying on the external calculator.
+
+### Step 3: External parity check (only when needed)
+
+Only after Steps 1 and 2, run:
+
+```bash
+npm run compare:veeam
+```
+
+Use this for directional parity evidence or baseline-capture maintenance, not as the first debugging tool.
+
+### Escalation rule
+
+Escalate to calculator investigation only if one of these is true:
+
+- lifecycle assertions fail,
+- internal model comparison fails unexpectedly,
+- or a planned baseline update specifically requires external parity refresh.
+
+If Steps 1 and 2 pass, treat the issue as **internally resolved** unless external parity is explicitly in scope.
+
+Script enforcement is active:
+
+- `npm run compare:veeam` now runs a guard that executes Step 1 and Step 2 first.
+- If either prerequisite fails, Veeam comparison is blocked.
+- Raw comparator remains available as `npm run compare:veeam:raw` for controlled internal tooling.
+
 From the project root:
 
 ```bash
@@ -304,7 +390,7 @@ Run after any change to:
 - `src/components/InputForm.tsx`
 - `src/components/OutputPanel.tsx`
 - Retention, GFS, tiering, base-promotion, or sizing logic
-- Working space sizing logic (largest-full based planned-capacity calculations)
+- Working space sizing logic (progressive bucket/bracket scale planned-capacity calculations)
 
 ## How To Add/Change Scenarios
 

@@ -156,7 +156,6 @@
         "expectedRPCount": 14,
         "expectedMonthlyGFSCount": 6,
         "expectedGfsEffectiveTB": 1.95,
-        "gfsEffectiveToleranceTB": 0.03,
         "usagePctCapacityTB": 5.2,
         "expectedUsagePctAtMost": 100,
         "requireDasUsageDisplayConsistency": true

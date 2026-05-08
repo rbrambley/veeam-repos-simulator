@@ -4,7 +4,7 @@
     "forecastYears": 3,
     "workingSpacePct": 20,
     "veeamWorkingSpacePct": 80,
-    "tolerancePct": 5
+    "tolerancePct": 0
   },
   "scenarios": [
     {

@@ -54,7 +54,7 @@ export interface BackupJob {
   dailyChangeRatePct: number; // % of source data changed daily (e.g. 5)
   annualGrowthRatePct: number; // % annual data growth (e.g. 10)
   forecastYears: number; // how many years to simulate/forecast
-  workingSpacePct?: number; // % of largest full reserved as operational rewrite space
+  workingSpacePct?: number; // legacy/optional UI field; Veeam WS uses computeVeeamWorkingSpaceTB bracket formula
   schedule: BackupSchedule;
   retention: RetentionPolicy;
   gfsPolicy?: GFSPolicy;
