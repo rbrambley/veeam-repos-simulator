@@ -1,4 +1,4 @@
-import { computeForecastGfsStatsAtYear } from '../models/gfsSizing.js';
+import { computeForecastGfsStatsAtYear } from '../../models/gfsSizing.js';
 
 interface LiveCase {
   id: string;

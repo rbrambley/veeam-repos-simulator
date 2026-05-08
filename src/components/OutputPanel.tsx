@@ -3,7 +3,7 @@ import { VeeamSimulator } from '../simulator/engine';
 import { ChainTimeline } from './ChainTimeline';
 import { StateLegend } from './StateLegend';
 import { computeVeeamWorkingSpaceTB } from '../models/veeam';
-import { computeForecastGfsStatsAtYear } from '../models/gfsSizing';
+import { computeSizingForecast, SizingScenarioConfig } from '../models/sizingForecast';
 
 interface OutputPanelProps {
   sim: VeeamSimulator;
@@ -287,102 +287,52 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         }];
       }
 
+      // Delegate all sizing logic to the shared model so UI and tests use identical formulas.
       const forecastYears = Math.max(0, Math.floor(job.forecastYears ?? 0));
-      const annualGrowthRate = (job.annualGrowthRatePct ?? 10) / 100;
-      const dailyChangeRate = (job.dailyChangeRatePct ?? 5) / 100;
-      const yearSourceTB = (job.sourceDataTB || 1) * Math.pow(1 + annualGrowthRate, forecastYears);
-      const yearFullTB = yearSourceTB * 0.5;
-      const yearIncrTB = yearSourceTB * dailyChangeRate * 0.5;
-      const fullIntervalDays = (job.type === 'SyntheticFull' || job.type === 'ForwardIncremental')
-        ? 7
-        : Math.max(1, job.retention?.restorePoints ?? 1);
-      const retentionDays = Math.max(0, job.retention?.restorePoints ?? 0);
       const wsInputTB = job.sourceDataTB || 1;
       const workingSpaceTB = computeVeeamWorkingSpaceTB(wsInputTB);
+      const startDate = sim.state.startDate || currentDate;
 
-      const gfsStats = computeForecastGfsStatsAtYear({
-        sourceDataTB: job.sourceDataTB,
-        annualGrowthRatePct: job.annualGrowthRatePct,
-        dailyChangeRatePct: job.dailyChangeRatePct,
-        retentionDays,
+      const scenarioConfig: SizingScenarioConfig = {
+        repositoryType: repo.type === 'SOBR' ? 'SOBR' : 'DAS',
+        jobType: job.type,
+        sourceDataTB: job.sourceDataTB || 1,
+        annualGrowthRatePct: job.annualGrowthRatePct ?? 10,
+        dailyChangeRatePct: job.dailyChangeRatePct ?? 5,
+        retention: Math.max(0, job.retention?.restorePoints ?? 0),
         gfsPolicy: {
           weekly: job.gfsPolicy?.weekly ?? 0,
           monthly: job.gfsPolicy?.monthly ?? 0,
           yearly: job.gfsPolicy?.yearly ?? 0,
         },
-        startDate: sim.state.startDate || currentDate,
-        yearOffset: forecastYears,
+        offloadAfterDays: repo.sobrConfig?.offloadAfterDays ?? 0,
+        archiveAfterDays: repo.sobrConfig?.archiveAfterDays ?? 0,
+        generationPeriodDays: repo.sobrConfig?.generationPeriodDays,
+        performanceImmutabilityDays: repo.sobrConfig?.performanceImmutabilityDays,
+        capacityImmutabilityDays: repo.sobrConfig?.capacityImmutabilityDays,
+        archiveImmutabilityDays: repo.sobrConfig?.archiveImmutabilityDays,
+        hasArchiveTier: repo.sobrConfig?.hasArchiveTier ?? false,
         copyEnabled: repo.sobrConfig?.copyEnabled ?? false,
-        effectiveMoveEnabled: repo.sobrConfig ? (repo.sobrConfig.moveEnabled ?? true) : false,
-        offloadAfterDays: repo.sobrConfig?.offloadAfterDays,
-        archiveAfterDays: repo.sobrConfig?.archiveAfterDays,
-        hasArchiveTier: repo.sobrConfig?.hasArchiveTier,
-        sizingMode: 'reverse',
-      });
-
-      const hasNoGfs = (job.gfsPolicy?.weekly ?? 0) === 0
-        && (job.gfsPolicy?.monthly ?? 0) === 0
-        && (job.gfsPolicy?.yearly ?? 0) === 0;
-
-      const estimateTierChainDataTB = (windowDays: number) => {
-        if (windowDays <= 0) return 0;
-        const chainsInWindow = Math.max(1, Math.ceil(windowDays / Math.max(1, fullIntervalDays)));
-        const effectiveDays = chainsInWindow * fullIntervalDays - 1 + (hasNoGfs ? fullIntervalDays : 0);
-        return yearFullTB + effectiveDays * yearIncrTB;
+        moveEnabled: repo.sobrConfig?.moveEnabled ?? true,
       };
 
+      const result = computeSizingForecast(scenarioConfig, startDate, forecastYears, 'reverse');
+
       if (repo.type !== 'SOBR' || !repo.sobrConfig) {
-        const requiredStoredTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalFullTB;
         return [repo.id, {
-          requiredTotalTB: requiredStoredTB + workingSpaceTB,
-          requiredPerfTB: requiredStoredTB + workingSpaceTB,
+          requiredTotalTB: result.plannedCapacityTB,
+          requiredPerfTB: result.plannedCapacityTB,
           requiredCapTB: 0,
           requiredArchTB: 0,
           workingSpaceTB,
         }];
       }
 
-      const copyEnabled = !!repo.sobrConfig.copyEnabled;
-      const moveEnabled = repo.sobrConfig.moveEnabled ?? true;
-      const hasArchiveTier = !!repo.sobrConfig.hasArchiveTier;
-      let requiredPerfUsedTB = 0;
-      let requiredCapUsedTB = 0;
-      let requiredArchUsedTB = 0;
-
-      if (copyEnabled && moveEnabled) {
-        requiredPerfUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalPerfFullTB;
-        requiredCapUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalCapFullTB;
-      } else if (copyEnabled) {
-        requiredPerfUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalPerfFullTB;
-        requiredCapUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalCapFullTB;
-      } else {
-        const elapsedDays = forecastYears * 365;
-        const offloadAfterDays = Math.max(0, repo.sobrConfig.offloadAfterDays ?? 0);
-        const generationPeriodDays = Math.max(1, repo.sobrConfig.generationPeriodDays ?? 10);
-        const perfImmutabilityDays = Math.max(0, repo.sobrConfig.performanceImmutabilityDays ?? 0);
-        const moveGateDays = offloadAfterDays + perfImmutabilityDays;
-        const alignedMoveGateDays = Math.ceil(moveGateDays / generationPeriodDays) * generationPeriodDays;
-        const performanceWindowDays = Math.max(fullIntervalDays, alignedMoveGateDays + fullIntervalDays);
-        const capacityAccumulationDays = Math.max(0, elapsedDays - alignedMoveGateDays + 1);
-
-        requiredPerfUsedTB = estimateTierChainDataTB(performanceWindowDays) + gfsStats.additionalPerfFullTB;
-        requiredCapUsedTB = estimateTierChainDataTB(capacityAccumulationDays) + gfsStats.additionalCapFullTB;
-      }
-
-      if (hasArchiveTier) {
-        requiredArchUsedTB = gfsStats.additionalArchFullTB;
-      }
-
-      const requiredPerfTB = requiredPerfUsedTB + workingSpaceTB;
-      const requiredCapTB = requiredCapUsedTB;
-      const requiredArchTB = requiredArchUsedTB;
-      const requiredTotalTB = requiredPerfTB + requiredCapTB + (hasArchiveTier ? requiredArchTB : 0);
-
       return [repo.id, {
-        requiredTotalTB,
-        requiredPerfTB,
-        requiredCapTB,
-        requiredArchTB,
+        requiredTotalTB: result.plannedCapacityTB,
+        requiredPerfTB: result.plannedPerformanceTierTB,
+        requiredCapTB: result.plannedCapacityTierTB,
+        requiredArchTB: result.plannedArchiveTierTB,
         workingSpaceTB,
       }];
     }));
@@ -403,6 +353,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         message: 'Alert: Required peak capacity exceeds configured repository capacity in the current scenario.',
       };
     }
+
 
     const hasWarning = pressureByRepo.some(r => r.capacityTB > 0 && r.combinedPct >= 85);
     if (hasWarning) {

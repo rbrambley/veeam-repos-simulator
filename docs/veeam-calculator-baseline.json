@@ -668,33 +668,78 @@
     },
     {
       "id": "das-medium-nogfs-r14",
-      "notes": "pending-capture — 50TB DAS, 14d retention, no GFS; use veeam-capture-guide to populate",
-      "expected": {}
+      "notes": "captured-from-playwright-2026-05-08",
+      "expected": {
+        "plannedCapacityTB": 81.1,
+        "veeamWorkingSpaceTB": 14.55,
+        "gfsWeeklyTB": 0,
+        "gfsMonthlyTB": 0,
+        "gfsYearlyTB": 0
+      }
     },
     {
       "id": "das-large-yearly2-r7",
-      "notes": "pending-capture — 100TB DAS, 7d retention, 2 yearly GFS; use veeam-capture-guide to populate",
-      "expected": {}
+      "notes": "captured-from-playwright-2026-05-08",
+      "expected": {
+        "plannedCapacityTB": 351.5,
+        "veeamWorkingSpaceTB": 24.55,
+        "gfsWeeklyTB": 0,
+        "gfsMonthlyTB": 0,
+        "gfsYearlyTB": 152.08,
+        "plannedPerformanceTierTB": 76.04
+      }
     },
     {
       "id": "das-large-wmy-r30",
-      "notes": "pending-capture — 100TB DAS, 30d retention, W4+M6+Y2; use veeam-capture-guide to populate",
-      "expected": {}
+      "notes": "captured-from-playwright-2026-05-08",
+      "expected": {
+        "plannedCapacityTB": 410.5,
+        "veeamWorkingSpaceTB": 24.55,
+        "gfsWeeklyTB": 13.32,
+        "gfsMonthlyTB": 109.82000000000001,
+        "gfsYearlyTB": 126.44999999999999,
+        "plannedPerformanceTierTB": 59.9
+      }
     },
     {
       "id": "sobr-medium-move-r30",
-      "notes": "pending-capture — 50TB SOBR move-only, 30d retention, no GFS; use veeam-capture-guide to populate",
-      "expected": {}
+      "notes": "captured-from-playwright-2026-05-08",
+      "expected": {
+        "plannedCapacityTB": 102.7,
+        "veeamWorkingSpaceTB": 14.55,
+        "gfsWeeklyTB": 0,
+        "gfsMonthlyTB": 0,
+        "gfsYearlyTB": 0,
+        "plannedPerformanceTierTB": 102.7,
+        "plannedCapacityTierTB": 184.9
+      }
     },
     {
       "id": "sobr-large-wmy-r60",
-      "notes": "pending-capture — 200TB SOBR move+archive, 60d retention, W4+M6+Y3; use veeam-capture-guide to populate",
-      "expected": {}
+      "notes": "captured-from-playwright-2026-05-08",
+      "expected": {
+        "plannedCapacityTB": 256.7,
+        "veeamWorkingSpaceTB": 37.05,
+        "gfsWeeklyTB": 26.64,
+        "gfsMonthlyTB": 193.02,
+        "gfsYearlyTB": 372.68,
+        "plannedPerformanceTierTB": 256.7,
+        "plannedCapacityTierTB": 592.3,
+        "plannedArchiveTierTB": 552.4
+      }
     },
     {
       "id": "sobr-xlarge-nogfs-r14",
-      "notes": "pending-capture — 500TB SOBR move-only, 14d retention, no GFS; use veeam-capture-guide to populate",
-      "expected": {}
+      "notes": "captured-from-playwright-2026-05-08",
+      "expected": {
+        "plannedCapacityTB": 476.8,
+        "veeamWorkingSpaceTB": 74.55,
+        "gfsWeeklyTB": 0,
+        "gfsMonthlyTB": 0,
+        "gfsYearlyTB": 0,
+        "plannedPerformanceTierTB": 476.8,
+        "plannedCapacityTierTB": 463.1
+      }
     }
   ]
 }

@@ -206,7 +206,7 @@
       "id": "das-large-yearly2-r7",
       "notes": "pending-seed — run comparator --seed to populate from simulator [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 305.0281,
+        "plannedCapacityTB": 350.65,
         "fileTypeFullTB": 76.0437,
         "fileTypeIncrementalTB": 7.6044,
         "fileTypeSyntheticFullTB": 7.6044
@@ -216,7 +216,7 @@
       "id": "das-large-wmy-r30",
       "notes": "pending-seed — run comparator --seed to populate from simulator [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 516.6899,
+        "plannedCapacityTB": 411.07,
         "fileTypeFullTB": 66.55,
         "fileTypeIncrementalTB": 3.3275,
         "fileTypeSyntheticFullTB": 3.3275
@@ -239,13 +239,13 @@
       "id": "sobr-large-wmy-r60",
       "notes": "pending-seed — run comparator --seed to populate from simulator [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1618.3653,
+        "plannedCapacityTB": 1400.22,
         "fileTypeFullTB": 133.1,
         "fileTypeIncrementalTB": 6.655,
         "fileTypeSyntheticFullTB": 6.655,
-        "plannedPerformanceTierTB": 223.3553,
-        "plannedCapacityTierTB": 631.4663,
-        "plannedArchiveTierTB": 763.5437
+        "plannedPerformanceTierTB": 256.89,
+        "plannedCapacityTierTB": 593.58,
+        "plannedArchiveTierTB": 549.75
       }
     },
     {

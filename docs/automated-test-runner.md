@@ -243,10 +243,11 @@ You will see:
 
 If all scenarios pass, the summary ends with:
 
-- `Passed: 7`
+- `Passed: 76` (for `npm run compare:veeam`)
+- `Passed: 23` (for `npm run compare:model`)
 - `Failed: 0`
 
-*(As of May 3, 2026, the baseline suite contains 7 scenarios: 5 original + 2 new regression scenarios.)*
+*(As of May 8, 2026, the captured calculator baseline suite contains 76 scenarios, and the internal model baseline suite contains 23 scenarios.)*
 
 For lifecycle quality validation, you will see:
 
@@ -254,6 +255,10 @@ For lifecycle quality validation, you will see:
 - lifecycle scenario results grouped by layer
 - summary totals including `PASS`, `SKIP (known gaps)`, and `FAIL`
 - generated report path: `docs/lifecycle-report.html`
+
+Current expected lifecycle total (as of May 8, 2026):
+
+- `51 passed, 0 skipped (known gaps), 0 failed`
 
 The HTML report includes:
 
