@@ -6,10 +6,23 @@ export interface GfsForecastStats {
   distinctPoints: number;
   inChainPoints: number;
   additionalPoints: number;
+  additionalWeeklyPoints: number;
+  additionalMonthlyPoints: number;
+  additionalYearlyPoints: number;
   additionalFullTB: number;
   additionalPerfFullTB: number;
   additionalCapFullTB: number;
   additionalArchFullTB: number;
+  additionalWeeklyFullTB: number;
+  additionalMonthlyFullTB: number;
+  additionalYearlyFullTB: number;
+  ageBucketLe14TB: number;
+  ageBucket15To38TB: number;
+  ageBucket39To100TB: number;
+  ageBucket101To193TB: number;
+  ageBucket194To286TB: number;
+  ageBucket287To379TB: number;
+  ageBucket380PlusTB: number;
 }
 
 export interface GfsForecastParams {
@@ -123,6 +136,19 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
   let additionalPerfFullTB = 0;
   let additionalCapFullTB = 0;
   let additionalArchFullTB = 0;
+  let additionalWeeklyPoints = 0;
+  let additionalMonthlyPoints = 0;
+  let additionalYearlyPoints = 0;
+  let additionalWeeklyFullTB = 0;
+  let additionalMonthlyFullTB = 0;
+  let additionalYearlyFullTB = 0;
+  let ageBucketLe14TB = 0;
+  let ageBucket15To38TB = 0;
+  let ageBucket39To100TB = 0;
+  let ageBucket101To193TB = 0;
+  let ageBucket194To286TB = 0;
+  let ageBucket287To379TB = 0;
+  let ageBucket380PlusTB = 0;
 
   for (const iso of distinctDates) {
     const pointDate = parseISODate(iso);
@@ -177,6 +203,24 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
         );
 
     additionalFullTB += storedContributionTB;
+    if (hasYearly) {
+      additionalYearlyPoints += 1;
+      additionalYearlyFullTB += storedContributionTB;
+    } else if (hasMonthly) {
+      additionalMonthlyPoints += 1;
+      additionalMonthlyFullTB += storedContributionTB;
+    } else if (hasWeekly) {
+      additionalWeeklyPoints += 1;
+      additionalWeeklyFullTB += storedContributionTB;
+    }
+
+    if (ageDays <= 14) ageBucketLe14TB += storedContributionTB;
+    else if (ageDays <= 38) ageBucket15To38TB += storedContributionTB;
+    else if (ageDays <= 100) ageBucket39To100TB += storedContributionTB;
+    else if (ageDays <= 193) ageBucket101To193TB += storedContributionTB;
+    else if (ageDays <= 286) ageBucket194To286TB += storedContributionTB;
+    else if (ageDays <= 379) ageBucket287To379TB += storedContributionTB;
+    else ageBucket380PlusTB += storedContributionTB;
 
     if (params.copyEnabled && params.effectiveMoveEnabled) {
       additionalCapFullTB += storedContributionTB;
@@ -258,16 +302,39 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
     additionalPerfFullTB *= dasPolicyFactor;
     additionalCapFullTB *= dasPolicyFactor;
     additionalArchFullTB *= dasPolicyFactor;
+    additionalWeeklyFullTB *= dasPolicyFactor;
+    additionalMonthlyFullTB *= dasPolicyFactor;
+    additionalYearlyFullTB *= dasPolicyFactor;
+    ageBucketLe14TB *= dasPolicyFactor;
+    ageBucket15To38TB *= dasPolicyFactor;
+    ageBucket39To100TB *= dasPolicyFactor;
+    ageBucket101To193TB *= dasPolicyFactor;
+    ageBucket194To286TB *= dasPolicyFactor;
+    ageBucket287To379TB *= dasPolicyFactor;
+    ageBucket380PlusTB *= dasPolicyFactor;
   }
 
   return {
     distinctPoints: distinctDates.length,
     inChainPoints,
     additionalPoints: Math.max(0, distinctDates.length - inChainPoints),
+    additionalWeeklyPoints,
+    additionalMonthlyPoints,
+    additionalYearlyPoints,
     additionalFullTB,
     additionalPerfFullTB,
     additionalCapFullTB,
     additionalArchFullTB,
+    additionalWeeklyFullTB,
+    additionalMonthlyFullTB,
+    additionalYearlyFullTB,
+    ageBucketLe14TB,
+    ageBucket15To38TB,
+    ageBucket39To100TB,
+    ageBucket101To193TB,
+    ageBucket194To286TB,
+    ageBucket287To379TB,
+    ageBucket380PlusTB,
   };
 }
 

@@ -69,6 +69,9 @@ interface BaselineEntry {
     fileTypeFullTB?: number | null;
     fileTypeIncrementalTB?: number | null;
     fileTypeSyntheticFullTB?: number | null;
+    gfsWeeklyTB?: number | null;
+    gfsMonthlyTB?: number | null;
+    gfsYearlyTB?: number | null;
   };
 }
 
@@ -145,10 +148,25 @@ interface ParsedVeeamCapture {
   growthRatePct: number | null;
   forecastPeriodYears: number | null;
   retentionDays: number | null;
+  gfsWeeklyTB: number | null;
+  gfsMonthlyTB: number | null;
+  gfsYearlyTB: number | null;
 }
 
 function parseVeeamCaptureText(raw: string): ParsedVeeamCapture {
   const normalized = raw.replace(/\r/g, '\n');
+
+  const rpMatches = Array.from(normalized.matchAll(/\b(W\d+|M\d+|Y\d+)\b[\s\S]{0,20}?(-?\d+(?:\.\d+)?)\s*TB\b/gi));
+  const weeklySum = rpMatches
+    .filter((m) => m[1].toUpperCase().startsWith('W'))
+    .reduce((sum, m) => sum + parseFloat(m[2]), 0);
+  const monthlySum = rpMatches
+    .filter((m) => m[1].toUpperCase().startsWith('M'))
+    .reduce((sum, m) => sum + parseFloat(m[2]), 0);
+  const yearlySum = rpMatches
+    .filter((m) => m[1].toUpperCase().startsWith('Y'))
+    .reduce((sum, m) => sum + parseFloat(m[2]), 0);
+
   return {
     storageRequiredTB: extractNumberNearLabel(normalized, ['Storage required', 'Repository'], '(?:TB)', 120),
     workingSpaceTB: extractNumberNearLabel(normalized, ['Working space'], '(?:TB)', 80),
@@ -160,6 +178,9 @@ function parseVeeamCaptureText(raw: string): ParsedVeeamCapture {
     growthRatePct: extractNumberNearLabel(normalized, ['Growth rate'], '(?:%)', 60),
     forecastPeriodYears: extractNumberAfterLabel(normalized, ['Forecast period'], 40),
     retentionDays: extractNumberAfterLabel(normalized, ['Days'], 40),
+    gfsWeeklyTB: weeklySum > 0 ? weeklySum : null,
+    gfsMonthlyTB: monthlySum > 0 ? monthlySum : null,
+    gfsYearlyTB: yearlySum > 0 ? yearlySum : null,
   };
 }
 
@@ -406,6 +427,21 @@ async function main(): Promise<void> {
         changesMade = true;
         console.log(`  ✓ Parsed Synthetic full backup file size: ${parsed.fileTypeSyntheticFullTB} TB`);
       }
+      if (parsed.gfsWeeklyTB !== null) {
+        entry.expected.gfsWeeklyTB = parsed.gfsWeeklyTB;
+        changesMade = true;
+        console.log(`  ✓ Parsed Weekly GFS contribution: ${parsed.gfsWeeklyTB} TB`);
+      }
+      if (parsed.gfsMonthlyTB !== null) {
+        entry.expected.gfsMonthlyTB = parsed.gfsMonthlyTB;
+        changesMade = true;
+        console.log(`  ✓ Parsed Monthly GFS contribution: ${parsed.gfsMonthlyTB} TB`);
+      }
+      if (parsed.gfsYearlyTB !== null) {
+        entry.expected.gfsYearlyTB = parsed.gfsYearlyTB;
+        changesMade = true;
+        console.log(`  ✓ Parsed Yearly GFS contribution: ${parsed.gfsYearlyTB} TB`);
+      }
     }
 
     // ── Storage required (total) fallback/manual ───────────────────────────
@@ -470,6 +506,27 @@ async function main(): Promise<void> {
     if (sfFileRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
     const sfFileVal = parseOptionalFloat(sfFileRaw);
     if (sfFileVal !== null) { entry.expected.fileTypeSyntheticFullTB = sfFileVal; changesMade = true; }
+
+    const existingW = entry.expected.gfsWeeklyTB ?? null;
+    const wHint = existingW !== null ? ` [current: ${existingW} TB]` : '';
+    const wRaw = await ask(iface, `  Weekly GFS contribution (TB) — optional, sum of W* restore points${wHint}: `);
+    if (wRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
+    const wVal = parseOptionalFloat(wRaw);
+    if (wVal !== null) { entry.expected.gfsWeeklyTB = wVal; changesMade = true; }
+
+    const existingM = entry.expected.gfsMonthlyTB ?? null;
+    const mHint = existingM !== null ? ` [current: ${existingM} TB]` : '';
+    const mRaw = await ask(iface, `  Monthly GFS contribution (TB) — optional, sum of M* restore points${mHint}: `);
+    if (mRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
+    const mVal = parseOptionalFloat(mRaw);
+    if (mVal !== null) { entry.expected.gfsMonthlyTB = mVal; changesMade = true; }
+
+    const existingY = entry.expected.gfsYearlyTB ?? null;
+    const yHint = existingY !== null ? ` [current: ${existingY} TB]` : '';
+    const yRaw = await ask(iface, `  Yearly GFS contribution (TB) — optional, sum of Y* restore points${yHint}: `);
+    if (yRaw.toLowerCase() === 'exit') { console.log('  Skipping this scenario.'); continue; }
+    const yVal = parseOptionalFloat(yRaw);
+    if (yVal !== null) { entry.expected.gfsYearlyTB = yVal; changesMade = true; }
 
     // ── Veeam working space ────────────────────────────────────────────────
     if (entry.expected.veeamWorkingSpaceTB === undefined || entry.expected.veeamWorkingSpaceTB === null) {

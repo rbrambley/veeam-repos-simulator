@@ -25,9 +25,13 @@ interface BaselineExpected {
   plannedPerformanceTierTB?: number;
   plannedCapacityTierTB?: number;
   plannedArchiveTierTB?: number;
+  veeamWorkingSpaceTB?: number;
   fileTypeFullTB?: number;
   fileTypeIncrementalTB?: number;
   fileTypeSyntheticFullTB?: number;
+  gfsWeeklyTB?: number;
+  gfsMonthlyTB?: number;
+  gfsYearlyTB?: number;
 }
 
 interface BaselineEntry {
@@ -354,6 +358,16 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
       latest: uniqueRestorePoints.filter((x) => x.point === 'LATEST').length,
     };
 
+    const gfsWeeklyTB = uniqueRestorePoints
+      .filter((x) => x.point.startsWith('W'))
+      .reduce((sum, x) => sum + x.sizeTB, 0);
+    const gfsMonthlyTB = uniqueRestorePoints
+      .filter((x) => x.point.startsWith('M'))
+      .reduce((sum, x) => sum + x.sizeTB, 0);
+    const gfsYearlyTB = uniqueRestorePoints
+      .filter((x) => x.point.startsWith('Y'))
+      .reduce((sum, x) => sum + x.sizeTB, 0);
+
     const scrapedPayload: Record<string, string | number | boolean | undefined> = {
       scenarioId: scenario.id,
       repositoryType: scenario.config.repositoryType,
@@ -402,6 +416,9 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
       restorePointCountMonthly: restorePointCounts.monthly,
       restorePointCountYearly: restorePointCounts.yearly,
       restorePointCountLatest: restorePointCounts.latest,
+      gfsWeeklyTB,
+      gfsMonthlyTB,
+      gfsYearlyTB,
     };
 
     const fullMatch = detailsText.match(/Full backup\s*\n\s*([0-9.,]+)\s*TB/i);
@@ -416,6 +433,12 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
     if (synthMatch) {
       results.fileTypeSyntheticFullTB = parseFloat(synthMatch[1].replace(/,/g, ''));
     }
+    if (typeof scrapedPayload.workingSpaceTB === 'number') {
+      results.veeamWorkingSpaceTB = scrapedPayload.workingSpaceTB;
+    }
+    results.gfsWeeklyTB = gfsWeeklyTB;
+    results.gfsMonthlyTB = gfsMonthlyTB;
+    results.gfsYearlyTB = gfsYearlyTB;
 
     if (typeof scrapedPayload.performanceTierY1TB === 'number') {
       results.plannedPerformanceTierTB = scrapedPayload.performanceTierY1TB;

@@ -20,6 +20,7 @@
     "capture:veeam": "tsx src/testing/veeamCalculatorScraper.ts",
     "capture:veeam:manual": "tsx src/testing/veeamCaptureGuide.ts",
     "test:lifecycle": "tsx src/testing/lifecycleRunner.ts",
+    "report:quarterly": "tsx src/testing/triWayReport.ts",
     "test:mutation": "tsx src/testing/mutationRunner.ts",
     "test:quality": "tsx src/testing/qualityRunner.ts",
     "test:quality:update-snapshots": "tsx src/testing/qualityRunner.ts --update-snapshots",
