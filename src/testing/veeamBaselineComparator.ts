@@ -118,6 +118,13 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
   // source: bucket brackets operate on sourceDataTB, then × 0.5 compression.
   const wsInputTB = config.sourceDataTB;
   const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(wsInputTB);
+  // SOBR move-only + archive + monthly/yearly GFS: weekly points within the chain
+  // genuinely contribute storage per Calculator captures. All other paths skip them.
+  const isSobrMoveArchiveWithMY = config.repositoryType === 'SOBR'
+    && !config.copyEnabled
+    && effectiveMoveEnabled
+    && config.hasArchiveTier
+    && ((config.gfsPolicy?.monthly ?? 0) > 0 || (config.gfsPolicy?.yearly ?? 0) > 0);
   const yearGfsStats = computeForecastGfsStatsAtYear({
     sourceDataTB: config.sourceDataTB,
     annualGrowthRatePct: config.annualGrowthRatePct,
@@ -132,6 +139,7 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     archiveAfterDays: config.archiveAfterDays,
     hasArchiveTier: config.hasArchiveTier,
     sizingMode: gfsSizingMode,
+    allowWeeklyInChainContribution: isSobrMoveArchiveWithMY,
   });
 
   const estimateTierChainDataForYearTB = (windowDays: number) => {
@@ -140,8 +148,19 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     // EXACT VEEAM MODEL: One promoted full (oldest SyntheticFull = base) +
     // (chainsInWindow * fullIntervalDays - 1) incrementals.
     // The active chain being built = working space, NOT stored data.
-    // DO NOT add an extra chain interval here — that double-counts working space.
-    const effectiveDays = chainsInWindow * fullIntervalDays - 1;
+    //
+    // When no GFS policy is active, the Veeam Calculator adds one extra full
+    // interval (fullIntervalDays) to account for the incoming chain window being
+    // built. Confirmed from large-scale captures:
+    //   das-medium-nogfs-r14 (50 TB): gap = 7 × yIncr exactly
+    //   sobr-medium-move-r30 (50 TB): gap = 7 × yIncr exactly
+    //   sobr-xlarge-nogfs-r14 (500 TB): gap = 7 × yIncr exactly
+    // For GFS scenarios the chain interacts with GFS point preservation in a
+    // way that varies by policy type; the extra interval is not added there.
+    const noGfs = (config.gfsPolicy?.weekly ?? 0) === 0
+      && (config.gfsPolicy?.monthly ?? 0) === 0
+      && (config.gfsPolicy?.yearly ?? 0) === 0;
+    const effectiveDays = chainsInWindow * fullIntervalDays - 1 + (noGfs ? fullIntervalDays : 0);
     return yearFullSizeTB + effectiveDays * effectiveYearIncrSizeTB;
   };
 
@@ -203,11 +222,7 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
       const capWindowDays = Math.max(fullIntervalDays, config.retention - config.offloadAfterDays + fullIntervalDays);
       yearPerfUsedTB = estimateTierChainDataForYearTB(perfWindowDays) + yearGfsStats.additionalPerfFullTB;
       yearCapUsedTB = estimateTierChainDataForYearTB(capWindowDays) + yearGfsStats.additionalCapFullTB;
-      // Small calibration aligns archive-tier rounding with live calculator captures
-      // for move-only mixed monthly/yearly GFS archive scenarios.
-      const horizonDays = totalDays ?? (forecastYears * 365);
-      const archiveCal = config.annualGrowthRatePct > 0 && horizonDays >= 1825 ? 1.2 : 1.1;
-      yearArchUsedTB = yearGfsStats.additionalArchFullTB * archiveCal;
+      yearArchUsedTB = yearGfsStats.additionalArchFullTB;
     } else {
       yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
       const isWeeklyOnlyArchiveMove = config.hasArchiveTier

@@ -112,7 +112,7 @@
   border-collapse: collapse;
   min-width: 400px;
   width: 100%;
-  table-layout: fixed;
+  table-layout: auto;
   font-size: 0.84rem;
 }
 
@@ -137,15 +137,6 @@
   border-bottom: 1px solid #e8eaf6;
   vertical-align: middle;
 }
-
-.storage-table th:nth-child(1), .storage-table td:nth-child(1) { width: 16%; }
-.storage-table th:nth-child(2), .storage-table td:nth-child(2) { width: 9%; }
-.storage-table th:nth-child(3), .storage-table td:nth-child(3) { width: 10%; }
-.storage-table th:nth-child(4), .storage-table td:nth-child(4) { width: 14%; }
-.storage-table th:nth-child(5), .storage-table td:nth-child(5) { width: 20%; }
-.storage-table th:nth-child(6), .storage-table td:nth-child(6) { width: 12%; }
-.storage-table th:nth-child(7), .storage-table td:nth-child(7) { width: 10%; }
-.storage-table th:nth-child(8), .storage-table td:nth-child(8) { width: 9%; }
 
 .storage-table tbody tr:nth-child(even) {
   background: #f5f7ff;

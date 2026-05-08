@@ -321,6 +321,12 @@ interface ActualLifecycle {
   milestones: Array<{ day: number; date: string; text: string }>;
   sampledSnapshots: DailySnapshot[];
   finalSnapshot: DailySnapshot;
+  peakStorageTB: number;
+  peakPerfStorageTB: number;
+  peakCapStorageTB: number;
+  peakArchStorageTB: number;
+  peakDay: number;
+  peakDate: string;
 }
 
 function buildExpectedPath(cfg: ScenarioConfig): string {
@@ -570,6 +576,13 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
     if (dailyCfg[k] === undefined) delete dailyCfg[k];
   }
 
+  let peakStorageTB = 0;
+  let peakPerfStorageTB = 0;
+  let peakCapStorageTB = 0;
+  let peakArchStorageTB = 0;
+  let peakDay = 1;
+  let peakDate = START_DATE;
+
   for (let day = 1; day <= sc.totalDays; day++) {
     // Apply any mid-run policy changes before this tick
     if (sc.policyChanges) {
@@ -606,7 +619,18 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
       milestones.push({ day, date: currentDate, text: dailyExplanation });
     }
 
-    allSnapshots.push(snapshotFromState(day, currentDate, sim.state, sim));
+    const todaySnapshot = snapshotFromState(day, currentDate, sim.state, sim);
+    allSnapshots.push(todaySnapshot);
+
+    // Track all-time storage peak (captures transient chain-overlap moments)
+    if (todaySnapshot.totalStorageTB > peakStorageTB) {
+      peakStorageTB     = todaySnapshot.totalStorageTB;
+      peakPerfStorageTB = todaySnapshot.perfStorageTB;
+      peakCapStorageTB  = todaySnapshot.capStorageTB;
+      peakArchStorageTB = todaySnapshot.archStorageTB;
+      peakDay           = day;
+      peakDate          = currentDate;
+    }
 
     // Detect deletions (chains present before but gone now)
     const deletedChainIds = new Set<string>();
@@ -958,6 +982,12 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
     milestones: milestones.slice(0, 30),
     sampledSnapshots,
     finalSnapshot,
+    peakStorageTB,
+    peakPerfStorageTB,
+    peakCapStorageTB,
+    peakArchStorageTB,
+    peakDay,
+    peakDate,
   };
 
   // Partition violations: known gaps vs real failures
@@ -1476,6 +1506,8 @@ function writeHtmlReport(
             <div class="path-line">${isSobr ? '<strong>By tier:</strong> ' + storageActualDetail : storageActualDetail}</div>
             <div class="path-line"><strong>Working space reserve:</strong> ${exp.workingSpaceReserveTB.toFixed(3)} TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> ${(finalStorageTB + exp.workingSpaceReserveTB).toFixed(3)} TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day ${act.peakDay}, ${act.peakDate}):</strong> <span style="font-weight:700">${act.peakStorageTB.toFixed(3)} TB</span>${isSobr ? ` &nbsp;·&nbsp; P: ${act.peakPerfStorageTB.toFixed(3)} · C: ${act.peakCapStorageTB.toFixed(3)} · A: ${act.peakArchStorageTB.toFixed(3)}` : ''}</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> ${`${act.peakStorageTB.toFixed(3)} + ${exp.workingSpaceReserveTB.toFixed(3)} = `}<span style="font-weight:700">${(act.peakStorageTB + exp.workingSpaceReserveTB).toFixed(3)} TB</span></div>
           </div>
         </div>
 

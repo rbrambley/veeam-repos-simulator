@@ -3,6 +3,7 @@ import { VeeamSimulator } from '../simulator/engine';
 import { ChainTimeline } from './ChainTimeline';
 import { StateLegend } from './StateLegend';
 import { computeVeeamWorkingSpaceTB } from '../models/veeam';
+import { computeForecastGfsStatsAtYear } from '../models/gfsSizing';
 
 interface OutputPanelProps {
   sim: VeeamSimulator;
@@ -267,21 +268,139 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     [workingSpaceByRepo]
   );
 
+  const requiredCapacityByRepo = useMemo((): Record<string, {
+    requiredTotalTB: number;
+    requiredPerfTB: number;
+    requiredCapTB: number;
+    requiredArchTB: number;
+    workingSpaceTB: number;
+  }> => {
+    return Object.fromEntries(sim.state.repositories.map(repo => {
+      const job = sim.state.jobs.find(j => j.repositoryId === repo.id);
+      if (!job) {
+        return [repo.id, {
+          requiredTotalTB: 0,
+          requiredPerfTB: 0,
+          requiredCapTB: 0,
+          requiredArchTB: 0,
+          workingSpaceTB: 0,
+        }];
+      }
+
+      const forecastYears = Math.max(0, Math.floor(job.forecastYears ?? 0));
+      const annualGrowthRate = (job.annualGrowthRatePct ?? 10) / 100;
+      const dailyChangeRate = (job.dailyChangeRatePct ?? 5) / 100;
+      const yearSourceTB = (job.sourceDataTB || 1) * Math.pow(1 + annualGrowthRate, forecastYears);
+      const yearFullTB = yearSourceTB * 0.5;
+      const yearIncrTB = yearSourceTB * dailyChangeRate * 0.5;
+      const fullIntervalDays = (job.type === 'SyntheticFull' || job.type === 'ForwardIncremental')
+        ? 7
+        : Math.max(1, job.retention?.restorePoints ?? 1);
+      const retentionDays = Math.max(0, job.retention?.restorePoints ?? 0);
+      const wsInputTB = job.sourceDataTB || 1;
+      const workingSpaceTB = computeVeeamWorkingSpaceTB(wsInputTB);
+
+      const gfsStats = computeForecastGfsStatsAtYear({
+        sourceDataTB: job.sourceDataTB,
+        annualGrowthRatePct: job.annualGrowthRatePct,
+        dailyChangeRatePct: job.dailyChangeRatePct,
+        retentionDays,
+        gfsPolicy: {
+          weekly: job.gfsPolicy?.weekly ?? 0,
+          monthly: job.gfsPolicy?.monthly ?? 0,
+          yearly: job.gfsPolicy?.yearly ?? 0,
+        },
+        startDate: sim.state.startDate || currentDate,
+        yearOffset: forecastYears,
+        copyEnabled: repo.sobrConfig?.copyEnabled ?? false,
+        effectiveMoveEnabled: repo.sobrConfig ? (repo.sobrConfig.moveEnabled ?? true) : false,
+        offloadAfterDays: repo.sobrConfig?.offloadAfterDays,
+        archiveAfterDays: repo.sobrConfig?.archiveAfterDays,
+        hasArchiveTier: repo.sobrConfig?.hasArchiveTier,
+        sizingMode: 'reverse',
+      });
+
+      const hasNoGfs = (job.gfsPolicy?.weekly ?? 0) === 0
+        && (job.gfsPolicy?.monthly ?? 0) === 0
+        && (job.gfsPolicy?.yearly ?? 0) === 0;
+
+      const estimateTierChainDataTB = (windowDays: number) => {
+        if (windowDays <= 0) return 0;
+        const chainsInWindow = Math.max(1, Math.ceil(windowDays / Math.max(1, fullIntervalDays)));
+        const effectiveDays = chainsInWindow * fullIntervalDays - 1 + (hasNoGfs ? fullIntervalDays : 0);
+        return yearFullTB + effectiveDays * yearIncrTB;
+      };
+
+      if (repo.type !== 'SOBR' || !repo.sobrConfig) {
+        const requiredStoredTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalFullTB;
+        return [repo.id, {
+          requiredTotalTB: requiredStoredTB + workingSpaceTB,
+          requiredPerfTB: requiredStoredTB + workingSpaceTB,
+          requiredCapTB: 0,
+          requiredArchTB: 0,
+          workingSpaceTB,
+        }];
+      }
+
+      const copyEnabled = !!repo.sobrConfig.copyEnabled;
+      const moveEnabled = repo.sobrConfig.moveEnabled ?? true;
+      const hasArchiveTier = !!repo.sobrConfig.hasArchiveTier;
+      let requiredPerfUsedTB = 0;
+      let requiredCapUsedTB = 0;
+      let requiredArchUsedTB = 0;
+
+      if (copyEnabled && moveEnabled) {
+        requiredPerfUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalPerfFullTB;
+        requiredCapUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalCapFullTB;
+      } else if (copyEnabled) {
+        requiredPerfUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalPerfFullTB;
+        requiredCapUsedTB = estimateTierChainDataTB(retentionDays) + gfsStats.additionalCapFullTB;
+      } else {
+        const elapsedDays = forecastYears * 365;
+        const offloadAfterDays = Math.max(0, repo.sobrConfig.offloadAfterDays ?? 0);
+        const generationPeriodDays = Math.max(1, repo.sobrConfig.generationPeriodDays ?? 10);
+        const perfImmutabilityDays = Math.max(0, repo.sobrConfig.performanceImmutabilityDays ?? 0);
+        const moveGateDays = offloadAfterDays + perfImmutabilityDays;
+        const alignedMoveGateDays = Math.ceil(moveGateDays / generationPeriodDays) * generationPeriodDays;
+        const performanceWindowDays = Math.max(fullIntervalDays, alignedMoveGateDays + fullIntervalDays);
+        const capacityAccumulationDays = Math.max(0, elapsedDays - alignedMoveGateDays + 1);
+
+        requiredPerfUsedTB = estimateTierChainDataTB(performanceWindowDays) + gfsStats.additionalPerfFullTB;
+        requiredCapUsedTB = estimateTierChainDataTB(capacityAccumulationDays) + gfsStats.additionalCapFullTB;
+      }
+
+      if (hasArchiveTier) {
+        requiredArchUsedTB = gfsStats.additionalArchFullTB;
+      }
+
+      const requiredPerfTB = requiredPerfUsedTB + workingSpaceTB;
+      const requiredCapTB = requiredCapUsedTB;
+      const requiredArchTB = requiredArchUsedTB;
+      const requiredTotalTB = requiredPerfTB + requiredCapTB + (hasArchiveTier ? requiredArchTB : 0);
+
+      return [repo.id, {
+        requiredTotalTB,
+        requiredPerfTB,
+        requiredCapTB,
+        requiredArchTB,
+        workingSpaceTB,
+      }];
+    }));
+  }, [sim.state.repositories, sim.state.jobs, sim.state.startDate, currentDate]);
+
   const temporarySpacePlanningStatus = useMemo(() => {
     const pressureByRepo = sim.state.repositories.map(repo => {
-      const usedTB = storageUsage[repo.id] || 0;
-      const neededTB = workingSpaceByRepo[repo.id]?.totalTB ?? 0;
+      const requiredTB = requiredCapacityByRepo[repo.id]?.requiredTotalTB ?? 0;
       const capacityTB = repo.capacityTB || 0;
-      const combinedTB = usedTB + neededTB;
-      const combinedPct = capacityTB > 0 ? (combinedTB / capacityTB) * 100 : 0;
-      return { combinedTB, combinedPct, capacityTB };
+      const combinedPct = capacityTB > 0 ? (requiredTB / capacityTB) * 100 : 0;
+      return { requiredTB, combinedPct, capacityTB };
     });
 
-    const hasAlert = pressureByRepo.some(r => r.capacityTB > 0 && r.combinedTB > r.capacityTB + 0.000001);
+    const hasAlert = pressureByRepo.some(r => r.capacityTB > 0 && r.requiredTB > r.capacityTB + 0.000001);
     if (hasAlert) {
       return {
         level: 'alert',
-        message: 'Alert: Temporary space planning exceeds available repository capacity in the current scenario.',
+        message: 'Alert: Required peak capacity exceeds configured repository capacity in the current scenario.',
       };
     }
 
@@ -289,15 +408,15 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     if (hasWarning) {
       return {
         level: 'warn',
-        message: 'Warn: Temporary space planning is close to repository capacity in the current scenario.',
+        message: 'Warn: Required peak capacity is close to configured repository capacity in the current scenario.',
       };
     }
 
     return {
       level: 'confirm',
-      message: 'Confirm: Temporary space planning is within repository capacity in the current scenario.',
+      message: 'Confirm: Required peak capacity is within configured repository capacity in the current scenario.',
     };
-  }, [sim.state.repositories, storageUsage, workingSpaceByRepo]);
+  }, [sim.state.repositories, requiredCapacityByRepo]);
 
   const policyInsight = useMemo(() => {
     const repo = sim.state.repositories.find(r => r.type === 'SOBR' && r.sobrConfig);
@@ -507,22 +626,25 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
           <tr>
             <th>Repository</th>
             <th>Type</th>
-            <th>Used</th>
-            <th>Work Space</th>
+            <th>Required (Peak+WS)</th>
+            <th>Current Used</th>
             {hasGenerationUi && <th>GENs</th>}
             {hasGenerationUi && <th>Next Delete</th>}
             <th>Capacity</th>
-            <th>Usage %</th>
+            <th>Gap</th>
+            <th>Planning %</th>
           </tr>
         </thead>
         <tbody>
           {sim.state.repositories.map(repo => {
             const used = storageUsage[repo.id] || 0;
             const neededWorkingSpaceTB = workingSpaceByRepo[repo.id]?.totalTB ?? 0;
-            const largestFullTB = workingSpaceByRepo[repo.id]?.largestFullTB ?? 0;
             const additionalWorkingSpaceTB = workingSpaceByRepo[repo.id]?.additionalTB ?? 0;
             const wsInputTB = workingSpaceByRepo[repo.id]?.initialSourceTB ?? 0;
-            const pct = repo.capacityTB > 0 ? (used / repo.capacityTB) * 100 : 0;
+            const requiredPeakTB = requiredCapacityByRepo[repo.id]?.requiredTotalTB ?? 0;
+            const planningPct = repo.capacityTB > 0 ? (requiredPeakTB / repo.capacityTB) * 100 : 0;
+            const currentPct = repo.capacityTB > 0 ? (used / repo.capacityTB) * 100 : 0;
+            const capacityGapTB = repo.capacityTB - requiredPeakTB;
             const isSobr = repo.type === 'SOBR' && repo.sobrConfig;
             const tierUsage = isSobr ? sim.getSOBRTierUsage(repo.id) : null;
             const tierColors: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
@@ -537,32 +659,44 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                 <tr>
                   <td>{repo.name}</td>
                   <td>{repo.type}</td>
+                  <td title={`Working space included: ${formatTB(neededWorkingSpaceTB)} (${formatTB(additionalWorkingSpaceTB)} additional, source input ${formatTB(wsInputTB)})`}>
+                    <span style={{ fontWeight: 700 }}>{formatTB(requiredPeakTB)}</span>
+                  </td>
                   <td>{formatTB(used)}</td>
-                  <td title={`${formatTB(additionalWorkingSpaceTB)} (progressive bracket scale input: ${formatTB(wsInputTB)})`}>{formatTB(neededWorkingSpaceTB)}</td>
                   {hasGenerationUi && <td>{renderGenTotals(repoLockedGenerations, repoWaitingGenerations, repoDeletableGenerations)}</td>}
                   {hasGenerationUi && <td>{repoNextDeleteOn || '-'}</td>}
                   <td>{formatTB(repo.capacityTB)}</td>
+                  <td style={{ color: capacityGapTB >= 0 ? '#1b5e20' : '#b71c1c', fontWeight: 700 }}>{capacityGapTB >= 0 ? '+' : ''}{formatTB(capacityGapTB)}</td>
                   <td>
                     <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '12px', width: '68px', display: 'inline-block', verticalAlign: 'middle' }}>
-                      <div style={{ background: pct > 100 ? '#7b1fa2' : pct > 85 ? '#d32f2f' : '#1976d2', width: `${Math.min(100, pct)}%`, height: '100%', borderRadius: '3px' }} />
+                      <div style={{ background: planningPct > 100 ? '#7b1fa2' : planningPct > 85 ? '#d32f2f' : '#1976d2', width: `${Math.min(100, planningPct)}%`, height: '100%', borderRadius: '3px' }} />
                     </div>
-                    {' '}<span style={{ color: pct > 100 ? '#7b1fa2' : pct > 85 ? '#d32f2f' : undefined, fontWeight: pct > 100 ? 'bold' : undefined }}>{pct.toFixed(1)}%</span>
+                    {' '}<span style={{ color: planningPct > 100 ? '#7b1fa2' : planningPct > 85 ? '#d32f2f' : undefined, fontWeight: planningPct > 100 ? 'bold' : undefined }}>{planningPct.toFixed(1)}%</span>
+                    <div style={{ fontSize: '0.72rem', color: '#607d8b', marginTop: '2px' }} title="Current used / configured capacity">
+                      now {currentPct.toFixed(1)}%
+                    </div>
                   </td>
                 </tr>
                 {isSobr && repo.sobrConfig && ['Performance', 'Capacity', ...(repo.sobrConfig.hasArchiveTier ? ['Archive'] : [])].map(tier => {
                   const tierUsed = tierUsage?.[tier] ?? 0;
-                  const tierWorkingSpaceNeededTB = workingSpaceByRepo[repo.id]?.byTier[tier as 'Performance' | 'Capacity' | 'Archive'] ?? 0;
                   const tierWorkingSpaceAdditionalTB = workingSpaceByRepo[repo.id]?.byTierAdditional[tier as 'Performance' | 'Capacity' | 'Archive'] ?? 0;
+                  const tierRequired = tier === 'Performance'
+                    ? (requiredCapacityByRepo[repo.id]?.requiredPerfTB ?? 0)
+                    : tier === 'Capacity'
+                      ? (requiredCapacityByRepo[repo.id]?.requiredCapTB ?? 0)
+                      : (requiredCapacityByRepo[repo.id]?.requiredArchTB ?? 0);
                   const tierCap = tier === 'Performance' ? repo.sobrConfig!.performanceCapacityTB
                     : tier === 'Capacity' ? repo.sobrConfig!.capacityCapacityTB
                     : repo.sobrConfig!.archiveCapacityTB;
-                  const tierPct = tierCap > 0 ? (tierUsed / tierCap) * 100 : 0;
+                  const tierPlanningPct = tierCap > 0 ? (tierRequired / tierCap) * 100 : 0;
+                  const tierCurrentPct = tierCap > 0 ? (tierUsed / tierCap) * 100 : 0;
+                  const tierGap = tierCap - tierRequired;
                   return (
                     <tr key={tier} style={{ background: '#f9f9f9', fontSize: '0.85rem' }}>
                       <td style={{ paddingLeft: '1.5rem', color: tierColors[tier], fontWeight: 'bold' }}>↳ {tier}</td>
                       <td style={{ color: '#999' }}>SOBR Tier</td>
+                      <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} additional working space on Performance` : 'No working-space requirement on this tier'}><span style={{ fontWeight: 700 }}>{formatTB(tierRequired)}</span></td>
                       <td>{formatTB(tierUsed)}</td>
-                      <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} (progressive bracket scale input: ${formatTB(wsInputTB)})` : 'No working-space requirement on this tier'}>{formatTB(tierWorkingSpaceNeededTB)}</td>
                       {hasGenerationUi && <td>{renderGenTotals(
                         repoGenerations.filter(g => {
                           const inTier = tier === 'Performance' ? g.hasPerformanceData : tier === 'Capacity' ? g.hasCapacityData : g.hasArchiveData;
@@ -579,11 +713,13 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       )}</td>}
                       {hasGenerationUi && <td>-</td>}
                       <td>{formatTB(tierCap)}</td>
+                      <td style={{ color: tierGap >= 0 ? '#1b5e20' : '#b71c1c', fontWeight: 700 }}>{tierGap >= 0 ? '+' : ''}{formatTB(tierGap)}</td>
                       <td>
                         <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '9px', width: '58px', display: 'inline-block', verticalAlign: 'middle' }}>
-                          <div style={{ background: tierPct > 100 ? '#7b1fa2' : tierPct > 85 ? '#d32f2f' : tierColors[tier], width: `${Math.min(100, tierPct)}%`, height: '100%', borderRadius: '3px' }} />
+                          <div style={{ background: tierPlanningPct > 100 ? '#7b1fa2' : tierPlanningPct > 85 ? '#d32f2f' : tierColors[tier], width: `${Math.min(100, tierPlanningPct)}%`, height: '100%', borderRadius: '3px' }} />
                         </div>
-                        {' '}<span style={{ color: tierPct > 100 ? '#7b1fa2' : tierPct > 85 ? '#d32f2f' : undefined, fontWeight: tierPct > 100 ? 'bold' : undefined }}>{tierPct.toFixed(1)}%</span>
+                        {' '}<span style={{ color: tierPlanningPct > 100 ? '#7b1fa2' : tierPlanningPct > 85 ? '#d32f2f' : undefined, fontWeight: tierPlanningPct > 100 ? 'bold' : undefined }}>{tierPlanningPct.toFixed(1)}%</span>
+                        <div style={{ fontSize: '0.72rem', color: '#607d8b', marginTop: '2px' }}>now {tierCurrentPct.toFixed(1)}%</div>
                       </td>
                     </tr>
                   );

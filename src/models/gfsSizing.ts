@@ -45,6 +45,13 @@ export interface GfsForecastParams {
    * where forecast must match the simulator, not the external calculator.
    */
   applyCalculatorCalibration?: boolean;
+  /**
+   * When true, weekly-only GFS points within the active retention chain are
+   * allowed to contribute storage (instead of being skipped as chain-covered).
+   * Only set true for SOBR move-only + archive + W/M/Y mixed-policy scenarios
+   * where the Calculator shows genuine weekly footprint.
+   */
+  allowWeeklyInChainContribution?: boolean;
 }
 
 export interface GfsStoredContributionParams {
@@ -164,17 +171,23 @@ export function computeForecastGfsStatsAtYear(params: GfsForecastParams): GfsFor
       inChainPoints += 1;
     }
     if (!usesPeriodSliceModel && pointDate >= retentionWindowStart) {
-      continue;
+      // Non-period-slice in-chain points are covered by chain storage.
+      // Exception: SOBR move+archive+W/M/Y in calculator mode — weekly points
+      // show genuine footprint per Calculator; allow them through.
+      const isWeeklyOnlyInMixed = hasMonthlyOrYearlyPolicy && hasWeekly && !hasMonthly && !hasYearly;
+      const allowThrough = isWeeklyOnlyInMixed
+        && (params.applyCalculatorCalibration ?? true)
+        && (params.allowWeeklyInChainContribution ?? false);
+      if (!allowThrough) continue;
     }
 
-    // In mixed policies, weekly-only points within the active retention chain are
-    // already represented by chain storage — skip them.
-    // Out-of-retention weekly-only points are genuine GFS-preserved snapshots
-    // that must contribute their own footprint (when calculator calibration is on).
-    // Lifecycle oracle mode uses old behavior (always skip) to maintain forecast=simulator.
-    const skipWeeklyOutOfChain = (params.applyCalculatorCalibration ?? true)
-      ? (hasMonthlyOrYearlyPolicy && hasWeekly && !hasMonthly && !hasYearly && pointDate >= retentionWindowStart)
-      : (hasMonthlyOrYearlyPolicy && hasWeekly && !hasMonthly && !hasYearly);
+    // In oracle mode, also skip out-of-chain weekly-only points (keeps forecast=simulator).
+    // In calculator mode this condition is never true — out-of-chain weekly always contribute.
+    const skipWeeklyOutOfChain = hasMonthlyOrYearlyPolicy
+      && hasWeekly
+      && !hasMonthly
+      && !hasYearly
+      && !(params.applyCalculatorCalibration ?? true);
     if (skipWeeklyOutOfChain) {
       continue;
     }
