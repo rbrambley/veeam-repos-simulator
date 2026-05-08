@@ -146,7 +146,7 @@
 
 <div class="report-header">
   <h1>Veeam Simulator — Quality &amp; Validation Report</h1>
-  <div class="run-meta">Generated May 8, 2026 at 03:00:32 AM &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
+  <div class="run-meta">Generated May 8, 2026 at 06:48:04 AM &nbsp;·&nbsp; Start date: 2026-05-02 (fixed for determinism)</div>
   <div class="summary-row">
     <span class="count-badge" style="background:#166534;color:#fff">51 PASS</span>
     <span class="count-badge" style="background:#92400e;color:#fff">0 SKIP (known gaps)</span>
@@ -162,7 +162,7 @@
 <div class="metrics-bar">
   <div class="metric"><span class="metric-value">51</span><span class="metric-label">Scenarios</span></div>
   <div class="metric"><span class="metric-value">24,305</span><span class="metric-label">Days Simulated</span></div>
-  <div class="metric"><span class="metric-value">12.3s</span><span class="metric-label">Total Duration</span></div>
+  <div class="metric"><span class="metric-value">13.3s</span><span class="metric-label">Total Duration</span></div>
   <div class="metric"><span class="metric-value">28</span><span class="metric-label">Rules Covered</span></div>
   <div class="metric"><span class="metric-value">11</span><span class="metric-label">Rules Uncovered</span></div>
 </div>
@@ -685,6 +685,8 @@
             <div class="path-line">0.825 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.350 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 13, 2026-05-15):</strong> <span style="font-weight:700">0.825 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 0.825 + 0.525 = <span style="font-weight:700">1.350 TB</span></div>
           </div>
         </div>
 
@@ -788,6 +790,8 @@
             <div class="path-line">0.775 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.300 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 13, 2026-05-15):</strong> <span style="font-weight:700">0.825 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 0.825 + 0.525 = <span style="font-weight:700">1.350 TB</span></div>
           </div>
         </div>
 
@@ -891,6 +895,8 @@
             <div class="path-line">0.675 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.200 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 13, 2026-05-15):</strong> <span style="font-weight:700">0.825 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 0.825 + 0.525 = <span style="font-weight:700">1.350 TB</span></div>
           </div>
         </div>
 
@@ -969,7 +975,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-expiry-order</span>
         <span class="sc-name">GFS expiry order: oldest weekly removed first</span>
-        <span class="sc-meta">35d &nbsp;·&nbsp; 2ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:2W/0M/0Y</span>
+        <span class="sc-meta">35d &nbsp;·&nbsp; 3ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:2W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With weekly=2, when a 3rd weekly tag is applied the oldest (W3→W1 shift) must be untagged first. No point with weekly flag must exist beyond its retention window.</p>
@@ -1003,6 +1009,8 @@
             <div class="path-line">0.675 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.200 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 13, 2026-05-15):</strong> <span style="font-weight:700">0.825 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 0.825 + 0.525 = <span style="font-weight:700">1.350 TB</span></div>
           </div>
         </div>
 
@@ -1081,7 +1089,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-monthly-boundary</span>
         <span class="sc-name">Monthly GFS lands only on last Saturday of month</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 10ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/3M/0Y</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 11ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/3M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A monthly GFS tag must appear on the last Saturday of each calendar month and not on any other Saturday.</p>
@@ -1115,6 +1123,8 @@
             <div class="path-line">1.375 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.900 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 100, 2026-08-10):</strong> <span style="font-weight:700">1.375 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.375 + 0.525 = <span style="font-weight:700">1.900 TB</span></div>
           </div>
         </div>
 
@@ -1211,7 +1221,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-yearly-boundary</span>
         <span class="sc-name">Yearly GFS lands only on last Saturday of December</span>
-        <span class="sc-meta">800d &nbsp;·&nbsp; 66ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/2Y</span>
+        <span class="sc-meta">800d &nbsp;·&nbsp; 69ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A yearly GFS tag must appear exactly on the last Saturday of December and never on any other Saturday.</p>
@@ -1245,6 +1255,8 @@
             <div class="path-line">2.225 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.750 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 797, 2028-07-07):</strong> <span style="font-weight:700">2.325 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.325 + 0.525 = <span style="font-weight:700">2.850 TB</span></div>
           </div>
         </div>
 
@@ -1487,7 +1499,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-gfs-stacking</span>
         <span class="sc-name">GFS tags stack on same Saturday restore point</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 44ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 42ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When weekly + monthly conditions are both true for the same Saturday, the single SyntheticFull must have both isWeeklyGFS and isMonthlyGFS set (no separate point created).</p>
@@ -1521,6 +1533,8 @@
             <div class="path-line">1.500 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.025 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 391, 2027-05-28):</strong> <span style="font-weight:700">2.225 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.225 + 0.525 = <span style="font-weight:700">2.750 TB</span></div>
           </div>
         </div>
 
@@ -1750,6 +1764,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.900 TB · C: 0.650 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.075 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 19, 2026-05-21):</strong> <span style="font-weight:700">1.625 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.650 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.625 + 0.525 = <span style="font-weight:700">2.150 TB</span></div>
           </div>
         </div>
 
@@ -1853,6 +1869,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 2.000 TB · C: 1.600 TB · A: 0.575 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 4.700 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 60, 2026-07-01):</strong> <span style="font-weight:700">4.175 TB</span> &nbsp;·&nbsp; P: 2.000 · C: 1.600 · A: 0.575</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 4.175 + 0.525 = <span style="font-weight:700">4.700 TB</span></div>
           </div>
         </div>
 
@@ -1931,7 +1949,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-archive-threshold-copy</span>
         <span class="sc-name">SOBR Copy: archive fires only after pointAge &gt;= offloadAfterDays + archiveAfterDays</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 15ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 16ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">In copy mode the archive gate is total point age, not cap-tier age. Point must not appear in Archive before age = offloadAfterDays + archiveAfterDays.</p>
@@ -1965,6 +1983,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.625 TB · C: 1.100 TB · A: 0.550 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.800 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 45, 2026-06-16):</strong> <span style="font-weight:700">3.275 TB</span> &nbsp;·&nbsp; P: 1.625 · C: 1.100 · A: 0.550</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.275 + 0.525 = <span style="font-weight:700">3.800 TB</span></div>
           </div>
         </div>
 
@@ -2043,7 +2063,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">lb-sobr-capacity-residue-after-archive</span>
         <span class="sc-name">SOBR Copy: non-GFS Capacity residue pruned when GFS full archives</span>
-        <span class="sc-meta">45d &nbsp;·&nbsp; 14ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
+        <span class="sc-meta">45d &nbsp;·&nbsp; 15ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/0M/0Y · Copy · Offload:14d · Archive:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">When a GFS SyntheticFull in a chain archives (copy mode), non-GFS points in that chain must be pruned from Capacity. Performance copy must still remain accessible.</p>
@@ -2077,6 +2097,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.275 TB · C: 0.925 TB · A: 0.525 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.250 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 34, 2026-06-05):</strong> <span style="font-weight:700">3.025 TB</span> &nbsp;·&nbsp; P: 1.350 · C: 1.175 · A: 0.500</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.025 + 0.525 = <span style="font-weight:700">3.550 TB</span></div>
           </div>
         </div>
 
@@ -2189,6 +2211,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.850 TB · C: 0.650 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.025 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 19, 2026-05-21):</strong> <span style="font-weight:700">1.625 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.650 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.625 + 0.525 = <span style="font-weight:700">2.150 TB</span></div>
           </div>
         </div>
 
@@ -2280,7 +2304,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-3yr-gfs-wmy</span>
         <span class="sc-name">DAS 3-year soak: W+M+Y GFS invariants every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 755ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 819ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years, daily assertions: weekly count ≤ limit, monthly count ≤ limit, yearly count ≤ limit, GFS tags only on SyntheticFull/Full, exactly one global base per job.</p>
@@ -2314,6 +2338,8 @@
             <div class="path-line">3.219 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.744 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 972, 2028-12-29):</strong> <span style="font-weight:700">3.782 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.782 + 0.525 = <span style="font-weight:700">4.307 TB</span></div>
           </div>
         </div>
 
@@ -2556,7 +2582,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-move-3yr</span>
         <span class="sc-name">SOBR Move-only 3-year soak: tier ordering invariants every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 653ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 648ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">No point may be in Archive without passing through Capacity. Prune before offload is forbidden. Active chains must never be offloadComplete.</p>
@@ -2590,6 +2616,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.097 TB · C: 0.720 TB · A: 0.287 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.629 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 1085, 2029-04-21):</strong> <span style="font-weight:700">3.966 TB</span> &nbsp;·&nbsp; P: 1.729 · C: 1.665 · A: 0.573</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.966 + 0.525 = <span style="font-weight:700">4.491 TB</span></div>
           </div>
         </div>
 
@@ -2832,7 +2860,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-copy-3yr</span>
         <span class="sc-name">SOBR Copy-only 3-year soak: capacity residue and archive gate every day</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 663ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 676ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Scan every day: after any archive event for a chain the non-GFS Capacity residue must immediately be zero. Archive gate must never be violated.</p>
@@ -2866,6 +2894,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.556 TB · C: 1.299 TB · A: 0.460 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.840 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 1084, 2029-04-20):</strong> <span style="font-weight:700">5.314 TB</span> &nbsp;·&nbsp; P: 2.642 · C: 1.499 · A: 1.174</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 5.314 + 0.525 = <span style="font-weight:700">5.839 TB</span></div>
           </div>
         </div>
 
@@ -3108,7 +3138,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-gfs-archive-5yr</span>
         <span class="sc-name">SOBR Move W+M+Y 5-year soak: full model over extended horizon</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 2292ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 2365ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">5-year soak exercising the full policy stack: daily GFS count limits, tier ordering, prune sequencing, chain deletion gating, SLA minimum, and base identity.</p>
@@ -3142,6 +3172,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 2.762 TB · C: 2.678 TB · A: 1.957 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 7.922 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 1696, 2030-12-23):</strong> <span style="font-weight:700">8.442 TB</span> &nbsp;·&nbsp; P: 3.088 · C: 2.811 · A: 2.543</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 8.442 + 0.525 = <span style="font-weight:700">8.967 TB</span></div>
           </div>
         </div>
 
@@ -3384,7 +3416,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-sla-minimum-5yr</span>
         <span class="sc-name">DAS 5-year soak: SLA minimum guarantee never violated</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 230ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 228ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 5 years verify that no chain point dated within slaDays of current date is ever deleted, regardless of count-based expiry pressure.</p>
@@ -3418,6 +3450,8 @@
             <div class="path-line">3.612 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 4.137 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 1672, 2030-11-29):</strong> <span style="font-weight:700">4.162 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 4.162 + 0.525 = <span style="font-weight:700">4.687 TB</span></div>
           </div>
         </div>
 
@@ -3660,7 +3694,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-chain-rp-drift-3yr</span>
         <span class="sc-name">DAS 3-year drift: inactive chains and RP count never accumulate</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 123ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 134ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years, assert every day that inactive chains never exceed 3 (steady-state max) and total restore points never exceed 42 (2×retention + GFS limits + buffer). Catches chain cleanup failures and pruning regressions that only manifest over long horizons.</p>
@@ -3694,6 +3728,8 @@
             <div class="path-line">3.219 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.744 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 972, 2028-12-29):</strong> <span style="font-weight:700">3.782 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.782 + 0.525 = <span style="font-weight:700">4.307 TB</span></div>
           </div>
         </div>
 
@@ -3936,7 +3972,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-sobr-move-chain-rp-drift-3yr</span>
         <span class="sc-name">SOBR Move 3-year drift: inactive chains and RP count never accumulate</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 578ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 640ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Over 3 years with SOBR Move mode, assert that inactive chains never exceed 4 (offload + immutability extend chain lifetime but should still plateau) and total restore points never exceed 78 (2×retention=30 + GFS limits + buffer). Detects SOBR-specific chain lifecycle failures over extended runs.</p>
@@ -3970,6 +4006,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.097 TB · C: 0.720 TB · A: 0.287 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.629 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 1085, 2029-04-21):</strong> <span style="font-weight:700">3.966 TB</span> &nbsp;·&nbsp; P: 1.729 · C: 1.665 · A: 0.573</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.966 + 0.525 = <span style="font-weight:700">4.491 TB</span></div>
           </div>
         </div>
 
@@ -4212,7 +4250,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ti-das-high-retention-drift-3yr</span>
         <span class="sc-name">DAS high-retention 3-year drift: retention=30 with full GFS never accumulates</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 263ms &nbsp;·&nbsp; DAS · Ret:30 · GFS:4W/3M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 249ms &nbsp;·&nbsp; DAS · Ret:30 · GFS:4W/3M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Higher retention (30 days) with full W+M+Y GFS over 3 years. Max inactive chains ≤ 3, max restore points ≤ 75 (2×30 + 9 + buffer). Validates that the engine scales correctly with larger retention windows without drift.</p>
@@ -4246,6 +4284,8 @@
             <div class="path-line">2.872 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.397 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 967, 2028-12-24):</strong> <span style="font-weight:700">4.035 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 4.035 + 0.525 = <span style="font-weight:700">4.560 TB</span></div>
           </div>
         </div>
 
@@ -4501,7 +4541,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-perf-immutability-blocks-prune</span>
         <span class="sc-name">Performance immutability blocks Performance prune</span>
-        <span class="sc-meta">55d &nbsp;·&nbsp; 8ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:14d</span>
+        <span class="sc-meta">55d &nbsp;·&nbsp; 7ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain is retention+SLA expired and offloadComplete, but performanceImmutabilityDays has not elapsed since GEN window end. Prune must not fire until the lock expires.</p>
@@ -4535,6 +4575,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.350 TB · C: 0.825 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.700 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 19, 2026-05-21):</strong> <span style="font-weight:700">1.625 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.650 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.625 + 0.525 = <span style="font-weight:700">2.150 TB</span></div>
           </div>
         </div>
 
@@ -4613,7 +4655,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-cap-immutability-blocks-deletion</span>
         <span class="sc-name">Capacity immutability blocks chain deletion</span>
-        <span class="sc-meta">70d &nbsp;·&nbsp; 11ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · CapImm:21d</span>
+        <span class="sc-meta">70d &nbsp;·&nbsp; 10ms &nbsp;·&nbsp; SOBR · Ret:14 · Move · Offload:7d · CapImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Chain's GEN deleteOn has been reached, but capacityImmutableUntil is in the future. Chain must not be deleted until lock clears.</p>
@@ -4647,6 +4689,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.850 TB · C: 0.650 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.025 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 33, 2026-06-04):</strong> <span style="font-weight:700">1.800 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.825 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.800 + 0.525 = <span style="font-weight:700">2.325 TB</span></div>
           </div>
         </div>
 
@@ -4734,7 +4778,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-arch-immutability-blocks-deletion</span>
         <span class="sc-name">Archive immutability blocks chain deletion</span>
-        <span class="sc-meta">100d &nbsp;·&nbsp; 29ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · ArchImm:30d</span>
+        <span class="sc-meta">100d &nbsp;·&nbsp; 26ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · ArchImm:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">GFS point in Archive is within archiveImmutableUntil. Chain deletion must wait for Archive lock to clear even after deleteOn and Capacity immutability have both passed.</p>
@@ -4768,6 +4812,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.250 TB · C: 1.000 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.775 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 35, 2026-06-06):</strong> <span style="font-weight:700">2.550 TB</span> &nbsp;·&nbsp; P: 1.375 · C: 1.175 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.550 + 0.525 = <span style="font-weight:700">3.075 TB</span></div>
           </div>
         </div>
 
@@ -4898,6 +4944,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.925 TB · C: 0.650 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.100 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 19, 2026-05-21):</strong> <span style="font-weight:700">1.625 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.650 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.625 + 0.525 = <span style="font-weight:700">2.150 TB</span></div>
           </div>
         </div>
 
@@ -5010,6 +5058,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.950 TB · C: 0.825 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.300 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 33, 2026-06-04):</strong> <span style="font-weight:700">1.800 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.825 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.800 + 0.525 = <span style="font-weight:700">2.325 TB</span></div>
           </div>
         </div>
 
@@ -5088,7 +5138,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-gen-state-transitions</span>
         <span class="sc-name">GEN lifecycle state is monotonic: Pending → WaitImmutability → Deletable</span>
-        <span class="sc-meta">80d &nbsp;·&nbsp; 12ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:2W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:7d</span>
+        <span class="sc-meta">80d &nbsp;·&nbsp; 15ms &nbsp;·&nbsp; SOBR · Ret:14 · GFS:2W/0M/0Y · Move · Offload:7d · PerfImm:7d · CapImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">A GEN must never go backwards through lifecycle states. Once Deletable it must not revert to Pending or WaitImmutability on a later day.</p>
@@ -5122,6 +5172,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.925 TB · C: 0.650 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.100 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 19, 2026-05-21):</strong> <span style="font-weight:700">1.625 TB</span> &nbsp;·&nbsp; P: 0.975 · C: 0.650 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.625 + 0.525 = <span style="font-weight:700">2.150 TB</span></div>
           </div>
         </div>
 
@@ -5209,7 +5261,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">im-all-tiers-immutability</span>
         <span class="sc-name">All three tier immutability locks interact correctly</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 34ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 39ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:2W/0M/0Y · Move · Offload:7d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With non-zero immutability on all three tiers, deletion must wait until ALL locks expire, even if only one tier contains data at deletion time.</p>
@@ -5243,6 +5295,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.750 TB · C: 1.175 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.450 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 35, 2026-06-06):</strong> <span style="font-weight:700">2.550 TB</span> &nbsp;·&nbsp; P: 1.375 · C: 1.175 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.550 + 0.525 = <span style="font-weight:700">3.075 TB</span></div>
           </div>
         </div>
 
@@ -5339,7 +5393,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-move-archive</span>
         <span class="sc-name">GFS W+M+Y × Move × Archive: cardinality and tier residency</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 356ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 318ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Mixed GFS with move mode and archive. Verify: weekly/monthly/yearly counts, tier residency per point, incremental-free Capacity after each chain archives, no premature archive entry.</p>
@@ -5373,6 +5427,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 2.350 TB · C: 2.225 TB · A: 0.700 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 5.800 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 380, 2027-05-17):</strong> <span style="font-weight:700">5.550 TB</span> &nbsp;·&nbsp; P: 2.475 · C: 2.125 · A: 0.950</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 5.550 + 0.525 = <span style="font-weight:700">6.075 TB</span></div>
           </div>
         </div>
 
@@ -5568,7 +5624,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-copy-archive</span>
         <span class="sc-name">GFS W+M+Y × Copy × Archive: residue and gate</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 387ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 366ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Mixed GFS with copy mode and archive. Non-GFS Capacity residue must clear immediately after GFS point archives. Archive gate is point-age-based.</p>
@@ -5602,6 +5658,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 2.875 TB · C: 1.075 TB · A: 1.075 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 5.550 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 388, 2027-05-25):</strong> <span style="font-weight:700">5.375 TB</span> &nbsp;·&nbsp; P: 3.050 · C: 1.100 · A: 1.225</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 5.375 + 0.525 = <span style="font-weight:700">5.900 TB</span></div>
           </div>
         </div>
 
@@ -5797,7 +5855,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-wmy-copy-archive-immutability</span>
         <span class="sc-name">GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction</span>
-        <span class="sc-meta">500d &nbsp;·&nbsp; 501ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
+        <span class="sc-meta">500d &nbsp;·&nbsp; 456ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Copy · Offload:14d · Archive:14d · PerfImm:7d · CapImm:14d · ArchImm:21d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">High-risk 3-way: mixed GFS stacking, copy mode, archive, and all-tier immutability. Verify correct interlock between archive gating, capacity residue clearing, and GEN immutability locks.</p>
@@ -5831,6 +5889,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 3.200 TB · C: 1.225 TB · A: 1.250 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 6.200 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 472, 2027-08-17):</strong> <span style="font-weight:700">5.675 TB</span> &nbsp;·&nbsp; P: 3.200 · C: 1.225 · A: 1.250</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 5.675 + 0.525 = <span style="font-weight:700">6.200 TB</span></div>
           </div>
         </div>
 
@@ -6044,7 +6104,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-monthly-move-immutability</span>
         <span class="sc-name">GFS Monthly × Move × Perf Immutability: GEN deleteOn vs immutability interlock</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 38ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:0W/3M/0Y · Move · Offload:7d · PerfImm:14d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 39ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:0W/3M/0Y · Move · Offload:7d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Monthly GFS extends GEN deleteOn. Combined with Perf immutability this requires both deleteOn and lock to clear before prune/delete. Neither alone should be sufficient.</p>
@@ -6078,6 +6138,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.775 TB · C: 1.225 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.525 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 105, 2026-08-15):</strong> <span style="font-weight:700">3.125 TB</span> &nbsp;·&nbsp; P: 1.500 · C: 1.625 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.125 + 0.525 = <span style="font-weight:700">3.650 TB</span></div>
           </div>
         </div>
 
@@ -6174,7 +6236,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-short-retention-long-gfs</span>
         <span class="sc-name">Short retention × long GFS yearly: chain outlives retention by years</span>
-        <span class="sc-meta">1825d &nbsp;·&nbsp; 120ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/5Y</span>
+        <span class="sc-meta">1825d &nbsp;·&nbsp; 131ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:0W/0M/5Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With retention=7 and yearly=5 (5 years), chains sealed early must survive for 5 years because of GFS tag. Verifies GFS protection overrides count+SLA expiry for the full GFS window.</p>
@@ -6208,6 +6270,8 @@
             <div class="path-line">5.050 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 5.575 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 1805, 2031-04-11):</strong> <span style="font-weight:700">5.075 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 5.075 + 0.525 = <span style="font-weight:700">5.600 TB</span></div>
           </div>
         </div>
 
@@ -6450,7 +6514,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-high-gen-period</span>
         <span class="sc-name">Large generationPeriodDays with GFS and immutability</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 144ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:0W/3M/0Y · Move · Offload:14d · PerfImm:14d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 156ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:0W/3M/0Y · Move · Offload:14d · PerfImm:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">generationPeriodDays=30: each GEN covers a full month. Verifies GEN window aligns correctly at 30-day boundaries and deleteOn is computed properly with monthly GFS extension.</p>
@@ -6484,6 +6548,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 2.350 TB · C: 1.675 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 4.550 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 177, 2026-10-26):</strong> <span style="font-weight:700">4.775 TB</span> &nbsp;·&nbsp; P: 2.475 · C: 2.300 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 4.775 + 0.525 = <span style="font-weight:700">5.300 TB</span></div>
           </div>
         </div>
 
@@ -6607,7 +6673,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-copy-move-combo</span>
         <span class="sc-name">Copy+Move mode with GFS W+M and archive</span>
-        <span class="sc-meta">120d &nbsp;·&nbsp; 47ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/2M/0Y · Copy · Offload:7d · Archive:30d</span>
+        <span class="sc-meta">120d &nbsp;·&nbsp; 52ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/2M/0Y · Copy · Offload:7d · Archive:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">copyEnabled+moveEnabled simultaneously. Verifies both copy semantics (Capacity stamped at creation) and move semantics (Performance removed after offloadAfterDays) apply correctly, with correct archive gating.</p>
@@ -6641,6 +6707,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.775 TB · C: 1.075 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.375 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 84, 2026-07-25):</strong> <span style="font-weight:700">3.550 TB</span> &nbsp;·&nbsp; P: 1.525 · C: 1.525 · A: 0.500</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.550 + 0.525 = <span style="font-weight:700">4.075 TB</span></div>
           </div>
         </div>
 
@@ -6737,7 +6805,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-no-gfs-long-archive</span>
         <span class="sc-name">SOBR Move no-GFS: archive tier should remain empty</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 62ms &nbsp;·&nbsp; SOBR · Ret:30 · Move · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 65ms &nbsp;·&nbsp; SOBR · Ret:30 · Move · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">With hasArchiveTier=true but no GFS policy, only GFS-tagged points may enter Archive. Archive tier must remain empty throughout the entire run.</p>
@@ -6771,6 +6839,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.300 TB · C: 0.825 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.650 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 35, 2026-06-06):</strong> <span style="font-weight:700">2.375 TB</span> &nbsp;·&nbsp; P: 1.375 · C: 1.000 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.375 + 0.525 = <span style="font-weight:700">2.900 TB</span></div>
           </div>
         </div>
 
@@ -6894,7 +6964,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-retention-variant-r7</span>
         <span class="sc-name">Retention variant retention=7 with W+M GFS</span>
-        <span class="sc-meta">200d &nbsp;·&nbsp; 75ms &nbsp;·&nbsp; SOBR · Ret:7 · GFS:4W/3M/0Y · Move · Offload:7d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">200d &nbsp;·&nbsp; 77ms &nbsp;·&nbsp; SOBR · Ret:7 · GFS:4W/3M/0Y · Move · Offload:7d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention=7 paired with GFS to stress-test boundary interaction at the shortest practical retention. Chain should seal every 7 days and GFS must survive past that.</p>
@@ -6928,6 +6998,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 0.775 TB · C: 1.100 TB · A: 0.500 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.900 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 103, 2026-08-13):</strong> <span style="font-weight:700">2.550 TB</span> &nbsp;·&nbsp; P: 0.800 · C: 1.250 · A: 0.500</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.550 + 0.525 = <span style="font-weight:700">3.075 TB</span></div>
           </div>
         </div>
 
@@ -7051,7 +7123,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-retention-variant-r60</span>
         <span class="sc-name">Retention variant retention=60 with W+M+Y GFS</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 345ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 411ms &nbsp;·&nbsp; SOBR · Ret:60 · GFS:4W/3M/2Y · Move · Offload:14d · Archive:30d · PerfImm:7d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention=60 with full GFS stack. Many chains coexist; verifies base identity remains oldest across all, GFS caps are respected across many active+inactive chains simultaneously.</p>
@@ -7085,6 +7157,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 2.350 TB · C: 2.225 TB · A: 0.700 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 5.800 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 380, 2027-05-17):</strong> <span style="font-weight:700">5.550 TB</span> &nbsp;·&nbsp; P: 2.475 · C: 2.125 · A: 0.950</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 5.550 + 0.525 = <span style="font-weight:700">6.075 TB</span></div>
           </div>
         </div>
 
@@ -7280,7 +7354,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-high-change-rate-drift-2yr</span>
         <span class="sc-name">High change-rate adversarial: 40% daily delta over 2 years</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 70ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/1Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 86ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/3M/1Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Stress scenario with extreme daily churn (40%) to catch storage or pruning behavior that appears stable at 5% but fails under heavy write amplification.</p>
@@ -7314,6 +7388,8 @@
             <div class="path-line">7.900 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 8.425 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 391, 2027-05-28):</strong> <span style="font-weight:700">9.500 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 9.500 + 0.525 = <span style="font-weight:700">10.025 TB</span></div>
           </div>
         </div>
 
@@ -7556,7 +7632,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-short-retention-drift-3yr</span>
         <span class="sc-name">Short retention adversarial: retention=3 over 3 years</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 75ms &nbsp;·&nbsp; DAS · Ret:3 · GFS:4W/3M/1Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 88ms &nbsp;·&nbsp; DAS · Ret:3 · GFS:4W/3M/1Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Very short retention with GFS enabled to stress frequent chain sealing/deletion. Ensures cleanup remains stable and restore points do not accumulate over long duration.</p>
@@ -7590,6 +7666,8 @@
             <div class="path-line">1.325 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.850 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 541, 2027-10-25):</strong> <span style="font-weight:700">2.425 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.425 + 0.525 = <span style="font-weight:700">2.950 TB</span></div>
           </div>
         </div>
 
@@ -7832,7 +7910,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-policy-change-mid-run</span>
         <span class="sc-name">Mid-run policy change: retention 7 → 30 on day 180</span>
-        <span class="sc-meta">365d &nbsp;·&nbsp; 46ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/0Y</span>
+        <span class="sc-meta">365d &nbsp;·&nbsp; 59ms &nbsp;·&nbsp; DAS · Ret:7 · GFS:4W/3M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Retention is expanded from 7 to 30 restore points partway through a 365-day run. Validates that the engine correctly grows the active chain toward the new limit, that old chains are not orphaned, and that GFS cardinality stays within limits throughout the transition.</p>
@@ -7866,6 +7944,8 @@
             <div class="path-line">1.325 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.850 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 204, 2026-11-22):</strong> <span style="font-weight:700">2.025 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.025 + 0.525 = <span style="font-weight:700">2.550 TB</span></div>
           </div>
         </div>
 
@@ -8043,7 +8123,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-gfs-only-policy</span>
         <span class="sc-name">GFS-only policy: weekly=52 with minimal daily retention</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 141ms &nbsp;·&nbsp; DAS · Ret:1 · GFS:52W/0M/0Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 149ms &nbsp;·&nbsp; DAS · Ret:1 · GFS:52W/0M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Stress test where daily retention is set to 1 (near-zero daily RPs) while weekly GFS keeps 52 weeks. After 2 years the engine should hold exactly 52 weekly GFS snapshots and no more. Validates GFS dominance over retention-based pruning.</p>
@@ -8077,6 +8157,8 @@
             <div class="path-line">25.350 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 25.875 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 370, 2027-05-07):</strong> <span style="font-weight:700">25.900 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 25.900 + 0.525 = <span style="font-weight:700">26.425 TB</span></div>
           </div>
         </div>
 
@@ -8319,7 +8401,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">ix-two-jobs-one-repo</span>
         <span class="sc-name">Two jobs sharing one repository</span>
-        <span class="sc-meta">400d &nbsp;·&nbsp; 71ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/2M/0Y</span>
+        <span class="sc-meta">400d &nbsp;·&nbsp; 74ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/2M/0Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Two independent backup jobs (different retention and GFS policies) write to the same DAS repository. Validates that chains do not cross-contaminate between jobs, each job maintains its own global base, and storage accounts for both jobs. Checks that inactive chain drift stays bounded across both job lifecycles.</p>
@@ -8353,6 +8435,8 @@
             <div class="path-line">1.425 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.950 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 118, 2026-08-28):</strong> <span style="font-weight:700">2.037 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.037 + 0.525 = <span style="font-weight:700">2.562 TB</span></div>
           </div>
         </div>
 
@@ -8595,6 +8679,8 @@
             <div class="path-line">1.050 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1.575 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 34, 2026-06-05):</strong> <span style="font-weight:700">1.150 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.150 + 0.525 = <span style="font-weight:700">1.675 TB</span></div>
           </div>
         </div>
 
@@ -8725,6 +8811,8 @@
             <div class="path-line">2.550 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.075 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 797, 2028-07-07):</strong> <span style="font-weight:700">3.025 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.025 + 0.525 = <span style="font-weight:700">3.550 TB</span></div>
           </div>
         </div>
 
@@ -9001,6 +9089,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.350 TB · C: 1.125 TB · A: 0.525 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.525 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 35, 2026-06-06):</strong> <span style="font-weight:700">3.025 TB</span> &nbsp;·&nbsp; P: 1.375 · C: 1.150 · A: 0.500</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.025 + 0.525 = <span style="font-weight:700">3.550 TB</span></div>
           </div>
         </div>
 
@@ -9122,6 +9212,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.250 TB · C: 1.000 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.775 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 35, 2026-06-06):</strong> <span style="font-weight:700">2.550 TB</span> &nbsp;·&nbsp; P: 1.375 · C: 1.175 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2.550 + 0.525 = <span style="font-weight:700">3.075 TB</span></div>
           </div>
         </div>
 
@@ -9252,6 +9344,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.100 TB · C: 0.825 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 2.450 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 26, 2026-05-28):</strong> <span style="font-weight:700">1.975 TB</span> &nbsp;·&nbsp; P: 1.150 · C: 0.825 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1.975 + 0.525 = <span style="font-weight:700">2.500 TB</span></div>
           </div>
         </div>
 
@@ -9339,7 +9433,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-sobr-copy-full-lifecycle</span>
         <span class="sc-name">Oracle diff: SOBR copy-only full lifecycle trace</span>
-        <span class="sc-meta">150d &nbsp;·&nbsp; 71ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
+        <span class="sc-meta">150d &nbsp;·&nbsp; 74ms &nbsp;·&nbsp; SOBR · Ret:30 · GFS:4W/3M/0Y · Copy · Offload:14d · Archive:14d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Copy mode: every new point immediately gets Capacity copy. Oracle tracks Perf+Cap dual occupancy per point, then Archive entry timing for GFS points, then Capacity residue clearing.</p>
@@ -9373,6 +9467,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 1.350 TB · C: 1.125 TB · A: 0.400 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 0.525 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 3.400 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 104, 2026-08-14):</strong> <span style="font-weight:700">3.625 TB</span> &nbsp;·&nbsp; P: 1.800 · C: 1.300 · A: 0.525</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 3.625 + 0.525 = <span style="font-weight:700">4.150 TB</span></div>
           </div>
         </div>
 
@@ -9478,7 +9574,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-das-wmy-weekly-size-nonzero</span>
         <span class="sc-name">Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage</span>
-        <span class="sc-meta">730d &nbsp;·&nbsp; 352ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/8M/2Y</span>
+        <span class="sc-meta">730d &nbsp;·&nbsp; 423ms &nbsp;·&nbsp; DAS · Ret:14 · GFS:4W/8M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Regression guard for bug fix: weekly-only GFS SyntheticFull points in a W+M+Y policy must contribute their incremental footprint (fullSize * changeRate) to used storage, not zero. Also validates GFS cardinality matches calendar expectations. Matches the exact user-reported scenario: 2TB source, 5% change, 10% growth, 14d retention, W4+M8+Y2 DAS.</p>
@@ -9512,6 +9608,8 @@
             <div class="path-line">10.561 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 1.050 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 11.611 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 727, 2028-04-28):</strong> <span style="font-weight:700">12.098 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 12.098 + 1.050 = <span style="font-weight:700">13.148 TB</span></div>
           </div>
         </div>
 
@@ -9754,7 +9852,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-calculator-parity-347tb-wmy</span>
         <span class="sc-name">Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 720ms &nbsp;·&nbsp; DAS · Ret:21 · GFS:4W/6M/2Y</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 823ms &nbsp;·&nbsp; DAS · Ret:21 · GFS:4W/6M/2Y</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Regression guard for block-absorption GFS model. Reference: 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 on a DAS repository. Model assumes ReFS/XFS block cloning is enabled (GFS points store as compressed diffs via bracket table). Simulator stored = 1,214.5 TB, working space = 55.4 TB, total = 1,269.9 TB. This matches forecast exactly (R-STOR-03) and validates the bracket-table GFS sizing. Note: Veeam Calculator without block cloning shows 2,345.6 TB; full parity requires modeling immutability windows and explicit block-clone logic.</p>
@@ -9788,6 +9886,8 @@
             <div class="path-line">1240.525 TB (DAS)</div>
             <div class="path-line"><strong>Working space reserve:</strong> 55.425 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1295.950 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 972, 2028-12-29):</strong> <span style="font-weight:700">1674.275 TB</span></div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 1674.275 + 55.425 = <span style="font-weight:700">1729.700 TB</span></div>
           </div>
         </div>
 
@@ -10030,7 +10130,7 @@
         <span class="status-badge" style="background:#1a7f37">PASS</span>
         <span class="sc-id mono">od-calculator-parity-347tb-wmy-sobr-move</span>
         <span class="sc-name">Oracle diff: 347TB W4+M6+Y2 SOBR Move storage — forecast must equal simulator</span>
-        <span class="sc-meta">1095d &nbsp;·&nbsp; 2676ms &nbsp;·&nbsp; SOBR · Ret:21 · GFS:4W/6M/2Y · Move · Offload:30d</span>
+        <span class="sc-meta">1095d &nbsp;·&nbsp; 3231ms &nbsp;·&nbsp; SOBR · Ret:21 · GFS:4W/6M/2Y · Move · Offload:30d</span>
       </summary>
       <div class="sc-body">
         <p class="sc-desc">Parity guard for SOBR Move mode. Same source config as DAS parity scenario (347TB / 5% change / 0% growth / 21d retention / W4+M6+Y2) but with SOBR Move, offload after 30 days, no archive tier. Forecast and simulator must agree exactly at the last Saturday of run (parity date). No Veeam Calculator reference yet — added once forecast=simulator is confirmed.</p>
@@ -10064,6 +10164,8 @@
             <div class="path-line"><strong>By tier:</strong> P: 329.650 TB · C: 1240.525 TB · A: 0.000 TB</div>
             <div class="path-line"><strong>Working space reserve:</strong> 55.425 TB</div>
             <div class="path-line"><strong>Total incl. reserve:</strong> 1625.600 TB</div>
+            <div class="path-line" style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0"><strong>Peak stored (day 958, 2028-12-15):</strong> <span style="font-weight:700">2055.975 TB</span> &nbsp;·&nbsp; P: 451.100 · C: 1604.875 · A: 0.000</div>
+            <div class="path-line"><strong>Peak incl. reserve:</strong> 2055.975 + 55.425 = <span style="font-weight:700">2111.400 TB</span></div>
           </div>
         </div>
 
