@@ -106,6 +106,24 @@ npm run compare:model
 
 This compares current simulator forecast output to the repository's internal model baseline (`docs/veeam-model-baseline.json`) without relying on the external calculator.
 
+### Step 2b: Visual diagnosis (sizing context at scale)
+
+Open the quarterly comparison report in a browser:
+
+```bash
+npm run report:quarterly
+# then open docs/quarterly-comparison-report.html
+```
+
+Use this when the raw numbers from Steps 1–2 pass but the sizing result looks wrong at a glance, or when investigating a large-source scenario (50TB+). The report shows:
+
+- Simulator vs Forecast vs Calculator across 8 scenarios × 12 quarters
+- Tier breakdown, GFS age buckets, Incr:Full ratio, and trend arrows per quarter
+- Decision strip (Green/Amber/Red readiness) per scenario
+- GFS zero assertions and cross-scenario comparison table at the top
+
+Do **not** skip this step for any scenario where the source data is ≥50TB — % deltas at large scale mask purchase-decision errors that are only visible in the absolute TB columns.
+
 ### Step 3: External parity check (only when needed)
 
 Only after Steps 1 and 2, run:
@@ -354,6 +372,13 @@ Active gates (required for workflow confidence):
 - `npm run verify:known-veeam-deltas`
 - `npm run test:quality`
 
+Visual investigation tools (regenerate after model or scenario changes):
+
+- `npm run report:quarterly` → `docs/quarterly-comparison-report.html`
+  - Regenerate whenever: new scenarios are added, GFS/tier logic changes, or a large-source sizing investigation is in progress.
+  - The committed HTML file should always reflect the current scenario set — stale HTML is a sign the report was not regenerated after a change.
+- `npm run test:quality` already regenerates `docs/lifecycle-report.html` as a side effect.
+
 Archived/exploratory tests (kept for research, not CI-gating):
 
 - `npm run archive:test:idealized-gfs`
@@ -392,6 +417,8 @@ Run after any change to:
 - Retention, GFS, tiering, base-promotion, or sizing logic
 - Working space sizing logic (progressive bucket/bracket scale planned-capacity calculations)
 
+Also regenerate `docs/quarterly-comparison-report.html` (`npm run report:quarterly`) after any of the above **and** after adding new scenarios or updating `REPORT_SCENARIOS` in `src/testing/triWayReport.ts`. The committed HTML should never be stale relative to the scenario list.
+
 ## How To Add/Change Scenarios
 
 Edit:
@@ -428,8 +455,10 @@ Typical next steps:
 2. Run `npm test` for the baseline comparison suite.
 3. Run `npm run test:quality` for engine, lifecycle, retention, GFS, tiering, or report changes.
 4. If failures occur, inspect the CLI output and `docs/lifecycle-report.html`.
-5. Fix logic or update expectations.
-6. Rerun until all required checks pass.
+5. If the failure involves sizing at scale (any scenario ≥50TB source), run `npm run report:quarterly` and open `docs/quarterly-comparison-report.html` to diagnose visually.
+6. Fix logic or update expectations.
+7. Rerun until all required checks pass.
+8. If you added scenarios or changed GFS/tier logic, regenerate both HTML reports before committing.
 
 ## Notes
 

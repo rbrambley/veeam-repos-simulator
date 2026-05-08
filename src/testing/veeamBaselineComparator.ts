@@ -30,6 +30,7 @@ interface TestScenario {
   id: string;
   name: string;
   config: ScenarioConfig;
+  totalDays?: number;
 }
 
 interface TestScenarioFile {
@@ -58,6 +59,11 @@ interface BaselineScenario {
   expected: BaselineExpected;
 }
 
+interface AbsoluteTolerance {
+  sourceTbLt: number;   // source TB upper bound (exclusive) for this tier
+  absoluteTB: number;   // max acceptable absolute delta for this tier
+}
+
 interface BaselineFile {
   defaults: {
     startDate: string;
@@ -65,6 +71,7 @@ interface BaselineFile {
     workingSpacePct: number;
     veeamWorkingSpacePct: number;
     tolerancePct: number;
+    absoluteToleranceTbGates?: AbsoluteTolerance[];
   };
   scenarios: BaselineScenario[];
 }
@@ -345,16 +352,50 @@ function asNumberOrUndefined(v: unknown): number | undefined {
   return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 }
 
-function compareMetric(label: string, actual: number, expected: number, tolerancePct: number, wsAdjustmentTB?: number): { ok: boolean; detail: string } {
+/**
+ * Returns the tiered absolute tolerance (TB) for a given source data size.
+ * Tiers: <10TB → 1TB, 10-100TB → 2TB, 100-500TB → 5TB, ≥500TB → 10TB.
+ * These thresholds map to meaningful storage purchase deltas (e.g. a single disk shelf).
+ */
+function computeAbsoluteToleranceTB(
+  sourceDataTB: number,
+  gates?: AbsoluteTolerance[]
+): number {
+  const defaultGates: AbsoluteTolerance[] = [
+    { sourceTbLt: 10,   absoluteTB: 1  },
+    { sourceTbLt: 100,  absoluteTB: 2  },
+    { sourceTbLt: 500,  absoluteTB: 5  },
+    { sourceTbLt: Infinity, absoluteTB: 10 },
+  ];
+  const activeTiers = gates ?? defaultGates;
+  const tier = activeTiers.find(t => sourceDataTB < t.sourceTbLt);
+  return tier?.absoluteTB ?? 10;
+}
+
+function compareMetric(
+  label: string,
+  actual: number,
+  expected: number,
+  tolerancePct: number,
+  wsAdjustmentTB?: number,
+  absoluteToleranceTB?: number
+): { ok: boolean; detail: string } {
   const delta = actual - expected;
-  const deltaPct = Math.abs(expected) > 0.000001 ? Math.abs(delta / expected) * 100 : Math.abs(delta);
-  const ok = deltaPct <= tolerancePct;
+  const absDelta = Math.abs(delta);
+  const deltaPct = Math.abs(expected) > 0.000001 ? (absDelta / expected) * 100 : absDelta;
+  // Pass if within % tolerance OR within absolute TB tolerance (purchase-decision gate).
+  const okByPct = deltaPct <= tolerancePct;
+  const okByAbs = absoluteToleranceTB !== undefined && absDelta <= absoluteToleranceTB;
+  const ok = okByPct || okByAbs;
+  const gateNote = okByAbs && !okByPct
+    ? ` [abs gate: ${absDelta.toFixed(3)} TB ≤ ${absoluteToleranceTB!.toFixed(1)} TB]`
+    : '';
   const wsNote = wsAdjustmentTB !== undefined && Math.abs(wsAdjustmentTB) > 0.001
     ? ` [ws adj: ${wsAdjustmentTB > 0 ? '-' : '+'}${Math.abs(wsAdjustmentTB).toFixed(2)} TB, Veeam working-space behavior is scenario-dependent]`
     : '';
   return {
     ok,
-    detail: `${label}: actual=${actual.toFixed(2)} TB expected=${expected.toFixed(2)} TB delta=${delta.toFixed(2)} TB (${deltaPct.toFixed(2)}%)${wsNote}`,
+    detail: `${label}: actual=${actual.toFixed(2)} TB expected=${expected.toFixed(2)} TB delta=${delta.toFixed(2)} TB (${deltaPct.toFixed(2)}%)${gateNote}${wsNote}`,
   };
 }
 
@@ -537,7 +578,10 @@ async function run(): Promise<void> {
       continue;
     }
 
-    const details = activeChecks.map(c => compareMetric(c.label, c.actual, c.expected, tolerancePct, undefined));
+    const absGates = baseline.defaults?.absoluteToleranceTbGates;
+    const sourceDataTB = scenario.config.sourceDataTB;
+    const absTolerance = computeAbsoluteToleranceTB(sourceDataTB, absGates);
+    const details = activeChecks.map(c => compareMetric(c.label, c.actual, c.expected, tolerancePct, undefined, absTolerance));
     const ok = details.every(d => d.ok);
 
     if (ok) {

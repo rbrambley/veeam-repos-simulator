@@ -239,6 +239,63 @@ const REPORT_SCENARIOS: ReportScenario[] = [
     },
     veeamCalcY3: { totalTB: 1.6, perfTB: 1.6, capTB: 3.0, archTB: 0.7 },
   },
+  // ── Large-source scenarios (pending Veeam Calculator capture) ─────────────
+  // Calculator reference values will be populated once captured via Playwright.
+  // Until then, totalTB: 0 signals "pending" and data quality will show as low.
+  {
+    id: 'das-large-yearly2-r7',
+    name: 'DAS Large — 100TB, 7d retention, 2 yearly GFS',
+    config: {
+      repositoryType: 'DAS',
+      sourceDataTB: 100,
+      annualGrowthRatePct: 15,
+      dailyChangeRatePct: 10,
+      retention: 7,
+      gfsPolicy: { weekly: 0, monthly: 0, yearly: 2 },
+      offloadAfterDays: 7,
+      archiveAfterDays: 14,
+      hasArchiveTier: false,
+      copyEnabled: false,
+      moveEnabled: false,
+    },
+    veeamCalcY3: { totalTB: 0 },
+  },
+  {
+    id: 'sobr-large-wmy-r60',
+    name: 'SOBR Large — 200TB, 60d retention, W4+M6+Y3, archive tier',
+    config: {
+      repositoryType: 'SOBR',
+      sourceDataTB: 200,
+      annualGrowthRatePct: 10,
+      dailyChangeRatePct: 5,
+      retention: 60,
+      gfsPolicy: { weekly: 4, monthly: 6, yearly: 3 },
+      offloadAfterDays: 14,
+      archiveAfterDays: 30,
+      hasArchiveTier: true,
+      copyEnabled: false,
+      moveEnabled: true,
+    },
+    veeamCalcY3: { totalTB: 0, perfTB: 0, capTB: 0, archTB: 0 },
+  },
+  {
+    id: 'sobr-xlarge-nogfs-r14',
+    name: 'SOBR XLarge — 500TB, 14d retention, no GFS',
+    config: {
+      repositoryType: 'SOBR',
+      sourceDataTB: 500,
+      annualGrowthRatePct: 5,
+      dailyChangeRatePct: 3,
+      retention: 14,
+      gfsPolicy: { weekly: 0, monthly: 0, yearly: 0 },
+      offloadAfterDays: 7,
+      archiveAfterDays: 30,
+      hasArchiveTier: false,
+      copyEnabled: false,
+      moveEnabled: true,
+    },
+    veeamCalcY3: { totalTB: 0, perfTB: 0, capTB: 0, archTB: 0 },
+  },
 ];
 
 function withBaselineCalcRef(sc: ReportScenario): ReportScenario {

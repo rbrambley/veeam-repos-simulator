@@ -552,6 +552,138 @@
         {"day": 8, "description": "First sealed chain should offload immediately"}
       ],
       "finalState": {}
+    },
+    {
+      "id": "das-medium-nogfs-r14",
+      "name": "DAS Medium — 50TB, 14d retention, no GFS",
+      "description": "Realistic SMB file server scenario. 50TB source, 10% annual growth, 5% daily change, 14d retention, no GFS. Tests chain sizing accuracy at a meaningful purchase scale.",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 50,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 28,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {}
+    },
+    {
+      "id": "das-large-yearly2-r7",
+      "name": "DAS Large — 100TB, 7d retention, 2 yearly GFS",
+      "description": "Mid-market scenario with meaningful yearly archival. 100TB source, 15% growth, 10% daily change, 7d retention, 2 yearly GFS points. Tests GFS sizing accuracy at real purchase scale.",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 100,
+        "annualGrowthRatePct": 15,
+        "dailyChangeRatePct": 10,
+        "retention": 7,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {}
+    },
+    {
+      "id": "das-large-wmy-r30",
+      "name": "DAS Large — 100TB, 30d retention, W4+M6+Y2 GFS",
+      "description": "Full compliance scenario at large scale. 100TB source, 10% growth, 5% daily change, 30d retention, W4+M6+Y2. Tests full GFS sizing accuracy for a real storage purchase decision.",
+      "config": {
+        "repositoryType": "DAS",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 100,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 4, "monthly": 6, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {}
+    },
+    {
+      "id": "sobr-medium-move-r30",
+      "name": "SOBR Medium Move-Only — 50TB, 30d retention, no GFS",
+      "description": "Fast-growth cloud offload scenario. 50TB source, 20% annual growth, 8% daily change, 30d retention, move-only, no GFS. Tests SOBR tier sizing at SMB/mid-market scale.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 50,
+        "annualGrowthRatePct": 20,
+        "dailyChangeRatePct": 8,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 60,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {}
+    },
+    {
+      "id": "sobr-large-wmy-r60",
+      "name": "SOBR Large — 200TB, 60d retention, W4+M6+Y3, archive tier",
+      "description": "Enterprise scenario with full GFS and archive tier. 200TB source, 10% growth, 5% daily change, 60d retention, W4+M6+Y3, archive tier enabled. The most demanding sizing scenario for real cost/purchase decisions.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 200,
+        "annualGrowthRatePct": 10,
+        "dailyChangeRatePct": 5,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 6, "yearly": 3},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {}
+    },
+    {
+      "id": "sobr-xlarge-nogfs-r14",
+      "name": "SOBR XLarge — 500TB, 14d retention, no GFS",
+      "description": "Large enterprise, cloud backup, no GFS. 500TB source, 5% annual growth, 3% daily change, 14d retention, move-only to capacity tier. Tests pure chain+tier sizing accuracy at the largest scale.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 500,
+        "annualGrowthRatePct": 5,
+        "dailyChangeRatePct": 3,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 1,
+      "checkpoints": [],
+      "finalState": {}
     }
   ]
 }

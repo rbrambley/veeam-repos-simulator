@@ -24,7 +24,7 @@
     "test:mutation": "tsx src/testing/mutationRunner.ts",
     "test:quality": "tsx src/testing/qualityRunner.ts",
     "test:quality:update-snapshots": "tsx src/testing/qualityRunner.ts --update-snapshots",
-    "validate:all": "npm run capture:veeam && npm run compare:veeam && npm run verify:known-veeam-deltas && npm run test:quality",
+    "validate:all": "npm run capture:veeam && npm run compare:veeam && npm run verify:known-veeam-deltas && npm run test:quality && npm run report:quarterly",
     "test:all": "npm run test:quality"
   },
   "dependencies": {

@@ -665,6 +665,36 @@
         "plannedCapacityTierTB": 1.5,
         "plannedArchiveTierTB": 0.6
       }
+    },
+    {
+      "id": "das-medium-nogfs-r14",
+      "notes": "pending-capture — 50TB DAS, 14d retention, no GFS; use veeam-capture-guide to populate",
+      "expected": {}
+    },
+    {
+      "id": "das-large-yearly2-r7",
+      "notes": "pending-capture — 100TB DAS, 7d retention, 2 yearly GFS; use veeam-capture-guide to populate",
+      "expected": {}
+    },
+    {
+      "id": "das-large-wmy-r30",
+      "notes": "pending-capture — 100TB DAS, 30d retention, W4+M6+Y2; use veeam-capture-guide to populate",
+      "expected": {}
+    },
+    {
+      "id": "sobr-medium-move-r30",
+      "notes": "pending-capture — 50TB SOBR move-only, 30d retention, no GFS; use veeam-capture-guide to populate",
+      "expected": {}
+    },
+    {
+      "id": "sobr-large-wmy-r60",
+      "notes": "pending-capture — 200TB SOBR move+archive, 60d retention, W4+M6+Y3; use veeam-capture-guide to populate",
+      "expected": {}
+    },
+    {
+      "id": "sobr-xlarge-nogfs-r14",
+      "notes": "pending-capture — 500TB SOBR move-only, 14d retention, no GFS; use veeam-capture-guide to populate",
+      "expected": {}
     }
   ]
 }

@@ -140,6 +140,36 @@
         "plannedCapacityTierTB": 36.5027,
         "plannedArchiveTierTB": 0.45
       }
+    },
+    {
+      "id": "das-medium-nogfs-r14",
+      "notes": "pending-seed — run comparator --seed to populate from simulator",
+      "expected": {}
+    },
+    {
+      "id": "das-large-yearly2-r7",
+      "notes": "pending-seed — run comparator --seed to populate from simulator",
+      "expected": {}
+    },
+    {
+      "id": "das-large-wmy-r30",
+      "notes": "pending-seed — run comparator --seed to populate from simulator",
+      "expected": {}
+    },
+    {
+      "id": "sobr-medium-move-r30",
+      "notes": "pending-seed — run comparator --seed to populate from simulator",
+      "expected": {}
+    },
+    {
+      "id": "sobr-large-wmy-r60",
+      "notes": "pending-seed — run comparator --seed to populate from simulator",
+      "expected": {}
+    },
+    {
+      "id": "sobr-xlarge-nogfs-r14",
+      "notes": "pending-seed — run comparator --seed to populate from simulator",
+      "expected": {}
     }
   ]
 }
