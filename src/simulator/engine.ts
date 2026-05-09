@@ -179,20 +179,33 @@ export class VeeamSimulator {
       .map(id => this.state.restorePoints.find(rp => rp.id === id))
       .filter((rp): rp is RestorePoint => !!rp);
 
+    // Base deletion: generation.windowEndDate + retention SLA/cardinality
     const retentionDays = Math.max(1, job.retention?.slaDays || job.retention?.restorePoints || 7);
     let deleteOn = this.addDaysISO(generation.windowEndDate, retentionDays);
 
+    // Extend deleteOn for GFS-protected restore points
+    // Per canonical model: generation deletion defers until all GFS tags on points expire
+    // GFS tags expire when points fall outside top-W/M/Y cardinality windows
     for (const rp of points) {
+      // Weekly GFS: each tagged point protected for the weekly retention period
+      // Cardinality window = weekly_count weeks, so extend deletion to preserve the point
       if (rp.isWeeklyGFS && (job.gfsPolicy?.weekly ?? 0) > 0) {
-        const candidate = this.addDaysISO(rp.date, job.gfsPolicy!.weekly * 7);
+        const weeklyRetentionDays = job.gfsPolicy!.weekly * 7; // 1 week = 7 days
+        const candidate = this.addDaysISO(rp.date, weeklyRetentionDays);
         if (this.parseISODate(candidate) > this.parseISODate(deleteOn)) deleteOn = candidate;
       }
+      // Monthly GFS: each tagged point protected for the monthly retention period
+      // Cardinality window = monthly_count months, approximate as 30.4 days/month
       if (rp.isMonthlyGFS && (job.gfsPolicy?.monthly ?? 0) > 0) {
-        const candidate = this.addDaysISO(rp.date, job.gfsPolicy!.monthly * 30);
+        const monthlyRetentionDays = Math.round(job.gfsPolicy!.monthly * 30.4); // 1 month ≈ 30.4 days
+        const candidate = this.addDaysISO(rp.date, monthlyRetentionDays);
         if (this.parseISODate(candidate) > this.parseISODate(deleteOn)) deleteOn = candidate;
       }
+      // Yearly GFS: each tagged point protected for the yearly retention period
+      // Cardinality window = yearly_count years, approximate as 365.25 days/year
       if (rp.isYearlyGFS && (job.gfsPolicy?.yearly ?? 0) > 0) {
-        const candidate = this.addDaysISO(rp.date, job.gfsPolicy!.yearly * 365);
+        const yearlyRetentionDays = Math.round(job.gfsPolicy!.yearly * 365.25); // 1 year ≈ 365.25 days
+        const candidate = this.addDaysISO(rp.date, yearlyRetentionDays);
         if (this.parseISODate(candidate) > this.parseISODate(deleteOn)) deleteOn = candidate;
       }
     }
