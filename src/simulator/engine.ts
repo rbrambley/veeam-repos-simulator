@@ -1145,47 +1145,84 @@ export class VeeamSimulator {
 
       // GFS retention: enforce max W/M/Y counts per job
       if (job.gfsPolicy) {
-        this.applyGFSRetention(job, actions);
+        this.validateGFSCardinality(job, actions);
       }
     }
     return actions;
   }
 
-  // Delete oldest GFS-tagged points that exceed the configured W/M/Y limits
-  applyGFSRetention(job: BackupJob, actions: string[]) {
+  /**
+   * CANONICAL INVARIANT #2: GFS Cardinality Protection
+   * 
+   * Validates that the GFS policy cardinality is preserved:
+   * - Exactly N weekly GFS points are retained (or fewer if job is young)
+   * - Exactly M monthly GFS points are retained (or fewer if job is young)
+   * - Exactly Y yearly GFS points are retained (or fewer if job is young)
+   * 
+   * GFS points are identified by isWeeklyGFS, isMonthlyGFS, isYearlyGFS flags.
+   * Cardinality enforcement removes the OLDEST tagged points when limits are exceeded.
+   * 
+   * This is distinct from retention-based deletion (handled by applyRetentionAndGFS).
+   * GFS cardinality is independent of chain status (active/inactive).
+   */
+  validateGFSCardinality(job: BackupJob, actions: string[]) {
     if (!job.gfsPolicy) return;
 
-    const deleteOldestGFS = (
-      flag: 'isWeeklyGFS' | 'isMonthlyGFS' | 'isYearlyGFS',
-      label: string,
-      maxKeep: number
-    ) => {
-      if (!maxKeep) return;
-      // All restore points (including detached GFS orphans) tagged with this flag for this job
-      const tagged = this.state.restorePoints
+    // Count current tagged GFS points per category across ALL chains and detached GFS orphans
+    const getTaggedPoints = (flag: 'isWeeklyGFS' | 'isMonthlyGFS' | 'isYearlyGFS') => {
+      return this.state.restorePoints
         .filter(rp => rp[flag] && (
-          // still in a chain belonging to this job, or a detached GFS orphan for this job
+          // Still in an active chain for this job
           this.state.chains.find(c => c.id === rp.chainId && c.jobId === job.id) ||
+          // Or a detached GFS orphan for this job
           (rp.chainId === `gfs-${job.id}` && rp.id.startsWith(`${job.id}-`))
         ))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // newest first
-      const excess = tagged.slice(maxKeep);
-      for (const rp of excess) {
-        actions.push(`${label} GFS point on ${rp.date} untagged (exceeds ${maxKeep} ${label.toLowerCase()} GFS limit).`);
-        // Clear this flag; if no GFS flags remain, clear isGFS.
-        // Point deletion is GEN-gated and handled by chain retention.
-        rp[flag] = false;
-        if (!rp.isWeeklyGFS && !rp.isMonthlyGFS && !rp.isYearlyGFS) {
+    };
+
+    // Enforce weekly GFS cardinality
+    if (job.gfsPolicy.weekly > 0) {
+      const weeklyPoints = getTaggedPoints('isWeeklyGFS');
+      const excessWeekly = weeklyPoints.slice(job.gfsPolicy.weekly);
+      for (const rp of excessWeekly) {
+        actions.push(`Weekly GFS point on ${rp.date} untagged (exceeds ${job.gfsPolicy.weekly} weekly GFS limit).`);
+        rp.isWeeklyGFS = false;
+        // Clear isGFS if no tags remain
+        if (!rp.isMonthlyGFS && !rp.isYearlyGFS) {
           rp.isGFS = false;
         }
       }
-    };
+    }
 
-    deleteOldestGFS('isWeeklyGFS', 'Weekly', job.gfsPolicy.weekly);
-    deleteOldestGFS('isMonthlyGFS', 'Monthly', job.gfsPolicy.monthly);
-    deleteOldestGFS('isYearlyGFS', 'Yearly', job.gfsPolicy.yearly);
+    // Enforce monthly GFS cardinality
+    if (job.gfsPolicy.monthly > 0) {
+      const monthlyPoints = getTaggedPoints('isMonthlyGFS');
+      const excessMonthly = monthlyPoints.slice(job.gfsPolicy.monthly);
+      for (const rp of excessMonthly) {
+        actions.push(`Monthly GFS point on ${rp.date} untagged (exceeds ${job.gfsPolicy.monthly} monthly GFS limit).`);
+        rp.isMonthlyGFS = false;
+        // Clear isGFS if no tags remain
+        if (!rp.isWeeklyGFS && !rp.isYearlyGFS) {
+          rp.isGFS = false;
+        }
+      }
+    }
 
-    // Detached points that no longer carry any GFS tag are no longer protected.
+    // Enforce yearly GFS cardinality
+    if (job.gfsPolicy.yearly > 0) {
+      const yearlyPoints = getTaggedPoints('isYearlyGFS');
+      const excessYearly = yearlyPoints.slice(job.gfsPolicy.yearly);
+      for (const rp of excessYearly) {
+        actions.push(`Yearly GFS point on ${rp.date} untagged (exceeds ${job.gfsPolicy.yearly} yearly GFS limit).`);
+        rp.isYearlyGFS = false;
+        // Clear isGFS if no tags remain
+        if (!rp.isWeeklyGFS && !rp.isMonthlyGFS) {
+          rp.isGFS = false;
+        }
+      }
+    }
+
+    // Clean up detached GFS orphans that no longer carry any GFS tag
     const detachedWithoutGfs = this.state.restorePoints.filter(rp =>
       rp.chainId === `gfs-${job.id}` &&
       !rp.isWeeklyGFS &&
@@ -1199,6 +1236,16 @@ export class VeeamSimulator {
       }
       actions.push(`Detached GFS point ${rp.id} deleted after all GFS tags expired.`);
     }
+  }
+
+  /**
+   * @deprecated Use validateGFSCardinality() instead.
+   * This method is kept for compatibility but behavior is now in validateGFSCardinality().
+   */
+  applyGFSRetention(job: BackupJob, actions: string[]) {
+    // Deprecated: This method now delegates to validateGFSCardinality().
+    // Kept for backward compatibility and to avoid breaking existing code references.
+    this.validateGFSCardinality(job, actions);
   }
 
   // Promote oldest full in each chain to be the chain base, and adjust sizing accordingly
