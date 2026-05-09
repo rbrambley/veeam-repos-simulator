@@ -79,6 +79,43 @@ interface PlannedResult {
   fileTypeSyntheticFullTB: number;
 }
 
+// VEEAM COMPENSATION FACTORS
+// Empirical calibration constants align simulator estimates to Veeam Calculator captures.
+// Veeam Calculator uses heuristics and block-level accounting that differ from the pure model.
+// Each block is documented with its discovery context and calculator behavior.
+const VEEAM_COMPENSATION = {
+  // Archive tier sizing for move-only + growth scenarios shows growth-dependent calibration
+  archiveCalibration: {
+    longHorizonWithGrowth: 1.2,
+    standard: 1.1,
+  },
+  // Monthly-only GFS scenarios have over-preserved perf tier and need rebalancing
+  monthlyOnlyRebalance: {
+    moveOnly: 0.16,
+    copyMovePerfDown: 0.16,
+    copyMoveCapDown: 0.56,
+    copyMoveArchDown: 0.28,
+  },
+  // Mixed W+M GFS rebalancing for archive scenarios
+  mixedWMRebalance: {
+    copyMovePerfDown: 0.16,
+    copyMoveCapDown: 0.56,
+    copyMoveArchDown: 0.28,
+    moveOnlyPerfDown: 0.16,
+    moveOnlyCapUp: 0.06,
+    moveOnlyArchUp: 0.38,
+  },
+  // Archive tail factor for non-GFS tail in archive tier
+  archiveTailFactor: {
+    copyLongDepth: 0.42,
+    copyShortDepth: 0.36,
+    moveLongDepth: 0.31,
+    moveShortDepth: 0.27,
+  },
+  // Archive zero-growth reduction for copy+move scenarios
+  archiveZeroGrowthReduction: 0.28,
+};
+
 function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, forecastYears: number, gfsSizingMode: GfsSizingMode, totalDays?: number): PlannedResult {
   const effectiveMoveEnabled = config.moveEnabled || !config.copyEnabled;
   const resolvedJobType = config.jobType ?? 'ForwardIncremental';
@@ -195,7 +232,9 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
       // Small calibration aligns archive-tier rounding with live calculator captures
       // for move-only mixed monthly/yearly GFS archive scenarios.
       const horizonDays = totalDays ?? (forecastYears * 365);
-      const archiveCal = config.annualGrowthRatePct > 0 && horizonDays >= 1825 ? 1.2 : 1.1;
+        const archiveCal = config.annualGrowthRatePct > 0 && horizonDays >= 1825
+          ? VEEAM_COMPENSATION.archiveCalibration.longHorizonWithGrowth
+          : VEEAM_COMPENSATION.archiveCalibration.standard;
       yearArchUsedTB = yearGfsStats.additionalArchFullTB * archiveCal;
     } else {
       yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
@@ -249,14 +288,14 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
   if (isMonthlyOnly) {
     if (!config.copyEnabled) {
       // Move-only monthly: shift a small slice from Perf to Capacity.
-      const rebalanceTB = yearFullSizeTB * 0.16;
+        const rebalanceTB = yearFullSizeTB * VEEAM_COMPENSATION.monthlyOnlyRebalance.moveOnly;
       yearPerfUsedTB = Math.max(0, yearPerfUsedTB - rebalanceTB);
       yearCapUsedTB += rebalanceTB;
     } else if (effectiveMoveEnabled && config.hasArchiveTier) {
       // Copy+Move monthly with archive: dampen total monthly overhead split.
-      const perfDownTB = yearFullSizeTB * 0.16;
-      const capDownTB = yearFullSizeTB * 0.56;
-      const archDownTB = yearFullSizeTB * 0.28;
+      const perfDownTB = yearFullSizeTB * VEEAM_COMPENSATION.monthlyOnlyRebalance.copyMovePerfDown;
+      const capDownTB = yearFullSizeTB * VEEAM_COMPENSATION.monthlyOnlyRebalance.copyMoveCapDown;
+      const archDownTB = yearFullSizeTB * VEEAM_COMPENSATION.monthlyOnlyRebalance.copyMoveArchDown;
       yearPerfUsedTB = Math.max(0, yearPerfUsedTB - perfDownTB);
       yearCapUsedTB = Math.max(0, yearCapUsedTB - capDownTB);
       yearArchUsedTB = Math.max(0, yearArchUsedTB - archDownTB);
@@ -271,9 +310,9 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     && (config.gfsPolicy?.monthly ?? 0) > 0
     && (config.gfsPolicy?.yearly ?? 0) === 0
   ) {
-    const perfDownTB = yearFullSizeTB * 0.16;
-    const capDownTB = yearFullSizeTB * 0.56;
-    const archDownTB = yearFullSizeTB * 0.28;
+    const perfDownTB = yearFullSizeTB * VEEAM_COMPENSATION.mixedWMRebalance.copyMovePerfDown;
+    const capDownTB = yearFullSizeTB * VEEAM_COMPENSATION.mixedWMRebalance.copyMoveCapDown;
+    const archDownTB = yearFullSizeTB * VEEAM_COMPENSATION.mixedWMRebalance.copyMoveArchDown;
     yearPerfUsedTB = Math.max(0, yearPerfUsedTB - perfDownTB);
     yearCapUsedTB = Math.max(0, yearCapUsedTB - capDownTB);
     yearArchUsedTB = Math.max(0, yearArchUsedTB - archDownTB);
@@ -288,10 +327,10 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     && (config.gfsPolicy?.yearly ?? 0) === 0
     && config.retention <= fullIntervalDays
   ) {
-    const perfToShiftTB = yearFullSizeTB * 0.16;
+    const perfToShiftTB = yearFullSizeTB * VEEAM_COMPENSATION.mixedWMRebalance.moveOnlyPerfDown;
     yearPerfUsedTB = Math.max(0, yearPerfUsedTB - perfToShiftTB);
-    yearCapUsedTB += yearFullSizeTB * 0.06;
-    yearArchUsedTB += yearFullSizeTB * 0.38;
+    yearCapUsedTB += yearFullSizeTB * VEEAM_COMPENSATION.mixedWMRebalance.moveOnlyCapUp;
+    yearArchUsedTB += yearFullSizeTB * VEEAM_COMPENSATION.mixedWMRebalance.moveOnlyArchUp;
   }
   // Monthly-only GFS archive scenarios on SOBR tend to include a non-GFS tail
   // component in the calculator's archive estimate that is not captured by
@@ -304,8 +343,8 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     const archiveTailWindowDays = Math.max(fullIntervalDays, config.archiveAfterDays);
     const archiveTailBaseTB = estimateTierChainDataForYearTB(archiveTailWindowDays);
     const archiveTailFactor = config.copyEnabled
-      ? (config.archiveAfterDays > (2 * fullIntervalDays) ? 0.42 : 0.36)
-      : (config.archiveAfterDays > (2 * fullIntervalDays) ? 0.31 : 0.27);
+      ? (config.archiveAfterDays > (2 * fullIntervalDays) ? VEEAM_COMPENSATION.archiveTailFactor.copyLongDepth : VEEAM_COMPENSATION.archiveTailFactor.copyShortDepth)
+      : (config.archiveAfterDays > (2 * fullIntervalDays) ? VEEAM_COMPENSATION.archiveTailFactor.moveLongDepth : VEEAM_COMPENSATION.archiveTailFactor.moveShortDepth);
     yearArchUsedTB += archiveTailBaseTB * archiveTailFactor;
   }
 
@@ -318,7 +357,7 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     && (config.gfsPolicy?.yearly ?? 0) === 0
     && config.annualGrowthRatePct === 0
   ) {
-    yearArchUsedTB = Math.max(0, yearArchUsedTB - (yearFullSizeTB * 0.28));
+    yearArchUsedTB = Math.max(0, yearArchUsedTB - (yearFullSizeTB * VEEAM_COMPENSATION.archiveZeroGrowthReduction));
   }
 
   const plannedPerformanceTierTB = yearPerfUsedTB + yearWorkingSpaceReserveTB;
