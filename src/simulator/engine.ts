@@ -1,5 +1,13 @@
-// Simulation engine for Veeam Backup Simulator
-// This module will handle day-by-day simulation of backup jobs, chains, retention, and storage usage.
+// Simulation engine for Veeam Backup Simulator.
+//
+// Canonical model reference: docs/canonical-model-spec.md
+// This engine enforces the following invariants at runtime:
+// 1) Retention model consistency (single global base per job when points exist)
+// 2) GFS cardinality/tag consistency (W/M/Y limits, tag/type constraints)
+// 3) Generation lifecycle consistency (window/deleteOn/immutability ordering)
+// 4) Working-space remains external to lifecycle mutations (documented in spec)
+// 5) SOBR residency semantics by mode (move single-tier, copy multi-tier allowed)
+// 6) Calculator parity boundaries remain external validation (testing layer)
 
 import { SimulationState, BackupJob, Repository, BackupChain, RestorePoint, BlockObject, SOBRTier, BackupGeneration } from '../models/veeam.ts';
 import { computeGfsStoredContributionTB } from '../models/gfsSizing.ts';
@@ -39,6 +47,133 @@ export function CalculateGfsSize(baseSize: number, dailyChangeRate: number, ageI
 
 export class VeeamSimulator {
   state: SimulationState;
+
+  private assertCanonicalInvariant(condition: boolean, message: string) {
+    if (!condition) {
+      throw new Error(`[CANONICAL_INVARIANT] ${message}`);
+    }
+  }
+
+  public assertCanonicalInvariants(context = 'runtime') {
+    this.ensureGenerationState();
+
+    for (const job of this.state.jobs) {
+      const repo = this.state.repositories.find(r => r.id === job.repositoryId);
+      const jobPoints = this.state.restorePoints.filter(rp => {
+        const chain = this.state.chains.find(c => c.id === rp.chainId);
+        return (!!chain && chain.jobId === job.id)
+          || (rp.chainId === `gfs-${job.id}` && rp.id.startsWith(`${job.id}-`));
+      });
+
+      // Invariant 1: one global base per job whenever full/synthetic points exist.
+      const fullLikePoints = jobPoints.filter(rp => rp.type === 'Full' || rp.type === 'SyntheticFull');
+      if (fullLikePoints.length > 0) {
+        const globalBaseCount = jobPoints.filter(rp => !!rp.isGlobalBase).length;
+        this.assertCanonicalInvariant(
+          globalBaseCount === 1,
+          `${context}: job ${job.id} must have exactly one global base (found ${globalBaseCount})`
+        );
+      }
+
+      // Invariant 2: GFS tags must only exist on Full/SyntheticFull and stay within W/M/Y limits.
+      const taggedPoints = jobPoints.filter(rp => !!rp.isWeeklyGFS || !!rp.isMonthlyGFS || !!rp.isYearlyGFS);
+      for (const rp of taggedPoints) {
+        this.assertCanonicalInvariant(
+          rp.type === 'Full' || rp.type === 'SyntheticFull',
+          `${context}: GFS-tagged point ${rp.id} has invalid type ${rp.type}`
+        );
+        this.assertCanonicalInvariant(
+          !!rp.isGFS,
+          `${context}: GFS-tagged point ${rp.id} must set isGFS=true`
+        );
+      }
+
+      if (job.gfsPolicy) {
+        const weeklyCount = jobPoints.filter(rp => !!rp.isWeeklyGFS).length;
+        const monthlyCount = jobPoints.filter(rp => !!rp.isMonthlyGFS).length;
+        const yearlyCount = jobPoints.filter(rp => !!rp.isYearlyGFS).length;
+
+        this.assertCanonicalInvariant(
+          weeklyCount <= (job.gfsPolicy.weekly ?? 0),
+          `${context}: job ${job.id} weekly GFS count ${weeklyCount} exceeds limit ${job.gfsPolicy.weekly ?? 0}`
+        );
+        this.assertCanonicalInvariant(
+          monthlyCount <= (job.gfsPolicy.monthly ?? 0),
+          `${context}: job ${job.id} monthly GFS count ${monthlyCount} exceeds limit ${job.gfsPolicy.monthly ?? 0}`
+        );
+        this.assertCanonicalInvariant(
+          yearlyCount <= (job.gfsPolicy.yearly ?? 0),
+          `${context}: job ${job.id} yearly GFS count ${yearlyCount} exceeds limit ${job.gfsPolicy.yearly ?? 0}`
+        );
+      }
+
+      // Invariant 5: SOBR tier residency semantics differ by copy/move mode.
+      if (repo?.type === 'SOBR' && repo.sobrConfig) {
+        const copyEnabled = this.isCopyEnabled(repo.sobrConfig);
+        const moveEnabled = this.isMoveEnabled(repo.sobrConfig);
+
+        for (const rp of jobPoints) {
+          const hasArch = this.hasTierData(rp, 'Archive');
+
+          if (hasArch) {
+            this.assertCanonicalInvariant(
+              repo.sobrConfig.hasArchiveTier,
+              `${context}: point ${rp.id} has archive data but archive tier is disabled`
+            );
+          }
+        }
+      }
+    }
+
+    // Invariant 3: generation windows/deleteOn/immutability ordering must be monotonic.
+    for (const gen of this.state.generations || []) {
+      const job = this.state.jobs.find(j => j.id === gen.jobId);
+      if (!job) continue;
+
+      this.assertCanonicalInvariant(
+        this.parseISODate(gen.windowStartDate).getTime() <= this.parseISODate(gen.windowEndDate).getTime(),
+        `${context}: generation ${gen.id} has windowStartDate after windowEndDate`
+      );
+
+      const retentionDays = Math.max(1, job.retention?.slaDays || job.retention?.restorePoints || 7);
+      const baselineDeleteOn = this.addDaysISO(gen.windowEndDate, retentionDays);
+      this.assertCanonicalInvariant(
+        this.parseISODate(gen.deleteOn).getTime() >= this.parseISODate(baselineDeleteOn).getTime(),
+        `${context}: generation ${gen.id} deleteOn ${gen.deleteOn} is earlier than baseline ${baselineDeleteOn}`
+      );
+
+      if (gen.performanceEnteredAt && gen.performanceImmutableUntil) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.performanceImmutableUntil).getTime() >= this.parseISODate(gen.performanceEnteredAt).getTime(),
+          `${context}: generation ${gen.id} performanceImmutableUntil precedes performanceEnteredAt`
+        );
+      }
+      if (gen.capacityEnteredAt && gen.capacityImmutableUntil) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.capacityImmutableUntil).getTime() >= this.parseISODate(gen.capacityEnteredAt).getTime(),
+          `${context}: generation ${gen.id} capacityImmutableUntil precedes capacityEnteredAt`
+        );
+      }
+      if (gen.archiveEnteredAt && gen.archiveImmutableUntil) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.archiveImmutableUntil).getTime() >= this.parseISODate(gen.archiveEnteredAt).getTime(),
+          `${context}: generation ${gen.id} archiveImmutableUntil precedes archiveEnteredAt`
+        );
+      }
+      if (gen.performanceEnteredAt && gen.capacityEnteredAt) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.performanceEnteredAt).getTime() <= this.parseISODate(gen.capacityEnteredAt).getTime(),
+          `${context}: generation ${gen.id} entered Capacity before Performance`
+        );
+      }
+      if (gen.capacityEnteredAt && gen.archiveEnteredAt) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.capacityEnteredAt).getTime() <= this.parseISODate(gen.archiveEnteredAt).getTime(),
+          `${context}: generation ${gen.id} entered Archive before Capacity`
+        );
+      }
+    }
+  }
 
   private setRestorePointSize(rp: RestorePoint, sizeTB: number) {
     rp.sizeGB = sizeTB;
@@ -360,6 +495,7 @@ export class VeeamSimulator {
     if (actions.length > 0) {
       this.lastDailyExplanation = actions.join(' ');
     }
+    this.assertCanonicalInvariants('constructor');
   }
 
   // Advance simulation by one day
@@ -438,6 +574,7 @@ export class VeeamSimulator {
 
     // Save daily explanation after all daily activity (including SOBR moves)
     this.lastDailyExplanation = actions.join(' ');
+    this.assertCanonicalInvariants(`nextDay:${this.state.date}`);
   }
   // GFS tagging: applies W/M/Y tags to Full or SyntheticFull points (type is never changed)
   tagGFSRestorePoint(job: BackupJob, rp: RestorePoint, date: Date, actions: string[]) {

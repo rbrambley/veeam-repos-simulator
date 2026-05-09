@@ -517,6 +517,18 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
   const allSnapshots: DailySnapshot[] = [];
   const milestones: Array<{ day: number; date: string; text: string }> = [];
 
+  try {
+    sim.assertCanonicalInvariants(`lifecycle:init:${sc.id}`);
+  } catch (err) {
+    violations.push({
+      day: 0,
+      date: sim.state.date,
+      violatedRule: 'R-CANONICAL-INIT',
+      expected: 'all canonical invariants hold at scenario initialization',
+      actual: err instanceof Error ? err.message : String(err),
+    });
+  }
+
   // Track per-scenario mutable state for cross-day checks
   const prevChainIds = new Set<string>(sim.state.chains.map((c) => c.id));
   // For GEN monotonicity: genId → last known state
@@ -581,6 +593,18 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
     // Advance simulation
     sim.nextDay();
     const currentDate = sim.state.date;
+
+    try {
+      sim.assertCanonicalInvariants(`lifecycle:day:${day}:${sc.id}`);
+    } catch (err) {
+      violations.push({
+        day,
+        date: currentDate,
+        violatedRule: 'R-CANONICAL-RUNTIME',
+        expected: 'all canonical invariants hold after nextDay',
+        actual: err instanceof Error ? err.message : String(err),
+      });
+    }
 
     const dailyExplanation = sim.getDailyExplanation();
     if (dailyExplanation && /(GFS|offload|Archive|pruned|deleted|SyntheticFull|Full restore point)/i.test(dailyExplanation)) {
