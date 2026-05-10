@@ -212,6 +212,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
   function renderImmutabilityChip(rp: RestorePointRow, tierHint?: 'Performance' | 'Capacity' | 'Archive') {
     const status = getRestorePointImmutability(rp, tierHint);
+    const displayLabel = status.isLocked === true ? 'Protected' : status.isLocked === false ? 'Mutable' : 'N/A';
     const style = status.isLocked === true
       ? { bg: '#e3f2fd', fg: '#1565c0' }
       : status.isLocked === false
@@ -219,7 +220,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         : { bg: '#eceff1', fg: '#455a64' };
     return (
       <span title={status.detail} style={{ background: style.bg, color: style.fg, borderRadius: '3px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>
-        {status.label}
+        {displayLabel}
       </span>
     );
   }
@@ -279,20 +280,33 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
   };
 
   const getGenerationStateLabel = (state: GenerationSnapshot['lifecycleState']) => {
-    if (state === 'DeleteOn Pending') return 'Locked';
+    if (state === 'DeleteOn Pending') return 'Sealed';
+    if (state === 'Waiting Immutability') return 'Immutability Hold';
+    if (state === 'Deletable') return 'Ready';
     return state;
+  };
+
+  const renderGenMetadataLine = (rp: RestorePointRow) => {
+    if (!hasGenerationUi || !rp.generationId || !generationById[rp.generationId]) return null;
+    const gen = generationById[rp.generationId];
+    const stateLabel = getGenerationStateLabel(gen.lifecycleState);
+    return (
+      <div style={{ fontSize: '0.75rem', color: '#546e7a', marginTop: '2px', fontFamily: 'monospace' }}>
+        📋 {shortId(rp.generationId)} ({stateLabel}, DeleteOn {gen.deleteOn})
+      </div>
+    );
   };
 
   const renderGenTotals = (locked: number, waiting: number, deletable: number) => (
     <div style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
-      <span title="Locked GENs" style={{ background: '#e3f2fd', color: '#1565c0', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
-        L {locked}
+      <span title="Sealed GENs" style={{ background: '#e3f2fd', color: '#1565c0', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        S {locked}
       </span>
-      <span title="Waiting Immutability GENs" style={{ background: '#efebe9', color: '#8d6e63', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
-        W {waiting}
+      <span title="Immutability Hold GENs" style={{ background: '#efebe9', color: '#8d6e63', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        H {waiting}
       </span>
-      <span title="Deletable GENs" style={{ background: '#e8f5e9', color: '#1b5e20', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
-        D {deletable}
+      <span title="Ready GENs" style={{ background: '#e8f5e9', color: '#1b5e20', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        R {deletable}
       </span>
     </div>
   );
@@ -1057,25 +1071,12 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                           <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isGlobalBase ? ' (Base)' : ''}</span>
                           <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{formatTB(displaySizeTB)}</span>
                         </div>
+                        {renderGenMetadataLine(rp)}
                         <div style={{ display: 'flex', gap: '3px', marginTop: '3px', flexWrap: 'wrap' }}>
-                          {hasGenerationUi && rp.generationId && (
-                            <span style={{ background: '#eceff1', color: '#455a64', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                              {shortId(rp.generationId)}
-                            </span>
-                          )}
-                          {hasGenerationUi && rp.generationId && generationById[rp.generationId] && (() => {
-                            const genState = generationById[rp.generationId].lifecycleState;
-                            const style = getGenerationStateStyle(genState);
-                            return (
-                              <span style={{ background: style.bg, color: style.color, borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                {getGenerationStateLabel(genState)}
-                              </span>
-                            );
-                          })()}
                           {renderImmutabilityChip(rp, tier)}
                           {prunedFromCapacity && (
                             <span style={{ background: '#8d6e63', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                              Pruned from Capacity
+                              Pruned
                             </span>
                           )}
                           {rp.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>W</span>}
@@ -1359,33 +1360,24 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               }
 
               // --- 4. Immutability status ---
+              const immutabilityStatus = getRestorePointImmutability(selected, currentTier);
               let immutabilityNote: React.ReactNode = <>Not configured.</>;
-              if (isSobr && selected.generationId && generationById[selected.generationId]) {
-                const gen = generationById[selected.generationId];
-                const immutableUntil = currentTier === 'Performance'
-                  ? gen.performanceImmutableUntil
-                  : currentTier === 'Capacity'
-                    ? gen.capacityImmutableUntil
-                    : gen.archiveImmutableUntil;
-                if (immutableUntil) {
-                  const lockUntilMs = parseISODate(immutableUntil).getTime();
-                  const daysUntilUnlock = Math.ceil((lockUntilMs - currentDateObj.getTime()) / 86400000);
-                  immutabilityNote = daysUntilUnlock > 0
-                    ? <>Locked in <strong>{currentTier}</strong> until <strong>{immutableUntil}</strong> ({daysUntilUnlock}d remaining).</>
-                    : <>Lock in <strong>{currentTier}</strong> expired on <strong>{immutableUntil}</strong>.</>;
-                } else {
-                  immutabilityNote = <>No active immutability lock configured for <strong>{currentTier}</strong>.</>;
-                }
-              } else if (!isSobr) {
-                const primaryImmutabilityDays = Math.max(0, selRepo?.immutabilityDays ?? 0);
-                if (primaryImmutabilityDays > 0) {
-                  const unlockIso = new Date(pointDateObj.getTime() + primaryImmutabilityDays * 86400000).toISOString().slice(0, 10);
-                  const unlockMs = parseISODate(unlockIso).getTime();
-                  const daysUntilUnlock = Math.ceil((unlockMs - currentDateObj.getTime()) / 86400000);
-                  immutabilityNote = daysUntilUnlock > 0
-                    ? <>Primary lock until <strong>{unlockIso}</strong> ({daysUntilUnlock}d remaining).</>
-                    : <>Primary lock expired on <strong>{unlockIso}</strong>.</>;
-                }
+              if (immutabilityStatus.isLocked === true) {
+                const detail = immutabilityStatus.detail;
+                const match = detail.match(/lock until (.+)$/);
+                const lockDate = match ? match[1] : immutabilityStatus.detail;
+                const lockUntilMs = parseISODate(lockDate).getTime();
+                const daysUntilUnlock = Math.ceil((lockUntilMs - currentDateObj.getTime()) / 86400000);
+                immutabilityNote = daysUntilUnlock > 0
+                  ? <>Locked in <strong>{currentTier}</strong> until <strong>{lockDate}</strong> ({daysUntilUnlock}d remaining).</>
+                  : <>Lock in <strong>{currentTier}</strong> expired on <strong>{lockDate}</strong>.</>;
+              } else if (immutabilityStatus.isLocked === false) {
+                const detail = immutabilityStatus.detail;
+                const match = detail.match(/lock expired (.+)$/);
+                const lockDate = match ? match[1] : immutabilityStatus.detail;
+                immutabilityNote = <>Lock in <strong>{currentTier}</strong> expired on <strong>{lockDate}</strong>.</>;
+              } else if (immutabilityStatus.isLocked === null) {
+                immutabilityNote = <>{immutabilityStatus.detail}</>;
               }
 
               // --- 5. Archive eligibility ---
