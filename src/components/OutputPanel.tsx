@@ -313,17 +313,15 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
   const tierBuckets = useMemo(() => ({
     Performance: sortedRestorePoints.filter(rp => {
-      if (rp.hasPerformanceData !== undefined || rp.hasCapacityData !== undefined || rp.hasArchiveData !== undefined) {
-        return !!rp.hasPerformanceData;
-      }
+      // For SOBR, use sobrTier (current location) exclusively, not hasPerformanceData (historical flag)
       return (rp.sobrTier ?? 'Performance') === 'Performance';
     }),
     Capacity: sortedRestorePoints.filter(rp => {
-      if (rp.hasCapacityData !== undefined) return !!rp.hasCapacityData;
+      // For SOBR, use sobrTier (current location) exclusively, not hasCapacityData (historical flag)
       return rp.sobrTier === 'Capacity';
     }),
     Archive: sortedRestorePoints.filter(rp => {
-      if (rp.hasArchiveData !== undefined) return !!rp.hasArchiveData;
+      // For SOBR, use sobrTier (current location) exclusively, not hasArchiveData (historical flag)
       return rp.sobrTier === 'Archive';
     }),
   }), [sortedRestorePoints]);
