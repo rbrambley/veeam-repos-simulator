@@ -1,6 +1,6 @@
 ﻿import React, { useMemo, useState } from 'react';
 import { VeeamSimulator } from '../simulator/engine';
-import { BackupChain, RestorePoint, SOBRTier } from '../models/veeam';
+import { BackupChain, RestorePoint, SOBRTier, Repository } from '../models/veeam';
 
 interface ChainTimelineProps {
   sim: VeeamSimulator;
@@ -109,7 +109,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
     [sim.state.jobs]
   );
   const repoById = useMemo(
-    () => Object.fromEntries(sim.state.repositories.map(repo => [repo.id, repo])) as Record<string, { type: string; immutabilityDays?: number }>,
+    () => Object.fromEntries(sim.state.repositories.map(repo => [repo.id, repo])) as Record<string, Repository>,
     [sim.state.repositories]
   );
   if (allPoints.length === 0) return null;
@@ -120,22 +120,50 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
     const job = chain ? jobById[chain.jobId] : sim.state.jobs[0];
     const repo = job ? repoById[job.repositoryId] : undefined;
 
-    if (repo?.type === 'SOBR' && rp.generationId && generationById[rp.generationId]) {
-      const gen = generationById[rp.generationId];
-      const immutableUntil = tier === 'Performance'
-        ? gen.performanceImmutableUntil
-        : tier === 'Capacity'
-          ? gen.capacityImmutableUntil
-          : gen.archiveImmutableUntil;
+    if (repo?.type === 'SOBR') {
+      const sobrConfig = repo.sobrConfig;
+      if (!sobrConfig) {
+        return { label: 'N/A', detail: 'SOBR config not found', isLocked: null as boolean | null };
+      }
 
-      if (!immutableUntil) {
+      // Use generation-based immutability if available
+      if (rp.generationId && generationById[rp.generationId]) {
+        const gen = generationById[rp.generationId];
+        const immutableUntil = tier === 'Performance'
+          ? gen.performanceImmutableUntil
+          : tier === 'Capacity'
+            ? gen.capacityImmutableUntil
+            : gen.archiveImmutableUntil;
+
+        if (!immutableUntil) {
+          return { label: 'N/A', detail: `${tier} immutability not configured`, isLocked: null as boolean | null };
+        }
+
+        const isLocked = new Date(`${immutableUntil}T00:00:00.000Z`).getTime() >= currentDateMs;
+        return {
+          label: isLocked ? 'Locked' : 'Unlocked',
+          detail: isLocked ? `${tier} lock until ${immutableUntil}` : `${tier} lock expired ${immutableUntil}`,
+          isLocked,
+        };
+      }
+
+      // For SOBR points not yet in a generation, calculate from tier immutability + tier entry date
+      const tierEnteredAt = rp.sobrTierEnteredAt || rp.date;
+      const tierImmutabilityDays = tier === 'Performance'
+        ? sobrConfig.performanceImmutabilityDays ?? 0
+        : tier === 'Capacity'
+          ? sobrConfig.capacityImmutabilityDays ?? 0
+          : sobrConfig.archiveImmutabilityDays ?? 0;
+
+      if (tierImmutabilityDays <= 0) {
         return { label: 'N/A', detail: `${tier} immutability not configured`, isLocked: null as boolean | null };
       }
 
-      const isLocked = new Date(`${immutableUntil}T00:00:00.000Z`).getTime() >= currentDateMs;
+      const unlockIso = new Date(new Date(`${tierEnteredAt}T00:00:00.000Z`).getTime() + tierImmutabilityDays * 86400000).toISOString().slice(0, 10);
+      const isLocked = new Date(`${unlockIso}T00:00:00.000Z`).getTime() >= currentDateMs;
       return {
         label: isLocked ? 'Locked' : 'Unlocked',
-        detail: isLocked ? `${tier} lock until ${immutableUntil}` : `${tier} lock expired ${immutableUntil}`,
+        detail: isLocked ? `${tier} lock until ${unlockIso}` : `${tier} lock expired ${unlockIso}`,
         isLocked,
       };
     }
