@@ -124,15 +124,10 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
   const performanceImmutabilityDays = Math.max(0, config.performanceImmutabilityDays ?? 7);
 
   const computeMoveLifecycleWindows = (retentionDays: number, offloadDays: number) => {
-    const moveGateDays = offloadDays + performanceImmutabilityDays;
-    const generationAlignedGateDays = Math.ceil(moveGateDays / generationPeriodDays) * generationPeriodDays;
-    // Move-only performance tier should hold only the active pre-move interval.
-    // If offload starts after retention, the calculator keeps a full retention chain in Perf.
-    const performanceWindowDays = offloadDays > retentionDays
-      ? retentionDays
-      : Math.max(1, Math.min(generationAlignedGateDays, fullIntervalDays));
-    // Capacity tier is the bounded intermediate residency window before archive/expiry.
-    const capacityWindowDays = Math.max(fullIntervalDays, retentionDays - offloadDays + fullIntervalDays);
+    // Strict move-only model: Performance keeps the short active-chain window,
+    // Capacity keeps the post-offload retention window.
+    const performanceWindowDays = Math.max(1, Math.min(fullIntervalDays, retentionDays));
+    const capacityWindowDays = Math.max(0, retentionDays - offloadDays);
     return {
       performanceWindowDays,
       capacityWindowDays,
@@ -171,7 +166,8 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
     return yearFullSizeTB + effectiveDays * effectiveYearIncrSizeTB;
   };
 
-  const yearActiveChainTB = estimateTierChainDataForYearTB(config.retention);
+  const dasRetentionWindowDays = Math.max(config.retention, performanceImmutabilityDays);
+  const yearActiveChainTB = estimateTierChainDataForYearTB(dasRetentionWindowDays);
   const hasMonthlyOrYearlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0 || (config.gfsPolicy?.yearly ?? 0) > 0;
   const hasAnyGfs = (config.gfsPolicy?.weekly ?? 0) > 0 || hasMonthlyOrYearlyGfs;
 
@@ -238,13 +234,7 @@ function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, fore
       yearArchUsedTB = yearGfsStats.additionalArchFullTB * archiveCal;
     } else {
       yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
-      const isWeeklyOnlyArchiveMove = config.hasArchiveTier
-        && !config.copyEnabled
-        && (config.gfsPolicy?.weekly ?? 0) > 0
-        && (config.gfsPolicy?.monthly ?? 0) === 0
-        && (config.gfsPolicy?.yearly ?? 0) === 0;
-      const moveCapWindowDays = (!hasAnyGfs || isWeeklyOnlyArchiveMove) ? config.retention : windows.capacityWindowDays;
-      yearCapUsedTB = estimateTierChainDataForYearTB(moveCapWindowDays) + yearGfsStats.additionalCapFullTB;
+      yearCapUsedTB = estimateTierChainDataForYearTB(windows.capacityWindowDays) + yearGfsStats.additionalCapFullTB;
     }
   }
 

@@ -92,13 +92,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     return stats;
   };
 
-  const computeMoveLifecycleWindows = (elapsedDays: number, retentionDays: number, offloadDays: number) => {
-    const moveGateDays = offloadDays + sobrPerformanceImmutabilityDays;
-    const generationAlignedGateDays = Math.ceil(moveGateDays / Math.max(1, sobrGenerationPeriodDays)) * sobrGenerationPeriodDays;
-    // Performance pruning can only happen after move gate and next-chain sequencing.
-    const performanceWindowDays = Math.max(fullIntervalDays, generationAlignedGateDays + fullIntervalDays);
-    // Capacity accumulates GENs that passed move gate but are still before DeleteOn.
-    const capacityAccumulationDays = Math.max(0, elapsedDays - generationAlignedGateDays + 1);
+  const computeMoveLifecycleWindows = (retentionDays: number, offloadDays: number) => {
+    // Strict move-only model: Performance keeps the short active-chain window,
+    // Capacity keeps the post-offload retention window.
+    const performanceWindowDays = Math.max(1, Math.min(fullIntervalDays, retentionDays));
+    const capacityAccumulationDays = Math.max(0, retentionDays - offloadDays);
     return {
       performanceWindowDays,
       capacityAccumulationDays,
@@ -156,7 +154,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     };
 
     const yearGfsTB = yearGfsStats.additionalFullTB;
-    const yearActiveChainTB = estimateTierChainDataForYearTB(retention);
+    const dasRetentionWindowDays = Math.max(retention, sobrPerformanceImmutabilityDays);
+    const yearActiveChainTB = estimateTierChainDataForYearTB(dasRetentionWindowDays);
 
     if (repoType !== 'SOBR') {
       const yearRepoUsedTB = yearActiveChainTB + yearGfsTB;
@@ -196,8 +195,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
         yearArchUsedTB = yearGfsStats.additionalArchFullTB;
       }
     } else {
-      const elapsedDays = year * 365;
-      const windows = computeMoveLifecycleWindows(elapsedDays, retention, sobrOffloadDays);
+      const windows = computeMoveLifecycleWindows(retention, sobrOffloadDays);
       yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
       yearCapUsedTB = estimateTierChainDataForYearTB(windows.capacityAccumulationDays) + yearGfsStats.additionalCapFullTB;
 
