@@ -922,9 +922,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             <th>Type</th>
             <th>Role</th>
             <th>Chain State</th>
-            {hasGenerationUi && <th>GEN</th>}
-            {hasGenerationUi && <th>DeleteOn</th>}
-            {hasGenerationUi && <th>GEN State</th>}
             <th>Immutability</th>
             <th>Represents</th>
             <th>Current Tier</th>
@@ -991,15 +988,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     <span style={{ color: '#666' }}>Preserved / Detached</span>
                   )}
                 </td>
-                {hasGenerationUi && <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{shortId(rp.generationId || '-')}</td>}
-                {hasGenerationUi && <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{rp.generationId ? (generationById[rp.generationId]?.deleteOn || '-') : '-'}</td>}
-                {hasGenerationUi && <td>
-                  {rp.generationId && generationById[rp.generationId] ? (() => {
-                    const genState = generationById[rp.generationId].lifecycleState;
-                    const style = getGenerationStateStyle(genState);
-                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>{getGenerationStateLabel(genState)}</span>;
-                  })() : '-'}
-                </td>}
                 <td>{renderImmutabilityChip(rp, currentTier)}</td>
                 <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                   {rp.representsRestorePointDate ? `${rp.representsRestorePointDate} / ${shortId(rp.representsRestorePointId || '')}` : `${rp.date} / self`}
