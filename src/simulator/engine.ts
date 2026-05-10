@@ -1441,7 +1441,9 @@ export class VeeamSimulator {
       // Clear global base for all job points, then assign only one global base.
       for (const rp of jobPoints) {
         rp.isGlobalBase = false;
-        if (rp.type === 'SyntheticFull' && !rp.isGFS) {
+        // Skip resizing SyntheticFulls that are tier bases — their full size was set by
+        // promoteTierBase and must not be clobbered back to incremental size.
+        if (rp.type === 'SyntheticFull' && !rp.isGFS && !(rp.baseTiers && rp.baseTiers.length > 0)) {
           const pointDate = this.parseISODate(rp.date);
           const elapsedDays = this.state.startDate
             ? (pointDate.getTime() - this.parseISODate(this.state.startDate).getTime()) / (1000 * 60 * 60 * 24)

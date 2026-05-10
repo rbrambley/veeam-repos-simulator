@@ -934,7 +934,8 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             const isSobr = !!rp.sobrTier || !!rp.hasPerformanceData || !!rp.hasCapacityData || !!rp.hasArchiveData;
             const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
             const isGlobalBase = !!rp.isGlobalBase;
-            const role = isGlobalBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
+            const isTierBase = isGlobalBase || (rp.baseTiers || []).includes(currentTier);
+            const role = isTierBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
             const displayType = rp.type;
             const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, currentTier);
             const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
@@ -957,12 +958,12 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                 </td>
                 <td>
                   <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    {isGlobalBase && (
+                    {isTierBase && (
                       <span style={{ background: '#455a64', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                         Base Full
                       </span>
                     )}
-                    {!isGlobalBase && !rp.isGFS && (
+                    {!isTierBase && !rp.isGFS && (
                       <span style={{ background: '#546e7a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                         Daily
                       </span>
@@ -1032,6 +1033,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   list.map((rp) => {
                     const isSelected = selectedRestorePointId === rp.id;
                     const isGlobalBase = !!rp.isGlobalBase;
+                    const isTierBase = isGlobalBase || (rp.baseTiers || []).includes(tier);
                     const displayType = rp.type;
                     const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, tier);
                     const prunedFromCapacity = tier === 'Performance' && wasPrunedFromCapacity(rp);
@@ -1054,7 +1056,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                           <span style={{ fontSize: '0.8rem', color: '#607d8b' }}>{rp.date}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center', marginTop: '2px' }}>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isGlobalBase ? ' (Base)' : ''}</span>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isTierBase ? ' (Base)' : ''}</span>
                           <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{formatTB(displaySizeTB)}</span>
                         </div>
                         {renderGenMetadataLine(rp)}
