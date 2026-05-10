@@ -677,6 +677,8 @@ export class VeeamSimulator {
 
             if (newestPointAgeDays >= cfg.offloadAfterDays && !immutableBlockedPoint) {
               for (const rp of perfPoints) {
+                rp.baseTiers = (rp.baseTiers || []).filter(t => t !== 'Performance');
+                rp.hasPerformanceData = false;
                 if (!rp.hasCapacityData) {
                   rp.hasCapacityData = true;
                   rp.capacityCopyCreatedAt = currentDateIso;

@@ -302,8 +302,8 @@ export function expectedTierResidency(
     // Performance always kept in copy mode (never removed)
     shouldBeInPerformance = true;
   } else if (isMove) {
-    // Performance until pruned
-    shouldBeInPerformance = chain.performancePrunedAt == null;
+    // Move mode removes points from Performance at offload completion.
+    shouldBeInPerformance = !chain.offloadComplete && chain.performancePrunedAt == null;
   }
 
   return {
