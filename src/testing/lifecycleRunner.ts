@@ -2042,6 +2042,466 @@ ${coverageRows}
   writeFileSync(outputPath, html, 'utf-8');
 }
 
+function writeHtmlReportV2(
+  scenarios: LifecycleScenario[],
+  results: RunResult[],
+  outputPath: string,
+  mutationReport: MutationReport | null,
+  gfsSizingTestStatus: GfsSizingTestStatus,
+  gfsSizingReport: GfsSizingReport | null
+): void {
+  const timestamp = new Date().toLocaleString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  });
+
+  const passed = results.filter((r) => r.passed && !r.skipped).length;
+  const skipped = results.filter((r) => r.skipped).length;
+  const failed = results.filter((r) => !r.passed).length;
+  const totalDaysSimulated = scenarios.reduce((s, sc) => s + sc.totalDays, 0);
+  const totalDurationMs = results.reduce((s, r) => s + r.durationMs, 0);
+
+  const confidence = failed === 0 ? 'HIGH' : failed <= 2 ? 'MEDIUM' : 'LOW';
+  const confDescription = failed === 0
+    ? 'No failing scenarios. Model behavior is stable for the tested space.'
+    : failed <= 2
+      ? 'Mostly stable, but a small number of failures need review.'
+      : 'Multiple failures detected. Results should not be trusted until fixed.';
+
+  const layerStats = [1, 2, 3, 4].map((l) => {
+    const ls = scenarios.filter((s) => s.layer === l);
+    const lr = ls.map((s) => results.find((r) => r.id === s.id)).filter((r): r is RunResult => !!r);
+    return {
+      layer: l,
+      name: LAYER_INFO[l].name,
+      description: LAYER_INFO[l].description,
+      total: ls.length,
+      pass: lr.filter((r) => r.passed && !r.skipped).length,
+      skip: lr.filter((r) => r.skipped).length,
+      fail: lr.filter((r) => !r.passed).length,
+    };
+  });
+
+  const topFailures = results
+    .filter((r) => !r.passed)
+    .sort((a, b) => b.violations.length - a.violations.length)
+    .slice(0, 12);
+
+  const scenarioSections = [1, 2, 3, 4].map((layer) => {
+    const layerScenarios = scenarios.filter((s) => s.layer === layer);
+    const cards = layerScenarios.map((sc) => {
+      const result = results.find((r) => r.id === sc.id);
+      if (!result) return '';
+
+      const status = !result.passed ? 'FAIL' : result.skipped ? 'SKIP' : 'PASS';
+      const statusClass = status.toLowerCase();
+      const assertions = getAssertionLabels(sc.assertions).map((x) => `<span class="chip">${esc(x)}</span>`).join(' ');
+      const ruleTags = sc.rules.map((r) => `<span class="chip chip-rule" title="${esc(RULE_DESCRIPTIONS[r] ?? r)}">${esc(r)}</span>`).join(' ');
+      const failures = result.violations.slice(0, 8).map((v) => `<tr>
+        <td>${v.day}</td><td class="mono">${esc(v.date)}</td><td class="mono">${esc(v.violatedRule)}</td><td>${esc(v.actual)}</td>
+      </tr>`).join('');
+
+      return `<details class="scenario-card" data-status="${statusClass}" data-layer="${layer}" data-search="${esc((sc.id + ' ' + sc.name + ' ' + sc.rules.join(' ')).toLowerCase())}">
+        <summary>
+          <span class="status ${statusClass}">${status}</span>
+          <span class="mono sid">${esc(sc.id)}</span>
+          <span class="sname">${esc(sc.name)}</span>
+          <span class="meta">${sc.totalDays}d · ${result.durationMs}ms</span>
+        </summary>
+        <div class="body">
+          <p class="desc">${esc(sc.description)}</p>
+          <div class="row"><strong>Configuration:</strong> ${esc(cfgSummary(sc.config))}</div>
+          <div class="row"><strong>Rules:</strong> ${ruleTags}</div>
+          <div class="row"><strong>Checks:</strong> ${assertions || '<em>none listed</em>'}</div>
+          <div class="split">
+            <div>
+              <h4>Expected</h4>
+              <div class="row"><strong>Path:</strong> ${esc(result.expectedLifecycle.expectedPath)}</div>
+              <div class="row"><strong>Final GFS:</strong> ${result.expectedLifecycle.expectedFinalGfs.weekly}/${result.expectedLifecycle.expectedFinalGfs.monthly}/${result.expectedLifecycle.expectedFinalGfs.yearly}</div>
+            </div>
+            <div>
+              <h4>Actual</h4>
+              <div class="row"><strong>Path:</strong> ${esc(result.actualLifecycle.actualPath)}</div>
+              <div class="row"><strong>Final GFS:</strong> ${result.actualLifecycle.finalSnapshot.weeklyGfsPoints}/${result.actualLifecycle.finalSnapshot.monthlyGfsPoints}/${result.actualLifecycle.finalSnapshot.yearlyGfsPoints}</div>
+            </div>
+          </div>
+          ${status === 'FAIL'
+            ? `<div class="fail-box"><strong>${result.violations.length} violation(s)</strong>
+                 <table><thead><tr><th>Day</th><th>Date</th><th>Rule</th><th>Actual</th></tr></thead><tbody>${failures}</tbody></table>
+               </div>`
+            : ''}
+        </div>
+      </details>`;
+    }).join('\n');
+
+    return `<section class="layer" id="layer-${layer}">
+      <header>
+        <h3>${esc(LAYER_INFO[layer].name)}</h3>
+        <div class="layer-badges">
+          <span class="badge pass">${layerStats.find((x) => x.layer === layer)?.pass ?? 0} PASS</span>
+          <span class="badge skip">${layerStats.find((x) => x.layer === layer)?.skip ?? 0} SKIP</span>
+          <span class="badge fail">${layerStats.find((x) => x.layer === layer)?.fail ?? 0} FAIL</span>
+        </div>
+      </header>
+      <p>${esc(LAYER_INFO[layer].description)}</p>
+      ${cards}
+    </section>`;
+  }).join('\n');
+
+  const gfsSection = `<details class="evidence"><summary>GFS Sizing Test</summary>
+    <div class="e-body">
+      <p>Status: <strong>${esc(gfsSizingTestStatus.status.toUpperCase())}</strong>${gfsSizingTestStatus.exitCode !== undefined ? ` (exit ${gfsSizingTestStatus.exitCode})` : ''}</p>
+      ${gfsSizingReport ? `<p>Case summary: ${gfsSizingReport.passedCases}/${gfsSizingReport.totalCases} passed.</p>` : '<p>No detailed GFS sizing report found.</p>'}
+    </div>
+  </details>`;
+
+  const mutationSection = `<details class="evidence"><summary>Mutation Testing</summary>
+    <div class="e-body">
+      ${mutationReport
+        ? `<p>Mutations caught: ${mutationReport.caughtCount}/${mutationReport.mutationCount}. Blind spots: ${mutationReport.blindSpotCount}.</p>`
+        : '<p>No mutation report found.</p>'}
+    </div>
+  </details>`;
+
+  const knownGapCount = results.filter((r) => r.skipped).length;
+  const uncoveredRuleCount = Object.keys(RULE_DESCRIPTIONS)
+    .filter((rule) => !scenarios.some((s) => s.rules.includes(rule)))
+    .length;
+  const dashboardHtml = topFailures.length > 0
+    ? `<table>
+        <thead><tr><th>Priority</th><th>Type</th><th>Detail</th></tr></thead>
+        <tbody>
+          ${topFailures.map((r, i) => `<tr>
+            <td>#${i + 1} <a class="focus-link mono" href="#sc-${esc(r.id)}">${esc(r.id)}</a></td>
+            <td>Scenario Failure</td>
+            <td>${r.violations.length} violation(s)</td>
+          </tr>`).join('')}
+          ${knownGapCount > 0 ? `<tr><td>Info</td><td>Known Gaps</td><td>${knownGapCount} scenario(s) marked as known gap</td></tr>` : ''}
+          ${uncoveredRuleCount > 0 ? `<tr><td>Info</td><td>Coverage</td><td>${uncoveredRuleCount} documented rule(s) are currently uncovered</td></tr>` : ''}
+        </tbody>
+      </table>`
+    : `<table>
+        <thead><tr><th>Status</th><th>Signal</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>OK</td><td>Scenario Failures</td><td>No failing scenarios in this run.</td></tr>
+          <tr><td>${knownGapCount > 0 ? 'Watch' : 'OK'}</td><td>Known Gaps</td><td>${knownGapCount} scenario(s) marked as known gap.</td></tr>
+          <tr><td>${uncoveredRuleCount > 0 ? 'Watch' : 'OK'}</td><td>Coverage</td><td>${uncoveredRuleCount} uncovered documented rule(s).</td></tr>
+        </tbody>
+      </table>`;
+
+  const goldenRows = results
+    .filter((r) => r.goldenSnapshotChecks.length > 0)
+    .map((r) => {
+      const labels = r.goldenSnapshotChecks.map((chk) => {
+        const label = chk.status === 'match' ? 'MATCH' : chk.status === 'seeded' ? 'SEEDED' : 'MISMATCH';
+        return `<span class="chip">${label} d${chk.day}</span>`;
+      }).join(' ');
+      return `<tr>
+        <td><a class="focus-link mono" href="#sc-${esc(r.id)}">${esc(r.id)}</a></td>
+        <td>${esc(r.name)}</td>
+        <td>${labels}</td>
+      </tr>`;
+    }).join('');
+
+  const goldenOverviewHtml = goldenRows
+    ? `<table class="ctable"><thead><tr><th>Scenario</th><th>Name</th><th>Checkpoints</th></tr></thead><tbody>${goldenRows}</tbody></table>`
+    : '<p>No golden snapshot checks available for the selected run.</p>';
+
+  type RegressionSignal = { severity: 'error' | 'warning' | 'info'; category: string; label: string; href: string; detail: string };
+  const regressionSignals: RegressionSignal[] = [];
+
+  for (const result of results.filter((r) => !r.passed)) {
+    regressionSignals.push({
+      severity: 'error',
+      category: 'Test Failure',
+      label: result.id,
+      href: `#sc-${esc(result.id)}`,
+      detail: `${result.violations.length} violation(s)`,
+    });
+  }
+
+  for (const result of results) {
+    for (const chk of result.goldenSnapshotChecks.filter((c) => c.status === 'mismatch')) {
+      regressionSignals.push({
+        severity: 'error',
+        category: 'Snapshot Drift',
+        label: `${result.id} · day ${chk.day}`,
+        href: `#sc-${esc(result.id)}`,
+        detail: chk.differences.join('; '),
+      });
+    }
+  }
+
+  if (mutationReport) {
+    for (const outcome of mutationReport.outcomes.filter((o) => !o.caught)) {
+      regressionSignals.push({
+        severity: 'error',
+        category: 'Mutation Blind Spot',
+        label: outcome.id,
+        href: '#section-evidence',
+        detail: outcome.description,
+      });
+    }
+  }
+
+  for (const result of results.filter((r) => r.skipped)) {
+    regressionSignals.push({
+      severity: 'warning',
+      category: 'Known Engine Gap',
+      label: result.id,
+      href: `#sc-${esc(result.id)}`,
+      detail: (result.skippedRules ?? []).map((rule) => `${rule}: ${RULE_DESCRIPTIONS[rule] ?? rule}`).join(' · '),
+    });
+  }
+
+  const regressionCounts = {
+    errors: regressionSignals.filter((item) => item.severity === 'error').length,
+    warnings: regressionSignals.filter((item) => item.severity === 'warning').length,
+    infos: regressionSignals.filter((item) => item.severity === 'info').length,
+  };
+
+  const regressionRows = regressionSignals.slice(0, 8).map((item) => `<tr>
+      <td><span class="finding-cat" style="background:${item.severity === 'error' ? '#fef2f2;color:#991b1b' : item.severity === 'warning' ? '#fff7ed;color:#9a3412' : '#eff6ff;color:#1d4ed8'}">${esc(item.category)}</span></td>
+      <td><a class="finding-link" href="${item.href}">${esc(item.label)}</a></td>
+      <td class="finding-detail">${esc(item.detail)}</td>
+    </tr>`).join('');
+
+  const regressionHtml = regressionSignals.length > 0
+    ? `<div class="finding-group" style="border-left:4px solid #b42318;background:#fff7f6">
+        <div class="finding-group-title">Regression watch<span class="finding-count" style="background:#b42318">${regressionSignals.length}</span></div>
+        <p style="margin:0 0 8px;font-size:12px;color:#7a1f16;">High-signal issues surfaced in this run. Start with the red items.</p>
+        <table class="finding-table"><tbody>${regressionRows}</tbody></table>
+        <p style="margin:8px 0 0;font-size:11px;color:#8b5e34;">${regressionCounts.errors} error(s), ${regressionCounts.warnings} warning(s), ${regressionCounts.infos} info item(s).</p>
+      </div>`
+    : `<div class="all-clear">No new regressions surfaced in this run.</div>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lifecycle Health Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#17212b; --muted:#5b6775; --line:#d8e0ea; --bg:#f4f7fb; --panel:#fff; --brand:#0f4566; --accent:#1a7f8f; --ok:#117a65; --warn:#b36200; --bad:#b42318; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:radial-gradient(1000px 500px at 10% -20%, rgba(26,127,143,.12), transparent 60%), var(--bg); color:var(--ink); font:14px/1.4 'IBM Plex Sans', sans-serif; }
+    h1,h2,h3,h4 { font-family:'Space Grotesk', sans-serif; margin:0; }
+    .mono { font-family:'Cascadia Code','Consolas',monospace; }
+    .hero { background:linear-gradient(125deg, rgba(10,45,66,.96), rgba(13,84,101,.95)); color:#fff; padding:28px 24px 20px; }
+    .hero h1 { font-size:30px; margin-bottom:6px; }
+    .sub { color:#cde8ff; font-size:12px; }
+    .pills { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .pill { border-radius:999px; padding:4px 10px; border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.1); font-weight:700; font-size:12px; }
+    .conf { margin-left:auto; max-width:420px; background:rgba(255,255,255,.1); border-radius:10px; padding:10px 12px; }
+    .conf .l { text-transform:uppercase; letter-spacing:.7px; font-size:10px; color:#bee0ff; }
+    .conf .v { font-size:20px; font-weight:700; }
+    .conf .d { color:#d8eeff; font-size:12px; }
+
+    .wrap { max-width:1180px; margin:0 auto; padding:16px; }
+    .kpis { display:grid; grid-template-columns:repeat(5,minmax(120px,1fr)); gap:10px; margin-bottom:14px; }
+    .kpi { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; }
+    .kpi .v { font-size:24px; color:var(--brand); font-family:'Space Grotesk',sans-serif; }
+    .kpi .l { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px; }
+    .panel h2 { margin-bottom:6px; color:#123a55; }
+    .panel p { margin:0 0 8px; color:var(--muted); font-size:12px; }
+
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; background:#edf3fa; color:#1b405b; border-bottom:2px solid #ccdae9; padding:8px 10px; font-size:11px; text-transform:uppercase; letter-spacing:.45px; }
+    td { padding:8px 10px; border-bottom:1px solid #e8eef5; vertical-align:top; }
+    .focus-link { color:#0c66cf; text-decoration:none; font-weight:600; }
+    .focus-link:hover { text-decoration:underline; }
+    .dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+    .dot.ok { background:var(--ok); } .dot.warn { background:var(--warn); } .dot.bad { background:var(--bad); }
+
+    .toolbar { background:#f8fbff; border:1px solid #dfe8f2; border-radius:10px; padding:10px; margin-bottom:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .btn { border:1px solid #c8d4e1; background:#fff; border-radius:6px; padding:6px 9px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn:hover { background:#eef4fb; }
+    .search { flex:1 1 280px; min-width:260px; border:1px solid #c8d4e1; border-radius:6px; padding:7px 9px; font-size:12px; }
+
+    .layer { margin-bottom:16px; }
+    .layer > header { background:#fff; border:1px solid var(--line); border-left:5px solid #2f7ca0; border-radius:10px 10px 0 0; padding:12px; display:flex; justify-content:space-between; align-items:center; }
+    .layer > p { margin:0; padding:8px 12px 10px; color:var(--muted); font-size:12px; background:#fff; border:1px solid var(--line); border-top:0; }
+    .layer-badges { display:flex; gap:6px; }
+    .badge { border-radius:999px; padding:2px 8px; font-size:11px; font-weight:700; }
+    .badge.pass { background:#dcf6ef; color:#106a58; } .badge.skip { background:#fff2dc; color:#8e4f00; } .badge.fail { background:#fde8e6; color:#9f1f14; }
+
+    .scenario-card { background:#fff; border:1px solid var(--line); border-top:0; }
+    .scenario-card summary { list-style:none; cursor:pointer; display:flex; align-items:baseline; gap:10px; padding:10px 12px; }
+    .scenario-card summary::-webkit-details-marker { display:none; }
+    .status { border-radius:999px; color:#fff; font-size:11px; font-weight:700; padding:2px 8px; }
+    .status.pass { background:var(--ok); } .status.skip { background:var(--warn); } .status.fail { background:var(--bad); }
+    .sid { color:#475569; }
+    .sname { font-weight:600; }
+    .meta { margin-left:auto; color:#7b8795; font-size:11px; }
+    .body { padding:0 12px 12px; }
+    .desc { margin:0 0 8px; color:#364152; }
+    .row { margin-bottom:6px; }
+    .chip { display:inline-block; border:1px solid #d7e2ee; border-radius:999px; padding:2px 7px; font-size:11px; background:#f8fbff; color:#3b4c5f; margin-right:4px; margin-bottom:4px; }
+    .chip-rule { background:#edf5ff; color:#1f4f8a; border-color:#bfd6f2; }
+    .split { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px; }
+    .split > div { border:1px solid #dce7f2; border-radius:8px; padding:8px; background:#fbfdff; }
+    .fail-box { margin-top:10px; border:1px solid #f2c7c2; border-radius:8px; background:#fff7f6; padding:8px; }
+    .fail-box table th { background:#fdeceb; color:#7a1f16; border-bottom-color:#f2c7c2; }
+
+    .evidence { background:#fff; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; }
+    .evidence summary { list-style:none; cursor:pointer; padding:10px 12px; font-weight:700; color:#173f5b; }
+    .evidence summary::-webkit-details-marker { display:none; }
+    .e-body { padding:0 12px 12px; color:#364152; }
+
+    .footer { text-align:center; color:#7a8594; font-size:11px; padding:18px; }
+
+    @media (max-width: 980px) { .kpis { grid-template-columns:repeat(2,minmax(140px,1fr)); } .conf { margin-left:0; } .split { grid-template-columns:1fr; } }
+    @media (max-width: 620px) { .hero { padding:22px 14px 16px; } .hero h1 { font-size:24px; } .wrap { padding:10px; } .kpis { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Lifecycle Health Report</h1>
+    <div class="sub">Generated ${timestamp} · Deterministic start: 2026-05-02</div>
+    <div class="pills">
+      <span class="pill">${passed} PASS</span>
+      <span class="pill">${skipped} SKIP</span>
+      <span class="pill">${failed} FAIL</span>
+      <div class="conf"><div class="l">Confidence</div><div class="v">${confidence}</div><div class="d">${esc(confDescription)}</div></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="kpis">
+      <article class="kpi"><div class="v">${results.length}</div><div class="l">Scenarios</div></article>
+      <article class="kpi"><div class="v">${totalDaysSimulated.toLocaleString()}</div><div class="l">Days Simulated</div></article>
+      <article class="kpi"><div class="v">${(totalDurationMs / 1000).toFixed(1)}s</div><div class="l">Run Duration</div></article>
+      <article class="kpi"><div class="v">${layerStats.filter((x) => x.fail === 0).length}/4</div><div class="l">Healthy Layers</div></article>
+      <article class="kpi"><div class="v">${topFailures.length}</div><div class="l">Priority Failures</div></article>
+    </section>
+
+    <section id="section-regressions" class="panel">
+      <h2>Regressions Since Last Run</h2>
+      <p>Quick scan for anything that needs attention before you dig into the full report.</p>
+      ${regressionHtml}
+    </section>
+
+    <section id="section-dashboard" class="panel">
+      <h2>Findings Summary</h2>
+      <p>Fast read: this groups what is broken, what is known debt, and what is informational.</p>
+      ${dashboardHtml}
+    </section>
+
+    <section id="section-priority" class="panel">
+      <h2>Priority Queue</h2>
+      <p>${topFailures.length > 0 ? 'Start here to resolve the highest-impact issues first.' : 'No failing scenarios in this run.'}</p>
+      ${topFailures.length > 0
+        ? `<table><thead><tr><th>Scenario</th><th>Violations</th><th>Top Rules</th></tr></thead><tbody>
+            ${topFailures.map((r) => `<tr>
+              <td><a class="focus-link mono" href="#sc-${esc(r.id)}">${esc(r.id)}</a></td>
+              <td>${r.violations.length}</td>
+              <td>${esc(Array.from(new Set(r.violations.map((v) => v.violatedRule))).slice(0, 4).join(', '))}</td>
+            </tr>`).join('')}
+          </tbody></table>`
+        : '<div class="all-clear">No priority failures to address.</div>'}
+    </section>
+
+    <section id="section-layer-overview" class="panel">
+      <h2>Layer Health</h2>
+      <p>Use this to choose where to inspect first.</p>
+      <table>
+        <thead><tr><th>Layer</th><th>Scope</th><th>Status</th><th>Pass</th><th>Skip</th><th>Fail</th></tr></thead>
+        <tbody>
+          ${layerStats.map((s) => `<tr>
+            <td><a class="focus-link" href="#layer-${s.layer}">Layer ${s.layer}</a></td>
+            <td>${esc(s.name.replace('Layer ' + s.layer + ' — ', ''))}</td>
+            <td>${s.fail > 0 ? '<span class="dot bad"></span>At Risk' : s.skip > 0 ? '<span class="dot warn"></span>Watch' : '<span class="dot ok"></span>Healthy'}</td>
+            <td>${s.pass}</td><td>${s.skip}</td><td>${s.fail}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </section>
+
+    <section id="section-scenarios" class="panel">
+      <h2>Scenario Explorer</h2>
+      <p>Details are collapsible. Failures are expanded by default.</p>
+      <div class="toolbar">
+        <button type="button" class="btn" id="expandAllBtn">Expand All</button>
+        <button type="button" class="btn" id="collapseAllBtn">Collapse All</button>
+        <input id="scenarioSearch" class="search" type="search" placeholder="Search by scenario id, name, or rule (ex: R-GEN-03)" />
+        <span id="scenarioCount" class="small"></span>
+      </div>
+      ${scenarioSections}
+    </section>
+
+    <section id="section-evidence" class="panel">
+      <h2>Evidence</h2>
+      <p>Supporting quality signals and coverage details.</p>
+      ${gfsSection}
+      ${mutationSection}
+      <details class="evidence"><summary>Golden Snapshots</summary><div class="e-body">${goldenOverviewHtml || '<p>No golden snapshot summary available.</p>'}</div></details>
+      <details class="evidence"><summary>Contract Rule Coverage</summary>
+        <div class="e-body">
+          <table class="ctable">
+            <thead><tr><th>Rule</th><th>Description</th><th>Covered by</th><th>Status</th></tr></thead>
+            <tbody>${Object.keys(RULE_DESCRIPTIONS).map((rule) => {
+              const ids = scenarios.filter((s) => s.rules.includes(rule)).map((s) => s.id);
+              const status = ids.length === 0 ? 'Uncovered' : (RULE_DESCRIPTIONS[rule] ?? '').includes('KNOWN GAP') ? 'Known Gap' : 'Covered';
+              return `<tr>
+                <td class="mono">${esc(rule)}</td>
+                <td>${esc(RULE_DESCRIPTIONS[rule] ?? '')}</td>
+                <td>${ids.length ? ids.map((id) => `<span class="mono small">${esc(id)}</span>`).join(' ') : '<em>none</em>'}</td>
+                <td>${status}</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer">Veeam Repos Simulator · Lifecycle Health Report · ${results.length} scenarios · ${totalDaysSimulated.toLocaleString()} simulation-days</footer>
+
+  <script>
+    (function () {
+      const cards = Array.from(document.querySelectorAll('.scenario-card'));
+      const search = document.getElementById('scenarioSearch');
+      const expandAllBtn = document.getElementById('expandAllBtn');
+      const collapseAllBtn = document.getElementById('collapseAllBtn');
+      const scenarioCount = document.getElementById('scenarioCount');
+
+      cards.forEach((card) => {
+        const status = (card.getAttribute('data-status') || '').toLowerCase();
+        card.open = status === 'fail' || status === 'skip';
+      });
+
+      function updateCount() {
+        const visible = cards.filter((c) => c.style.display !== 'none').length;
+        if (scenarioCount) scenarioCount.textContent = visible + ' scenario' + (visible === 1 ? '' : 's') + ' visible';
+      }
+
+      function applyFilter() {
+        const q = ((search && search.value) || '').trim().toLowerCase();
+        cards.forEach((card) => {
+          const haystack = (card.getAttribute('data-search') || '').toLowerCase();
+          card.style.display = !q || haystack.includes(q) ? '' : 'none';
+        });
+        updateCount();
+      }
+
+      if (search) search.addEventListener('input', applyFilter);
+      if (expandAllBtn) expandAllBtn.addEventListener('click', () => cards.filter((c) => c.style.display !== 'none').forEach((c) => { c.open = true; }));
+      if (collapseAllBtn) collapseAllBtn.addEventListener('click', () => cards.filter((c) => c.style.display !== 'none').forEach((c) => { c.open = false; }));
+
+      applyFilter();
+    })();
+  </script>
+</body>
+</html>`;
+
+  writeFileSync(outputPath, html, 'utf-8');
+}
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -2120,7 +2580,7 @@ function main() {
   const mutationReport = readMutationReport();
   const gfsSizingTestStatus = readGfsSizingTestStatusFromEnv();
   const gfsSizingReport = readGfsSizingReport();
-  writeHtmlReport(scenarios, results, reportPath, mutationReport, gfsSizingTestStatus, gfsSizingReport);
+  writeHtmlReportV2(scenarios, results, reportPath, mutationReport, gfsSizingTestStatus, gfsSizingReport);
   console.log(`\nReport: docs/lifecycle-report.html`);
 
   if (failed > 0) {

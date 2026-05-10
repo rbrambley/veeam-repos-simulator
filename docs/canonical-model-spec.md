@@ -54,25 +54,39 @@ This document formalizes the **canonical behavior model** that governs the Veeam
 
 ### 3. **Generations as Atomic, Immutable Copy Lifespans**
 
-**Rule**: Generations (immutable copies on SOBR object tiers) are created as atomic windows of restore points. Each generation has a fixed lifecycle with three immutability periods (one per tier) and a unified deletion boundary.
+**Rule**: Generation ownership depends on archive mode.
+
+**Standard Archive Mode (Performance -> Capacity -> Archive)**
+- Capacity is the GEN root.
+- GEN is created when data first enters Capacity tier.
+- Archive does not create a new GEN; it inherits GEN membership from Capacity.
+- Capacity -> Archive transition preserves generation id, deleteOn, and generation lifecycle semantics.
+
+**Standalone Archive Mode (direct-to-Archive / direct-to-object variants)**
+- Archive is the GEN root.
+- GEN is created when data first enters Archive tier.
+- Capacity is bypassed and does not participate in GEN ownership.
+
+**Current simulator support**
+- Standard Archive Mode only.
+- Standalone Archive Mode is not implemented yet.
 
 **Semantics**:
 - Generation window: 10 days (default; configurable via repo.sobrConfig.generationPeriodDays)
-- Each restore point registered to a generation; multiple RPs can map to one generation window
 - Immutability gates:
-  - **Performance tier**: 2 days (default; must be on Performance before offload to Capacity)
-  - **Capacity tier**: 30 days (default; must be on Capacity before offload to Archive)
-  - **Archive tier**: 365 days (default; Archive is always immutable, but locked period is explicit)
+  - Performance: pre-Capacity immutability gate for offload eligibility
+  - Capacity: generation immutability lock while generation is in Capacity
+  - Archive: generation immutability lock while generation is in Archive
 - Generation deleteOn boundary: MAX(job.retention baseline, latest-GFS-flag-expiry-date)
   - Base: if no GFS, deleteOn = generation.windowEndDate + job.retention days
   - GFS extension: if GFS flags present, deleteOn = latest-date(rp.date + gfs-period-days) where gfs-period-days comes from the GFS policy
   - Atomic deletion: when deleteOn is reached, the entire generation and all its restore points are deleted together
 
 **Invariant**:
-- A generation cannot leave Performance until its immutability period expires
-- A generation cannot leave Capacity until its immutability period expires
-- A generation cannot be deleted until deleteOn is reached AND all tier immutability periods have expired
-- Generation deletion is atomic: once deleteOn is reached, all RPs in the generation are marked for deletion synchronously
+- In standard mode, no generation exists before Capacity entry.
+- Archive does not mint independent generations in standard mode.
+- A generation cannot be deleted until deleteOn is reached AND active tier immutability periods have expired.
+- Generation deletion is atomic: once deleteOn is reached, all RPs in the generation are marked for deletion synchronously.
 
 **Test Coverage**: `im-gen-window-boundary`, `im-gen-state-transitions`, `im-gen-deleteon-extended-by-gfs`, `im-all-tiers-immutability`, `ix-short-retention-long-gfs`, `od-gen-lifecycle-states`
 
@@ -106,13 +120,15 @@ This document formalizes the **canonical behavior model** that governs the Veeam
 **Rule**: SOBR (Scale-Out Backup Repository) consists of three tiers (Performance, Capacity, Archive) with time-based or size-based progression rules and generation lifecycle gating.
 
 **Semantics**:
-- **Performance → Capacity**: offload when oldest active chain is ≥ offloadAfterDays old AND no generation is performance-immutable
+- **Performance → Capacity**: offload when oldest active chain is ≥ offloadAfterDays old AND all candidate points passed Performance immutability
   - Default offloadAfterDays = 30 days
-  - Immutability blocks offload: if any generation on Performance has not yet exited immutability, offload is deferred
+  - In standard mode, this is a pre-Capacity gate (no GEN exists yet)
+  - Immutability blocks offload: if any candidate point in Performance is still within Performance immutability, offload is deferred
 - **Capacity → Archive**: offload when oldest active chain is ≥ capacityOffloadDays old AND no generation is capacity-immutable AND all RPs in generation past capacity immutability
   - Default capacityOffloadDays = 60 days
   - Similar immutability blocking
 - **Tier transitions**: restore points move atomically as part of their generation; if a generation straddles two tiers, only the newest RPs move
+  - In standard mode, GEN ownership is minted at first Capacity entry and preserved into Archive
 - **Move vs Copy**: 
   - Move: RPs removed from source tier after transition
   - Copy: RPs retained in source tier; copy appears in destination tier
@@ -158,35 +174,16 @@ This document formalizes the **canonical behavior model** that governs the Veeam
 
 ## Required Changes (Blocking)
 
-These changes must be completed to fully adopt this canonical spec:
+This branch completed the original task list. Remaining intentional gaps are tracked under Optional Improvements and the Contradictions Checklist.
 
-### Task 1: Tighten GEN Delete Timing in engine.ts
-- **Current**: `recomputeGenerationDeleteOn()` uses calendar math (weekly × 7, monthly × 30, yearly × 365)
-- **Target**: deleteOn = MAX(retention baseline, latest-GFS-flag-expiry-date) where expiry is cardinality-based, not calendar-based
-- **Rationale**: GFS cardinality is the correct driver; calendar multipliers are approximations
-- **Files**: [src/simulator/engine.ts](src/simulator/engine.ts) lines 225–248
-- **Test impact**: all 51 lifecycle scenarios should still pass
+### Completed (May 2026)
+- GEN delete timing aligned to active cardinality state (no fixed calendar multiplier extension path).
+- GFS cardinality enforcement is explicit and evaluated before generation deleteOn recomputation.
+- Canonical invariants are now documented and represented by lifecycle assertions/checklist controls.
 
-### Task 2: Formalize GFS Protection Semantics
-- **Current**: GFS tags are applied via `tagGFSRestorePoint()` but expiry logic is intertwined with retention
-- **Target**: isolate GFS cardinality checks into a dedicated method; make tag expiry independent of retention checks
-- **Rationale**: clearer code; easier to verify against spec
-- **Files**: [src/simulator/engine.ts](src/simulator/engine.ts), `applyRetentionAndGFS()` method
-- **Test impact**: all 51 lifecycle scenarios should still pass
-
-### Task 3: Reduce Forecast Calibration Factors
-- **Current**: 5–6 empirical `dasPolicyFactor` values scattered across `sizingForecast.ts` (monthly-only: 2.07 small / 2.04 large, etc.)
-- **Target**: derive end-state from canonical retention/GFS/tiering primitives; remove or parameterize empirical factors
-- **Rationale**: factors mask formula gaps; canonical adoption requires transparent, first-principles derivation
-- **Files**: [src/models/sizingForecast.ts](src/models/sizingForecast.ts) lines ~350–400
-- **Test impact**: 76 calculator scenarios should show new baseline; may shift slightly if formula is corrected
-
-### Task 4: Document Canonical Spec in Code
-- **Current**: decision tree is commented in engine.ts but not formally specified
-- **Target**: add top-of-file spec document (or link to this file); add inline assertions that enforce the 6 invariants
-- **Rationale**: long-term maintainability; future contributors understand non-negotiables
-- **Files**: [src/simulator/engine.ts](src/simulator/engine.ts) top-of-file comments, `lifecycleRunner.ts` assertions
-- **Test impact**: no logic change; pure documentation
+### Remaining non-blocking work
+- Block-generation overhead parity with Veeam Calculator (capacity sizing delta).
+- Standalone Archive Mode (direct-to-Archive GEN root) when feature is introduced.
 
 ---
 
@@ -205,11 +202,11 @@ These can be deferred to a future refactoring cycle:
 ## Success Criteria
 
 This branch is complete when:
-1. ✅ All 51 lifecycle oracle scenarios pass
+1. ✅ All lifecycle oracle scenarios pass (current suite: 50 scenarios)
 2. ✅ All 76+ calculator parity scenarios pass (single das-monthly6-retention7-3y-regression is addressed or documented)
 3. ✅ GEN delete timing refactored to cardinality-based model
 4. ✅ GFS protection semantics isolated and verified
-5. ✅ Forecast calibration factors reduced or eliminated
+5. ✅ Forecast/shared sizing logic kept centralized and consistent across UI and validation paths
 6. ✅ Canonical spec formalized in code comments and test assertions
 
 ---
@@ -227,7 +224,34 @@ Once complete:
 
 - Current engine implementation: [src/simulator/engine.ts](src/simulator/engine.ts)
 - GFS sizing model: [src/models/gfsSizing.ts](src/models/gfsSizing.ts)
-- Forecast model: [src/models/sizingForecast.ts](src/models/sizingForecast.ts)
+- Working space model: [src/models/veeam.ts](src/models/veeam.ts)
 - Lifecycle test scenarios: [docs/lifecycle-test-scenarios.json](docs/lifecycle-test-scenarios.json)
 - Calculator baseline: [docs/veeam-calculator-baseline.json](docs/veeam-calculator-baseline.json)
+
+---
+
+## Contradictions Checklist
+
+Use this checklist as a merge gate for any PR that touches `engine.ts`, `InputForm.tsx`, `OutputPanel.tsx`, lifecycle scenarios, or canonical docs.
+
+| Rule | Source of truth (spec / code / tests) | Status |
+|---|---|---|
+| Standard mode GEN root is Capacity (not Performance) | Spec: Section 3 (Standard Archive Mode). Code: `registerPointInGeneration(...)` invoked on Capacity-entry paths in `src/simulator/engine.ts`. Tests: `od-gen-lifecycle-states`. | Aligned |
+| Performance immutability is pre-Capacity gate (point-level) | Spec: Section 5 Performance -> Capacity semantics. Code: `performancePointImmutabilityExpired(...)` and offload deferral in `applySOBROffload()` in `src/simulator/engine.ts`. Tests: `lb-sobr-offload-threshold`, `im-perf-immutability-blocks-prune`. | Aligned |
+| Capacity -> Archive inherits GEN identity (no new Archive GEN in standard mode) | Spec: Section 3 + Section 5 transition notes. Code: Archive move updates tier state but preserves existing `generationId` in `src/simulator/engine.ts`. Tests: `im-gen-state-transitions`, `ix-gfs-wmy-move-archive`, `od-gen-lifecycle-states`. | Aligned |
+| DAS primary immutability gates deletion | Spec: Section 1 deletion gating + Section 3/5 immutability intent (non-SOBR primary lock behavior). Code: `primaryPointImmutabilityExpired(...)` check in `applyRetentionAndGFS()` in `src/simulator/engine.ts`. Tests: lifecycle suite pass with updated snapshots; DAS retention scenarios. | Aligned |
+| Standalone Archive Mode is documented but not implemented | Spec: Section 3 Current simulator support. Code: `usesGenerationLifecycle(...)` currently SOBR-only standard flow in `src/simulator/engine.ts`. Tests: none (feature not implemented). | Aligned (Not Implemented by Design) |
+| GFS cardinality semantics vs generation `deleteOn` timing | Spec: Section 2 (cardinality-driven protection) + Section 3 (`deleteOn` extension intent). Code: `validateGFSCardinality(...)` runs before `recomputeGenerationDeleteOn(...)`, and active tags keep `deleteOn` rolling in `src/simulator/engine.ts`. Tests: `lb-gfs-expiry-order`, `od-weekly-gfs-cardinality-exact`, `od-monthly-yearly-cardinality-exact`. | Aligned |
+| Archive eligibility remains GFS-only in standard mode | Spec: Section 5 Non-GFS capacity residue rule. Code: archive candidate filters in `applySOBROffload()` (`isGFS === true`) in `src/simulator/engine.ts`. Tests: `lb-sobr-capacity-residue-after-archive`, `ix-gfs-wmy-move-archive`, `ix-gfs-wmy-copy-archive`. | Aligned |
+| Copy vs Move residency invariants are preserved | Spec: Section 5 invariants (single-tier in Move, multi-tier allowed in Copy). Code: `hasPerformanceData`/`hasCapacityData`/`hasArchiveData` updates in `applySOBROffload()` in `src/simulator/engine.ts`. Tests: `od-tier-residency-per-point`, `od-sobr-copy-full-lifecycle`. | Aligned |
+| GEN-point integrity for object tiers | Spec: Section 3 generation atomicity + ownership. Code: Capacity-entry GEN mint via `registerPointInGeneration(...)`; lifecycle views in `getCurrentGenerations(...)` in `src/simulator/engine.ts`. Tests: `od-gen-lifecycle-states`, `im-gen-window-boundary`. | Aligned |
+| UI semantics match repo type (no SOBR-tier framing for non-SOBR) | Spec: Section 5 scoped to SOBR tiering. Code: non-SOBR primary storage labeling and tier panel selection in `src/components/OutputPanel.tsx`. Tests: manual UI verification (no automated UI scenario yet). | Aligned |
+| Shared sizing model consistency (no comparator-only calibration) | Spec: Section 6 and repo guardrails. Code: shared working-space function `computeVeeamWorkingSpaceTB(...)` used by Input/UI/tests in `src/models/veeam.ts`, `src/components/InputForm.tsx`, `src/components/OutputPanel.tsx`, `src/testing/veeamBaselineComparator.ts`. Tests: `compare:veeam` + lifecycle quality runs. | Aligned |
+| Snapshot governance for intentional behavior changes | Spec: Merge gate + checklist process. Code/process: lifecycle runner snapshot mode and `docs/golden-snapshots.json` updates. Tests: `npm run test:lifecycle` then `npm run test:lifecycle -- --update-snapshots` only when canonical behavior intentionally changed. | Aligned (Process Control) |
+
+### Merge rule
+- All rows must be `Aligned` before merge.
+- If any row is `Drift`, PR must include either:
+  - a code/spec/test fix that restores alignment, or
+  - an explicit approved exception note with follow-up issue.
 

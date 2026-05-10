@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-07T10:20:39.949Z",
+  "generatedAt": "2026-05-10T07:54:00.545Z",
   "snapshotDays": [
     365,
     730
@@ -49,21 +49,21 @@
     "ti-sobr-move-3yr": {
       "365": {
         "date": "2027-05-02",
-        "chainCount": 7,
-        "rpCount": 45,
+        "chainCount": 8,
+        "rpCount": 52,
         "gfsWeeklyCount": 4,
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 0,
-        "storageTB": 2.43
+        "storageTB": 2.612
       },
       "730": {
         "date": "2028-05-01",
-        "chainCount": 7,
-        "rpCount": 45,
+        "chainCount": 8,
+        "rpCount": 52,
         "gfsWeeklyCount": 4,
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 0,
-        "storageTB": 2.553
+        "storageTB": 3.265
       }
     },
     "ti-sobr-copy-3yr": {
@@ -89,21 +89,21 @@
     "ti-sobr-gfs-archive-5yr": {
       "365": {
         "date": "2027-05-02",
-        "chainCount": 11,
-        "rpCount": 72,
+        "chainCount": 13,
+        "rpCount": 86,
         "gfsWeeklyCount": 4,
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 1,
-        "storageTB": 4.849
+        "storageTB": 5.211
       },
       "730": {
         "date": "2028-05-01",
-        "chainCount": 12,
-        "rpCount": 81,
+        "chainCount": 13,
+        "rpCount": 88,
         "gfsWeeklyCount": 4,
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 2,
-        "storageTB": 6.225
+        "storageTB": 6.416
       }
     },
     "ti-das-sla-minimum-5yr": {
@@ -149,21 +149,21 @@
     "ti-sobr-move-chain-rp-drift-3yr": {
       "365": {
         "date": "2027-05-02",
-        "chainCount": 7,
-        "rpCount": 45,
+        "chainCount": 8,
+        "rpCount": 52,
         "gfsWeeklyCount": 4,
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 0,
-        "storageTB": 2.43
+        "storageTB": 2.612
       },
       "730": {
         "date": "2028-05-01",
-        "chainCount": 7,
-        "rpCount": 45,
+        "chainCount": 8,
+        "rpCount": 52,
         "gfsWeeklyCount": 4,
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 0,
-        "storageTB": 2.553
+        "storageTB": 3.265
       }
     },
     "ti-das-high-retention-drift-3yr": {
