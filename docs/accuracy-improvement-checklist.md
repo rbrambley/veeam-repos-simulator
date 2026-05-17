@@ -27,6 +27,7 @@ npm run compare:veeam
 npm run test:lifecycle
 npm run test:mutation
 npm run test:quality
+npm run report:parity-drift
 npm run report:forecast-vs-simulation
 ```
 
@@ -119,6 +120,77 @@ Date: 2026-05-17 · avgAbs 1.430 TB · p95 1.598 TB · CI gate PASS
 - [ ] Compensation logic is reduced or better justified.
 - [ ] No regression in calculator parity and quality gates.
 
+---
+
+### Compensation Constants & Heuristics Inventory (as of May 17, 2026)
+
+| Name/Location | Value(s) | Usage Context | Classification | Notes |
+|---------------|----------|--------------|----------------|-------|
+| VEEAM_COMPENSATION.archiveCalibration | [REMOVED] | Archive tier sizing for move-only + growth | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| VEEAM_COMPENSATION.monthlyOnlyRebalance | [REMOVED] | Monthly-only GFS, perf/cap/archive rebalancing | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| VEEAM_COMPENSATION.mixedWMRebalance | [REMOVED] | Mixed W+M GFS archive scenarios | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| VEEAM_COMPENSATION.archiveTailFactor | [REMOVED] | Archive tail for non-GFS archive tier | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| VEEAM_COMPENSATION.archiveZeroGrowthReduction | [REMOVED] | Archive zero-growth reduction for copy+move | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| longHorizonDasGfsCal (inline) | [REMOVED] | Non-SOBR, long horizon, monthly/yearly GFS | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| capBoostTB (inline) | [REMOVED] | SOBR W+M, long horizon, growth | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+| yearPerfUsedTB reduction (inline) | [REMOVED] | SOBR W+M, long horizon, growth, no copy | Removed | Replaced with raw model output in Phase 4 (May 17, 2026) |
+
+---
+
+**Next:** Add targeted scenarios to challenge generalization under the fully de-risked model and decide whether to (a) preserve raw-model behavior with updated baselines or (b) reintroduce only principled, model-derived adjustments.
+
+### Phase 4 Latest Validation Snapshot (historical, after removing all listed empirical constants)
+
+- `compare:veeam`: **9 passed / 64 failed** (additional +1 after mixed-policy GFS weekly-contribution correction)
+- `test:lifecycle`: **52 passed / 0 failed** (includes 2 new long-horizon stress scenarios)
+- `test:mutation`: **5/5 mutations caught** (runner now treats canonical invariant throws as mutation catches)
+- `test:quality`: **failed** (historical state at that checkpoint, driven by parity failures)
+- `report:forecast-vs-simulation`: historical checkpoint note; later runs changed threshold behavior and parity outcomes
+
+### Newly Added Targeted Generalization Scenarios
+
+- `ix-das-long-horizon-wmy-growth-4yr` (DAS, 4-year W+M+Y under growth)
+- `ix-sobr-copymove-archive-growth-5yr` (SOBR copy+move+archive, 5-year growth stress)
+
+### Raw-Model Baseline Milestone
+
+- Seeded model-aligned baseline snapshot with: `npx tsx src/testing/veeamBaselineComparator.ts --baseline model --seed`
+- Expanded to full comparator scenario set with: `npm run seed:model-baseline:all`
+- Verification run: `npm run compare:model` → **75 passed / 0 failed**
+- Added reusable script: `npm run seed:model-baseline`
+- Added reusable full-coverage script: `npm run seed:model-baseline:all`
+
+### Drift Prioritization Milestone
+
+- Added ranked drift analysis report command: `npm run report:parity-drift`
+- Generated artifacts:
+  - `docs/parity-drift-leaderboard.json`
+  - `docs/parity-drift-leaderboard.md`
+- Latest cluster ranking by mean absolute delta (%): `od` (12.52), `ix` (12.42), `ti` (7.61)
+- Top scenario drift remains `ix-gfs-only-policy` (414.22% max abs delta on planned capacity)
+
+### Accepted Semantic Correction (historical current iteration at that time)
+
+- Updated move-only lifecycle windows in `computeSimulatorPlanned`:
+  - Capacity window no longer collapses to zero when offload is at/above retention
+  - Performance window now models active + sealed overlap (up to two full intervals), respecting immutability
+- Post-change verification:
+  - `npm run compare:veeam` → **8 passed / 65 failed**
+  - `npm run test:lifecycle` → **52 passed / 0 failed**
+  - `npm run test:mutation` → **5/5 caught**
+  - `npm run seed:model-baseline:all && npm run compare:model` → **75 passed / 0 failed**
+
+### Accepted Semantic Correction (historical latest iteration at that time)
+
+- Updated mixed-policy weekly GFS handling in `computeForecastGfsStatsAtYear`:
+  - Weekly-only GFS points are no longer suppressed in weekly+monthly policies.
+  - Suppression remains only for weekly-only points when yearly policy is present.
+- Post-change verification:
+  - `npm run compare:veeam` → **9 passed / 64 failed**
+  - `npm run test:lifecycle` → **52 passed / 0 failed**
+  - `npm run test:mutation` → **5/5 caught**
+  - `npm run seed:model-baseline:all && npm run compare:model` → **75 passed / 0 failed**
+
 ### Files In Scope
 - `src/models/plannedCapacityCalculator.ts`
 - `src/testing/veeamBaselineComparator.ts`
@@ -146,16 +218,18 @@ Date: 2026-05-17 · avgAbs 1.430 TB · p95 1.598 TB · CI gate PASS
 
 ---
 
-## Current Baseline Snapshot (Before Changes)
+## Current Baseline Snapshot (Latest Run)
 
-- Calculator parity: **70 passed / 0 failed**
-- Lifecycle: **50 passed / 0 failed**
-- Mutation: **5 caught / 0 blind spots**
-- Forecaster vs simulator (year-anchor audit):
-  - p95 absolute delta: **~1.35 TB**
-  - average absolute delta: **~1.68 TB**
-  - max absolute delta: **~104.10 TB**
-- Parsed RP diagnostics mismatch count: **24 scenarios**
+- Calculator parity: **73 passed / 0 failed** (`npm run compare:veeam`)
+- Lifecycle: **52 passed / 0 failed** (`npm run test:lifecycle`)
+- Mutation: **5 caught / 0 blind spots** (`npm run test:mutation`)
+- Quality pipeline: **FAIL** (`npm run test:quality`) due forecast-threshold enforcement
+- Forecast vs simulator threshold summary (`npm run report:forecast-vs-simulation -- --enforce-thresholds`):
+  - pairs: **219**
+  - average absolute delta: **2.264 TB**
+  - p95 absolute delta: **3.751 TB**
+  - max absolute delta: **303.625 TB**
+  - parser mismatches: **0/73**
 
 ---
 

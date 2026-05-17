@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-06T10:20:50.374Z",
-  "probeScenarioCount": 48,
+  "generatedAt": "2026-05-17T12:56:49.557Z",
+  "probeScenarioCount": 52,
   "mutationCount": 5,
   "caughtCount": 5,
   "blindSpotCount": 0,
@@ -16,8 +16,8 @@
         "scenarioId": "lb-das-gfs-preserves-chain",
         "day": 21,
         "date": "2026-05-23",
-        "rule": "R-GFS-01",
-        "message": "expected: weeklyGFS count ≤ 2 | actual: weeklyGFS count = 3"
+        "rule": "nextDay",
+        "message": "[CANONICAL_INVARIANT] nextDay:2026-05-23: job job-lb-das-gfs-preserves-chain weekly GFS count 3 exceeds limit 2"
       }
     },
     {
@@ -27,11 +27,11 @@
       "expectedCatchingRule": "R-GFS-03 (gfsWeeklyCountNeverExceedsLimit)",
       "caught": true,
       "catchResult": {
-        "scenarioId": "lb-das-gfs-preserves-chain",
-        "day": 21,
-        "date": "2026-05-23",
-        "rule": "R-GFS-01",
-        "message": "expected: weeklyGFS count ≤ 2 | actual: weeklyGFS count = 3"
+        "scenarioId": "ti-sobr-move-chain-rp-drift-3yr",
+        "day": 35,
+        "date": "2026-06-06",
+        "rule": "R-DRIFT-01",
+        "message": "expected: inactive chain count ≤ 4 | actual: inactive chain count = 5 (chains accumulating — engine not cleaning up)"
       }
     },
     {
@@ -55,11 +55,11 @@
       "expectedCatchingRule": "singleGlobalBasePerJobEveryDay",
       "caught": true,
       "catchResult": {
-        "scenarioId": "ti-das-3yr-gfs-wmy",
-        "day": 21,
-        "date": "2026-05-23",
-        "rule": "R-BASE-01",
-        "message": "expected: exactly 1 global base per job | actual: job job-ti-das-3yr-gfs-wmy has 0 global bases"
+        "scenarioId": "lb-das-retention-count",
+        "day": 14,
+        "date": "2026-05-16",
+        "rule": "nextDay",
+        "message": "[CANONICAL_INVARIANT] nextDay:2026-05-16: job job-lb-das-retention-count must have exactly one global base (found 0)"
       }
     },
     {
@@ -69,11 +69,11 @@
       "expectedCatchingRule": "R-GFS-03 (gfsWeeklyCountNeverExceedsLimit)",
       "caught": true,
       "catchResult": {
-        "scenarioId": "ti-sobr-move-chain-rp-drift-3yr",
-        "day": 35,
-        "date": "2026-06-06",
-        "rule": "R-DRIFT-01",
-        "message": "expected: inactive chain count ≤ 4 | actual: inactive chain count = 5 (chains accumulating — engine not cleaning up)"
+        "scenarioId": "lb-das-gfs-preserves-chain",
+        "day": 1,
+        "date": "2026-05-03",
+        "rule": "nextDay",
+        "message": "[CANONICAL_INVARIANT] nextDay:2026-05-03: GFS-tagged point job-lb-das-gfs-preserves-chain-2026-05-03-Incremental has invalid type Incremental"
       }
     }
   ]

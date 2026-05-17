@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-10T11:25:46.394Z",
+  "generatedAt": "2026-05-17T08:54:09.471Z",
   "snapshotDays": [
     365,
     730
@@ -324,6 +324,46 @@
         "gfsMonthlyCount": 6,
         "gfsYearlyCount": 2,
         "storageTB": 1231.85
+      }
+    },
+    "ix-das-long-horizon-wmy-growth-4yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 3,
+        "rpCount": 20,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 1,
+        "storageTB": 4.128
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 3,
+        "rpCount": 22,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 2,
+        "storageTB": 6.515
+      }
+    },
+    "ix-sobr-copymove-archive-growth-5yr": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 10,
+        "rpCount": 65,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 0,
+        "storageTB": 7.038
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 10,
+        "rpCount": 66,
+        "gfsWeeklyCount": 4,
+        "gfsMonthlyCount": 3,
+        "gfsYearlyCount": 0,
+        "storageTB": 7.861
       }
     }
   }
