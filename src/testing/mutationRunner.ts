@@ -220,7 +220,24 @@ function runProbeScenario(sc: ProbeScenario): CatchResult | null {
     const prevChainIds = new Set(sim.state.chains.map((c) => c.id));
     const prevPoints   = new Map(sim.state.restorePoints.map((r) => [r.id, r]));
 
-    sim.nextDay();
+    try {
+      sim.nextDay();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      // Mutations may now be caught by engine-level canonical invariants before
+      // lifecycle oracle checks execute. Treat that as a successful catch.
+      if (message.includes('[CANONICAL_INVARIANT]')) {
+        const rule = message.match(/\[CANONICAL_INVARIANT\]\s*([^:]+)/)?.[1]?.trim() || 'CANONICAL_INVARIANT';
+        return {
+          scenarioId: sc.id,
+          day,
+          date: sim.state.date,
+          rule,
+          message,
+        };
+      }
+      throw error;
+    }
 
     const deletedThisTick = new Set<string>();
     for (const id of prevChainIds) {

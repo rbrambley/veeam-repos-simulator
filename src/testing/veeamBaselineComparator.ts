@@ -119,6 +119,7 @@ function loadComparatorScenarios(): TestScenario[] {
 
 async function run(): Promise<void> {
   const seedMode = process.argv.includes('--seed');
+  const seedAllMode = process.argv.includes('--seed-all');
   const gfsLegacyMode = process.argv.includes('--gfs-legacy');
   const gfsReverseMode = process.argv.includes('--gfs-reverse');
   const gfsEndperiodMode = process.argv.includes('--gfs-endperiod');
@@ -149,7 +150,18 @@ async function run(): Promise<void> {
   const startDate = baseline.defaults?.startDate || '2026-05-02';
 
   if (seedMode) {
-    const seededScenarios = baseline.scenarios.map((entry) => {
+    const seedMarker = 'seeded-from-simulator';
+    const appendSeedMarker = (notes?: string) => {
+      if (!notes) return seedMarker;
+      return notes.includes(seedMarker) ? notes : `${notes} [${seedMarker}]`;
+    };
+
+    const baselineById = new Map(baseline.scenarios.map((entry) => [entry.id, entry]));
+    const sourceEntries: BaselineScenario[] = seedAllMode
+      ? scenariosData.map((scenario) => baselineById.get(scenario.id) ?? { id: scenario.id, expected: {} })
+      : baseline.scenarios;
+
+    const seededScenarios = sourceEntries.map((entry) => {
       const scenario = scenarioById.get(entry.id);
       if (!scenario) return entry;
 
@@ -171,9 +183,8 @@ async function run(): Promise<void> {
 
       return {
         ...entry,
-        notes: entry.notes
-          ? `${entry.notes} [seeded-from-simulator]`
-          : 'seeded-from-simulator',
+        forecastYears,
+        notes: appendSeedMarker(entry.notes),
         expected,
       };
     });
@@ -186,6 +197,7 @@ async function run(): Promise<void> {
     fs.writeFileSync(baselinePath, JSON.stringify(seededBaseline, null, 2) + '\n', 'utf-8');
     console.log('✅ Baseline file seeded from current simulator calculations.');
     console.log(`   File: docs/${baselineFileName}`);
+    console.log(`   Scenarios seeded: ${seededScenarios.length}${seedAllMode ? ' (seed-all mode)' : ''}`);
     process.exit(0);
   }
 
