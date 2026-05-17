@@ -1,0 +1,450 @@
+
+> veeam-repos-simulator@1.0.0 compare:veeam
+> tsx src/testing/veeamBaselineComparator.ts
+
+
+=ƒöì Comparing simulator vs Veeam calculator baseline (tolerance 5%)
+
+  GÜá  Known structural differences GÇö deltas are expected:
+     GÇó Veeam block generation period (10 days default) adds overhead to SOBR Cap/Archive Tiers GÇö not modeled yet
+     GÇó Simulator and Veeam Calculator now use the same progressive tiered WS scale GÇö no WS adjustment applied
+     GÇó GFS sizing mode: growth-based (each GFS at its historical forecast-period date)
+     GÇó This comparison is directional (ballpark alignment), not an exact equivalence
+
+G£à das-basic: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à das-retention-14: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.62 TB expected=1.62 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-moveonly: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.87 TB expected=0.87 TB delta=-0.00 TB (0.01%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-copymove: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.33 TB expected=1.33 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à das-gfs: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.46 TB expected=1.46 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-gfs-archive: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.26 TB expected=2.26 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à das-monthly-2-small-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.38 TB expected=1.38 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à das-yearly-2-small-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=2.52 TB expected=2.52 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à das-monthly-2-large-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=22.33 TB expected=22.33 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=6.66 TB expected=6.66 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+G£à das-yearly-2-large-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=42.31 TB expected=42.31 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=6.66 TB expected=6.66 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+G£à das-mixed-2w1m-small-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.23 TB expected=1.23 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à das-mixed-2w1y-small-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.63 TB expected=1.63 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à das-mixed-1m1y-small-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.67 TB expected=1.68 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à das-mixed-2w1m1y-small-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.67 TB expected=1.68 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à das-mixed-2w1m1y-large-r7: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=30.32 TB expected=30.32 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=6.66 TB expected=6.66 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+G£à sobr-mixed-2w1m1y-small-r60: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.56 TB expected=2.56 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.64 TB expected=0.64 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-mixed-1m1y-small-r60: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.56 TB expected=2.56 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.64 TB expected=0.64 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-copyonly-archive-gating: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.80 TB expected=1.80 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-matrix-move-lt-retention: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.10 TB expected=1.10 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-matrix-move-eq-retention: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-matrix-move-gt-retention: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à sobr-matrix-move-zero: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.39 TB expected=1.39 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.10 TB expected=1.10 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.67 TB expected=0.67 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=-0.00 TB (0.08%)
+G£à lb-das-retention-count: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-das-sla-overrides-count: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-das-gfs-preserves-chain: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.23 TB expected=1.23 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-gfs-expiry-order: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.23 TB expected=1.23 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-gfs-monthly-boundary: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.63 TB expected=1.63 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-gfs-yearly-boundary: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=2.36 TB expected=2.36 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-gfs-stacking: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=2.98 TB expected=2.98 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-sobr-offload-threshold: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.65 TB expected=0.65 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-sobr-archive-threshold-move: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.88 TB expected=1.88 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-sobr-archive-threshold-copy: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.05 TB expected=2.05 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-sobr-capacity-residue-after-archive: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.35 TB expected=1.35 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à lb-perf-prune-ordering: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.65 TB expected=0.65 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ti-das-3yr-gfs-wmy: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=3.24 TB expected=3.24 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-sobr-move-3yr: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.21 TB expected=1.21 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.63 TB expected=1.63 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.80 TB expected=0.80 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-sobr-copy-3yr: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.28 TB expected=1.28 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.51 TB expected=1.51 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.80 TB expected=0.80 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-sobr-gfs-archive-5yr: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.28 TB expected=1.28 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.40 TB expected=2.40 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=2.13 TB expected=2.13 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-das-sla-minimum-5yr: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=3.24 TB expected=3.24 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-das-chain-rp-drift-3yr: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=3.24 TB expected=3.24 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-sobr-move-chain-rp-drift-3yr: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.21 TB expected=1.21 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.63 TB expected=1.63 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.80 TB expected=0.80 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à ti-das-high-retention-drift-3yr: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=3.85 TB expected=3.85 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.58 TB expected=0.58 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.14%)
+G£à im-perf-immutability-blocks-prune: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.65 TB expected=0.65 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à im-cap-immutability-blocks-deletion: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.65 TB expected=0.65 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à im-arch-immutability-blocks-deletion: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à im-gen-window-boundary: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.65 TB expected=0.65 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à im-gen-deleteon-extended-by-gfs: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.05 TB expected=1.05 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à im-gen-state-transitions: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.65 TB expected=0.65 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à im-all-tiers-immutability: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-gfs-wmy-move-archive: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.08 TB expected=2.08 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=1.76 TB expected=1.76 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-gfs-wmy-copy-archive: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.92 TB expected=1.93 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=1.75 TB expected=1.75 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-gfs-wmy-copy-archive-immutability: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.92 TB expected=1.93 TB delta=-0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=1.75 TB expected=1.75 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-gfs-monthly-move-immutability: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.15 TB expected=1.15 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.66 TB expected=1.66 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-short-retention-long-gfs: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=3.15 TB expected=3.15 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-high-gen-period: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.15 TB expected=1.15 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.18 TB expected=2.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-copy-move-combo: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.15 TB expected=1.15 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.27 TB expected=1.27 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.43 TB expected=0.43 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-no-gfs-long-archive: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.00 TB expected=1.00 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-retention-variant-r7: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.15 TB expected=1.15 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.83 TB expected=0.83 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.88 TB expected=0.88 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-retention-variant-r60: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=2.08 TB expected=2.08 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=1.76 TB expected=1.76 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-high-change-rate-drift-2yr: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=7.14 TB expected=7.14 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.20 TB expected=0.20 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.20 TB expected=0.20 TB delta=0.00 TB (0.00%)
+G£à ix-short-retention-drift-3yr: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.97 TB expected=1.97 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-policy-change-mid-run: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.63 TB expected=1.63 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-gfs-only-policy: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=26.22 TB expected=26.23 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à ix-two-jobs-one-repo: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.55 TB expected=1.55 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à od-weekly-gfs-cardinality-exact: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=1.65 TB expected=1.65 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à od-monthly-yearly-cardinality-exact: all compared metrics within tolerance
+   G£ô Planned Capacity: actual=2.93 TB expected=2.93 TB delta=-0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à od-tier-residency-per-point: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à od-gen-lifecycle-states: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à od-chain-phase-transitions: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=0.82 TB expected=0.82 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.00 TB expected=0.00 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+G£à od-sobr-copy-full-lifecycle: all compared metrics within tolerance
+   G£ô Planned Performance Tier: actual=1.18 TB expected=1.18 TB delta=0.00 TB (0.00%)
+   G£ô Planned Capacity Tier: actual=1.23 TB expected=1.23 TB delta=0.00 TB (0.00%)
+   G£ô Planned Archive Tier: actual=0.70 TB expected=0.70 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Full: actual=0.50 TB expected=0.50 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - Incremental: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+   G£ô File Type Size - SyntheticFull: actual=0.03 TB expected=0.03 TB delta=0.00 TB (0.00%)
+
+============================================================
+=ƒôè Baseline Comparison Summary
+============================================================
+G£à Passed: 70
+G¥î Failed: 0
+GÅ¦ Pending (missing expected values): 0
+============================================================
+

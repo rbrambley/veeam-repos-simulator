@@ -9,27 +9,37 @@
   "scenarios": [
     {
       "id": "das-basic",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
-        "fileTypeSyntheticFullTB": 0.0333
+        "fileTypeSyntheticFullTB": 0.0333,
+        "restorePointsTotalTB": 1.0600000000000003,
+        "varianceTB": 0.5399999999999998,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 14,
+        "parsedRestorePointCount": 14
       }
     },
     {
       "id": "das-retention-14",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.9,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
-        "fileTypeSyntheticFullTB": 0.0333
+        "fileTypeSyntheticFullTB": 0.0333,
+        "restorePointsTotalTB": 1.2700000000000005,
+        "varianceTB": 0.6299999999999994,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 21,
+        "parsedRestorePointCount": 21
       }
     },
     {
       "id": "sobr-moveonly",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
@@ -37,7 +47,12 @@
         "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
         "plannedCapacityTierTB": 1.3,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.3299999999999983,
+        "varianceTB": -0.7299999999999982,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
@@ -49,9 +64,14 @@
         "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
         "plannedCapacityTierTB": 1.6,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.539999999999997,
+        "varianceTB": -0.9399999999999968,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 42,
+        "parsedRestorePointCount": 42
       },
-      "notes": "captured-from-playwright-2026-05-06"
+      "notes": "captured-from-playwright-2026-05-11"
     },
     {
       "id": "das-gfs",
@@ -59,9 +79,14 @@
         "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
         "fileTypeIncrementalTB": 0.0333,
-        "fileTypeSyntheticFullTB": 0.0333
+        "fileTypeSyntheticFullTB": 0.0333,
+        "restorePointsTotalTB": 1.0600000000000003,
+        "varianceTB": 0.5399999999999998,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 14,
+        "parsedRestorePointCount": 14
       },
-      "notes": "captured-from-playwright-2026-05-06"
+      "notes": "captured-from-playwright-2026-05-11"
     },
     {
       "id": "sobr-gfs-archive",
@@ -72,109 +97,159 @@
         "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
         "plannedCapacityTierTB": 3,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 3.769999999999989,
+        "varianceTB": -2.169999999999989,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 84,
+        "parsedRestorePointCount": 83
       },
-      "notes": "captured-from-playwright-2026-05-06"
+      "notes": "captured-from-playwright-2026-05-11"
     },
     {
       "id": "das-monthly-2-small-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
-        "fileTypeSyntheticFullTB": 0.025
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.1500000000000004,
+        "varianceTB": 0.44999999999999973,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "das-yearly-2-small-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 2.3,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
         "fileTypeSyntheticFullTB": 0.025,
-        "plannedPerformanceTierTB": 0.45
+        "restorePointsTotalTB": 1.7900000000000003,
+        "varianceTB": 0.5099999999999996,
+        "plannedPerformanceTierTB": 0.45,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "das-monthly-2-large-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 28.3,
         "fileTypeFullTB": 6.66,
         "fileTypeIncrementalTB": 0.666,
-        "fileTypeSyntheticFullTB": 0.666
+        "fileTypeSyntheticFullTB": 0.666,
+        "restorePointsTotalTB": 22.030000000000015,
+        "varianceTB": 6.269999999999985,
+        "workingSpaceTB": 6.35,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "das-yearly-2-large-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 35,
         "fileTypeFullTB": 6.66,
         "fileTypeIncrementalTB": 0.666,
         "fileTypeSyntheticFullTB": 0.666,
-        "plannedPerformanceTierTB": 6.66
+        "restorePointsTotalTB": 28.690000000000023,
+        "varianceTB": 6.309999999999977,
+        "plannedPerformanceTierTB": 6.66,
+        "workingSpaceTB": 6.35,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "das-mixed-2w1m-small-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.5,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
-        "fileTypeSyntheticFullTB": 0.025
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.0200000000000002,
+        "varianceTB": 0.47999999999999976,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 15,
+        "parsedRestorePointCount": 15
       }
     },
     {
       "id": "das-mixed-2w1y-small-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.8,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
         "fileTypeSyntheticFullTB": 0.025,
-        "plannedPerformanceTierTB": 0.5
+        "restorePointsTotalTB": 1.3400000000000003,
+        "varianceTB": 0.45999999999999974,
+        "plannedPerformanceTierTB": 0.5,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 15,
+        "parsedRestorePointCount": 15
       }
     },
     {
       "id": "das-mixed-1m1y-small-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.9,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
         "fileTypeSyntheticFullTB": 0.025,
-        "plannedPerformanceTierTB": 0.5
+        "restorePointsTotalTB": 1.4700000000000004,
+        "varianceTB": 0.4299999999999995,
+        "plannedPerformanceTierTB": 0.5,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "das-mixed-2w1m1y-small-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.9,
         "fileTypeFullTB": 0.5,
         "fileTypeIncrementalTB": 0.025,
         "fileTypeSyntheticFullTB": 0.025,
-        "plannedPerformanceTierTB": 0.5
+        "restorePointsTotalTB": 1.4700000000000004,
+        "varianceTB": 0.4299999999999995,
+        "plannedPerformanceTierTB": 0.5,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "das-mixed-2w1m1y-large-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 31.7,
         "fileTypeFullTB": 6.66,
         "fileTypeIncrementalTB": 0.666,
         "fileTypeSyntheticFullTB": 0.666,
-        "plannedPerformanceTierTB": 6.66
+        "restorePointsTotalTB": 25.36000000000002,
+        "varianceTB": 6.3399999999999785,
+        "plannedPerformanceTierTB": 6.66,
+        "workingSpaceTB": 6.35,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "sobr-mixed-2w1m1y-small-r60",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
@@ -182,12 +257,17 @@
         "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
         "plannedCapacityTierTB": 3,
-        "plannedArchiveTierTB": 0.7
+        "plannedArchiveTierTB": 0.7,
+        "restorePointsTotalTB": 4.439999999999989,
+        "varianceTB": -2.8399999999999888,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 85,
+        "parsedRestorePointCount": 84
       }
     },
     {
       "id": "sobr-mixed-1m1y-small-r60",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
         "fileTypeFullTB": 0.6655,
@@ -195,475 +275,957 @@
         "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
         "plannedCapacityTierTB": 3,
-        "plannedArchiveTierTB": 0.7
+        "plannedArchiveTierTB": 0.7,
+        "restorePointsTotalTB": 4.469999999999989,
+        "varianceTB": -2.869999999999989,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 85,
+        "parsedRestorePointCount": 85
       }
     },
     {
       "id": "sobr-copyonly-archive-gating",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
         "plannedCapacityTierTB": 2,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.9299999999999944,
+        "varianceTB": -1.3299999999999943,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 55
       }
     },
     {
       "id": "sobr-matrix-move-lt-retention",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
-        "plannedCapacityTierTB": 1.6
+        "plannedCapacityTierTB": 1.6,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.539999999999997,
+        "varianceTB": -0.9399999999999968,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 42,
+        "parsedRestorePointCount": 42
       }
     },
     {
       "id": "sobr-matrix-move-eq-retention",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
-        "plannedCapacityTierTB": 1.3
+        "plannedCapacityTierTB": 1.3,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.3299999999999983,
+        "varianceTB": -0.7299999999999982,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "sobr-matrix-move-gt-retention",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.9,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.9,
-        "plannedCapacityTierTB": 1.3
+        "plannedCapacityTierTB": 1.3,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.539999999999997,
+        "varianceTB": -0.639999999999997,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 42,
+        "parsedRestorePointCount": 42
       }
     },
     {
       "id": "sobr-matrix-move-zero",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.6,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
         "plannedPerformanceTierTB": 1.6,
-        "plannedCapacityTierTB": 1.3
+        "plannedCapacityTierTB": 1.3,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.3299999999999983,
+        "varianceTB": -0.7299999999999982,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "lb-das-retention-count",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.4
+        "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 0.8900000000000003,
+        "varianceTB": 0.5099999999999996,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 14,
+        "parsedRestorePointCount": 14
       }
     },
     {
       "id": "lb-das-sla-overrides-count",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.4
+        "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 0.8900000000000003,
+        "varianceTB": 0.5099999999999996,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 14,
+        "parsedRestorePointCount": 14
       }
     },
     {
       "id": "lb-das-gfs-preserves-chain",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.4
+        "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 0.8900000000000003,
+        "varianceTB": 0.5099999999999996,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 14,
+        "parsedRestorePointCount": 14
       }
     },
     {
       "id": "lb-gfs-expiry-order",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.4
+        "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 0.8900000000000003,
+        "varianceTB": 0.5099999999999996,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 14,
+        "parsedRestorePointCount": 14
       }
     },
     {
       "id": "lb-gfs-monthly-boundary",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.7
+        "plannedCapacityTB": 1.7,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.2800000000000002,
+        "varianceTB": 0.4199999999999997,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 17,
+        "parsedRestorePointCount": 17
       }
     },
     {
       "id": "lb-gfs-yearly-boundary",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 2.3,
-        "plannedPerformanceTierTB": 0.45
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.7900000000000003,
+        "varianceTB": 0.5099999999999996,
+        "plannedPerformanceTierTB": 0.45,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 16,
+        "parsedRestorePointCount": 16
       }
     },
     {
       "id": "lb-gfs-stacking",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 2.7,
-        "plannedPerformanceTierTB": 0.45
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 2.219999999999999,
+        "varianceTB": 0.4800000000000013,
+        "plannedPerformanceTierTB": 0.45,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 21,
+        "parsedRestorePointCount": 21
       }
     },
     {
       "id": "lb-sobr-offload-threshold",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.7900000000000007,
+        "varianceTB": -0.3900000000000008,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "lb-sobr-archive-threshold-move",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 2.2,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.7500000000000013,
+        "varianceTB": -1.3500000000000014,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 84,
+        "parsedRestorePointCount": 83
       }
     },
     {
       "id": "lb-sobr-archive-threshold-copy",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 2.2,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.7500000000000013,
+        "varianceTB": -1.3500000000000014,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 84,
+        "parsedRestorePointCount": 83
       }
     },
     {
       "id": "lb-sobr-capacity-residue-after-archive",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.190000000000001,
+        "varianceTB": -0.7900000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 55
       }
     },
     {
       "id": "lb-perf-prune-ordering",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.7900000000000007,
+        "varianceTB": -0.3900000000000008,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "ti-das-3yr-gfs-wmy",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 3.1,
-        "plannedPerformanceTierTB": 0.52
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "restorePointsTotalTB": 2.5899999999999963,
+        "varianceTB": 0.5100000000000038,
+        "plannedPerformanceTierTB": 0.52,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 27,
+        "parsedRestorePointCount": 27
       }
     },
     {
       "id": "ti-sobr-move-3yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.5,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
         "plannedPerformanceTierTB": 1.5,
         "plannedCapacityTierTB": 1.8,
-        "plannedArchiveTierTB": 0.7
+        "plannedArchiveTierTB": 0.7,
+        "restorePointsTotalTB": 3.4699999999999958,
+        "varianceTB": -1.9699999999999958,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 58,
+        "parsedRestorePointCount": 57
       }
     },
     {
       "id": "ti-sobr-copy-3yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.5,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
         "plannedPerformanceTierTB": 1.5,
         "plannedCapacityTierTB": 1.8,
-        "plannedArchiveTierTB": 0.7
+        "plannedArchiveTierTB": 0.7,
+        "restorePointsTotalTB": 3.4699999999999958,
+        "varianceTB": -1.9699999999999958,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 58,
+        "parsedRestorePointCount": 57
       }
     },
     {
       "id": "ti-sobr-gfs-archive-5yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.5,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
         "plannedPerformanceTierTB": 1.5,
         "plannedCapacityTierTB": 2.6,
-        "plannedArchiveTierTB": 1.5
+        "plannedArchiveTierTB": 1.5,
+        "restorePointsTotalTB": 5.11999999999999,
+        "varianceTB": -3.6199999999999903,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 87,
+        "parsedRestorePointCount": 86
       }
     },
     {
       "id": "ti-das-sla-minimum-5yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 3.1,
-        "plannedPerformanceTierTB": 0.52
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "restorePointsTotalTB": 2.5899999999999963,
+        "varianceTB": 0.5100000000000038,
+        "plannedPerformanceTierTB": 0.52,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 27,
+        "parsedRestorePointCount": 27
       }
     },
     {
       "id": "ti-das-chain-rp-drift-3yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 3.1,
-        "plannedPerformanceTierTB": 0.52
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "restorePointsTotalTB": 2.5899999999999963,
+        "varianceTB": 0.5100000000000038,
+        "plannedPerformanceTierTB": 0.52,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 27,
+        "parsedRestorePointCount": 27
       }
     },
     {
       "id": "ti-sobr-move-chain-rp-drift-3yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.5,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
         "plannedPerformanceTierTB": 1.5,
         "plannedCapacityTierTB": 1.8,
-        "plannedArchiveTierTB": 0.7
+        "plannedArchiveTierTB": 0.7,
+        "restorePointsTotalTB": 3.4699999999999958,
+        "varianceTB": -1.9699999999999958,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 58,
+        "parsedRestorePointCount": 57
       }
     },
     {
       "id": "ti-das-high-retention-drift-3yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 3.5,
-        "plannedPerformanceTierTB": 0.52
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "restorePointsTotalTB": 3.0399999999999934,
+        "varianceTB": 0.4600000000000066,
+        "plannedPerformanceTierTB": 0.52,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 46,
+        "parsedRestorePointCount": 46
       }
     },
     {
       "id": "im-perf-immutability-blocks-prune",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.7900000000000007,
+        "varianceTB": -0.3900000000000008,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "im-cap-immutability-blocks-deletion",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.7900000000000007,
+        "varianceTB": -0.3900000000000008,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "im-arch-immutability-blocks-deletion",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.190000000000001,
+        "varianceTB": -0.7900000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 55
       }
     },
     {
       "id": "im-gen-window-boundary",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.7900000000000007,
+        "varianceTB": -0.3900000000000008,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "im-gen-deleteon-extended-by-gfs",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1.1
+        "plannedCapacityTierTB": 1.1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.8500000000000008,
+        "varianceTB": -0.45000000000000084,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 36,
+        "parsedRestorePointCount": 35
       }
     },
     {
       "id": "im-gen-state-transitions",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.7700000000000007,
+        "varianceTB": -0.3700000000000008,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 35,
+        "parsedRestorePointCount": 34
       }
     },
     {
       "id": "im-all-tiers-immutability",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.190000000000001,
+        "varianceTB": -0.7900000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 55
       }
     },
     {
       "id": "ix-gfs-wmy-move-archive",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 2.2,
-        "plannedArchiveTierTB": 1.3
+        "plannedArchiveTierTB": 1.3,
+        "restorePointsTotalTB": 4.080000000000002,
+        "varianceTB": -2.680000000000002,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 87,
+        "parsedRestorePointCount": 86
       }
     },
     {
       "id": "ix-gfs-wmy-copy-archive",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 2.2,
-        "plannedArchiveTierTB": 1.3
+        "plannedArchiveTierTB": 1.3,
+        "restorePointsTotalTB": 4.080000000000002,
+        "varianceTB": -2.680000000000002,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 87,
+        "parsedRestorePointCount": 86
       }
     },
     {
       "id": "ix-gfs-wmy-copy-archive-immutability",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 2.2,
-        "plannedArchiveTierTB": 1.3
+        "plannedArchiveTierTB": 1.3,
+        "restorePointsTotalTB": 4.080000000000002,
+        "varianceTB": -2.680000000000002,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 87,
+        "parsedRestorePointCount": 86
       }
     },
     {
       "id": "ix-gfs-monthly-move-immutability",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1.8
+        "plannedCapacityTierTB": 1.8,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.450000000000001,
+        "varianceTB": -1.0500000000000012,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 58,
+        "parsedRestorePointCount": 58
       }
     },
     {
       "id": "ix-short-retention-long-gfs",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 3.6,
-        "plannedPerformanceTierTB": 0.45
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 3.1399999999999975,
+        "varianceTB": 0.46000000000000263,
+        "plannedPerformanceTierTB": 0.45,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 19,
+        "parsedRestorePointCount": 19
       }
     },
     {
       "id": "ix-high-gen-period",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 2.4
+        "plannedCapacityTierTB": 2.4,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.8900000000000015,
+        "varianceTB": -1.4900000000000015,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 85,
+        "parsedRestorePointCount": 85
       }
     },
     {
       "id": "ix-copy-move-combo",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0.5
+        "plannedArchiveTierTB": 0.5,
+        "restorePointsTotalTB": 2.690000000000001,
+        "varianceTB": -1.290000000000001,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 57,
+        "parsedRestorePointCount": 56
       }
     },
     {
       "id": "ix-no-gfs-long-archive",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.210000000000001,
+        "varianceTB": -0.8100000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 56
       }
     },
     {
       "id": "ix-retention-variant-r7",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1,
-        "plannedArchiveTierTB": 0.8
+        "plannedArchiveTierTB": 0.8,
+        "restorePointsTotalTB": 2.530000000000001,
+        "varianceTB": -1.1300000000000012,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 33,
+        "parsedRestorePointCount": 32
       }
     },
     {
       "id": "ix-retention-variant-r60",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 2.2,
-        "plannedArchiveTierTB": 1.3
+        "plannedArchiveTierTB": 1.3,
+        "restorePointsTotalTB": 4.080000000000002,
+        "varianceTB": -2.680000000000002,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 87,
+        "parsedRestorePointCount": 86
       }
     },
     {
       "id": "ix-high-change-rate-drift-2yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 7.5,
-        "plannedPerformanceTierTB": 0.5
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.2,
+        "fileTypeSyntheticFullTB": 0.2,
+        "restorePointsTotalTB": 7.0000000000000036,
+        "varianceTB": 0.49999999999999645,
+        "plannedPerformanceTierTB": 0.5,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 26,
+        "parsedRestorePointCount": 26
       }
     },
     {
       "id": "ix-short-retention-drift-3yr",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 2.2,
-        "plannedPerformanceTierTB": 0.5
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.7700000000000007,
+        "varianceTB": 0.4299999999999995,
+        "plannedPerformanceTierTB": 0.5,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 20,
+        "parsedRestorePointCount": 20
       }
     },
     {
       "id": "ix-policy-change-mid-run",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.8
+        "plannedCapacityTB": 1.8,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.3900000000000001,
+        "varianceTB": 0.4099999999999999,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 19,
+        "parsedRestorePointCount": 19
       }
     },
     {
       "id": "ix-gfs-only-policy",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 5.1
+        "plannedCapacityTB": 5.1,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 4.890000000000006,
+        "varianceTB": 0.20999999999999375,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 64,
+        "parsedRestorePointCount": 64
       }
     },
     {
       "id": "ix-two-jobs-one-repo",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.8
+        "plannedCapacityTB": 1.8,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.3900000000000003,
+        "varianceTB": 0.4099999999999997,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 24,
+        "parsedRestorePointCount": 24
       }
     },
     {
       "id": "od-weekly-gfs-cardinality-exact",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
-        "plannedCapacityTB": 1.6
+        "plannedCapacityTB": 1.6,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 1.1800000000000004,
+        "varianceTB": 0.4199999999999997,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 22,
+        "parsedRestorePointCount": 22
       }
     },
     {
       "id": "od-monthly-yearly-cardinality-exact",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 2.7,
-        "plannedPerformanceTierTB": 0.45
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "restorePointsTotalTB": 2.319999999999998,
+        "varianceTB": 0.3800000000000021,
+        "plannedPerformanceTierTB": 0.45,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 26,
+        "parsedRestorePointCount": 26
       }
     },
     {
       "id": "od-tier-residency-per-point",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.190000000000001,
+        "varianceTB": -0.7900000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 55
       }
     },
     {
       "id": "od-gen-lifecycle-states",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1.5
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 2.190000000000001,
+        "varianceTB": -0.7900000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 56,
+        "parsedRestorePointCount": 55
       }
     },
     {
       "id": "od-chain-phase-transitions",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
-        "plannedCapacityTierTB": 1.2
+        "plannedCapacityTierTB": 1.2,
+        "plannedArchiveTierTB": 0,
+        "restorePointsTotalTB": 1.9100000000000008,
+        "varianceTB": -0.5100000000000009,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 42,
+        "parsedRestorePointCount": 41
       }
     },
     {
       "id": "od-sobr-copy-full-lifecycle",
-      "notes": "captured-from-playwright-2026-05-06",
+      "notes": "captured-from-playwright-2026-05-11",
       "expected": {
         "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
         "plannedPerformanceTierTB": 1.4,
         "plannedCapacityTierTB": 1.5,
-        "plannedArchiveTierTB": 0.6
+        "plannedArchiveTierTB": 0.6,
+        "restorePointsTotalTB": 2.810000000000001,
+        "varianceTB": -1.410000000000001,
+        "workingSpaceTB": 0.53,
+        "calculatorSummaryRestorePointCount": 58,
+        "parsedRestorePointCount": 57
+      }
+    },
+    {
+      "id": "das-monthly6-retention7-3y-regression",
+      "notes": "captured-from-playwright-2026-05-11",
+      "expected": {
+        "plannedCapacityTB": 5.2,
+        "restorePointsTotalTB": 4.22,
+        "varianceTB": 0.9800000000000004,
+        "workingSpaceTB": 1.05,
+        "calculatorSummaryRestorePointCount": 20,
+        "parsedRestorePointCount": 20
+      }
+    },
+    {
+      "id": "od-das-wmy-weekly-size-nonzero",
+      "notes": "captured-from-playwright-2026-05-11",
+      "expected": {
+        "plannedCapacityTB": 8.4,
+        "restorePointsTotalTB": 7.440000000000007,
+        "varianceTB": 0.9599999999999937,
+        "plannedPerformanceTierTB": 1.2,
+        "workingSpaceTB": 1.05,
+        "calculatorSummaryRestorePointCount": 32,
+        "parsedRestorePointCount": 32
+      }
+    },
+    {
+      "id": "od-calculator-parity-347tb-wmy",
+      "notes": "captured-from-playwright-2026-05-11",
+      "expected": {
+        "plannedCapacityTB": 966.3,
+        "restorePointsTotalTB": 911.0399999999986,
+        "varianceTB": 55.260000000001355,
+        "plannedPerformanceTierTB": 156.15,
+        "workingSpaceTB": 55.43,
+        "calculatorSummaryRestorePointCount": 36,
+        "parsedRestorePointCount": 36
       }
     }
   ]

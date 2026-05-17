@@ -1,0 +1,3582 @@
+[
+    {
+        "scenarioId":  "das-basic",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-basic",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-basic",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-basic",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-retention-14",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.62",
+        "expectedTB":  "1.62",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-retention-14",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-retention-14",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-retention-14",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-moveonly",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-moveonly",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.87",
+        "expectedTB":  "0.87",
+        "deltaTB":  "0",
+        "deltaPct":  "0.01",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-moveonly",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-moveonly",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-moveonly",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-moveonly",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copymove",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copymove",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.33",
+        "expectedTB":  "1.33",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copymove",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copymove",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copymove",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copymove",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.46",
+        "expectedTB":  "1.46",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-gfs-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-gfs-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.26",
+        "expectedTB":  "2.26",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-gfs-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-gfs-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-gfs-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-gfs-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.38",
+        "expectedTB":  "1.38",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "2.52",
+        "expectedTB":  "2.52",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "22.33",
+        "expectedTB":  "22.33",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "6.66",
+        "expectedTB":  "6.66",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-monthly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "42.31",
+        "expectedTB":  "42.31",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "6.66",
+        "expectedTB":  "6.66",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-yearly-2-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.23",
+        "expectedTB":  "1.23",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.63",
+        "expectedTB":  "1.63",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.67",
+        "expectedTB":  "1.68",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.67",
+        "expectedTB":  "1.68",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-small-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "30.32",
+        "expectedTB":  "30.32",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "6.66",
+        "expectedTB":  "6.66",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "das-mixed-2w1m1y-large-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-2w1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-2w1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.56",
+        "expectedTB":  "2.56",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-2w1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.64",
+        "expectedTB":  "0.64",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-2w1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-2w1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-2w1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.56",
+        "expectedTB":  "2.56",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.64",
+        "expectedTB":  "0.64",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-mixed-1m1y-small-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copyonly-archive-gating",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copyonly-archive-gating",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.8",
+        "expectedTB":  "1.8",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copyonly-archive-gating",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copyonly-archive-gating",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copyonly-archive-gating",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-copyonly-archive-gating",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-lt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-lt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.1",
+        "expectedTB":  "1.1",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-lt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-lt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-lt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-lt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-eq-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-eq-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-eq-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-eq-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-eq-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-eq-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-gt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-gt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-gt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-gt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-gt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-gt-retention",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-zero",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.39",
+        "expectedTB":  "1.39",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-zero",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.1",
+        "expectedTB":  "1.1",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-zero",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-zero",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.67",
+        "expectedTB":  "0.67",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-zero",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "sobr-matrix-move-zero",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.08",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-retention-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-retention-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-retention-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-retention-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-sla-overrides-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-sla-overrides-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-sla-overrides-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-sla-overrides-count",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-gfs-preserves-chain",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.23",
+        "expectedTB":  "1.23",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-gfs-preserves-chain",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-gfs-preserves-chain",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-das-gfs-preserves-chain",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-expiry-order",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.23",
+        "expectedTB":  "1.23",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-expiry-order",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-expiry-order",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-expiry-order",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-monthly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.63",
+        "expectedTB":  "1.63",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-monthly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-monthly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-monthly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-yearly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "2.36",
+        "expectedTB":  "2.36",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-yearly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-yearly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-yearly-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-stacking",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "2.98",
+        "expectedTB":  "2.98",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-stacking",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-stacking",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-gfs-stacking",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-offload-threshold",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-offload-threshold",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.65",
+        "expectedTB":  "0.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-offload-threshold",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-offload-threshold",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-offload-threshold",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-offload-threshold",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-move",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-move",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.88",
+        "expectedTB":  "1.88",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-move",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-move",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-move",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-move",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-copy",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-copy",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.05",
+        "expectedTB":  "2.05",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-copy",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-copy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-copy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-archive-threshold-copy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-capacity-residue-after-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-capacity-residue-after-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.35",
+        "expectedTB":  "1.35",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-capacity-residue-after-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-capacity-residue-after-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-capacity-residue-after-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-sobr-capacity-residue-after-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-perf-prune-ordering",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-perf-prune-ordering",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.65",
+        "expectedTB":  "0.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-perf-prune-ordering",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-perf-prune-ordering",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-perf-prune-ordering",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "lb-perf-prune-ordering",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-3yr-gfs-wmy",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "3.24",
+        "expectedTB":  "3.24",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-3yr-gfs-wmy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-3yr-gfs-wmy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-3yr-gfs-wmy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.21",
+        "expectedTB":  "1.21",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.63",
+        "expectedTB":  "1.63",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.8",
+        "expectedTB":  "0.8",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-copy-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.28",
+        "expectedTB":  "1.28",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-copy-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.51",
+        "expectedTB":  "1.51",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-copy-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.8",
+        "expectedTB":  "0.8",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-copy-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-copy-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-copy-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-gfs-archive-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.28",
+        "expectedTB":  "1.28",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-gfs-archive-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.4",
+        "expectedTB":  "2.4",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-gfs-archive-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "2.13",
+        "expectedTB":  "2.13",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-gfs-archive-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-gfs-archive-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-gfs-archive-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-sla-minimum-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "3.24",
+        "expectedTB":  "3.24",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-sla-minimum-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-sla-minimum-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-sla-minimum-5yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "3.24",
+        "expectedTB":  "3.24",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.21",
+        "expectedTB":  "1.21",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.63",
+        "expectedTB":  "1.63",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.8",
+        "expectedTB":  "0.8",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-sobr-move-chain-rp-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-high-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "3.85",
+        "expectedTB":  "3.85",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-high-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.58",
+        "expectedTB":  "0.58",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-high-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ti-das-high-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0.14",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-perf-immutability-blocks-prune",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-perf-immutability-blocks-prune",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.65",
+        "expectedTB":  "0.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-perf-immutability-blocks-prune",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-perf-immutability-blocks-prune",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-perf-immutability-blocks-prune",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-perf-immutability-blocks-prune",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-cap-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-cap-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.65",
+        "expectedTB":  "0.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-cap-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-cap-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-cap-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-cap-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-arch-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-arch-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-arch-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-arch-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-arch-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-arch-immutability-blocks-deletion",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-window-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-window-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.65",
+        "expectedTB":  "0.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-window-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-window-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-window-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-window-boundary",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-deleteon-extended-by-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-deleteon-extended-by-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.05",
+        "expectedTB":  "1.05",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-deleteon-extended-by-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-deleteon-extended-by-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-deleteon-extended-by-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-deleteon-extended-by-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-state-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-state-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.65",
+        "expectedTB":  "0.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-state-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-state-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-state-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-gen-state-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-all-tiers-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-all-tiers-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-all-tiers-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-all-tiers-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-all-tiers-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "im-all-tiers-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-move-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-move-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.08",
+        "expectedTB":  "2.08",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-move-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "1.76",
+        "expectedTB":  "1.76",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-move-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-move-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-move-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.92",
+        "expectedTB":  "1.93",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "1.75",
+        "expectedTB":  "1.75",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.92",
+        "expectedTB":  "1.93",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "1.75",
+        "expectedTB":  "1.75",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-monthly-move-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.15",
+        "expectedTB":  "1.15",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-monthly-move-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.66",
+        "expectedTB":  "1.66",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-monthly-move-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-monthly-move-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-monthly-move-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-monthly-move-immutability",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-long-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "3.15",
+        "expectedTB":  "3.15",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-long-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-long-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-long-gfs",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-gen-period",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.15",
+        "expectedTB":  "1.15",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-gen-period",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.18",
+        "expectedTB":  "2.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-gen-period",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-gen-period",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-gen-period",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-gen-period",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-copy-move-combo",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.15",
+        "expectedTB":  "1.15",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-copy-move-combo",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.27",
+        "expectedTB":  "1.27",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-copy-move-combo",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.43",
+        "expectedTB":  "0.43",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-copy-move-combo",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-copy-move-combo",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-copy-move-combo",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-no-gfs-long-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-no-gfs-long-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1",
+        "expectedTB":  "1",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-no-gfs-long-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-no-gfs-long-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-no-gfs-long-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-no-gfs-long-archive",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.15",
+        "expectedTB":  "1.15",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.83",
+        "expectedTB":  "0.83",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.88",
+        "expectedTB":  "0.88",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r7",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "2.08",
+        "expectedTB":  "2.08",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "1.76",
+        "expectedTB":  "1.76",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-retention-variant-r60",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-change-rate-drift-2yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "7.14",
+        "expectedTB":  "7.14",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-change-rate-drift-2yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-change-rate-drift-2yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.2",
+        "expectedTB":  "0.2",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-high-change-rate-drift-2yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.2",
+        "expectedTB":  "0.2",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.97",
+        "expectedTB":  "1.97",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-short-retention-drift-3yr",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-policy-change-mid-run",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.63",
+        "expectedTB":  "1.63",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-policy-change-mid-run",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-policy-change-mid-run",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-policy-change-mid-run",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-only-policy",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "26.22",
+        "expectedTB":  "26.23",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-only-policy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-only-policy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-gfs-only-policy",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-two-jobs-one-repo",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.55",
+        "expectedTB":  "1.55",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-two-jobs-one-repo",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-two-jobs-one-repo",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "ix-two-jobs-one-repo",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-weekly-gfs-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "1.65",
+        "expectedTB":  "1.65",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-weekly-gfs-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-weekly-gfs-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-weekly-gfs-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-monthly-yearly-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity",
+        "actualTB":  "2.93",
+        "expectedTB":  "2.93",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-monthly-yearly-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-monthly-yearly-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-monthly-yearly-cardinality-exact",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-tier-residency-per-point",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-tier-residency-per-point",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-tier-residency-per-point",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-tier-residency-per-point",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-tier-residency-per-point",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-tier-residency-per-point",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-gen-lifecycle-states",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-gen-lifecycle-states",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-gen-lifecycle-states",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-gen-lifecycle-states",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-gen-lifecycle-states",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-gen-lifecycle-states",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-chain-phase-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-chain-phase-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "0.82",
+        "expectedTB":  "0.82",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-chain-phase-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0",
+        "expectedTB":  "0",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-chain-phase-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-chain-phase-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-chain-phase-transitions",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-sobr-copy-full-lifecycle",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Performance Tier",
+        "actualTB":  "1.18",
+        "expectedTB":  "1.18",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-sobr-copy-full-lifecycle",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Capacity Tier",
+        "actualTB":  "1.23",
+        "expectedTB":  "1.23",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-sobr-copy-full-lifecycle",
+        "scenarioStatus":  "PASS",
+        "metric":  "Planned Archive Tier",
+        "actualTB":  "0.7",
+        "expectedTB":  "0.7",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-sobr-copy-full-lifecycle",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Full",
+        "actualTB":  "0.5",
+        "expectedTB":  "0.5",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-sobr-copy-full-lifecycle",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - Incremental",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    },
+    {
+        "scenarioId":  "od-sobr-copy-full-lifecycle",
+        "scenarioStatus":  "PASS",
+        "metric":  "File Type Size - SyntheticFull",
+        "actualTB":  "0.03",
+        "expectedTB":  "0.03",
+        "deltaTB":  "0",
+        "deltaPct":  "0",
+        "metricStatus":  "PASS"
+    }
+]
