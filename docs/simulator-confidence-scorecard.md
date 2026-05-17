@@ -63,9 +63,26 @@ Confidence is lower when extrapolating beyond captured baseline classes, especia
 1. **Use directly** for calculator-equivalent sizing in covered scenarios.
 2. **Gate changes** with:
 - `npm run compare:veeam`
+- `npm run report:forecast-vs-simulation -- --enforce-thresholds`
 - `npm run test:lifecycle`
 - `npm run test:mutation`
 3. **Require new captures** before claiming parity in new scenario classes.
+
+---
+
+## Phase 1 CI Guardrails
+
+Current CI guardrails (operational):
+1. Calculator parity failed scenarios: **<= 0**
+2. Forecaster vs simulator p95 absolute delta: **<= 2.00 TB**
+3. Parser diagnostics mismatch scenarios: **<= 30**
+
+Target thresholds (plan objective):
+1. Forecaster vs simulator p95 absolute delta: **<= 0.25 TB**
+2. Parser diagnostics mismatch scenarios: **<= 3**
+
+Consolidated Phase 1 metric artifact:
+- [docs/forecast-vs-simulation-summary.json](docs/forecast-vs-simulation-summary.json)
 
 ---
 

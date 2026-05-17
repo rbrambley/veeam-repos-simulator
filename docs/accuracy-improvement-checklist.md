@@ -40,13 +40,13 @@ Use this report for manual review:
 **Goal:** Make drift measurable before changing behavior.
 
 ### Tasks
-- [ ] Add consolidated accuracy summary output (calculator parity + forecaster/simulator deltas + parser diagnostics).
-- [ ] Define and document pass/fail thresholds in CI terms.
-- [ ] Ensure report generation captures year-anchor comparison consistently.
+- [x] Add consolidated accuracy summary output (calculator parity + forecaster/simulator deltas + parser diagnostics).
+- [x] Define and document pass/fail thresholds in CI terms.
+- [x] Ensure report generation captures year-anchor comparison consistently.
 
 ### Done When
-- [ ] A single run produces all key metrics needed to approve/reject changes.
-- [ ] Thresholds are documented in this file and reflected in report output.
+- [x] A single run produces all key metrics needed to approve/reject changes.
+- [x] Thresholds are documented in this file and reflected in report output.
 
 ### Files In Scope
 - `src/testing/forecastSimulationComparisonReport.ts`
@@ -164,10 +164,14 @@ Use this report for manual review:
 ## Phase Sign-off Log
 
 ### Phase 1 Sign-off
-- Date:
-- Owner:
+- Date: 2026-05-17
+- Owner: GitHub Copilot (with user supervision)
 - Gate results:
+  - report:forecast-vs-simulation -- --enforce-thresholds: PASS (with standalone baseline artifacts)
+  - test:quality: FAIL in this branch due existing compare:veeam and test:mutation failures
 - Notes:
+  - Added consolidated metrics + threshold status in report HTML and JSON summary artifact.
+  - Wired quality pipeline to run compare + report guardrails before existing gates.
 
 ### Phase 2 Sign-off
 - Date:

@@ -54,6 +54,10 @@
     .input-group td:first-child { text-align: left; }
     .input-group td:last-child { width: 38%; }
     .missing { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 12px 0 14px; }
+    .summary-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+    .summary-card h3 { margin: 0 0 6px; font-size: 15px; color: #153a5d; }
+    .summary-card p { margin: 4px 0; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -61,11 +65,185 @@
     <h1>Forecast vs Simulation Comparison Report</h1>
     <p class="intro">Veeam Calculator values, Forecaster estimates, and Simulator day snapshots for Year 1/2/3. No parser rerun required.</p>
     <div class="meta">
-      <p><strong>Generated:</strong> 2026-05-11T06:55:50.914Z</p>
+      <p><strong>Generated:</strong> 2026-05-17T07:25:59.633Z</p>
       <p><strong>Captured Forecast Period (baseline defaults):</strong> 3 year(s)</p>
       <p><strong>Year Alignment Rule:</strong> Year anniversary date snapped to last Saturday on or before that date.</p>
       <p><strong>Scenarios Included:</strong> 73</p>
+      <p><strong>CI Thresholds:</strong> calculator failed scenarios <= 0, p95 abs delta <= 2.00 TB, parser mismatches <= 30</p>
+      <p><strong>Target Thresholds:</strong> p95 abs delta <= 0.25 TB, parser mismatches <= 3</p>
     </div>
+
+    <div class="summary-grid">
+      <section class="summary-card">
+        <h3>Calculator Parity</h3>
+        <p>Available: Yes</p>
+        <p>Scenarios: 70</p>
+        <p>Passed: <span class="ok">69</span></p>
+        <p>Failed: <span class="warn">1</span></p>
+      </section>
+      <section class="summary-card">
+        <h3>Forecast vs Simulator</h3>
+        <p>Pairs: 219</p>
+        <p>Avg Delta TB: 1.461</p>
+        <p>Avg Abs Delta TB: 1.682</p>
+        <p>p95 Abs Delta TB: <span class="ok">1.353</span></p>
+        <p>Max Abs Delta TB: 104.100</p>
+      </section>
+      <section class="summary-card">
+        <h3>Parser Diagnostics</h3>
+        <p>Scenarios With Diagnostics: 73</p>
+        <p>Mismatches: <span class="ok">24</span> (32.9%)</p>
+        <p>Variance Min/Avg/Max TB: -3.620 / 0.520 / 55.260</p>
+      </section>
+      <section class="summary-card">
+        <h3>CI Guardrail Status</h3>
+        <p>Calculator parity gate: <span class="warn">FAIL</span></p>
+        <p>Forecast drift gate: <span class="ok">PASS</span></p>
+        <p>Parser mismatch gate: <span class="ok">PASS</span></p>
+        <p>Overall CI status: <span class="warn">FAIL</span></p>
+      </section>
+    </div>
+
+    <section class="summary-card" style="margin-bottom: 14px;">
+      <h3>Year-Anchor Consistency</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Unique Simulation Days</th>
+            <th>Unique Dates</th>
+            <th>All Saturday</th>
+            <th>Sample Day</th>
+            <th>Sample Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+      <td>Year 1</td>
+      <td class="num ok">1</td>
+      <td class="num ok">1</td>
+      <td class="num ok">Yes</td>
+      <td class="num">364</td>
+      <td>2027-05-01</td>
+    </tr><tr>
+      <td>Year 2</td>
+      <td class="num ok">1</td>
+      <td class="num ok">1</td>
+      <td class="num ok">Yes</td>
+      <td class="num">728</td>
+      <td>2028-04-29</td>
+    </tr><tr>
+      <td>Year 3</td>
+      <td class="num ok">1</td>
+      <td class="num ok">1</td>
+      <td class="num ok">Yes</td>
+      <td class="num">1092</td>
+      <td>2029-04-28</td>
+    </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="summary-card" style="margin-bottom: 14px;">
+      <h3>Largest Forecast vs Simulator Outliers</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Year</th>
+            <th>Repo</th>
+            <th>Forecast TB</th>
+            <th>Simulator TB</th>
+            <th>Delta TB</th>
+            <th>Abs Delta TB</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+      <td>od-calculator-parity-347tb-wmy</td>
+      <td>2</td>
+      <td>DAS</td>
+      <td class="num">1165.825</td>
+      <td class="num">1269.925</td>
+      <td class="num warn">104.100</td>
+      <td class="num warn">104.100</td>
+    </tr><tr>
+      <td>od-calculator-parity-347tb-wmy</td>
+      <td>3</td>
+      <td>DAS</td>
+      <td class="num">1165.825</td>
+      <td class="num">1269.925</td>
+      <td class="num warn">104.100</td>
+      <td class="num warn">104.100</td>
+    </tr><tr>
+      <td>od-calculator-parity-347tb-wmy</td>
+      <td>1</td>
+      <td>DAS</td>
+      <td class="num">891.001</td>
+      <td class="num">957.625</td>
+      <td class="num warn">66.624</td>
+      <td class="num warn">66.624</td>
+    </tr><tr>
+      <td>das-monthly-2-large-r7</td>
+      <td>1</td>
+      <td>DAS</td>
+      <td class="num">22.330</td>
+      <td class="num">16.336</td>
+      <td class="num warn">-5.994</td>
+      <td class="num warn">5.994</td>
+    </tr><tr>
+      <td>das-mixed-2w1m1y-large-r7</td>
+      <td>1</td>
+      <td>DAS</td>
+      <td class="num">30.322</td>
+      <td class="num">24.328</td>
+      <td class="num warn">-5.994</td>
+      <td class="num warn">5.994</td>
+    </tr><tr>
+      <td>ix-gfs-wmy-copy-archive</td>
+      <td>3</td>
+      <td>SOBR</td>
+      <td class="num">4.850</td>
+      <td class="num">8.050</td>
+      <td class="num warn">3.200</td>
+      <td class="num warn">3.200</td>
+    </tr><tr>
+      <td>ix-gfs-wmy-copy-archive-immutability</td>
+      <td>3</td>
+      <td>SOBR</td>
+      <td class="num">4.850</td>
+      <td class="num">8.050</td>
+      <td class="num warn">3.200</td>
+      <td class="num warn">3.200</td>
+    </tr><tr>
+      <td>ix-gfs-wmy-copy-archive</td>
+      <td>2</td>
+      <td>SOBR</td>
+      <td class="num">4.850</td>
+      <td class="num">7.100</td>
+      <td class="num warn">2.250</td>
+      <td class="num warn">2.250</td>
+    </tr><tr>
+      <td>ix-gfs-wmy-copy-archive-immutability</td>
+      <td>2</td>
+      <td>SOBR</td>
+      <td class="num">4.850</td>
+      <td class="num">7.100</td>
+      <td class="num warn">2.250</td>
+      <td class="num warn">2.250</td>
+    </tr><tr>
+      <td>sobr-matrix-move-eq-retention</td>
+      <td>3</td>
+      <td>SOBR</td>
+      <td class="num">1.390</td>
+      <td class="num">2.972</td>
+      <td class="num warn">1.582</td>
+      <td class="num warn">1.582</td>
+    </tr>
+        </tbody>
+      </table>
+    </section>
+
     <div class="controls">
       <label for="scenario-search">Scenario Filter:</label>
       <input id="scenario-search" type="text" placeholder="Type scenario id or name" />

@@ -72,7 +72,105 @@ interface RuntimeMetrics {
   workingSpaceTB: number;
 }
 
+interface ComparisonResultRow {
+  scenarioId?: string;
+  scenarioStatus?: string;
+}
+
+interface CalculatorParitySummary {
+  scenarioCount: number;
+  passedScenarioCount: number;
+  failedScenarioCount: number;
+  available: boolean;
+}
+
+interface ParserDiagnosticsSummary {
+  scenarioCountWithDiagnostics: number;
+  mismatchScenarioCount: number;
+  mismatchRatePct: number;
+  varianceMinTB?: number;
+  varianceMaxTB?: number;
+  varianceAvgTB?: number;
+}
+
+interface DriftPoint {
+  scenarioId: string;
+  scenarioName: string;
+  repositoryType: string;
+  year: number;
+  simulationDay: number;
+  anchorDate: string;
+  forecastTB: number;
+  runtimeTB: number;
+  deltaTB: number;
+  absDeltaTB: number;
+}
+
+interface YearAnchorSummary {
+  year: number;
+  uniqueSimulationDays: number;
+  uniqueDates: number;
+  allSaturday: boolean;
+  sampleDay?: number;
+  sampleDate?: string;
+}
+
+interface ForecastSimulationSummary {
+  pairCount: number;
+  avgDeltaTB: number;
+  avgAbsDeltaTB: number;
+  p95AbsDeltaTB: number;
+  maxAbsDeltaTB: number;
+  year1AvgAbsDeltaTB?: number;
+  year2AvgAbsDeltaTB?: number;
+  year3AvgAbsDeltaTB?: number;
+  topOutliers: DriftPoint[];
+  anchorConsistency: YearAnchorSummary[];
+}
+
+interface ThresholdSummary {
+  calculatorParityPass: boolean;
+  forecastP95Pass: boolean;
+  parserMismatchPass: boolean;
+  ciPass: boolean;
+}
+
+interface ConsolidatedAccuracySummary {
+  generatedAt: string;
+  thresholds: {
+    ci: {
+      calculatorFailedScenarioMax: number;
+      forecastP95AbsDeltaTBMax: number;
+      parserMismatchScenarioMax: number;
+    };
+    target: {
+      forecastP95AbsDeltaTBMax: number;
+      parserMismatchScenarioMax: number;
+    };
+  };
+  calculatorParity: CalculatorParitySummary;
+  parserDiagnostics: ParserDiagnosticsSummary;
+  forecastVsSimulation: ForecastSimulationSummary;
+  thresholdStatus: ThresholdSummary;
+}
+
+interface AggregationCollector {
+  driftPoints: DriftPoint[];
+  yearAnchors: Map<number, { days: Set<number>; dates: Set<string>; allSaturday: boolean }>;
+}
+
 const YEARS = [1, 2, 3];
+
+const CI_THRESHOLDS = {
+  calculatorFailedScenarioMax: 0,
+  forecastP95AbsDeltaTBMax: 2.0,
+  parserMismatchScenarioMax: 30,
+};
+
+const TARGET_THRESHOLDS = {
+  forecastP95AbsDeltaTBMax: 0.25,
+  parserMismatchScenarioMax: 3,
+};
 
 function stripJsonComments(input: string): string {
   let content = input.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -140,6 +238,176 @@ function esc(s: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function avg(values: number[]): number {
+  if (values.length === 0) return 0;
+  return values.reduce((acc, v) => acc + v, 0) / values.length;
+}
+
+function percentile(values: number[], pct: number): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.floor(Math.max(0, Math.min(1, pct)) * (sorted.length - 1));
+  return sorted[index];
+}
+
+function loadCalculatorParitySummary(comparisonPath: string, compareExitCode?: number): CalculatorParitySummary {
+  const baseUnavailable: CalculatorParitySummary = {
+    scenarioCount: 0,
+    passedScenarioCount: 0,
+    failedScenarioCount: 0,
+    available: false,
+  };
+
+  if (!fs.existsSync(comparisonPath)) {
+    if (compareExitCode === undefined) return baseUnavailable;
+    return {
+      scenarioCount: compareExitCode === 0 ? 0 : 1,
+      passedScenarioCount: compareExitCode === 0 ? 0 : 0,
+      failedScenarioCount: compareExitCode === 0 ? 0 : 1,
+      available: true,
+    };
+  }
+
+  const rows = JSON.parse(fs.readFileSync(comparisonPath, 'utf-8')) as ComparisonResultRow[];
+  const byScenario = new Map<string, string>();
+
+  for (const row of rows) {
+    const id = row.scenarioId?.trim();
+    if (!id) continue;
+    const status = (row.scenarioStatus || '').toUpperCase() === 'FAIL' ? 'FAIL' : 'PASS';
+    if (!byScenario.has(id)) {
+      byScenario.set(id, status);
+      continue;
+    }
+    if (status === 'FAIL') {
+      byScenario.set(id, 'FAIL');
+    }
+  }
+
+  const scenarioStatuses = [...byScenario.values()];
+  const failedScenarioCount = scenarioStatuses.filter((s) => s === 'FAIL').length;
+  const passedScenarioCount = scenarioStatuses.length - failedScenarioCount;
+
+  const parsedSummary: CalculatorParitySummary = {
+    scenarioCount: scenarioStatuses.length,
+    passedScenarioCount,
+    failedScenarioCount,
+    available: true,
+  };
+
+  if (compareExitCode === undefined) {
+    return parsedSummary;
+  }
+
+  if (compareExitCode === 0) {
+    return parsedSummary;
+  }
+
+  return {
+    ...parsedSummary,
+    failedScenarioCount: Math.max(1, parsedSummary.failedScenarioCount),
+    passedScenarioCount: Math.max(0, parsedSummary.scenarioCount - Math.max(1, parsedSummary.failedScenarioCount)),
+  };
+}
+
+function computeParserDiagnosticsSummary(baseline: BaselineFile): ParserDiagnosticsSummary {
+  const scenariosWithDiagnostics = baseline.scenarios.filter((sc) =>
+    typeof sc.expected.calculatorSummaryRestorePointCount === 'number'
+      && Number.isFinite(sc.expected.calculatorSummaryRestorePointCount)
+      && typeof sc.expected.parsedRestorePointCount === 'number'
+      && Number.isFinite(sc.expected.parsedRestorePointCount),
+  );
+
+  const mismatchScenarioCount = scenariosWithDiagnostics.filter((sc) =>
+    Math.round(sc.expected.parsedRestorePointCount!) !== Math.round(sc.expected.calculatorSummaryRestorePointCount!),
+  ).length;
+
+  const varianceValues = baseline.scenarios
+    .map((sc) => sc.expected.varianceTB)
+    .filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+
+  const varianceMinTB = varianceValues.length > 0 ? Math.min(...varianceValues) : undefined;
+  const varianceMaxTB = varianceValues.length > 0 ? Math.max(...varianceValues) : undefined;
+  const varianceAvgTB = varianceValues.length > 0 ? avg(varianceValues) : undefined;
+
+  return {
+    scenarioCountWithDiagnostics: scenariosWithDiagnostics.length,
+    mismatchScenarioCount,
+    mismatchRatePct: scenariosWithDiagnostics.length === 0
+      ? 0
+      : (mismatchScenarioCount / scenariosWithDiagnostics.length) * 100,
+    varianceMinTB,
+    varianceMaxTB,
+    varianceAvgTB,
+  };
+}
+
+function computeForecastSimulationSummary(collector: AggregationCollector): ForecastSimulationSummary {
+  const deltas = collector.driftPoints.map((p) => p.deltaTB);
+  const absDeltas = collector.driftPoints.map((p) => p.absDeltaTB);
+
+  const byYear = new Map<number, number[]>();
+  for (const p of collector.driftPoints) {
+    if (!byYear.has(p.year)) byYear.set(p.year, []);
+    byYear.get(p.year)!.push(p.absDeltaTB);
+  }
+
+  const anchorConsistency: YearAnchorSummary[] = YEARS.map((year) => {
+    const info = collector.yearAnchors.get(year);
+    if (!info) {
+      return {
+        year,
+        uniqueSimulationDays: 0,
+        uniqueDates: 0,
+        allSaturday: false,
+      };
+    }
+    return {
+      year,
+      uniqueSimulationDays: info.days.size,
+      uniqueDates: info.dates.size,
+      allSaturday: info.allSaturday,
+      sampleDay: [...info.days][0],
+      sampleDate: [...info.dates][0],
+    };
+  });
+
+  const topOutliers = [...collector.driftPoints]
+    .sort((a, b) => b.absDeltaTB - a.absDeltaTB)
+    .slice(0, 10);
+
+  return {
+    pairCount: deltas.length,
+    avgDeltaTB: avg(deltas),
+    avgAbsDeltaTB: avg(absDeltas),
+    p95AbsDeltaTB: percentile(absDeltas, 0.95),
+    maxAbsDeltaTB: absDeltas.length > 0 ? Math.max(...absDeltas) : 0,
+    year1AvgAbsDeltaTB: avg(byYear.get(1) || []),
+    year2AvgAbsDeltaTB: avg(byYear.get(2) || []),
+    year3AvgAbsDeltaTB: avg(byYear.get(3) || []),
+    topOutliers,
+    anchorConsistency,
+  };
+}
+
+function computeThresholdStatus(
+  calculatorParity: CalculatorParitySummary,
+  parserDiagnostics: ParserDiagnosticsSummary,
+  forecastVsSimulation: ForecastSimulationSummary,
+): ThresholdSummary {
+  const calculatorParityPass = calculatorParity.available
+    ? calculatorParity.failedScenarioCount <= CI_THRESHOLDS.calculatorFailedScenarioMax
+    : false;
+  const forecastP95Pass = forecastVsSimulation.p95AbsDeltaTB <= CI_THRESHOLDS.forecastP95AbsDeltaTBMax;
+  const parserMismatchPass = parserDiagnostics.mismatchScenarioCount <= CI_THRESHOLDS.parserMismatchScenarioMax;
+  return {
+    calculatorParityPass,
+    forecastP95Pass,
+    parserMismatchPass,
+    ciPass: calculatorParityPass && forecastP95Pass && parserMismatchPass,
+  };
 }
 
 function loadScenarios(): TestScenario[] {
@@ -488,8 +756,24 @@ function buildScenarioSection(
   baselineScenario: BaselineScenario,
   scenario: TestScenario,
   startDate: string,
+  collector: AggregationCollector,
 ): string {
   const anchors = YEARS.map((year) => getYearAnchor(startDate, year));
+
+  for (const anchor of anchors) {
+    if (!collector.yearAnchors.has(anchor.year)) {
+      collector.yearAnchors.set(anchor.year, {
+        days: new Set<number>(),
+        dates: new Set<string>(),
+        allSaturday: true,
+      });
+    }
+    const entry = collector.yearAnchors.get(anchor.year)!;
+    entry.days.add(anchor.simulationDay);
+    entry.dates.add(anchor.date);
+    entry.allSaturday = entry.allSaturday && anchor.dayOfWeek === 'Saturday';
+  }
+
   const runtimeByDay = collectRuntimeByDay(scenario, startDate, anchors.map((a) => a.simulationDay));
 
   const anchorRows = anchors.map((a) => `<tr>
@@ -512,6 +796,20 @@ function buildScenarioSection(
     const forecastStoredDataTB = forecast.plannedCapacityTB - forecastWorkingSpaceTB;
     const forecastVarianceTB = forecast.plannedCapacityTB - forecastStoredDataTB;
     const runtimeVarianceTB = runtime.plannedCapacityTB - runtime.storedDataTB;
+
+    const deltaTB = runtime.plannedCapacityTB - forecast.plannedCapacityTB;
+    collector.driftPoints.push({
+      scenarioId: scenario.id,
+      scenarioName: scenario.name,
+      repositoryType: scenario.config.repositoryType,
+      year: a.year,
+      simulationDay: a.simulationDay,
+      anchorDate: a.date,
+      forecastTB: forecast.plannedCapacityTB,
+      runtimeTB: runtime.plannedCapacityTB,
+      deltaTB,
+      absDeltaTB: Math.abs(deltaTB),
+    });
 
     coreRows.push(renderMetricRow('Repository Total TB', baselineScenario.expected.plannedCapacityTB, forecast.plannedCapacityTB, runtime.plannedCapacityTB));
     coreRows.push(renderMetricRow('RP Sum TB', baselineScenario.expected.restorePointsTotalTB, forecastStoredDataTB, runtime.storedDataTB));
@@ -580,12 +878,17 @@ function buildScenarioSection(
   `;
 }
 
-function buildHtml(
+function buildHtmlAndSummary(
   baseline: BaselineFile,
   scenarios: TestScenario[],
   selectedIds: Set<string>,
-): string {
+  calculatorParity: CalculatorParitySummary,
+): { html: string; summary: ConsolidatedAccuracySummary } {
   const scenarioMap = new Map(scenarios.map((sc) => [sc.id, sc]));
+  const collector: AggregationCollector = {
+    driftPoints: [],
+    yearAnchors: new Map<number, { days: Set<number>; dates: Set<string>; allSaturday: boolean }>(),
+  };
 
   const usableBaselineScenarios = baseline.scenarios
     .filter((s) => selectedIds.size === 0 || selectedIds.has(s.id));
@@ -593,15 +896,56 @@ function buildHtml(
   const found = usableBaselineScenarios.filter((b) => scenarioMap.has(b.id));
   const missing = usableBaselineScenarios.filter((b) => !scenarioMap.has(b.id));
 
-  const sections = found.map((b) => buildScenarioSection(b, scenarioMap.get(b.id)!, baseline.defaults.startDate)).join('\n');
+  const sections = found.map((b) => buildScenarioSection(b, scenarioMap.get(b.id)!, baseline.defaults.startDate, collector)).join('\n');
   const missingList = missing.length > 0
     ? `<div class="missing"><strong>Missing Scenario Configs:</strong> ${missing.map((m) => esc(m.id)).join(', ')}</div>`
     : '';
 
+  const parserDiagnostics = computeParserDiagnosticsSummary(baseline);
+  const forecastVsSimulation = computeForecastSimulationSummary(collector);
+  const thresholdStatus = computeThresholdStatus(calculatorParity, parserDiagnostics, forecastVsSimulation);
+
+  const summary: ConsolidatedAccuracySummary = {
+    generatedAt: new Date().toISOString(),
+    thresholds: {
+      ci: { ...CI_THRESHOLDS },
+      target: { ...TARGET_THRESHOLDS },
+    },
+    calculatorParity,
+    parserDiagnostics,
+    forecastVsSimulation,
+    thresholdStatus,
+  };
+
+  const topOutlierRows = forecastVsSimulation.topOutliers
+    .map((o) => `<tr>
+      <td>${esc(o.scenarioId)}</td>
+      <td>${o.year}</td>
+      <td>${esc(o.repositoryType)}</td>
+      <td class="num">${fmt(o.forecastTB)}</td>
+      <td class="num">${fmt(o.runtimeTB)}</td>
+      <td class="num warn">${fmt(o.deltaTB)}</td>
+      <td class="num warn">${fmt(o.absDeltaTB)}</td>
+    </tr>`)
+    .join('');
+
+  const anchorRows = forecastVsSimulation.anchorConsistency
+    .map((a) => `<tr>
+      <td>Year ${a.year}</td>
+      <td class="num ${a.uniqueSimulationDays === 1 ? 'ok' : 'warn'}">${a.uniqueSimulationDays}</td>
+      <td class="num ${a.uniqueDates === 1 ? 'ok' : 'warn'}">${a.uniqueDates}</td>
+      <td class="num ${a.allSaturday ? 'ok' : 'warn'}">${a.allSaturday ? 'Yes' : 'No'}</td>
+      <td class="num">${a.sampleDay === undefined ? 'N/A' : a.sampleDay}</td>
+      <td>${a.sampleDate ?? 'N/A'}</td>
+    </tr>`)
+    .join('');
+
+  const ciStatusClass = (pass: boolean): string => (pass ? 'ok' : 'warn');
+
   const now = new Date().toISOString();
   const usedForecast = baseline.defaults.forecastYears;
 
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -657,6 +1001,10 @@ function buildHtml(
     .input-group td:first-child { text-align: left; }
     .input-group td:last-child { width: 38%; }
     .missing { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 12px 0 14px; }
+    .summary-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+    .summary-card h3 { margin: 0 0 6px; font-size: 15px; color: #153a5d; }
+    .summary-card p { margin: 4px 0; font-size: 13px; }
   </style>
 </head>
 <body>
@@ -668,7 +1016,80 @@ function buildHtml(
       <p><strong>Captured Forecast Period (baseline defaults):</strong> ${usedForecast} year(s)</p>
       <p><strong>Year Alignment Rule:</strong> Year anniversary date snapped to last Saturday on or before that date.</p>
       <p><strong>Scenarios Included:</strong> ${found.length}</p>
+      <p><strong>CI Thresholds:</strong> calculator failed scenarios <= ${CI_THRESHOLDS.calculatorFailedScenarioMax}, p95 abs delta <= ${CI_THRESHOLDS.forecastP95AbsDeltaTBMax.toFixed(2)} TB, parser mismatches <= ${CI_THRESHOLDS.parserMismatchScenarioMax}</p>
+      <p><strong>Target Thresholds:</strong> p95 abs delta <= ${TARGET_THRESHOLDS.forecastP95AbsDeltaTBMax.toFixed(2)} TB, parser mismatches <= ${TARGET_THRESHOLDS.parserMismatchScenarioMax}</p>
     </div>
+
+    <div class="summary-grid">
+      <section class="summary-card">
+        <h3>Calculator Parity</h3>
+        <p>Available: ${calculatorParity.available ? 'Yes' : 'No'}</p>
+        <p>Scenarios: ${calculatorParity.scenarioCount}</p>
+        <p>Passed: <span class="ok">${calculatorParity.passedScenarioCount}</span></p>
+        <p>Failed: <span class="${ciStatusClass(thresholdStatus.calculatorParityPass)}">${calculatorParity.failedScenarioCount}</span></p>
+      </section>
+      <section class="summary-card">
+        <h3>Forecast vs Simulator</h3>
+        <p>Pairs: ${forecastVsSimulation.pairCount}</p>
+        <p>Avg Delta TB: ${fmt(forecastVsSimulation.avgDeltaTB)}</p>
+        <p>Avg Abs Delta TB: ${fmt(forecastVsSimulation.avgAbsDeltaTB)}</p>
+        <p>p95 Abs Delta TB: <span class="${ciStatusClass(thresholdStatus.forecastP95Pass)}">${fmt(forecastVsSimulation.p95AbsDeltaTB)}</span></p>
+        <p>Max Abs Delta TB: ${fmt(forecastVsSimulation.maxAbsDeltaTB)}</p>
+      </section>
+      <section class="summary-card">
+        <h3>Parser Diagnostics</h3>
+        <p>Scenarios With Diagnostics: ${parserDiagnostics.scenarioCountWithDiagnostics}</p>
+        <p>Mismatches: <span class="${ciStatusClass(thresholdStatus.parserMismatchPass)}">${parserDiagnostics.mismatchScenarioCount}</span> (${parserDiagnostics.mismatchRatePct.toFixed(1)}%)</p>
+        <p>Variance Min/Avg/Max TB: ${fmt(parserDiagnostics.varianceMinTB)} / ${fmt(parserDiagnostics.varianceAvgTB)} / ${fmt(parserDiagnostics.varianceMaxTB)}</p>
+      </section>
+      <section class="summary-card">
+        <h3>CI Guardrail Status</h3>
+        <p>Calculator parity gate: <span class="${ciStatusClass(thresholdStatus.calculatorParityPass)}">${thresholdStatus.calculatorParityPass ? 'PASS' : 'FAIL'}</span></p>
+        <p>Forecast drift gate: <span class="${ciStatusClass(thresholdStatus.forecastP95Pass)}">${thresholdStatus.forecastP95Pass ? 'PASS' : 'FAIL'}</span></p>
+        <p>Parser mismatch gate: <span class="${ciStatusClass(thresholdStatus.parserMismatchPass)}">${thresholdStatus.parserMismatchPass ? 'PASS' : 'FAIL'}</span></p>
+        <p>Overall CI status: <span class="${ciStatusClass(thresholdStatus.ciPass)}">${thresholdStatus.ciPass ? 'PASS' : 'FAIL'}</span></p>
+      </section>
+    </div>
+
+    <section class="summary-card" style="margin-bottom: 14px;">
+      <h3>Year-Anchor Consistency</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Unique Simulation Days</th>
+            <th>Unique Dates</th>
+            <th>All Saturday</th>
+            <th>Sample Day</th>
+            <th>Sample Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${anchorRows}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="summary-card" style="margin-bottom: 14px;">
+      <h3>Largest Forecast vs Simulator Outliers</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Year</th>
+            <th>Repo</th>
+            <th>Forecast TB</th>
+            <th>Simulator TB</th>
+            <th>Delta TB</th>
+            <th>Abs Delta TB</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${topOutlierRows || '<tr><td colspan="7">No outliers available.</td></tr>'}
+        </tbody>
+      </table>
+    </section>
+
     <div class="controls">
       <label for="scenario-search">Scenario Filter:</label>
       <input id="scenario-search" type="text" placeholder="Type scenario id or name" />
@@ -740,11 +1161,15 @@ function buildHtml(
   </script>
 </body>
 </html>`;
+
+  return { html, summary };
 }
 
 function main(): void {
   const baselinePath = path.join(__dirname, '../../docs/veeam-calculator-baseline.json');
   const reportPath = path.join(__dirname, '../../docs/forecast-vs-simulation-report.html');
+  const comparisonDetailedPath = path.join(__dirname, '../../docs/comparison-results-detailed.json');
+  const summaryPath = path.join(__dirname, '../../docs/forecast-vs-simulation-summary.json');
 
   if (!fs.existsSync(baselinePath)) {
     throw new Error('Missing docs/veeam-calculator-baseline.json');
@@ -762,14 +1187,37 @@ function main(): void {
       .filter((id) => id.length > 0),
   );
 
-  const html = buildHtml(baseline, scenarios, selectedIds);
-  fs.writeFileSync(reportPath, html, 'utf-8');
+  const compareExitCodeRaw = process.env.COMPARE_VEEAM_EXIT_CODE;
+  const parsedCompareExitCode = compareExitCodeRaw !== undefined && compareExitCodeRaw !== ''
+    ? Number(compareExitCodeRaw)
+    : Number.NaN;
+  const compareExitCode = Number.isFinite(parsedCompareExitCode) ? parsedCompareExitCode : undefined;
+  const calculatorParity = loadCalculatorParitySummary(comparisonDetailedPath, compareExitCode);
+  const result = buildHtmlAndSummary(baseline, scenarios, selectedIds, calculatorParity);
+  fs.writeFileSync(reportPath, result.html, 'utf-8');
+  fs.writeFileSync(summaryPath, JSON.stringify(result.summary, null, 2), 'utf-8');
+
+  const enforceThresholds = process.argv.includes('--enforce-thresholds');
 
   console.log(`\nGenerated report: docs/forecast-vs-simulation-report.html`);
+  console.log(`Generated summary: docs/forecast-vs-simulation-summary.json`);
   console.log(`Scenarios loaded: ${scenarios.length}`);
   console.log(`Baseline scenarios: ${baseline.scenarios.length}`);
+  console.log('');
+  console.log('=== Consolidated Accuracy Summary ===');
+  console.log(`Calculator parity: ${result.summary.calculatorParity.passedScenarioCount} passed / ${result.summary.calculatorParity.failedScenarioCount} failed${result.summary.calculatorParity.available ? '' : ' (comparison data unavailable)'}`);
+  console.log(`Forecast vs simulator: pairs=${result.summary.forecastVsSimulation.pairCount}, avgAbs=${result.summary.forecastVsSimulation.avgAbsDeltaTB.toFixed(3)} TB, p95Abs=${result.summary.forecastVsSimulation.p95AbsDeltaTB.toFixed(3)} TB, maxAbs=${result.summary.forecastVsSimulation.maxAbsDeltaTB.toFixed(3)} TB`);
+  console.log(`Parser diagnostics: mismatches=${result.summary.parserDiagnostics.mismatchScenarioCount}/${result.summary.parserDiagnostics.scenarioCountWithDiagnostics} (${result.summary.parserDiagnostics.mismatchRatePct.toFixed(1)}%), variance min/avg/max=${fmt(result.summary.parserDiagnostics.varianceMinTB)}/${fmt(result.summary.parserDiagnostics.varianceAvgTB)}/${fmt(result.summary.parserDiagnostics.varianceMaxTB)} TB`);
+  console.log(`CI thresholds: failedScenarios<=${CI_THRESHOLDS.calculatorFailedScenarioMax}, p95Abs<=${CI_THRESHOLDS.forecastP95AbsDeltaTBMax.toFixed(2)} TB, parserMismatches<=${CI_THRESHOLDS.parserMismatchScenarioMax}`);
+  console.log(`CI status: ${result.summary.thresholdStatus.ciPass ? 'PASS' : 'FAIL'}`);
+
   if (selectedIds.size > 0) {
     console.log(`Filtered IDs: ${[...selectedIds].join(', ')}`);
+  }
+
+  if (enforceThresholds && !result.summary.thresholdStatus.ciPass) {
+    console.error('\nThreshold enforcement failed. One or more CI guardrails are red.');
+    process.exit(1);
   }
 }
 
