@@ -784,7 +784,11 @@ function buildScenarioSection(
   </tr>`).join('');
 
   const yearTables = anchors.map((a) => {
-    const forecast = computeSimulatorPlanned(scenario.config, startDate, a.year, 'reverse', scenario.totalDays);
+    // Use a.year * 365 as totalDays so the forecaster uses the same planning horizon
+    // as the UI (which defaults to forecastYears * 365). Previously scenario.totalDays
+    // was passed, causing long-horizon calibration factors to apply incorrectly to
+    // year-1/2 anchors of multi-year scenarios.
+    const forecast = computeSimulatorPlanned(scenario.config, startDate, a.year, 'reverse', a.year * 365);
     const runtime = runtimeByDay.get(a.simulationDay);
 
     if (!runtime) {

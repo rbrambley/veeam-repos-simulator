@@ -33,6 +33,8 @@ export interface PlannedResult {
   fileTypeFullTB: number;
   fileTypeIncrementalTB: number;
   fileTypeSyntheticFullTB: number;
+  /** Exact GFS storage contribution from the model (DAS: calibrated additionalFullTB; SOBR: sum of per-tier GFS stats before compensation rebalancing). */
+  gfsStorageTB: number;
 }
 
 // VEEAM COMPENSATION FACTORS
@@ -144,9 +146,12 @@ export function computeSimulatorPlanned(
   const hasMonthlyOrYearlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0 || (config.gfsPolicy?.yearly ?? 0) > 0;
   const hasAnyGfs = (config.gfsPolicy?.weekly ?? 0) > 0 || hasMonthlyOrYearlyGfs;
 
+  // Non-SOBR repositories (DAS, NAS, DedupAppliance, ObjectStorage, Tape) all use
+  // a single-tier model: stored data + working space = planned capacity.
   if (config.repositoryType !== 'SOBR') {
     const longHorizonDasGfsCal = hasMonthlyOrYearlyGfs && (totalDays ?? (forecastYears * 365)) >= 700 ? 0.88 : 1;
-    const yearRepoUsedTB = yearActiveChainTB + (yearGfsStats.additionalFullTB * longHorizonDasGfsCal);
+    const dasGfsStorageTB = yearGfsStats.additionalFullTB * longHorizonDasGfsCal;
+    const yearRepoUsedTB = yearActiveChainTB + dasGfsStorageTB;
     return {
       plannedCapacityTB: yearRepoUsedTB + yearWorkingSpaceReserveTB,
       plannedPerformanceTierTB: 0,
@@ -155,6 +160,7 @@ export function computeSimulatorPlanned(
       fileTypeFullTB: yearFullSizeTB,
       fileTypeIncrementalTB: yearIncrSizeTB,
       fileTypeSyntheticFullTB: yearIncrSizeTB,
+      gfsStorageTB: dasGfsStorageTB,
     };
   }
 
@@ -327,6 +333,8 @@ export function computeSimulatorPlanned(
   const plannedCapacityTierTB = yearCapUsedTB;
   const plannedArchiveTierTB = yearArchUsedTB;
   const plannedCapacityTB = plannedPerformanceTierTB + plannedCapacityTierTB + (config.hasArchiveTier ? plannedArchiveTierTB : 0);
+  // SOBR GFS storage: sum of per-tier GFS stats before compensation rebalancing.
+  const sobrGfsStorageTB = yearGfsStats.additionalPerfFullTB + yearGfsStats.additionalCapFullTB + yearGfsStats.additionalArchFullTB;
 
   return {
     plannedCapacityTB,
@@ -336,5 +344,6 @@ export function computeSimulatorPlanned(
     fileTypeFullTB: yearFullSizeTB,
     fileTypeIncrementalTB: yearIncrSizeTB,
     fileTypeSyntheticFullTB: yearIncrSizeTB,
+    gfsStorageTB: sobrGfsStorageTB,
   };
 }

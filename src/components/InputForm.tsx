@@ -176,7 +176,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
         incrementalTB: planned.fileTypeIncrementalTB,
         workingSpaceNeededTB: yearWorkingSpaceReserveTB,
         workingSpaceAdditionalTB: yearWorkingSpaceReserveTB,
-        gfsTB: planned.plannedCapacityTB - planned.fileTypeFullTB - (planned.fileTypeIncrementalTB * (year * 365 / 7)), // Approximation for display
+        gfsTB: planned.gfsStorageTB,
         repoUsedTB: planned.plannedCapacityTB - yearWorkingSpaceReserveTB,
         repoTotalTB: planned.plannedCapacityTB,
         perfTB: 0,
@@ -194,7 +194,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
       incrementalTB: planned.fileTypeIncrementalTB,
       workingSpaceNeededTB: yearWorkingSpaceReserveTB,
       workingSpaceAdditionalTB: yearWorkingSpaceReserveTB,
-      gfsTB: planned.plannedCapacityTB - planned.plannedPerformanceTierTB - planned.plannedCapacityTierTB - (sobrHasArchive ? planned.plannedArchiveTierTB : 0), // Approximation
+      gfsTB: planned.gfsStorageTB,
       repoUsedTB: 0,
       repoTotalTB: 0,
       perfTB: planned.plannedPerformanceTierTB,

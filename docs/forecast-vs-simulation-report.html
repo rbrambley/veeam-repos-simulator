@@ -65,7 +65,7 @@
     <h1>Forecast vs Simulation Comparison Report</h1>
     <p class="intro">Veeam Calculator values, Forecaster estimates, and Simulator day snapshots for Year 1/2/3. No parser rerun required.</p>
     <div class="meta">
-      <p><strong>Generated:</strong> 2026-05-17T07:25:59.633Z</p>
+      <p><strong>Generated:</strong> 2026-05-17T07:47:03.325Z</p>
       <p><strong>Captured Forecast Period (baseline defaults):</strong> 3 year(s)</p>
       <p><strong>Year Alignment Rule:</strong> Year anniversary date snapped to last Saturday on or before that date.</p>
       <p><strong>Scenarios Included:</strong> 73</p>
@@ -78,15 +78,15 @@
         <h3>Calculator Parity</h3>
         <p>Available: Yes</p>
         <p>Scenarios: 70</p>
-        <p>Passed: <span class="ok">69</span></p>
-        <p>Failed: <span class="warn">1</span></p>
+        <p>Passed: <span class="ok">70</span></p>
+        <p>Failed: <span class="ok">0</span></p>
       </section>
       <section class="summary-card">
         <h3>Forecast vs Simulator</h3>
         <p>Pairs: 219</p>
-        <p>Avg Delta TB: 1.461</p>
-        <p>Avg Abs Delta TB: 1.682</p>
-        <p>p95 Abs Delta TB: <span class="ok">1.353</span></p>
+        <p>Avg Delta TB: 1.204</p>
+        <p>Avg Abs Delta TB: 1.430</p>
+        <p>p95 Abs Delta TB: <span class="ok">1.598</span></p>
         <p>Max Abs Delta TB: 104.100</p>
       </section>
       <section class="summary-card">
@@ -97,10 +97,10 @@
       </section>
       <section class="summary-card">
         <h3>CI Guardrail Status</h3>
-        <p>Calculator parity gate: <span class="warn">FAIL</span></p>
+        <p>Calculator parity gate: <span class="ok">PASS</span></p>
         <p>Forecast drift gate: <span class="ok">PASS</span></p>
         <p>Parser mismatch gate: <span class="ok">PASS</span></p>
-        <p>Overall CI status: <span class="warn">FAIL</span></p>
+        <p>Overall CI status: <span class="ok">PASS</span></p>
       </section>
     </div>
 
@@ -176,14 +176,6 @@
       <td class="num warn">104.100</td>
       <td class="num warn">104.100</td>
     </tr><tr>
-      <td>od-calculator-parity-347tb-wmy</td>
-      <td>1</td>
-      <td>DAS</td>
-      <td class="num">891.001</td>
-      <td class="num">957.625</td>
-      <td class="num warn">66.624</td>
-      <td class="num warn">66.624</td>
-    </tr><tr>
       <td>das-monthly-2-large-r7</td>
       <td>1</td>
       <td>DAS</td>
@@ -200,6 +192,22 @@
       <td class="num warn">-5.994</td>
       <td class="num warn">5.994</td>
     </tr><tr>
+      <td>das-yearly-2-large-r7</td>
+      <td>2</td>
+      <td>DAS</td>
+      <td class="num">39.273</td>
+      <td class="num">42.976</td>
+      <td class="num warn">3.703</td>
+      <td class="num warn">3.703</td>
+    </tr><tr>
+      <td>das-yearly-2-large-r7</td>
+      <td>3</td>
+      <td>DAS</td>
+      <td class="num">39.273</td>
+      <td class="num">42.976</td>
+      <td class="num warn">3.703</td>
+      <td class="num warn">3.703</td>
+    </tr><tr>
       <td>ix-gfs-wmy-copy-archive</td>
       <td>3</td>
       <td>SOBR</td>
@@ -231,14 +239,6 @@
       <td class="num">7.100</td>
       <td class="num warn">2.250</td>
       <td class="num warn">2.250</td>
-    </tr><tr>
-      <td>sobr-matrix-move-eq-retention</td>
-      <td>3</td>
-      <td>SOBR</td>
-      <td class="num">1.390</td>
-      <td class="num">2.972</td>
-      <td class="num warn">1.582</td>
-      <td class="num warn">1.582</td>
     </tr>
         </tbody>
       </table>
@@ -3288,20 +3288,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.600</td>
-    <td class="num warn">0.225</td>
+    <td class="num warn">0.249</td>
+    <td class="num">1.351</td>
     <td class="num">1.375</td>
-    <td class="num">1.375</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">1.78%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.150</td>
-    <td class="num warn">0.300</td>
+    <td class="num warn">0.324</td>
+    <td class="num">0.826</td>
     <td class="num">0.850</td>
-    <td class="num">0.850</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">2.91%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -3369,20 +3369,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.600</td>
-    <td class="num warn">0.225</td>
+    <td class="num warn">0.249</td>
+    <td class="num">1.351</td>
     <td class="num">1.375</td>
-    <td class="num">1.375</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">1.78%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.150</td>
-    <td class="num warn">0.300</td>
+    <td class="num warn">0.324</td>
+    <td class="num">0.826</td>
     <td class="num">0.850</td>
-    <td class="num">0.850</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">2.91%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -3707,20 +3707,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.300</td>
-    <td class="num warn">-0.225</td>
-    <td class="num">2.525</td>
+    <td class="num warn">-0.063</td>
+    <td class="num">2.363</td>
     <td class="num">2.550</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">0.99%</td>
+    <td class="num warn">0.187</td>
+    <td class="num warn">7.91%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.790</td>
-    <td class="num warn">-0.210</td>
-    <td class="num">2.000</td>
+    <td class="num warn">-0.048</td>
+    <td class="num">1.838</td>
     <td class="num">2.025</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">1.25%</td>
+    <td class="num warn">0.187</td>
+    <td class="num warn">10.17%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -3788,20 +3788,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.300</td>
-    <td class="num warn">-0.225</td>
-    <td class="num">2.525</td>
+    <td class="num warn">-0.063</td>
+    <td class="num">2.363</td>
     <td class="num">2.550</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">0.99%</td>
+    <td class="num warn">0.187</td>
+    <td class="num warn">7.91%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.790</td>
-    <td class="num warn">-0.210</td>
-    <td class="num">2.000</td>
+    <td class="num warn">-0.048</td>
+    <td class="num">1.838</td>
     <td class="num">2.025</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">1.25%</td>
+    <td class="num warn">0.187</td>
+    <td class="num warn">10.17%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -4126,20 +4126,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">28.300</td>
-    <td class="num warn">5.970</td>
+    <td class="num warn">6.610</td>
+    <td class="num">21.690</td>
     <td class="num">22.330</td>
-    <td class="num">22.330</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.639</td>
+    <td class="num warn">2.95%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">22.030</td>
-    <td class="num warn">6.046</td>
+    <td class="num warn">6.685</td>
+    <td class="num">15.345</td>
     <td class="num">15.984</td>
-    <td class="num">15.984</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.639</td>
+    <td class="num warn">4.17%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -4207,20 +4207,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">28.300</td>
-    <td class="num warn">5.970</td>
+    <td class="num warn">6.610</td>
+    <td class="num">21.690</td>
     <td class="num">22.330</td>
-    <td class="num">22.330</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.639</td>
+    <td class="num warn">2.95%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">22.030</td>
-    <td class="num warn">6.046</td>
+    <td class="num warn">6.685</td>
+    <td class="num">15.345</td>
     <td class="num">15.984</td>
-    <td class="num">15.984</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.639</td>
+    <td class="num warn">4.17%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -4545,20 +4545,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">35.000</td>
-    <td class="num warn">-7.310</td>
-    <td class="num">42.310</td>
+    <td class="num warn">-4.273</td>
+    <td class="num">39.273</td>
     <td class="num">42.976</td>
-    <td class="num warn">0.666</td>
-    <td class="num warn">1.57%</td>
+    <td class="num warn">3.703</td>
+    <td class="num warn">9.43%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">28.690</td>
-    <td class="num warn">-7.274</td>
-    <td class="num">35.964</td>
+    <td class="num warn">-4.237</td>
+    <td class="num">32.927</td>
     <td class="num">36.630</td>
-    <td class="num warn">0.666</td>
-    <td class="num warn">1.85%</td>
+    <td class="num warn">3.703</td>
+    <td class="num warn">11.25%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -4626,20 +4626,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">35.000</td>
-    <td class="num warn">-7.310</td>
-    <td class="num">42.310</td>
+    <td class="num warn">-4.273</td>
+    <td class="num">39.273</td>
     <td class="num">42.976</td>
-    <td class="num warn">0.666</td>
-    <td class="num warn">1.57%</td>
+    <td class="num warn">3.703</td>
+    <td class="num warn">9.43%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">28.690</td>
-    <td class="num warn">-7.274</td>
-    <td class="num">35.964</td>
+    <td class="num warn">-4.237</td>
+    <td class="num">32.927</td>
     <td class="num">36.630</td>
-    <td class="num warn">0.666</td>
-    <td class="num warn">1.85%</td>
+    <td class="num warn">3.703</td>
+    <td class="num warn">11.25%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -4964,20 +4964,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.275</td>
+    <td class="num warn">0.281</td>
+    <td class="num">1.219</td>
     <td class="num">1.225</td>
-    <td class="num">1.225</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.006</td>
+    <td class="num warn">0.49%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.020</td>
-    <td class="num warn">0.320</td>
+    <td class="num warn">0.326</td>
+    <td class="num">0.694</td>
     <td class="num">0.700</td>
-    <td class="num">0.700</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.006</td>
+    <td class="num warn">0.86%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -5045,20 +5045,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.275</td>
+    <td class="num warn">0.281</td>
+    <td class="num">1.219</td>
     <td class="num">1.225</td>
-    <td class="num">1.225</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.006</td>
+    <td class="num warn">0.49%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.020</td>
-    <td class="num warn">0.320</td>
+    <td class="num warn">0.326</td>
+    <td class="num">0.694</td>
     <td class="num">0.700</td>
-    <td class="num">0.700</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.006</td>
+    <td class="num warn">0.86%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -5383,20 +5383,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.175</td>
-    <td class="num">1.625</td>
+    <td class="num warn">0.229</td>
+    <td class="num">1.571</td>
     <td class="num">1.650</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">1.54%</td>
+    <td class="num warn">0.079</td>
+    <td class="num warn">5.03%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.340</td>
-    <td class="num warn">0.240</td>
-    <td class="num">1.100</td>
+    <td class="num warn">0.294</td>
+    <td class="num">1.046</td>
     <td class="num">1.125</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">2.27%</td>
+    <td class="num warn">0.079</td>
+    <td class="num warn">7.55%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -5464,20 +5464,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.175</td>
-    <td class="num">1.625</td>
+    <td class="num warn">0.229</td>
+    <td class="num">1.571</td>
     <td class="num">1.650</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">1.54%</td>
+    <td class="num warn">0.079</td>
+    <td class="num warn">5.03%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.340</td>
-    <td class="num warn">0.240</td>
-    <td class="num">1.100</td>
+    <td class="num warn">0.294</td>
+    <td class="num">1.046</td>
     <td class="num">1.125</td>
-    <td class="num warn">0.025</td>
-    <td class="num warn">2.27%</td>
+    <td class="num warn">0.079</td>
+    <td class="num warn">7.55%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -5802,20 +5802,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.900</td>
-    <td class="num warn">0.225</td>
+    <td class="num warn">0.285</td>
+    <td class="num">1.615</td>
     <td class="num">1.675</td>
-    <td class="num">1.675</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">3.72%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.470</td>
-    <td class="num warn">0.320</td>
+    <td class="num warn">0.380</td>
+    <td class="num">1.090</td>
     <td class="num">1.150</td>
-    <td class="num">1.150</td>
-    <td class="num ok">-0.000</td>
-    <td class="num ok">-0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">5.50%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -5883,20 +5883,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.900</td>
-    <td class="num warn">0.225</td>
+    <td class="num warn">0.285</td>
+    <td class="num">1.615</td>
     <td class="num">1.675</td>
-    <td class="num">1.675</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">3.72%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.470</td>
-    <td class="num warn">0.320</td>
+    <td class="num warn">0.380</td>
+    <td class="num">1.090</td>
     <td class="num">1.150</td>
-    <td class="num">1.150</td>
-    <td class="num ok">-0.000</td>
-    <td class="num ok">-0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">5.50%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -6221,20 +6221,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.900</td>
-    <td class="num warn">0.225</td>
+    <td class="num warn">0.285</td>
+    <td class="num">1.615</td>
     <td class="num">1.675</td>
-    <td class="num">1.675</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">3.72%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.470</td>
-    <td class="num warn">0.320</td>
+    <td class="num warn">0.380</td>
+    <td class="num">1.090</td>
     <td class="num">1.150</td>
-    <td class="num">1.150</td>
-    <td class="num ok">-0.000</td>
-    <td class="num ok">-0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">5.50%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -6302,20 +6302,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.900</td>
-    <td class="num warn">0.225</td>
+    <td class="num warn">0.285</td>
+    <td class="num">1.615</td>
     <td class="num">1.675</td>
-    <td class="num">1.675</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">3.72%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.470</td>
-    <td class="num warn">0.320</td>
+    <td class="num warn">0.380</td>
+    <td class="num">1.090</td>
     <td class="num">1.150</td>
-    <td class="num">1.150</td>
-    <td class="num ok">-0.000</td>
-    <td class="num ok">-0.00%</td>
+    <td class="num warn">0.060</td>
+    <td class="num warn">5.50%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -6640,20 +6640,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">31.700</td>
-    <td class="num warn">1.378</td>
+    <td class="num warn">2.977</td>
+    <td class="num">28.723</td>
     <td class="num">30.322</td>
-    <td class="num">30.322</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">1.598</td>
+    <td class="num warn">5.56%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">25.360</td>
-    <td class="num warn">1.384</td>
+    <td class="num warn">2.982</td>
+    <td class="num">22.378</td>
     <td class="num">23.976</td>
-    <td class="num">23.976</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">1.598</td>
+    <td class="num warn">7.14%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -6721,20 +6721,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">31.700</td>
-    <td class="num warn">1.378</td>
+    <td class="num warn">2.977</td>
+    <td class="num">28.723</td>
     <td class="num">30.322</td>
-    <td class="num">30.322</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">1.598</td>
+    <td class="num warn">5.56%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">25.360</td>
-    <td class="num warn">1.384</td>
+    <td class="num warn">2.982</td>
+    <td class="num">22.378</td>
     <td class="num">23.976</td>
-    <td class="num">23.976</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">1.598</td>
+    <td class="num warn">7.14%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -12235,20 +12235,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.700</td>
-    <td class="num warn">0.075</td>
+    <td class="num warn">0.129</td>
+    <td class="num">1.571</td>
     <td class="num">1.625</td>
-    <td class="num">1.625</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.054</td>
+    <td class="num warn">3.44%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.280</td>
-    <td class="num warn">0.180</td>
+    <td class="num warn">0.234</td>
+    <td class="num">1.046</td>
     <td class="num">1.100</td>
-    <td class="num">1.100</td>
-    <td class="num ok">-0.000</td>
-    <td class="num ok">-0.00%</td>
+    <td class="num warn">0.054</td>
+    <td class="num warn">5.16%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -12316,20 +12316,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.700</td>
-    <td class="num warn">0.075</td>
+    <td class="num warn">0.129</td>
+    <td class="num">1.571</td>
     <td class="num">1.625</td>
-    <td class="num">1.625</td>
-    <td class="num ok">0.000</td>
-    <td class="num ok">0.00%</td>
+    <td class="num warn">0.054</td>
+    <td class="num warn">3.44%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.280</td>
-    <td class="num warn">0.180</td>
+    <td class="num warn">0.234</td>
+    <td class="num">1.046</td>
     <td class="num">1.100</td>
-    <td class="num">1.100</td>
-    <td class="num ok">-0.000</td>
-    <td class="num ok">-0.00%</td>
+    <td class="num warn">0.054</td>
+    <td class="num warn">5.16%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -12573,20 +12573,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.300</td>
-    <td class="num warn">0.729</td>
-    <td class="num">1.571</td>
+    <td class="num warn">0.675</td>
+    <td class="num">1.625</td>
     <td class="num">1.650</td>
-    <td class="num warn">0.079</td>
-    <td class="num warn">5.03%</td>
+    <td class="num warn">0.025</td>
+    <td class="num warn">1.54%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.790</td>
-    <td class="num warn">0.744</td>
-    <td class="num">1.046</td>
+    <td class="num warn">0.690</td>
+    <td class="num">1.100</td>
     <td class="num">1.125</td>
-    <td class="num warn">0.079</td>
-    <td class="num warn">7.55%</td>
+    <td class="num warn">0.025</td>
+    <td class="num warn">2.27%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -13073,20 +13073,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.700</td>
-    <td class="num warn">-0.275</td>
-    <td class="num">2.975</td>
+    <td class="num warn">-0.059</td>
+    <td class="num">2.759</td>
     <td class="num">3.175</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">6.72%</td>
+    <td class="num warn">0.416</td>
+    <td class="num warn">15.08%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">2.220</td>
-    <td class="num warn">-0.230</td>
-    <td class="num">2.450</td>
+    <td class="num warn">-0.014</td>
+    <td class="num">2.234</td>
     <td class="num">2.650</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">8.16%</td>
+    <td class="num warn">0.416</td>
+    <td class="num warn">18.62%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -13154,20 +13154,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.700</td>
-    <td class="num warn">-0.275</td>
-    <td class="num">2.975</td>
+    <td class="num warn">-0.059</td>
+    <td class="num">2.759</td>
     <td class="num">3.175</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">6.72%</td>
+    <td class="num warn">0.416</td>
+    <td class="num warn">15.08%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">2.220</td>
-    <td class="num warn">-0.230</td>
-    <td class="num">2.450</td>
+    <td class="num warn">-0.014</td>
+    <td class="num">2.234</td>
     <td class="num">2.650</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">8.16%</td>
+    <td class="num warn">0.416</td>
+    <td class="num warn">18.62%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -15911,20 +15911,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">3.100</td>
-    <td class="num warn">0.887</td>
-    <td class="num">2.213</td>
+    <td class="num warn">0.775</td>
+    <td class="num">2.325</td>
     <td class="num">2.481</td>
-    <td class="num warn">0.268</td>
-    <td class="num warn">12.10%</td>
+    <td class="num warn">0.156</td>
+    <td class="num warn">6.69%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">2.590</td>
-    <td class="num warn">0.902</td>
-    <td class="num">1.688</td>
+    <td class="num warn">0.790</td>
+    <td class="num">1.800</td>
     <td class="num">1.956</td>
-    <td class="num warn">0.268</td>
-    <td class="num warn">15.86%</td>
+    <td class="num warn">0.156</td>
+    <td class="num warn">8.65%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -16330,20 +16330,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-1.850</td>
-    <td class="num">3.350</td>
+    <td class="num warn">-1.876</td>
+    <td class="num">3.376</td>
     <td class="num">3.243</td>
-    <td class="num warn">-0.107</td>
-    <td class="num warn">-3.21%</td>
+    <td class="num warn">-0.134</td>
+    <td class="num warn">-3.96%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.470</td>
-    <td class="num warn">0.645</td>
-    <td class="num">2.825</td>
+    <td class="num warn">0.619</td>
+    <td class="num">2.851</td>
     <td class="num">2.718</td>
-    <td class="num warn">-0.107</td>
-    <td class="num warn">-3.80%</td>
+    <td class="num warn">-0.134</td>
+    <td class="num warn">-4.69%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -16366,20 +16366,20 @@
 <tr>
     <td>Performance Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.350</td>
-    <td class="num">1.150</td>
+    <td class="num warn">0.240</td>
+    <td class="num">1.260</td>
     <td class="num">1.442</td>
-    <td class="num warn">0.293</td>
-    <td class="num warn">25.45%</td>
+    <td class="num warn">0.182</td>
+    <td class="num warn">14.47%</td>
   </tr>
 <tr>
     <td>Capacity Tier TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.326</td>
-    <td class="num">1.474</td>
+    <td class="num warn">0.410</td>
+    <td class="num">1.390</td>
     <td class="num">1.540</td>
-    <td class="num warn">0.065</td>
-    <td class="num warn">4.44%</td>
+    <td class="num warn">0.149</td>
+    <td class="num warn">10.75%</td>
   </tr>
 <tr>
     <td>Archive Tier TB</td>
@@ -16438,20 +16438,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-1.991</td>
-    <td class="num">3.491</td>
+    <td class="num warn">-2.019</td>
+    <td class="num">3.519</td>
     <td class="num">3.543</td>
-    <td class="num warn">0.052</td>
-    <td class="num warn">1.48%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">0.69%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.470</td>
-    <td class="num warn">0.504</td>
-    <td class="num">2.966</td>
+    <td class="num warn">0.476</td>
+    <td class="num">2.994</td>
     <td class="num">3.018</td>
-    <td class="num warn">0.052</td>
-    <td class="num warn">1.75%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">0.81%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -16474,20 +16474,20 @@
 <tr>
     <td>Performance Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.319</td>
-    <td class="num">1.181</td>
+    <td class="num warn">0.203</td>
+    <td class="num">1.297</td>
     <td class="num">1.488</td>
-    <td class="num warn">0.307</td>
-    <td class="num warn">26.00%</td>
+    <td class="num warn">0.191</td>
+    <td class="num warn">14.75%</td>
   </tr>
 <tr>
     <td>Capacity Tier TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.252</td>
-    <td class="num">1.548</td>
+    <td class="num warn">0.340</td>
+    <td class="num">1.460</td>
     <td class="num">1.782</td>
-    <td class="num warn">0.233</td>
-    <td class="num warn">15.08%</td>
+    <td class="num warn">0.322</td>
+    <td class="num warn">22.03%</td>
   </tr>
 <tr>
     <td>Archive Tier TB</td>
@@ -16830,20 +16830,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-1.807</td>
-    <td class="num">3.307</td>
+    <td class="num warn">-1.723</td>
+    <td class="num">3.223</td>
     <td class="num">4.626</td>
-    <td class="num warn">1.320</td>
-    <td class="num warn">39.92%</td>
+    <td class="num warn">1.404</td>
+    <td class="num warn">43.57%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.470</td>
-    <td class="num warn">0.688</td>
-    <td class="num">2.782</td>
+    <td class="num warn">0.772</td>
+    <td class="num">2.698</td>
     <td class="num">4.101</td>
-    <td class="num warn">1.320</td>
-    <td class="num warn">47.45%</td>
+    <td class="num warn">1.404</td>
+    <td class="num warn">52.04%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -16875,11 +16875,11 @@
 <tr>
     <td>Capacity Tier TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.430</td>
-    <td class="num">1.370</td>
+    <td class="num warn">0.514</td>
+    <td class="num">1.286</td>
     <td class="num">1.100</td>
-    <td class="num warn">-0.270</td>
-    <td class="num warn">-19.71%</td>
+    <td class="num warn">-0.186</td>
+    <td class="num warn">-14.47%</td>
   </tr>
 <tr>
     <td>Archive Tier TB</td>
@@ -16938,20 +16938,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-1.946</td>
-    <td class="num">3.446</td>
+    <td class="num warn">-1.857</td>
+    <td class="num">3.357</td>
     <td class="num">3.737</td>
-    <td class="num warn">0.291</td>
-    <td class="num warn">8.45%</td>
+    <td class="num warn">0.379</td>
+    <td class="num warn">11.30%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.470</td>
-    <td class="num warn">0.549</td>
-    <td class="num">2.921</td>
+    <td class="num warn">0.638</td>
+    <td class="num">2.832</td>
     <td class="num">3.212</td>
-    <td class="num warn">0.291</td>
-    <td class="num warn">9.97%</td>
+    <td class="num warn">0.379</td>
+    <td class="num warn">13.40%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -16983,11 +16983,11 @@
 <tr>
     <td>Capacity Tier TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.361</td>
-    <td class="num">1.439</td>
+    <td class="num warn">0.449</td>
+    <td class="num">1.351</td>
     <td class="num">1.155</td>
-    <td class="num warn">-0.284</td>
-    <td class="num warn">-19.72%</td>
+    <td class="num warn">-0.196</td>
+    <td class="num warn">-14.48%</td>
   </tr>
 <tr>
     <td>Archive Tier TB</td>
@@ -17330,20 +17330,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-2.755</td>
-    <td class="num">4.255</td>
+    <td class="num warn">-2.683</td>
+    <td class="num">4.183</td>
     <td class="num">4.564</td>
-    <td class="num warn">0.308</td>
-    <td class="num warn">7.25%</td>
+    <td class="num warn">0.381</td>
+    <td class="num warn">9.11%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">5.120</td>
-    <td class="num warn">1.390</td>
-    <td class="num">3.730</td>
+    <td class="num warn">1.462</td>
+    <td class="num">3.658</td>
     <td class="num">4.039</td>
-    <td class="num warn">0.308</td>
-    <td class="num warn">8.27%</td>
+    <td class="num warn">0.381</td>
+    <td class="num warn">10.41%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -17384,11 +17384,11 @@
 <tr>
     <td>Archive Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.630</td>
-    <td class="num">0.870</td>
+    <td class="num warn">0.703</td>
+    <td class="num">0.797</td>
     <td class="num">0.725</td>
-    <td class="num warn">-0.145</td>
-    <td class="num warn">-16.67%</td>
+    <td class="num warn">-0.072</td>
+    <td class="num warn">-9.09%</td>
   </tr>
 <tr>
     <td>Full TB</td>
@@ -17438,20 +17438,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-4.057</td>
-    <td class="num">5.557</td>
+    <td class="num warn">-3.888</td>
+    <td class="num">5.388</td>
     <td class="num">5.873</td>
-    <td class="num warn">0.317</td>
-    <td class="num warn">5.70%</td>
+    <td class="num warn">0.486</td>
+    <td class="num warn">9.01%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">5.120</td>
-    <td class="num warn">0.088</td>
-    <td class="num">5.032</td>
+    <td class="num warn">0.257</td>
+    <td class="num">4.863</td>
     <td class="num">5.348</td>
-    <td class="num warn">0.317</td>
-    <td class="num warn">6.29%</td>
+    <td class="num warn">0.486</td>
+    <td class="num warn">9.99%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -17492,11 +17492,11 @@
 <tr>
     <td>Archive Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-0.528</td>
-    <td class="num">2.028</td>
+    <td class="num warn">-0.359</td>
+    <td class="num">1.859</td>
     <td class="num">1.690</td>
-    <td class="num warn">-0.338</td>
-    <td class="num warn">-16.67%</td>
+    <td class="num warn">-0.169</td>
+    <td class="num warn">-9.09%</td>
   </tr>
 <tr>
     <td>Full TB</td>
@@ -17546,20 +17546,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-4.309</td>
-    <td class="num">5.809</td>
+    <td class="num warn">-4.131</td>
+    <td class="num">5.631</td>
     <td class="num">5.913</td>
-    <td class="num warn">0.105</td>
-    <td class="num warn">1.80%</td>
+    <td class="num warn">0.282</td>
+    <td class="num warn">5.01%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">5.120</td>
-    <td class="num warn">-0.164</td>
-    <td class="num">5.284</td>
+    <td class="num warn">0.014</td>
+    <td class="num">5.106</td>
     <td class="num">5.388</td>
-    <td class="num warn">0.105</td>
-    <td class="num warn">1.98%</td>
+    <td class="num warn">0.282</td>
+    <td class="num warn">5.52%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -17600,11 +17600,11 @@
 <tr>
     <td>Archive Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-0.630</td>
-    <td class="num">2.130</td>
+    <td class="num warn">-0.452</td>
+    <td class="num">1.952</td>
     <td class="num">1.775</td>
-    <td class="num warn">-0.355</td>
-    <td class="num warn">-16.67%</td>
+    <td class="num warn">-0.177</td>
+    <td class="num warn">-9.09%</td>
   </tr>
 <tr>
     <td>Full TB</td>
@@ -17830,20 +17830,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">3.100</td>
-    <td class="num warn">0.887</td>
-    <td class="num">2.213</td>
+    <td class="num warn">0.775</td>
+    <td class="num">2.325</td>
     <td class="num">2.481</td>
-    <td class="num warn">0.268</td>
-    <td class="num warn">12.10%</td>
+    <td class="num warn">0.156</td>
+    <td class="num warn">6.69%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">2.590</td>
-    <td class="num warn">0.902</td>
-    <td class="num">1.688</td>
+    <td class="num warn">0.790</td>
+    <td class="num">1.800</td>
     <td class="num">1.956</td>
-    <td class="num warn">0.268</td>
-    <td class="num warn">15.86%</td>
+    <td class="num warn">0.156</td>
+    <td class="num warn">8.65%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -18249,20 +18249,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">3.100</td>
-    <td class="num warn">0.887</td>
-    <td class="num">2.213</td>
+    <td class="num warn">0.775</td>
+    <td class="num">2.325</td>
     <td class="num">2.481</td>
-    <td class="num warn">0.268</td>
-    <td class="num warn">12.10%</td>
+    <td class="num warn">0.156</td>
+    <td class="num warn">6.69%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">2.590</td>
-    <td class="num warn">0.902</td>
-    <td class="num">1.688</td>
+    <td class="num warn">0.790</td>
+    <td class="num">1.800</td>
     <td class="num">1.956</td>
-    <td class="num warn">0.268</td>
-    <td class="num warn">15.86%</td>
+    <td class="num warn">0.156</td>
+    <td class="num warn">8.65%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -18668,20 +18668,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-1.850</td>
-    <td class="num">3.350</td>
+    <td class="num warn">-1.876</td>
+    <td class="num">3.376</td>
     <td class="num">3.243</td>
-    <td class="num warn">-0.107</td>
-    <td class="num warn">-3.21%</td>
+    <td class="num warn">-0.134</td>
+    <td class="num warn">-3.96%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.470</td>
-    <td class="num warn">0.645</td>
-    <td class="num">2.825</td>
+    <td class="num warn">0.619</td>
+    <td class="num">2.851</td>
     <td class="num">2.718</td>
-    <td class="num warn">-0.107</td>
-    <td class="num warn">-3.80%</td>
+    <td class="num warn">-0.134</td>
+    <td class="num warn">-4.69%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -18704,20 +18704,20 @@
 <tr>
     <td>Performance Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.350</td>
-    <td class="num">1.150</td>
+    <td class="num warn">0.240</td>
+    <td class="num">1.260</td>
     <td class="num">1.442</td>
-    <td class="num warn">0.293</td>
-    <td class="num warn">25.45%</td>
+    <td class="num warn">0.182</td>
+    <td class="num warn">14.47%</td>
   </tr>
 <tr>
     <td>Capacity Tier TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.326</td>
-    <td class="num">1.474</td>
+    <td class="num warn">0.410</td>
+    <td class="num">1.390</td>
     <td class="num">1.540</td>
-    <td class="num warn">0.065</td>
-    <td class="num warn">4.44%</td>
+    <td class="num warn">0.149</td>
+    <td class="num warn">10.75%</td>
   </tr>
 <tr>
     <td>Archive Tier TB</td>
@@ -18776,20 +18776,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">-1.991</td>
-    <td class="num">3.491</td>
+    <td class="num warn">-2.019</td>
+    <td class="num">3.519</td>
     <td class="num">3.543</td>
-    <td class="num warn">0.052</td>
-    <td class="num warn">1.48%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">0.69%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.470</td>
-    <td class="num warn">0.504</td>
-    <td class="num">2.966</td>
+    <td class="num warn">0.476</td>
+    <td class="num">2.994</td>
     <td class="num">3.018</td>
-    <td class="num warn">0.052</td>
-    <td class="num warn">1.75%</td>
+    <td class="num warn">0.024</td>
+    <td class="num warn">0.81%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -18812,20 +18812,20 @@
 <tr>
     <td>Performance Tier TB</td>
     <td class="num">1.500</td>
-    <td class="num warn">0.319</td>
-    <td class="num">1.181</td>
+    <td class="num warn">0.203</td>
+    <td class="num">1.297</td>
     <td class="num">1.488</td>
-    <td class="num warn">0.307</td>
-    <td class="num warn">26.00%</td>
+    <td class="num warn">0.191</td>
+    <td class="num warn">14.75%</td>
   </tr>
 <tr>
     <td>Capacity Tier TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.252</td>
-    <td class="num">1.548</td>
+    <td class="num warn">0.340</td>
+    <td class="num">1.460</td>
     <td class="num">1.782</td>
-    <td class="num warn">0.233</td>
-    <td class="num warn">15.08%</td>
+    <td class="num warn">0.322</td>
+    <td class="num warn">22.03%</td>
   </tr>
 <tr>
     <td>Archive Tier TB</td>
@@ -19168,20 +19168,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">3.500</td>
-    <td class="num warn">0.736</td>
-    <td class="num">2.764</td>
+    <td class="num warn">0.624</td>
+    <td class="num">2.876</td>
     <td class="num">2.349</td>
-    <td class="num warn">-0.415</td>
-    <td class="num warn">-15.02%</td>
+    <td class="num warn">-0.527</td>
+    <td class="num warn">-18.33%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.040</td>
-    <td class="num warn">0.801</td>
-    <td class="num">2.239</td>
+    <td class="num warn">0.689</td>
+    <td class="num">2.351</td>
     <td class="num">1.824</td>
-    <td class="num warn">-0.415</td>
-    <td class="num warn">-18.54%</td>
+    <td class="num warn">-0.527</td>
+    <td class="num warn">-22.42%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -25087,20 +25087,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">3.600</td>
-    <td class="num warn">2.029</td>
-    <td class="num">1.571</td>
+    <td class="num warn">1.975</td>
+    <td class="num">1.625</td>
     <td class="num">1.650</td>
-    <td class="num warn">0.079</td>
-    <td class="num warn">5.03%</td>
+    <td class="num warn">0.025</td>
+    <td class="num warn">1.54%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">3.140</td>
-    <td class="num warn">2.094</td>
-    <td class="num">1.046</td>
+    <td class="num warn">2.040</td>
+    <td class="num">1.100</td>
     <td class="num">1.125</td>
-    <td class="num warn">0.079</td>
-    <td class="num warn">7.55%</td>
+    <td class="num warn">0.025</td>
+    <td class="num warn">2.27%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -28006,20 +28006,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">7.500</td>
-    <td class="num warn">0.363</td>
-    <td class="num">7.137</td>
+    <td class="num warn">-0.045</td>
+    <td class="num">7.545</td>
     <td class="num">8.025</td>
-    <td class="num warn">0.888</td>
-    <td class="num warn">12.44%</td>
+    <td class="num warn">0.480</td>
+    <td class="num warn">6.36%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">7.000</td>
-    <td class="num warn">0.388</td>
-    <td class="num">6.612</td>
+    <td class="num warn">-0.020</td>
+    <td class="num">7.020</td>
     <td class="num">7.500</td>
-    <td class="num warn">0.888</td>
-    <td class="num warn">13.43%</td>
+    <td class="num warn">0.480</td>
+    <td class="num warn">6.84%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -28425,20 +28425,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.200</td>
-    <td class="num warn">0.233</td>
-    <td class="num">1.967</td>
+    <td class="num warn">0.125</td>
+    <td class="num">2.075</td>
     <td class="num">1.800</td>
-    <td class="num warn">-0.167</td>
-    <td class="num warn">-8.49%</td>
+    <td class="num warn">-0.275</td>
+    <td class="num warn">-13.25%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.770</td>
-    <td class="num warn">0.328</td>
-    <td class="num">1.442</td>
+    <td class="num warn">0.220</td>
+    <td class="num">1.550</td>
     <td class="num">1.275</td>
-    <td class="num warn">-0.167</td>
-    <td class="num warn">-11.58%</td>
+    <td class="num warn">-0.275</td>
+    <td class="num warn">-17.74%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -28925,20 +28925,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.175</td>
-    <td class="num">1.625</td>
+    <td class="num warn">0.229</td>
+    <td class="num">1.571</td>
     <td class="num">1.825</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">12.31%</td>
+    <td class="num warn">0.254</td>
+    <td class="num warn">16.17%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.390</td>
-    <td class="num warn">0.290</td>
-    <td class="num">1.100</td>
+    <td class="num warn">0.344</td>
+    <td class="num">1.046</td>
     <td class="num">1.300</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">18.18%</td>
+    <td class="num warn">0.254</td>
+    <td class="num warn">24.28%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -29006,20 +29006,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.175</td>
-    <td class="num">1.625</td>
+    <td class="num warn">0.229</td>
+    <td class="num">1.571</td>
     <td class="num">1.825</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">12.31%</td>
+    <td class="num warn">0.254</td>
+    <td class="num warn">16.17%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.390</td>
-    <td class="num warn">0.290</td>
-    <td class="num">1.100</td>
+    <td class="num warn">0.344</td>
+    <td class="num">1.046</td>
     <td class="num">1.300</td>
-    <td class="num warn">0.200</td>
-    <td class="num warn">18.18%</td>
+    <td class="num warn">0.254</td>
+    <td class="num warn">24.28%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -29763,20 +29763,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.250</td>
-    <td class="num">1.550</td>
+    <td class="num warn">0.274</td>
+    <td class="num">1.526</td>
     <td class="num">1.700</td>
-    <td class="num warn">0.150</td>
-    <td class="num warn">9.68%</td>
+    <td class="num warn">0.174</td>
+    <td class="num warn">11.40%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.390</td>
-    <td class="num warn">0.365</td>
-    <td class="num">1.025</td>
+    <td class="num warn">0.389</td>
+    <td class="num">1.001</td>
     <td class="num">1.175</td>
-    <td class="num warn">0.150</td>
-    <td class="num warn">14.63%</td>
+    <td class="num warn">0.174</td>
+    <td class="num warn">17.38%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -29844,20 +29844,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">1.800</td>
-    <td class="num warn">0.250</td>
-    <td class="num">1.550</td>
+    <td class="num warn">0.274</td>
+    <td class="num">1.526</td>
     <td class="num">1.700</td>
-    <td class="num warn">0.150</td>
-    <td class="num warn">9.68%</td>
+    <td class="num warn">0.174</td>
+    <td class="num warn">11.40%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">1.390</td>
-    <td class="num warn">0.365</td>
-    <td class="num">1.025</td>
+    <td class="num warn">0.389</td>
+    <td class="num">1.001</td>
     <td class="num">1.175</td>
-    <td class="num warn">0.150</td>
-    <td class="num warn">14.63%</td>
+    <td class="num warn">0.174</td>
+    <td class="num warn">17.38%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -30520,20 +30520,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">2.700</td>
-    <td class="num warn">0.558</td>
-    <td class="num">2.142</td>
+    <td class="num warn">0.450</td>
     <td class="num">2.250</td>
-    <td class="num warn">0.108</td>
-    <td class="num warn">5.04%</td>
+    <td class="num">2.250</td>
+    <td class="num ok">-0.000</td>
+    <td class="num ok">-0.00%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">2.320</td>
-    <td class="num warn">0.703</td>
-    <td class="num">1.617</td>
+    <td class="num warn">0.595</td>
     <td class="num">1.725</td>
-    <td class="num warn">0.108</td>
-    <td class="num warn">6.68%</td>
+    <td class="num">1.725</td>
+    <td class="num ok">-0.000</td>
+    <td class="num ok">-0.00%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -32939,20 +32939,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">5.200</td>
-    <td class="num warn">-0.292</td>
-    <td class="num">5.492</td>
+    <td class="num warn">-0.703</td>
+    <td class="num">5.903</td>
     <td class="num">4.858</td>
-    <td class="num warn">-0.635</td>
-    <td class="num warn">-11.56%</td>
+    <td class="num warn">-1.045</td>
+    <td class="num warn">-17.71%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">4.220</td>
-    <td class="num warn">-0.222</td>
-    <td class="num">4.442</td>
+    <td class="num warn">-0.633</td>
+    <td class="num">4.853</td>
     <td class="num">3.808</td>
-    <td class="num warn">-0.635</td>
-    <td class="num warn">-14.29%</td>
+    <td class="num warn">-1.045</td>
+    <td class="num warn">-21.54%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -33358,20 +33358,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">8.400</td>
-    <td class="num warn">0.595</td>
-    <td class="num">7.805</td>
+    <td class="num warn">-0.079</td>
+    <td class="num">8.479</td>
     <td class="num">8.801</td>
-    <td class="num warn">0.996</td>
-    <td class="num warn">12.76%</td>
+    <td class="num warn">0.322</td>
+    <td class="num warn">3.80%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">7.440</td>
-    <td class="num warn">0.685</td>
-    <td class="num">6.755</td>
+    <td class="num warn">0.011</td>
+    <td class="num">7.429</td>
     <td class="num">7.751</td>
-    <td class="num warn">0.996</td>
-    <td class="num warn">14.75%</td>
+    <td class="num warn">0.322</td>
+    <td class="num warn">4.34%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
@@ -33777,20 +33777,20 @@
           <tr>
     <td>Repository Total TB</td>
     <td class="num">966.300</td>
-    <td class="num warn">75.299</td>
-    <td class="num">891.001</td>
+    <td class="num warn">8.675</td>
     <td class="num">957.625</td>
-    <td class="num warn">66.624</td>
-    <td class="num warn">7.48%</td>
+    <td class="num">957.625</td>
+    <td class="num ok">-0.000</td>
+    <td class="num ok">-0.00%</td>
   </tr>
 <tr>
     <td>RP Sum TB</td>
     <td class="num">911.040</td>
-    <td class="num warn">75.464</td>
-    <td class="num">835.576</td>
+    <td class="num warn">8.840</td>
     <td class="num">902.200</td>
-    <td class="num warn">66.624</td>
-    <td class="num warn">7.97%</td>
+    <td class="num">902.200</td>
+    <td class="num ok">-0.000</td>
+    <td class="num ok">-0.00%</td>
   </tr>
 <tr>
     <td>Working Space TB</td>
