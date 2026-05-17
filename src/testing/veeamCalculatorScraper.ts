@@ -350,6 +350,7 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
     let currentTier = 'Unknown';
     const pointToken = /^(LATEST|D\d+|W\d+|M\d+|Y\d+)$/i;
     const sizeToken = /^([0-9]+(?:\.[0-9]+)?)\s*TB$/i;
+      const splitSizeToken = /^([0-9]+(?:\.[0-9]+)?)\s*\+\s*([0-9]+(?:\.[0-9]+)?)\s*TB$/i;
 
     for (let i = 0; i < rpLines.length; i++) {
       const line = rpLines[i];
@@ -382,6 +383,15 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
           }
           break;
         }
+          const splitMatch = nextLine.match(splitSizeToken);
+          if (splitMatch) {
+            const a = parseFloat(splitMatch[1]);
+            const b = parseFloat(splitMatch[2]);
+            if (Number.isFinite(a) && Number.isFinite(b)) {
+              sizeTB = a + b;
+            }
+            break;
+          }
       }
 
       if (sizeTB !== undefined) {

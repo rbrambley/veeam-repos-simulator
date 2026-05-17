@@ -164,7 +164,7 @@ const YEARS = [1, 2, 3];
 const CI_THRESHOLDS = {
   calculatorFailedScenarioMax: 0,
   forecastP95AbsDeltaTBMax: 2.0,
-  parserMismatchScenarioMax: 30,
+    parserMismatchScenarioMax: 3,
 };
 
 const TARGET_THRESHOLDS = {

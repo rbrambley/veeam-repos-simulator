@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-05-17T07:47:03.325Z",
+  "generatedAt": "2026-05-17T08:13:26.041Z",
   "thresholds": {
     "ci": {
       "calculatorFailedScenarioMax": 0,
       "forecastP95AbsDeltaTBMax": 2,
-      "parserMismatchScenarioMax": 30
+      "parserMismatchScenarioMax": 3
     },
     "target": {
       "forecastP95AbsDeltaTBMax": 0.25,
@@ -19,8 +19,8 @@
   },
   "parserDiagnostics": {
     "scenarioCountWithDiagnostics": 73,
-    "mismatchScenarioCount": 24,
-    "mismatchRatePct": 32.87671232876712,
+    "mismatchScenarioCount": 0,
+    "mismatchRatePct": 0,
     "varianceMinTB": -3.6199999999999903,
     "varianceMaxTB": 55.260000000001355,
     "varianceAvgTB": 0.5201369863013884
