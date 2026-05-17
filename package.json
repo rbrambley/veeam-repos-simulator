@@ -14,6 +14,7 @@
     "archive:test:live-weekly-gfs": "tsx src/testing/archive/validateLiveWeeklyGfsHypothesis.ts",
     "archive:test:live-period-gfs": "tsx src/testing/archive/validateLivePeriodGfsModel.ts",
     "compare:veeam": "tsx src/testing/veeamBaselineComparator.ts",
+    "report:forecast-vs-simulation": "tsx src/testing/forecastSimulationComparisonReport.ts",
     "verify:known-veeam-deltas": "tsx src/testing/verifyKnownCalculatorDeltas.ts",
     "compare:model": "tsx src/testing/veeamBaselineComparator.ts --baseline model",
     "capture:veeam": "tsx src/testing/veeamCalculatorScraper.ts",

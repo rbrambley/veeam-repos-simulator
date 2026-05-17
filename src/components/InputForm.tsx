@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { computeForecastGfsStatsAtYear } from '../models/gfsSizing';
 import { SimulationState, BackupJobType, RepositoryType, computeVeeamWorkingSpaceTB } from '../models/veeam';
+import { computeSimulatorPlanned, ScenarioConfig } from '../models/plannedCapacityCalculator';
 
 interface InputFormProps {
   simState: SimulationState;
@@ -140,35 +141,44 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     const yearIncrSizeTB = yearSourceTB * (dailyChangeRate / 100) * 0.5;
     // Working space uses initial sourceDataTB (no growth) — matches Veeam Calculator behaviour
     const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(sourceDataTB);
-    const yearGfsStats = computeGfsStatsAtYear(year);
 
-    const estimateTierChainDataForYearTB = (windowDays: number) => {
-      if (windowDays <= 0) return 0;
-      const chainsInWindow = Math.max(1, Math.ceil(windowDays / Math.max(1, fullIntervalDays)));
-      // EXACT VEEAM MODEL: One promoted full (oldest SyntheticFull = base) +
-      // (chainsInWindow * fullIntervalDays - 1) incrementals.
-      // The active chain being built = working space, NOT stored data.
-      // DO NOT add an extra chain interval here — that double-counts working space.
-      const effectiveDays = chainsInWindow * fullIntervalDays - 1;
-      return yearFullSizeTB + effectiveDays * yearIncrSizeTB;
+    // Build scenario config for shared calculator
+    const config: ScenarioConfig = {
+      repositoryType: repoType === 'SOBR' ? 'SOBR' : 'DAS',
+      jobType: jobType as string,
+      sourceDataTB,
+      annualGrowthRatePct: annualGrowthRate,
+      dailyChangeRatePct: dailyChangeRate,
+      retention,
+      gfsPolicy: {
+        weekly: gfsWeekly,
+        monthly: gfsMonthly,
+        yearly: gfsYearly,
+      },
+      offloadAfterDays: sobrOffloadDays,
+      archiveAfterDays: sobrArchiveDays,
+      generationPeriodDays: sobrGenerationPeriodDays,
+      performanceImmutabilityDays: sobrPerformanceImmutabilityDays,
+      capacityImmutabilityDays: sobrCapacityImmutabilityDays,
+      archiveImmutabilityDays: sobrArchiveImmutabilityDays,
+      hasArchiveTier: sobrHasArchive,
+      copyEnabled: effectiveCopyEnabled,
+      moveEnabled: effectiveMoveEnabled,
     };
 
-    const yearGfsTB = yearGfsStats.additionalFullTB;
-    const dasRetentionWindowDays = Math.max(retention, sobrPerformanceImmutabilityDays);
-    const yearActiveChainTB = estimateTierChainDataForYearTB(dasRetentionWindowDays);
+    // Call shared calculator
+    const planned = computeSimulatorPlanned(config, startDate, year, 'reverse');
 
     if (repoType !== 'SOBR') {
-      const yearRepoUsedTB = yearActiveChainTB + yearGfsTB;
-      const yearRepoTB = yearRepoUsedTB + yearWorkingSpaceReserveTB;
       return {
         peakSourceTB: yearSourceTB,
-        fullBackupTB: yearFullSizeTB,
-        incrementalTB: yearIncrSizeTB,
+        fullBackupTB: planned.fileTypeFullTB,
+        incrementalTB: planned.fileTypeIncrementalTB,
         workingSpaceNeededTB: yearWorkingSpaceReserveTB,
         workingSpaceAdditionalTB: yearWorkingSpaceReserveTB,
-        gfsTB: yearGfsTB,
-        repoUsedTB: yearRepoUsedTB,
-        repoTotalTB: yearRepoTB,
+        gfsTB: planned.plannedCapacityTB - planned.fileTypeFullTB - (planned.fileTypeIncrementalTB * (year * 365 / 7)), // Approximation for display
+        repoUsedTB: planned.plannedCapacityTB - yearWorkingSpaceReserveTB,
+        repoTotalTB: planned.plannedCapacityTB,
         perfTB: 0,
         capTB: 0,
         archTB: 0,
@@ -177,52 +187,21 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
       };
     }
 
-    let yearPerfUsedTB = 0;
-    let yearCapUsedTB = 0;
-    let yearArchUsedTB = 0;
-
-    if (effectiveCopyEnabled && effectiveMoveEnabled) {
-      // Copy+Move: data lives in Perf until explicitly moved, so size for full retention window.
-      yearPerfUsedTB = estimateTierChainDataForYearTB(retention) + yearGfsStats.additionalPerfFullTB;
-      yearCapUsedTB = yearActiveChainTB + yearGfsStats.additionalCapFullTB;
-      if (sobrHasArchive) {
-        yearArchUsedTB = yearGfsStats.additionalArchFullTB;
-      }
-    } else if (effectiveCopyEnabled) {
-      yearPerfUsedTB = yearActiveChainTB + yearGfsStats.additionalPerfFullTB;
-      yearCapUsedTB = yearActiveChainTB + yearGfsStats.additionalCapFullTB;
-      if (sobrHasArchive) {
-        yearArchUsedTB = yearGfsStats.additionalArchFullTB;
-      }
-    } else {
-      const windows = computeMoveLifecycleWindows(retention, sobrOffloadDays);
-      yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
-      yearCapUsedTB = estimateTierChainDataForYearTB(windows.capacityAccumulationDays) + yearGfsStats.additionalCapFullTB;
-
-      if (sobrHasArchive) {
-        yearArchUsedTB = yearGfsStats.additionalArchFullTB;
-      }
-    }
-
-    const yearPerfTB = yearPerfUsedTB + yearWorkingSpaceReserveTB;
-    const yearCapTB = yearCapUsedTB;
-    const yearArchTB = yearArchUsedTB;
-    const yearSobrUsedTB = yearPerfUsedTB + yearCapUsedTB + (sobrHasArchive ? yearArchUsedTB : 0);
-
+    // SOBR case: extract tier breakdowns
     return {
       peakSourceTB: yearSourceTB,
-      fullBackupTB: yearFullSizeTB,
-      incrementalTB: yearIncrSizeTB,
+      fullBackupTB: planned.fileTypeFullTB,
+      incrementalTB: planned.fileTypeIncrementalTB,
       workingSpaceNeededTB: yearWorkingSpaceReserveTB,
       workingSpaceAdditionalTB: yearWorkingSpaceReserveTB,
-      gfsTB: yearGfsTB,
+      gfsTB: planned.plannedCapacityTB - planned.plannedPerformanceTierTB - planned.plannedCapacityTierTB - (sobrHasArchive ? planned.plannedArchiveTierTB : 0), // Approximation
       repoUsedTB: 0,
       repoTotalTB: 0,
-      perfTB: yearPerfTB,
-      capTB: yearCapTB,
-      archTB: yearArchTB,
-      sobrUsedTB: yearSobrUsedTB,
-      sobrTotalTB: yearSobrUsedTB + yearWorkingSpaceReserveTB,
+      perfTB: planned.plannedPerformanceTierTB,
+      capTB: planned.plannedCapacityTierTB,
+      archTB: sobrHasArchive ? planned.plannedArchiveTierTB : 0,
+      sobrUsedTB: planned.plannedCapacityTB - yearWorkingSpaceReserveTB,
+      sobrTotalTB: planned.plannedCapacityTB,
     };
   };
 

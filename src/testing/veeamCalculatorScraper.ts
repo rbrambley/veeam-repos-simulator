@@ -28,6 +28,11 @@ interface BaselineExpected {
   fileTypeFullTB?: number;
   fileTypeIncrementalTB?: number;
   fileTypeSyntheticFullTB?: number;
+  calculatorSummaryRestorePointCount?: number;
+  parsedRestorePointCount?: number;
+  workingSpaceTB?: number;
+  restorePointsTotalTB?: number; // Sum of all restore point sizes (raw, no block cloning)
+  varianceTB?: number; // plannedCapacityTB - restorePointsTotalTB
 }
 
 interface BaselineEntry {
@@ -330,20 +335,82 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
     const rpSectionIdx = detailsText.search(/Restore Points Simulation/i);
     const rpText = rpSectionIdx >= 0 ? detailsText.slice(rpSectionIdx) : '';
 
-    const restorePoints: Array<{ point: string; sizeTB: number }> = [];
-    const pointRegex = /\b(LATEST|D\d+|W\d+|M\d+|Y\d+)\b[\s\S]{0,30}?([0-9]+(?:\.[0-9]+)?)\s*TB\b/gi;
-    let pointMatch: RegExpExecArray | null = null;
-    while ((pointMatch = pointRegex.exec(rpText)) !== null) {
-      const size = parseFloat(pointMatch[2]);
-      if (Number.isFinite(size)) {
-        restorePoints.push({ point: pointMatch[1], sizeTB: size });
+    const rpLines = rpText
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    const restorePoints: Array<{ tier: string; point: string; sizeTB: number }> = [];
+    const tierByHeading: Record<string, string> = {
+      'Performance Tier': 'Performance',
+      'Capacity Tier': 'Capacity',
+      'Archive Tier': 'Archive',
+    };
+
+    let currentTier = 'Unknown';
+    const pointToken = /^(LATEST|D\d+|W\d+|M\d+|Y\d+)$/i;
+    const sizeToken = /^([0-9]+(?:\.[0-9]+)?)\s*TB$/i;
+
+    for (let i = 0; i < rpLines.length; i++) {
+      const line = rpLines[i];
+
+      if (line in tierByHeading) {
+        currentTier = tierByHeading[line];
+        continue;
+      }
+
+      if (/^Summary$/i.test(line)) {
+        break;
+      }
+
+      const pointMatch = line.match(pointToken);
+      if (!pointMatch) {
+        continue;
+      }
+
+      let sizeTB: number | undefined;
+      for (let j = i + 1; j < Math.min(i + 5, rpLines.length); j++) {
+        const nextLine = rpLines[j];
+        if (nextLine in tierByHeading || pointToken.test(nextLine) || /^Summary$/i.test(nextLine)) {
+          break;
+        }
+        const sizeMatch = nextLine.match(sizeToken);
+        if (sizeMatch) {
+          const parsed = parseFloat(sizeMatch[1]);
+          if (Number.isFinite(parsed)) {
+            sizeTB = parsed;
+          }
+          break;
+        }
+      }
+
+      if (sizeTB !== undefined) {
+        restorePoints.push({ tier: currentTier, point: pointMatch[1].toUpperCase(), sizeTB });
       }
     }
-    const uniquePointMap = new Map<string, number>();
+
+    // De-duplicate by tier + point to handle repeated text snapshots from scroll capture.
+    const uniquePointMap = new Map<string, { tier: string; point: string; sizeTB: number }>();
     for (const rp of restorePoints) {
-      uniquePointMap.set(rp.point, rp.sizeTB);
+      const key = `${rp.tier}:${rp.point}`;
+      if (!uniquePointMap.has(key)) {
+        uniquePointMap.set(key, rp);
+      }
     }
-    const uniqueRestorePoints = Array.from(uniquePointMap.entries()).map(([point, sizeTB]) => ({ point, sizeTB }));
+    const uniqueRestorePoints = Array.from(uniquePointMap.values());
+
+    const summaryRestorePointCount = extractNumberFrom(rpText, /Summary\s*\n\s*([0-9.,]+)\s*restore\s*points/i);
+
+    // Sum of all restore point sizes (raw, no block cloning)
+    const restorePointsTotalTB = uniqueRestorePoints.reduce((sum, rp) => sum + rp.sizeTB, 0);
+    results.calculatorSummaryRestorePointCount = summaryRestorePointCount;
+    results.parsedRestorePointCount = uniqueRestorePoints.length;
+    results.restorePointsTotalTB = restorePointsTotalTB;
+    results.workingSpaceTB = extractNumberFrom(topHalfText, /Working space\s*\n\s*([0-9.,]+)\s*TB/i);
+    // Variance: plannedCapacityTB - restorePointsTotalTB
+    if (typeof results.plannedCapacityTB === 'number') {
+      results.varianceTB = results.plannedCapacityTB - restorePointsTotalTB;
+    }
 
     const restorePointCounts = {
       total: uniqueRestorePoints.length,
@@ -391,7 +458,7 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
       archiveTierY1TB:
         extractNumberFrom(topHalfText, /Archive tier\s*[\s\S]*?Archive tier storage\s*\n\s*([0-9.,]+)\s*TB/i)
         ?? extractNumberFrom(topHalfText, /Archive Tier[\s\S]*?Y1\s*\n\s*([0-9.,]+)\s*TB/i),
-      workingSpaceTB: extractNumberFrom(topHalfText, /Working space\s*\n\s*([0-9.,]+)\s*TB/i),
+      workingSpaceTB: results.workingSpaceTB,
 
       fullBackupTB: extractNumberFrom(topHalfText, /Full backup\s*\n\s*([0-9.,]+)\s*TB/i),
       incrementalBackupTB: extractNumberFrom(topHalfText, /Incremental backup\s*\n\s*([0-9.,]+)\s*TB/i),
@@ -402,6 +469,10 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
       restorePointCountMonthly: restorePointCounts.monthly,
       restorePointCountYearly: restorePointCounts.yearly,
       restorePointCountLatest: restorePointCounts.latest,
+      calculatorSummaryRestorePointCount: summaryRestorePointCount,
+      parsedRestorePointCount: uniqueRestorePoints.length,
+      restorePointsTotalTB,
+      varianceTB: results.varianceTB,
     };
 
     const fullMatch = detailsText.match(/Full backup\s*\n\s*([0-9.,]+)\s*TB/i);
@@ -430,8 +501,8 @@ async function scrapeCalculator(scenario: CalcScenario, forecastYears: number): 
     console.log('  Scraped Details Payload:');
     console.log(JSON.stringify(scrapedPayload, null, 2));
     if (uniqueRestorePoints.length > 0) {
-      console.log('  Restore Points Snapshot (point:sizeTB):');
-      console.log(uniqueRestorePoints.map((x) => `${x.point}:${x.sizeTB}`).join(', '));
+      console.log('  Restore Points Snapshot (tier:point:sizeTB):');
+      console.log(uniqueRestorePoints.map((x) => `${x.tier}:${x.point}:${x.sizeTB}`).join(', '));
     } else {
       console.log('  Restore Points Snapshot: none parsed from details text');
     }
