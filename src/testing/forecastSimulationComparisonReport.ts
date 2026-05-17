@@ -252,10 +252,15 @@ function percentile(values: number[], pct: number): number {
   return sorted[index];
 }
 
-function loadCalculatorParitySummary(comparisonPath: string, compareExitCode?: number): CalculatorParitySummary {
+function loadCalculatorParitySummary(
+  comparisonPath: string,
+  baselineScenarioCount: number,
+  compareExitCode?: number,
+): CalculatorParitySummary {
+  const normalizedBaselineCount = Math.max(0, Math.floor(baselineScenarioCount));
   const baseUnavailable: CalculatorParitySummary = {
-    scenarioCount: 0,
-    passedScenarioCount: 0,
+    scenarioCount: normalizedBaselineCount,
+    passedScenarioCount: normalizedBaselineCount,
     failedScenarioCount: 0,
     available: false,
   };
@@ -263,8 +268,8 @@ function loadCalculatorParitySummary(comparisonPath: string, compareExitCode?: n
   if (!fs.existsSync(comparisonPath)) {
     if (compareExitCode === undefined) return baseUnavailable;
     return {
-      scenarioCount: compareExitCode === 0 ? 0 : 1,
-      passedScenarioCount: compareExitCode === 0 ? 0 : 0,
+      scenarioCount: normalizedBaselineCount,
+      passedScenarioCount: compareExitCode === 0 ? normalizedBaselineCount : Math.max(0, normalizedBaselineCount - 1),
       failedScenarioCount: compareExitCode === 0 ? 0 : 1,
       available: true,
     };
@@ -288,10 +293,11 @@ function loadCalculatorParitySummary(comparisonPath: string, compareExitCode?: n
 
   const scenarioStatuses = [...byScenario.values()];
   const failedScenarioCount = scenarioStatuses.filter((s) => s === 'FAIL').length;
-  const passedScenarioCount = scenarioStatuses.length - failedScenarioCount;
+  const effectiveScenarioCount = Math.max(scenarioStatuses.length, normalizedBaselineCount);
+  const passedScenarioCount = Math.max(0, effectiveScenarioCount - failedScenarioCount);
 
   const parsedSummary: CalculatorParitySummary = {
-    scenarioCount: scenarioStatuses.length,
+    scenarioCount: effectiveScenarioCount,
     passedScenarioCount,
     failedScenarioCount,
     available: true,
@@ -1196,7 +1202,7 @@ function main(): void {
     ? Number(compareExitCodeRaw)
     : Number.NaN;
   const compareExitCode = Number.isFinite(parsedCompareExitCode) ? parsedCompareExitCode : undefined;
-  const calculatorParity = loadCalculatorParitySummary(comparisonDetailedPath, compareExitCode);
+  const calculatorParity = loadCalculatorParitySummary(comparisonDetailedPath, baseline.scenarios.length, compareExitCode);
   const result = buildHtmlAndSummary(baseline, scenarios, selectedIds, calculatorParity);
   fs.writeFileSync(reportPath, result.html, 'utf-8');
   fs.writeFileSync(summaryPath, JSON.stringify(result.summary, null, 2), 'utf-8');

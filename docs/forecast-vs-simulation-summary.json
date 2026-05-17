@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-17T08:13:26.041Z",
+  "generatedAt": "2026-05-17T13:03:24.498Z",
   "thresholds": {
     "ci": {
       "calculatorFailedScenarioMax": 0,
@@ -12,8 +12,8 @@
     }
   },
   "calculatorParity": {
-    "scenarioCount": 70,
-    "passedScenarioCount": 70,
+    "scenarioCount": 73,
+    "passedScenarioCount": 73,
     "failedScenarioCount": 0,
     "available": true
   },
@@ -27,26 +27,14 @@
   },
   "forecastVsSimulation": {
     "pairCount": 219,
-    "avgDeltaTB": 1.2036255609537625,
-    "avgAbsDeltaTB": 1.4304445558438,
-    "p95AbsDeltaTB": 1.5984000000000052,
-    "maxAbsDeltaTB": 104.099999999999,
-    "year1AvgAbsDeltaTB": 0.5274318005503711,
-    "year2AvgAbsDeltaTB": 1.8598662030068682,
-    "year3AvgAbsDeltaTB": 1.90403566397416,
+    "avgDeltaTB": 1.6202621821538956,
+    "avgAbsDeltaTB": 2.263691778384991,
+    "p95AbsDeltaTB": 3.7513607748072895,
+    "maxAbsDeltaTB": 303.6249999999991,
+    "year1AvgAbsDeltaTB": 0.9450896395552695,
+    "year2AvgAbsDeltaTB": 0.8241849880634041,
+    "year3AvgAbsDeltaTB": 5.021800707536297,
     "topOutliers": [
-      {
-        "scenarioId": "od-calculator-parity-347tb-wmy",
-        "scenarioName": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
-        "repositoryType": "DAS",
-        "year": 2,
-        "simulationDay": 728,
-        "anchorDate": "2028-04-29",
-        "forecastTB": 1165.825,
-        "runtimeTB": 1269.924999999999,
-        "deltaTB": 104.099999999999,
-        "absDeltaTB": 104.099999999999
-      },
       {
         "scenarioId": "od-calculator-parity-347tb-wmy",
         "scenarioName": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
@@ -54,10 +42,46 @@
         "year": 3,
         "simulationDay": 1092,
         "anchorDate": "2029-04-28",
-        "forecastTB": 1165.825,
+        "forecastTB": 966.3,
         "runtimeTB": 1269.924999999999,
-        "deltaTB": 104.099999999999,
-        "absDeltaTB": 104.099999999999
+        "deltaTB": 303.6249999999991,
+        "absDeltaTB": 303.6249999999991
+      },
+      {
+        "scenarioId": "ix-gfs-only-policy",
+        "scenarioName": "GFS-only policy: weekly=52 with minimal daily retention",
+        "repositoryType": "DAS",
+        "year": 1,
+        "simulationDay": 364,
+        "anchorDate": "2027-05-01",
+        "forecastTB": 5.2924999999999995,
+        "runtimeTB": 25.849999999999973,
+        "deltaTB": 20.557499999999973,
+        "absDeltaTB": 20.557499999999973
+      },
+      {
+        "scenarioId": "ix-gfs-only-policy",
+        "scenarioName": "GFS-only policy: weekly=52 with minimal daily retention",
+        "repositoryType": "DAS",
+        "year": 2,
+        "simulationDay": 728,
+        "anchorDate": "2028-04-29",
+        "forecastTB": 5.2924999999999995,
+        "runtimeTB": 25.849999999999973,
+        "deltaTB": 20.557499999999973,
+        "absDeltaTB": 20.557499999999973
+      },
+      {
+        "scenarioId": "ix-gfs-only-policy",
+        "scenarioName": "GFS-only policy: weekly=52 with minimal daily retention",
+        "repositoryType": "DAS",
+        "year": 3,
+        "simulationDay": 1092,
+        "anchorDate": "2029-04-28",
+        "forecastTB": 5.2924999999999995,
+        "runtimeTB": 25.849999999999973,
+        "deltaTB": 20.557499999999973,
+        "absDeltaTB": 20.557499999999973
       },
       {
         "scenarioId": "das-monthly-2-large-r7",
@@ -66,10 +90,34 @@
         "year": 1,
         "simulationDay": 364,
         "anchorDate": "2027-05-01",
-        "forecastTB": 22.329600000000003,
+        "forecastTB": 27.124800000000004,
         "runtimeTB": 16.335600000000003,
-        "deltaTB": -5.994,
-        "absDeltaTB": 5.994
+        "deltaTB": -10.789200000000001,
+        "absDeltaTB": 10.789200000000001
+      },
+      {
+        "scenarioId": "das-yearly-2-large-r7",
+        "scenarioName": "DAS with 2 Yearly GFS - Large Case",
+        "repositoryType": "DAS",
+        "year": 2,
+        "simulationDay": 728,
+        "anchorDate": "2028-04-29",
+        "forecastTB": 36.48876,
+        "runtimeTB": 42.97559999999998,
+        "deltaTB": 6.4868399999999795,
+        "absDeltaTB": 6.4868399999999795
+      },
+      {
+        "scenarioId": "das-yearly-2-large-r7",
+        "scenarioName": "DAS with 2 Yearly GFS - Large Case",
+        "repositoryType": "DAS",
+        "year": 3,
+        "simulationDay": 1092,
+        "anchorDate": "2029-04-28",
+        "forecastTB": 36.48876,
+        "runtimeTB": 42.97559999999998,
+        "deltaTB": 6.4868399999999795,
+        "absDeltaTB": 6.4868399999999795
       },
       {
         "scenarioId": "das-mixed-2w1m1y-large-r7",
@@ -84,76 +132,28 @@
         "absDeltaTB": 5.994
       },
       {
-        "scenarioId": "das-yearly-2-large-r7",
-        "scenarioName": "DAS with 2 Yearly GFS - Large Case",
+        "scenarioId": "das-monthly-2-large-r7",
+        "scenarioName": "DAS with 2 Monthly GFS - Large Case",
         "repositoryType": "DAS",
         "year": 2,
         "simulationDay": 728,
         "anchorDate": "2028-04-29",
-        "forecastTB": 39.272639999999996,
-        "runtimeTB": 42.97559999999998,
-        "deltaTB": 3.702959999999983,
-        "absDeltaTB": 3.702959999999983
+        "forecastTB": 27.124800000000004,
+        "runtimeTB": 22.329600000000003,
+        "deltaTB": -4.795200000000001,
+        "absDeltaTB": 4.795200000000001
       },
       {
-        "scenarioId": "das-yearly-2-large-r7",
-        "scenarioName": "DAS with 2 Yearly GFS - Large Case",
+        "scenarioId": "das-monthly-2-large-r7",
+        "scenarioName": "DAS with 2 Monthly GFS - Large Case",
         "repositoryType": "DAS",
         "year": 3,
         "simulationDay": 1092,
         "anchorDate": "2029-04-28",
-        "forecastTB": 39.272639999999996,
-        "runtimeTB": 42.97559999999998,
-        "deltaTB": 3.702959999999983,
-        "absDeltaTB": 3.702959999999983
-      },
-      {
-        "scenarioId": "ix-gfs-wmy-copy-archive",
-        "scenarioName": "GFS W+M+Y × Copy × Archive: residue and gate",
-        "repositoryType": "SOBR",
-        "year": 3,
-        "simulationDay": 1092,
-        "anchorDate": "2029-04-28",
-        "forecastTB": 4.85,
-        "runtimeTB": 8.049999999999994,
-        "deltaTB": 3.199999999999994,
-        "absDeltaTB": 3.199999999999994
-      },
-      {
-        "scenarioId": "ix-gfs-wmy-copy-archive-immutability",
-        "scenarioName": "GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction",
-        "repositoryType": "SOBR",
-        "year": 3,
-        "simulationDay": 1092,
-        "anchorDate": "2029-04-28",
-        "forecastTB": 4.85,
-        "runtimeTB": 8.049999999999994,
-        "deltaTB": 3.199999999999994,
-        "absDeltaTB": 3.199999999999994
-      },
-      {
-        "scenarioId": "ix-gfs-wmy-copy-archive",
-        "scenarioName": "GFS W+M+Y × Copy × Archive: residue and gate",
-        "repositoryType": "SOBR",
-        "year": 2,
-        "simulationDay": 728,
-        "anchorDate": "2028-04-29",
-        "forecastTB": 4.85,
-        "runtimeTB": 7.099999999999994,
-        "deltaTB": 2.2499999999999947,
-        "absDeltaTB": 2.2499999999999947
-      },
-      {
-        "scenarioId": "ix-gfs-wmy-copy-archive-immutability",
-        "scenarioName": "GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction",
-        "repositoryType": "SOBR",
-        "year": 2,
-        "simulationDay": 728,
-        "anchorDate": "2028-04-29",
-        "forecastTB": 4.85,
-        "runtimeTB": 7.099999999999994,
-        "deltaTB": 2.2499999999999947,
-        "absDeltaTB": 2.2499999999999947
+        "forecastTB": 27.124800000000004,
+        "runtimeTB": 22.329600000000003,
+        "deltaTB": -4.795200000000001,
+        "absDeltaTB": 4.795200000000001
       }
     ],
     "anchorConsistency": [
@@ -185,8 +185,8 @@
   },
   "thresholdStatus": {
     "calculatorParityPass": true,
-    "forecastP95Pass": true,
+    "forecastP95Pass": false,
     "parserMismatchPass": true,
-    "ciPass": true
+    "ciPass": false
   }
 }
