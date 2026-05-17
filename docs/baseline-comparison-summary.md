@@ -1,9 +1,14 @@
 # Baseline Comparison Summary Report
 
-**Date:** May 10, 2026  
+**Date:** May 17, 2026  
 **Status:** ✅ All 70 scenarios passing (0 failures)  
 **Tolerance:** 5% per metric  
 **Model:** Current simulator with shared `computeSimulatorPlanned()` function
+
+**Synchronized with:**
+- [compare-output.txt](compare-output.txt) latest parity snapshot
+- [docs/lifecycle-report.html](docs/lifecycle-report.html) latest lifecycle run (50 passed, 0 failed)
+- [docs/simulator-confidence-scorecard.md](docs/simulator-confidence-scorecard.md)
 
 ---
 
@@ -14,6 +19,7 @@
 | **Total** | **70** | **✅ 100% Passing** |
 | **Passed** | 70 | ✅ All within tolerance |
 | **Failed** | 0 | ✅ None |
+| **Lifecycle gate** | 50 | ✅ 100% Passing |
 | **Pending** | 0 | - |
 
 ---
@@ -259,6 +265,6 @@ npm test
 
 ---
 
-**Report Generated:** May 10, 2026  
+**Report Generated:** May 17, 2026  
 **Baseline File:** `docs/veeam-calculator-baseline.json`  
 **Last Updated:** `npm run compare:veeam -- --seed`
