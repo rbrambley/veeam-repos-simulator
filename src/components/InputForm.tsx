@@ -322,7 +322,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   Type:
                   <select value={jobType} onChange={e => setJobType(e.target.value as BackupJobType)}>
                     <option value="ForwardIncremental">Forward Incr w/ Synth Full</option>
-                    <option value="ActiveFull">Active Full</option>
                   </select>
                 </label>
                 <label>

@@ -142,7 +142,6 @@ Phase 4: Planned Next Steps (priority order)
 2. Realistic job type behaviors
    - Currently all job types use the same logic. Implement proper per-type behavior:
      - ForwardIncremental: full on first run, incrementals daily, synthetic full when retention is reached (already partially done)
-     - ActiveFull: creates a brand-new full from source every N days (configurable); no synthetic full
      - SyntheticFull: already partially done — refine chain close/open logic
      - GFS: overlay on any job type; tag qualifying fulls as weekly/monthly/yearly GFS
 
@@ -196,3 +195,9 @@ Known Issues / Remaining Gaps (as of May 3, 2026)
    - Move and archive events are one log per chain.
    - **Impact**: Minor cosmetic inconsistency; no calculation impact.
    - **Status**: Low priority.
+
+5. **Active Full mode is intentionally deferred**
+   - Active Full is removed from the current simulator UI/model to avoid presenting a mode that is not yet behaviorally accurate.
+   - Proper Active Full would require full runtime + forecast parity work (new full-from-source scheduling, chain lifecycle changes, GFS/SOBR/immutability interactions).
+   - **Impact**: None for current default Veeam workflows (Forward Incremental with Synthetic Full remains the active modeled path).
+   - **Status**: Deferred to a dedicated future branch (recommended: `feature/active-full-mode`).
