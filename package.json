@@ -27,7 +27,8 @@
     "test:quality:update-snapshots": "tsx src/testing/qualityRunner.ts --update-snapshots",
     "report:parity-drift": "tsx src/testing/parityDriftLeaderboard.ts",
     "validate:all": "npm run capture:veeam && npm run compare:veeam && npm run verify:known-veeam-deltas && npm run test:quality",
-    "test:all": "npm run test:quality"
+    "test:all": "npm run test:quality",
+    "prepare": "husky"
   },
   "dependencies": {
     "react": "^18.0.0",
@@ -39,6 +40,7 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "husky": "^9.1.7",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
     "vite": "^4.0.0"

@@ -1,0 +1,5 @@
+* text=auto
+
+# Keep generated docs stable across OS line ending defaults
+docs/*.html text eol=lf
+docs/*.json text eol=lf
