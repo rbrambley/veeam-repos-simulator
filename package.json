@@ -16,6 +16,7 @@
     "compare:veeam": "tsx src/testing/veeamBaselineComparator.ts",
     "seed:model-baseline": "tsx src/testing/veeamBaselineComparator.ts --baseline model --seed",
     "seed:model-baseline:all": "tsx src/testing/veeamBaselineComparator.ts --baseline model --seed --seed-all",
+    "validate:forecast-ci-exclusions": "tsx src/testing/validateForecastCiExclusions.ts",
     "report:forecast-vs-simulation": "tsx src/testing/forecastSimulationComparisonReport.ts",
     "verify:known-veeam-deltas": "tsx src/testing/verifyKnownCalculatorDeltas.ts",
     "compare:model": "tsx src/testing/veeamBaselineComparator.ts --baseline model",

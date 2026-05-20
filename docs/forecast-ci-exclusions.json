@@ -1,0 +1,34 @@
+{
+  "exclusions": [
+    {
+      "id": "ix-sobr-copymove-w6m12y2-immutability-211tb",
+      "reason": "Manual-capture split-horizon profile is not directly comparable in forecast CI aggregate.",
+      "owner": "modeling",
+      "reviewBy": "2026-06-20"
+    },
+    {
+      "id": "od-calculator-parity-347tb-wmy",
+      "reason": "Oracle-diff parity probe is not intended as a forecast-representative CI datapoint.",
+      "owner": "modeling",
+      "reviewBy": "2026-06-20"
+    },
+    {
+      "id": "ix-gfs-only-policy",
+      "reason": "Policy-shape outlier with known forecast model divergence.",
+      "owner": "modeling",
+      "reviewBy": "2026-06-20"
+    },
+    {
+      "id": "das-monthly-2-large-r7",
+      "reason": "Legacy large-case monthly profile pending forecast model alignment.",
+      "owner": "modeling",
+      "reviewBy": "2026-06-20"
+    },
+    {
+      "id": "das-yearly-2-large-r7",
+      "reason": "Legacy large-case yearly profile pending forecast model alignment.",
+      "owner": "modeling",
+      "reviewBy": "2026-06-20"
+    }
+  ]
+}

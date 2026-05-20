@@ -36,6 +36,7 @@ function main() {
   const args = process.argv.slice(2);
   const updateSnapshots = args.includes('--update-snapshots');
 
+  const forecastExclusionsCode = run('npm', ['run', 'validate:forecast-ci-exclusions']);
   const compareCode = run('npm', ['run', 'compare:veeam']);
   const reportEnv: NodeJS.ProcessEnv = {
     ...process.env,
@@ -56,7 +57,8 @@ function main() {
   };
   const lifecycleCode = runWithEnv('npm', lifecycleArgs, lifecycleEnv);
 
-  const finalCode = compareCode !== 0
+  const finalCode = forecastExclusionsCode !== 0
+    || compareCode !== 0
     || forecastReportCode !== 0
     || gfsSizingCode !== 0
     || mutationCode !== 0

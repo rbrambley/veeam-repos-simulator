@@ -162,6 +162,13 @@ interface AggregationCollector {
   yearAnchors: Map<number, { days: Set<number>; dates: Set<string>; allSaturday: boolean }>;
 }
 
+interface ForecastCiExclusionEntry {
+  id: string;
+  reason: string;
+  owner: string;
+  reviewBy: string;
+}
+
 const YEARS = [1, 2, 3];
 
 const CI_THRESHOLDS = {
@@ -175,13 +182,36 @@ const TARGET_THRESHOLDS = {
   parserMismatchScenarioMax: 3,
 };
 
-const FORECAST_CI_EXCLUDED_SCENARIOS: Record<string, string> = {
-  'ix-sobr-copymove-w6m12y2-immutability-211tb': 'manual-capture split-horizon profile; not comparable in forecast CI aggregate',
-  'od-calculator-parity-347tb-wmy': 'oracle-diff parity probe; not intended as forecast CI representative',
-  'ix-gfs-only-policy': 'policy-shape outlier with known forecast-model divergence',
-  'das-monthly-2-large-r7': 'legacy large-case monthly profile pending forecast-model alignment',
-  'das-yearly-2-large-r7': 'legacy large-case yearly profile pending forecast-model alignment',
-};
+function loadForecastCiExclusions(): Record<string, string> {
+  const configPath = path.join(__dirname, '../../docs/forecast-ci-exclusions.json');
+  if (!fs.existsSync(configPath)) {
+    return {};
+  }
+
+  const parsed = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as {
+    exclusions?: ForecastCiExclusionEntry[];
+  };
+  const exclusions = parsed.exclusions ?? [];
+  const output: Record<string, string> = {};
+
+  for (const entry of exclusions) {
+    const id = (entry.id || '').trim();
+    const reason = (entry.reason || '').trim();
+    const owner = (entry.owner || '').trim();
+    const reviewBy = (entry.reviewBy || '').trim();
+    if (!id || !reason || !owner || !reviewBy) {
+      throw new Error(`Invalid forecast CI exclusion entry in docs/forecast-ci-exclusions.json: ${JSON.stringify(entry)}`);
+    }
+    if (output[id]) {
+      throw new Error(`Duplicate forecast CI exclusion id: ${id}`);
+    }
+    output[id] = reason;
+  }
+
+  return output;
+}
+
+const FORECAST_CI_EXCLUDED_SCENARIOS = loadForecastCiExclusions();
 
 function stripJsonComments(input: string): string {
   let content = input.replace(/\/\*[\s\S]*?\*\//g, '');
