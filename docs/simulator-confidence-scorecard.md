@@ -72,6 +72,10 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 4. Quality pipeline status:
 - Source: [docs/forecast-vs-simulation-summary.json](docs/forecast-vs-simulation-summary.json)
 - Latest run: **PASS** on threshold enforcement (`p95Abs 1.535 TB <= 2.00 TB`) with calculator parity green in `compare:veeam`.
+- Governance enforcement: exclusions are validated before quality execution via:
+	- [docs/forecast-ci-exclusions.json](docs/forecast-ci-exclusions.json)
+	- `npm run validate:forecast-ci-exclusions`
+	- [src/testing/validateForecastCiExclusions.ts](src/testing/validateForecastCiExclusions.ts)
 
 5. Coverage mapping and traceability:
 - Source: [docs/lifecycle-coverage-ledger.md](docs/lifecycle-coverage-ledger.md)
@@ -95,7 +99,6 @@ Confidence is lower when extrapolating beyond captured baseline classes, especia
 3. Additional captures are still useful for confidence expansion beyond the validated matrix.
 4. Confidence outside captured matrix is directional, not proven by parity capture.
 5. Summary docs are partially stale versus latest runs:
-- [docs/simulator-confidence-assessment.md](docs/simulator-confidence-assessment.md)
 - [docs/baseline-comparison-summary.md](docs/baseline-comparison-summary.md)
 
 ---
