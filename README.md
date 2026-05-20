@@ -63,6 +63,32 @@ npm run verify:known-veeam-deltas
 `compare:veeam` uses the live-captured calculator baseline in [docs/veeam-calculator-baseline.json](docs/veeam-calculator-baseline.json).
 `compare:model` uses the lifecycle-aligned internal baseline in [docs/veeam-model-baseline.json](docs/veeam-model-baseline.json).
 
+## PR Automation (Create or Update)
+
+One-time GitHub CLI auth:
+
+```bash
+"C:/Program Files/GitHub CLI/gh.exe" auth login --hostname github.com --web --git-protocol https
+```
+
+Create or update the current branch PR (same branch/base pair):
+
+```bash
+npm run pr:sync
+```
+
+Create as draft when no PR exists yet:
+
+```bash
+npm run pr:sync:draft
+```
+
+Notes:
+
+- Uses the latest `docs/pr-summary-*.md` as PR body when present.
+- Uses the latest commit subject as the default PR title.
+- Auto-detects base branch from `origin/HEAD` (falls back to `main`).
+
 ## Result Summary
 
 - Use `npm run compare:veeam` as the primary calculator-parity gate. This is the source-of-truth comparison against live-captured Veeam calculator values.
