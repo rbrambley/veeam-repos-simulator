@@ -142,7 +142,6 @@ Phase 4: Planned Next Steps (priority order)
 2. Realistic job type behaviors
    - Currently all job types use the same logic. Implement proper per-type behavior:
      - ForwardIncremental: full on first run, incrementals daily, synthetic full when retention is reached (already partially done)
-     - ReverseIncremental (VBK+VRB): always rewrites the VBK nightly by merging the latest incremental; no synthetic full needed
      - ActiveFull: creates a brand-new full from source every N days (configurable); no synthetic full
      - SyntheticFull: already partially done — refine chain close/open logic
      - GFS: overlay on any job type; tag qualifying fulls as weekly/monthly/yearly GFS
