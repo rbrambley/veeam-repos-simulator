@@ -364,21 +364,23 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   Name:
                   <input value={repoName} onChange={e => setRepoName(e.target.value)} />
                 </label>
-                <label>
-                  Type:
-                  <select value={repoType} onChange={e => setRepoType(e.target.value as RepositoryType)}>
-                    <option value="DAS">DAS</option>
-                    <option value="SOBR">SOBR</option>
-                  </select>
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '0.6rem' }}>
-                  <input
-                    type="checkbox"
-                    checked={isObjectStorage}
-                    onChange={e => setIsObjectStorage(e.target.checked)}
-                  />
-                  Use Object Storage
-                </label>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+                    <label style={{ flex: 1 }}>
+                      Type:
+                      <select value={repoType} onChange={e => setRepoType(e.target.value as RepositoryType)}>
+                        <option value="DAS">DAS</option>
+                        <option value="SOBR">SOBR</option>
+                      </select>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexShrink: 0, marginBottom: '0.05rem' }}>
+                      Use Object Storage
+                      <input
+                        type="checkbox"
+                        checked={isObjectStorage}
+                        onChange={e => setIsObjectStorage(e.target.checked)}
+                      />
+                    </label>
+                  </div>
               </div>
               <div className="card-split-col">
                 <div className="card-split-col-header">
