@@ -85,12 +85,12 @@
 <body>
   <header class="hero">
     <h1>Lifecycle Health Report</h1>
-    <div class="sub">Generated May 20, 2026 at 06:13:37 AM · Deterministic start: 2026-05-02</div>
+    <div class="sub">Generated May 20, 2026 at 07:08:41 AM · Deterministic start: 2026-05-02</div>
     <div class="pills">
-      <span class="pill">53 PASS</span>
+      <span class="pill">52 PASS</span>
       <span class="pill">0 SKIP</span>
-      <span class="pill">0 FAIL</span>
-      <div class="conf"><div class="l">Confidence</div><div class="v">HIGH</div><div class="d">No failing scenarios. Model behavior is stable for the tested space.</div></div>
+      <span class="pill">1 FAIL</span>
+      <div class="conf"><div class="l">Confidence</div><div class="v">MEDIUM</div><div class="d">Mostly stable, but a small number of failures need review.</div></div>
     </div>
   </header>
 
@@ -98,34 +98,53 @@
     <section class="kpis">
       <article class="kpi"><div class="v">53</div><div class="l">Scenarios</div></article>
       <article class="kpi"><div class="v">27,587</div><div class="l">Days Simulated</div></article>
-      <article class="kpi"><div class="v">17.1s</div><div class="l">Run Duration</div></article>
-      <article class="kpi"><div class="v">4/4</div><div class="l">Healthy Layers</div></article>
-      <article class="kpi"><div class="v">0</div><div class="l">Priority Failures</div></article>
+      <article class="kpi"><div class="v">17.3s</div><div class="l">Run Duration</div></article>
+      <article class="kpi"><div class="v">3/4</div><div class="l">Healthy Layers</div></article>
+      <article class="kpi"><div class="v">1</div><div class="l">Priority Failures</div></article>
     </section>
 
     <section id="section-regressions" class="panel">
       <h2>Regressions Since Last Run</h2>
       <p>Quick scan for anything that needs attention before you dig into the full report.</p>
-      <div class="all-clear">No new regressions surfaced in this run.</div>
+      <div class="finding-group" style="border-left:4px solid #b42318;background:#fff7f6">
+        <div class="finding-group-title">Regression watch<span class="finding-count" style="background:#b42318">1</span></div>
+        <p style="margin:0 0 8px;font-size:12px;color:#7a1f16;">High-signal issues surfaced in this run. Start with the red items.</p>
+        <table class="finding-table"><tbody><tr>
+      <td><span class="finding-cat" style="background:#fef2f2;color:#991b1b">Test Failure</span></td>
+      <td><a class="finding-link" href="#sc-od-calculator-parity-347tb-wmy">od-calculator-parity-347tb-wmy</a></td>
+      <td class="finding-detail">1 violation(s)</td>
+    </tr></tbody></table>
+        <p style="margin:8px 0 0;font-size:11px;color:#8b5e34;">1 error(s), 0 warning(s), 0 info item(s).</p>
+      </div>
     </section>
 
     <section id="section-dashboard" class="panel">
       <h2>Findings Summary</h2>
       <p>Fast read: this groups what is broken, what is known debt, and what is informational.</p>
       <table>
-        <thead><tr><th>Status</th><th>Signal</th><th>Detail</th></tr></thead>
+        <thead><tr><th>Priority</th><th>Type</th><th>Detail</th></tr></thead>
         <tbody>
-          <tr><td>OK</td><td>Scenario Failures</td><td>No failing scenarios in this run.</td></tr>
-          <tr><td>OK</td><td>Known Gaps</td><td>0 scenario(s) marked as known gap.</td></tr>
-          <tr><td>Watch</td><td>Coverage</td><td>1 uncovered documented rule(s).</td></tr>
+          <tr>
+            <td>#1 <a class="focus-link mono" href="#sc-od-calculator-parity-347tb-wmy">od-calculator-parity-347tb-wmy</a></td>
+            <td>Scenario Failure</td>
+            <td>1 violation(s)</td>
+          </tr>
+          
+          <tr><td>Info</td><td>Coverage</td><td>1 documented rule(s) are currently uncovered</td></tr>
         </tbody>
       </table>
     </section>
 
     <section id="section-priority" class="panel">
       <h2>Priority Queue</h2>
-      <p>No failing scenarios in this run.</p>
-      <div class="all-clear">No priority failures to address.</div>
+      <p>Start here to resolve the highest-impact issues first.</p>
+      <table><thead><tr><th>Scenario</th><th>Violations</th><th>Top Rules</th></tr></thead><tbody>
+            <tr>
+              <td><a class="focus-link mono" href="#sc-od-calculator-parity-347tb-wmy">od-calculator-parity-347tb-wmy</a></td>
+              <td>1</td>
+              <td>R-STOR-03</td>
+            </tr>
+          </tbody></table>
     </section>
 
     <section id="section-layer-overview" class="panel">
@@ -152,8 +171,8 @@
           </tr><tr>
             <td><a class="focus-link" href="#layer-4">Layer 4</a></td>
             <td>Oracle Diff</td>
-            <td><span class="dot ok"></span>Healthy</td>
-            <td>8</td><td>0</td><td>0</td>
+            <td><span class="dot bad"></span>At Risk</td>
+            <td>7</td><td>0</td><td>1</td>
           </tr>
         </tbody>
       </table>
@@ -237,7 +256,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-das-gfs-preserves-chain</span>
           <span class="sname">DAS GFS preserves chain past standard retention</span>
-          <span class="meta">42d · 5ms</span>
+          <span class="meta">42d · 6ms</span>
         </summary>
         <div class="body">
           <p class="desc">A chain whose newest point is a weekly GFS full must NOT be deleted when standard retention+SLA have both expired; it must survive for the full GFS window (2 weeks = 14 days from tagging).</p>
@@ -291,7 +310,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-gfs-monthly-boundary</span>
           <span class="sname">Monthly GFS lands only on last Saturday of month</span>
-          <span class="meta">100d · 14ms</span>
+          <span class="meta">100d · 12ms</span>
         </summary>
         <div class="body">
           <p class="desc">A monthly GFS tag must appear on the last Saturday of each calendar month and not on any other Saturday.</p>
@@ -318,7 +337,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-gfs-yearly-boundary</span>
           <span class="sname">Yearly GFS lands only on last Saturday of December</span>
-          <span class="meta">800d · 126ms</span>
+          <span class="meta">800d · 90ms</span>
         </summary>
         <div class="body">
           <p class="desc">A yearly GFS tag must appear exactly on the last Saturday of December and never on any other Saturday.</p>
@@ -345,7 +364,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-gfs-stacking</span>
           <span class="sname">GFS tags stack on same Saturday restore point</span>
-          <span class="meta">400d · 66ms</span>
+          <span class="meta">400d · 56ms</span>
         </summary>
         <div class="body">
           <p class="desc">When weekly + monthly conditions are both true for the same Saturday, the single SyntheticFull must have both isWeeklyGFS and isMonthlyGFS set (no separate point created).</p>
@@ -372,7 +391,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-sobr-offload-threshold</span>
           <span class="sname">SOBR Move: offload fires on exact offloadAfterDays boundary</span>
-          <span class="meta">30d · 9ms</span>
+          <span class="meta">30d · 11ms</span>
         </summary>
         <div class="body">
           <p class="desc">Chain sealed at day D. Points must still be in Performance on day D+offloadAfterDays-1 and must be in Capacity on day D+offloadAfterDays.</p>
@@ -399,7 +418,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-sobr-archive-threshold-move</span>
           <span class="sname">SOBR Move: archive fires on exact capTierAge &gt;= archiveAfterDays boundary</span>
-          <span class="meta">60d · 29ms</span>
+          <span class="meta">60d · 32ms</span>
         </summary>
         <div class="body">
           <p class="desc">After chain offloads to Capacity, a GFS-tagged point must NOT enter Archive until capTierAgeDays &gt;= archiveAfterDays.</p>
@@ -426,7 +445,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-sobr-archive-threshold-copy</span>
           <span class="sname">SOBR Copy: archive fires only after pointAge &gt;= offloadAfterDays + archiveAfterDays</span>
-          <span class="meta">45d · 21ms</span>
+          <span class="meta">45d · 16ms</span>
         </summary>
         <div class="body">
           <p class="desc">In copy mode the archive gate is total point age, not cap-tier age. Point must not appear in Archive before age = offloadAfterDays + archiveAfterDays.</p>
@@ -453,7 +472,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-sobr-capacity-residue-after-archive</span>
           <span class="sname">SOBR Copy: non-GFS Capacity residue pruned when GFS full archives</span>
-          <span class="meta">45d · 18ms</span>
+          <span class="meta">45d · 15ms</span>
         </summary>
         <div class="body">
           <p class="desc">When a GFS SyntheticFull in a chain archives (copy mode), non-GFS points in that chain must be pruned from Capacity. Performance copy must still remain accessible.</p>
@@ -480,7 +499,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">lb-perf-prune-ordering</span>
           <span class="sname">SOBR Move: Performance pruning cannot precede offload completion</span>
-          <span class="meta">35d · 8ms</span>
+          <span class="meta">35d · 15ms</span>
         </summary>
         <div class="body">
           <p class="desc">On the day of offload completion chain.performancePrunedAt must still be null. Prune must not happen until offloadComplete=true AND retention/SLA expired AND GEN immutability cleared.</p>
@@ -518,7 +537,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-das-3yr-gfs-wmy</span>
           <span class="sname">DAS 3-year soak: W+M+Y GFS invariants every day</span>
-          <span class="meta">1095d · 815ms</span>
+          <span class="meta">1095d · 895ms</span>
         </summary>
         <div class="body">
           <p class="desc">Over 3 years, daily assertions: weekly count ≤ limit, monthly count ≤ limit, yearly count ≤ limit, GFS tags only on SyntheticFull/Full, exactly one global base per job.</p>
@@ -545,7 +564,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-sobr-move-3yr</span>
           <span class="sname">SOBR Move-only 3-year soak: tier ordering invariants every day</span>
-          <span class="meta">1095d · 990ms</span>
+          <span class="meta">1095d · 910ms</span>
         </summary>
         <div class="body">
           <p class="desc">No point may be in Archive without passing through Capacity. Prune before offload is forbidden. Active chains must never be offloadComplete.</p>
@@ -572,7 +591,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-sobr-copy-3yr</span>
           <span class="sname">SOBR Copy-only 3-year soak: capacity residue and archive gate every day</span>
-          <span class="meta">1095d · 816ms</span>
+          <span class="meta">1095d · 907ms</span>
         </summary>
         <div class="body">
           <p class="desc">Scan every day: after any archive event for a chain the non-GFS Capacity residue must immediately be zero. Archive gate must never be violated.</p>
@@ -599,7 +618,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-sobr-gfs-archive-5yr</span>
           <span class="sname">SOBR Move W+M+Y 5-year soak: full model over extended horizon</span>
-          <span class="meta">1825d · 2827ms</span>
+          <span class="meta">1825d · 2735ms</span>
         </summary>
         <div class="body">
           <p class="desc">5-year soak exercising the full policy stack: daily GFS count limits, tier ordering, prune sequencing, chain deletion gating, SLA minimum, and base identity.</p>
@@ -626,7 +645,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-das-sla-minimum-5yr</span>
           <span class="sname">DAS 5-year soak: SLA minimum guarantee never violated</span>
-          <span class="meta">1825d · 218ms</span>
+          <span class="meta">1825d · 236ms</span>
         </summary>
         <div class="body">
           <p class="desc">Over 5 years verify that no chain point dated within slaDays of current date is ever deleted, regardless of count-based expiry pressure.</p>
@@ -653,7 +672,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-das-chain-rp-drift-3yr</span>
           <span class="sname">DAS 3-year drift: inactive chains and RP count never accumulate</span>
-          <span class="meta">1095d · 146ms</span>
+          <span class="meta">1095d · 155ms</span>
         </summary>
         <div class="body">
           <p class="desc">Over 3 years, assert every day that inactive chains never exceed 3 (steady-state max) and total restore points never exceed 42 (2×retention + GFS limits + buffer). Catches chain cleanup failures and pruning regressions that only manifest over long horizons.</p>
@@ -680,7 +699,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-sobr-move-chain-rp-drift-3yr</span>
           <span class="sname">SOBR Move 3-year drift: inactive chains and RP count never accumulate</span>
-          <span class="meta">1095d · 811ms</span>
+          <span class="meta">1095d · 860ms</span>
         </summary>
         <div class="body">
           <p class="desc">Over 3 years with SOBR Move mode, assert that inactive chains never exceed 4 (offload + immutability extend chain lifetime but should still plateau) and total restore points never exceed 78 (2×retention=30 + GFS limits + buffer). Detects SOBR-specific chain lifecycle failures over extended runs.</p>
@@ -707,7 +726,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ti-das-high-retention-drift-3yr</span>
           <span class="sname">DAS high-retention 3-year drift: retention=30 with full GFS never accumulates</span>
-          <span class="meta">1095d · 323ms</span>
+          <span class="meta">1095d · 288ms</span>
         </summary>
         <div class="body">
           <p class="desc">Higher retention (30 days) with full W+M+Y GFS over 3 years. Max inactive chains ≤ 3, max restore points ≤ 75 (2×30 + 9 + buffer). Validates that the engine scales correctly with larger retention windows without drift.</p>
@@ -745,7 +764,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">im-perf-immutability-blocks-prune</span>
           <span class="sname">Performance immutability blocks Performance prune</span>
-          <span class="meta">55d · 13ms</span>
+          <span class="meta">55d · 12ms</span>
         </summary>
         <div class="body">
           <p class="desc">Chain is retention+SLA expired and offloadComplete, but performanceImmutabilityDays has not elapsed since GEN window end. Prune must not fire until the lock expires.</p>
@@ -799,7 +818,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">im-arch-immutability-blocks-deletion</span>
           <span class="sname">Archive immutability blocks chain deletion</span>
-          <span class="meta">100d · 39ms</span>
+          <span class="meta">100d · 35ms</span>
         </summary>
         <div class="body">
           <p class="desc">GFS point in Archive is within archiveImmutableUntil. Chain deletion must wait for Archive lock to clear even after deleteOn and Capacity immutability have both passed.</p>
@@ -826,7 +845,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">im-gen-window-boundary</span>
           <span class="sname">GEN window aligns to generationPeriodDays boundaries</span>
-          <span class="meta">45d · 9ms</span>
+          <span class="meta">45d · 8ms</span>
         </summary>
         <div class="body">
           <p class="desc">Points created in days 1-10 must belong to GEN-0 and points created in days 11-20 to GEN-1 when generationPeriodDays=10. deleteOn for each GEN must equal windowEnd + slaDays.</p>
@@ -853,7 +872,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">im-gen-deleteon-extended-by-gfs</span>
           <span class="sname">GEN deleteOn extended when GFS point falls in window</span>
-          <span class="meta">60d · 15ms</span>
+          <span class="meta">60d · 11ms</span>
         </summary>
         <div class="body">
           <p class="desc">When a GFS weekly point belongs to a GEN, the GEN's deleteOn must be recalculated to max(default deleteOn, gfsDate + gfsWeeks*7). Standard non-GFS GENs must keep original deleteOn.</p>
@@ -880,7 +899,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">im-gen-state-transitions</span>
           <span class="sname">GEN lifecycle state is monotonic: Pending → WaitImmutability → Deletable</span>
-          <span class="meta">80d · 21ms</span>
+          <span class="meta">80d · 17ms</span>
         </summary>
         <div class="body">
           <p class="desc">A GEN must never go backwards through lifecycle states. Once Deletable it must not revert to Pending or WaitImmutability on a later day.</p>
@@ -907,7 +926,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">im-all-tiers-immutability</span>
           <span class="sname">All three tier immutability locks interact correctly</span>
-          <span class="meta">120d · 52ms</span>
+          <span class="meta">120d · 48ms</span>
         </summary>
         <div class="body">
           <p class="desc">With non-zero immutability on all three tiers, deletion must wait until ALL locks expire, even if only one tier contains data at deletion time.</p>
@@ -934,7 +953,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-gfs-wmy-move-archive</span>
           <span class="sname">GFS W+M+Y × Move × Archive: cardinality and tier residency</span>
-          <span class="meta">400d · 483ms</span>
+          <span class="meta">400d · 464ms</span>
         </summary>
         <div class="body">
           <p class="desc">Mixed GFS with move mode and archive. Verify: weekly/monthly/yearly counts, tier residency per point, incremental-free Capacity after each chain archives, no premature archive entry.</p>
@@ -961,7 +980,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-gfs-wmy-copy-archive</span>
           <span class="sname">GFS W+M+Y × Copy × Archive: residue and gate</span>
-          <span class="meta">400d · 457ms</span>
+          <span class="meta">400d · 453ms</span>
         </summary>
         <div class="body">
           <p class="desc">Mixed GFS with copy mode and archive. Non-GFS Capacity residue must clear immediately after GFS point archives. Archive gate is point-age-based.</p>
@@ -988,7 +1007,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-gfs-wmy-copy-archive-immutability</span>
           <span class="sname">GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction</span>
-          <span class="meta">500d · 569ms</span>
+          <span class="meta">500d · 568ms</span>
         </summary>
         <div class="body">
           <p class="desc">High-risk 3-way: mixed GFS stacking, copy mode, archive, and all-tier immutability. Verify correct interlock between archive gating, capacity residue clearing, and GEN immutability locks.</p>
@@ -1015,7 +1034,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-gfs-monthly-move-immutability</span>
           <span class="sname">GFS Monthly × Move × Perf Immutability: GEN deleteOn vs immutability interlock</span>
-          <span class="meta">120d · 59ms</span>
+          <span class="meta">120d · 57ms</span>
         </summary>
         <div class="body">
           <p class="desc">Monthly GFS extends GEN deleteOn. Combined with Perf immutability this requires both deleteOn and lock to clear before prune/delete. Neither alone should be sufficient.</p>
@@ -1042,7 +1061,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-short-retention-long-gfs</span>
           <span class="sname">Short retention × long GFS yearly: chain outlives retention by years</span>
-          <span class="meta">1825d · 148ms</span>
+          <span class="meta">1825d · 162ms</span>
         </summary>
         <div class="body">
           <p class="desc">With retention=7 and yearly=5 (5 years), chains sealed early must survive for 5 years because of GFS tag. Verifies GFS protection overrides count+SLA expiry for the full GFS window.</p>
@@ -1069,7 +1088,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-high-gen-period</span>
           <span class="sname">Large generationPeriodDays with GFS and immutability</span>
-          <span class="meta">200d · 188ms</span>
+          <span class="meta">200d · 153ms</span>
         </summary>
         <div class="body">
           <p class="desc">generationPeriodDays=30: each GEN covers a full month. Verifies GEN window aligns correctly at 30-day boundaries and deleteOn is computed properly with monthly GFS extension.</p>
@@ -1096,7 +1115,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-copy-move-combo</span>
           <span class="sname">Copy+Move mode with GFS W+M and archive</span>
-          <span class="meta">120d · 64ms</span>
+          <span class="meta">120d · 52ms</span>
         </summary>
         <div class="body">
           <p class="desc">copyEnabled+moveEnabled simultaneously. Verifies both copy semantics (Capacity stamped at creation) and move semantics (Performance removed after offloadAfterDays) apply correctly, with correct archive gating.</p>
@@ -1123,7 +1142,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-sobr-copymove-w6m12y2-immutability-211tb</span>
           <span class="sname">SOBR Copy+Move with W6+M12+Y2 and perf/cap immutability (211TB)</span>
-          <span class="meta">1092d · 2720ms</span>
+          <span class="meta">1092d · 2821ms</span>
         </summary>
         <div class="body">
           <p class="desc">Manual calculator parity capture for a high-scale mixed-policy profile with copy+move enabled, archive enabled, archiveAfter=14, and Archive immutability disabled.</p>
@@ -1150,7 +1169,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-no-gfs-long-archive</span>
           <span class="sname">SOBR Move no-GFS: archive tier should remain empty</span>
-          <span class="meta">200d · 81ms</span>
+          <span class="meta">200d · 100ms</span>
         </summary>
         <div class="body">
           <p class="desc">With hasArchiveTier=true but no GFS policy, only GFS-tagged points may enter Archive. Archive tier must remain empty throughout the entire run.</p>
@@ -1177,7 +1196,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-retention-variant-r7</span>
           <span class="sname">Retention variant retention=7 with W+M GFS</span>
-          <span class="meta">200d · 86ms</span>
+          <span class="meta">200d · 89ms</span>
         </summary>
         <div class="body">
           <p class="desc">Retention=7 paired with GFS to stress-test boundary interaction at the shortest practical retention. Chain should seal every 7 days and GFS must survive past that.</p>
@@ -1204,7 +1223,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-retention-variant-r60</span>
           <span class="sname">Retention variant retention=60 with W+M+Y GFS</span>
-          <span class="meta">400d · 439ms</span>
+          <span class="meta">400d · 429ms</span>
         </summary>
         <div class="body">
           <p class="desc">Retention=60 with full GFS stack. Many chains coexist; verifies base identity remains oldest across all, GFS caps are respected across many active+inactive chains simultaneously.</p>
@@ -1231,7 +1250,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-high-change-rate-drift-2yr</span>
           <span class="sname">High change-rate adversarial: 40% daily delta over 2 years</span>
-          <span class="meta">730d · 88ms</span>
+          <span class="meta">730d · 84ms</span>
         </summary>
         <div class="body">
           <p class="desc">Stress scenario with extreme daily churn (40%) to catch storage or pruning behavior that appears stable at 5% but fails under heavy write amplification.</p>
@@ -1258,7 +1277,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-short-retention-drift-3yr</span>
           <span class="sname">Short retention adversarial: retention=3 over 3 years</span>
-          <span class="meta">1095d · 96ms</span>
+          <span class="meta">1095d · 95ms</span>
         </summary>
         <div class="body">
           <p class="desc">Very short retention with GFS enabled to stress frequent chain sealing/deletion. Ensures cleanup remains stable and restore points do not accumulate over long duration.</p>
@@ -1285,7 +1304,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-policy-change-mid-run</span>
           <span class="sname">Mid-run policy change: retention 7 → 30 on day 180</span>
-          <span class="meta">365d · 63ms</span>
+          <span class="meta">365d · 70ms</span>
         </summary>
         <div class="body">
           <p class="desc">Retention is expanded from 7 to 30 restore points partway through a 365-day run. Validates that the engine correctly grows the active chain toward the new limit, that old chains are not orphaned, and that GFS cardinality stays within limits throughout the transition.</p>
@@ -1312,7 +1331,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-gfs-only-policy</span>
           <span class="sname">GFS-only policy: weekly=52 with minimal daily retention</span>
-          <span class="meta">730d · 214ms</span>
+          <span class="meta">730d · 247ms</span>
         </summary>
         <div class="body">
           <p class="desc">Stress test where daily retention is set to 1 (near-zero daily RPs) while weekly GFS keeps 52 weeks. After 2 years the engine should hold exactly 52 weekly GFS snapshots and no more. Validates GFS dominance over retention-based pruning.</p>
@@ -1339,7 +1358,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-two-jobs-one-repo</span>
           <span class="sname">Two jobs sharing one repository</span>
-          <span class="meta">400d · 119ms</span>
+          <span class="meta">400d · 78ms</span>
         </summary>
         <div class="body">
           <p class="desc">Two independent backup jobs (different retention and GFS policies) write to the same DAS repository. Validates that chains do not cross-contaminate between jobs, each job maintains its own global base, and storage accounts for both jobs. Checks that inactive chain drift stays bounded across both job lifecycles.</p>
@@ -1366,7 +1385,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-das-long-horizon-wmy-growth-4yr</span>
           <span class="sname">DAS long-horizon W+M+Y with growth (4 years)</span>
-          <span class="meta">1460d · 207ms</span>
+          <span class="meta">1460d · 223ms</span>
         </summary>
         <div class="body">
           <p class="desc">Adversarial long-run DAS scenario targeting previously high-drift W+M+Y combinations under steady growth. Focus is lifecycle/cardinality stability and long-run accumulation bounds rather than calculator fit.</p>
@@ -1393,7 +1412,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">ix-sobr-copymove-archive-growth-5yr</span>
           <span class="sname">SOBR copy+move archive growth stress (5 years)</span>
-          <span class="meta">1825d · 2089ms</span>
+          <span class="meta">1825d · 2166ms</span>
         </summary>
         <div class="body">
           <p class="desc">Long-horizon SOBR copy+move scenario with archive enabled and annual growth. Targets tier sequencing, offload/prune ordering, and GFS cap stability in the exact policy family that showed large parity drift.</p>
@@ -1420,9 +1439,9 @@
       <header>
         <h3>Layer 4 — Oracle Diff</h3>
         <div class="layer-badges">
-          <span class="badge pass">8 PASS</span>
+          <span class="badge pass">7 PASS</span>
           <span class="badge skip">0 SKIP</span>
-          <span class="badge fail">0 FAIL</span>
+          <span class="badge fail">1 FAIL</span>
         </div>
       </header>
       <p>Full structural oracle: exact GFS cardinality, tier residency per point, GEN state machine, chain phase transitions.</p>
@@ -1431,7 +1450,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">od-weekly-gfs-cardinality-exact</span>
           <span class="sname">Oracle diff: weekly GFS cardinality exact on every Saturday</span>
-          <span class="meta">100d · 8ms</span>
+          <span class="meta">100d · 7ms</span>
         </summary>
         <div class="body">
           <p class="desc">Every Saturday the weekly GFS count must equal min(weeks elapsed since start, gfsPolicy.weekly). Validated by oracle that computes expected count from dates, not from engine state.</p>
@@ -1512,7 +1531,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">od-gen-lifecycle-states</span>
           <span class="sname">Oracle diff: GEN lifecycle state per day matches expected dates</span>
-          <span class="meta">100d · 30ms</span>
+          <span class="meta">100d · 29ms</span>
         </summary>
         <div class="body">
           <p class="desc">Oracle computes expected GEN state (Pending/WaitImmutability/Deletable) based on deleteOn and immutableUntil dates. Diffs against getCurrentGenerations() output each day.</p>
@@ -1539,7 +1558,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">od-chain-phase-transitions</span>
           <span class="sname">Oracle diff: chain phase transitions match expected schedule</span>
-          <span class="meta">80d · 18ms</span>
+          <span class="meta">80d · 17ms</span>
         </summary>
         <div class="body">
           <p class="desc">Oracle predicts chain phase per day: Active, Inactive, OffloadPending, OffloadComplete, PerfPruned, Deleted. Diffs against actual chain and restore-point state each day.</p>
@@ -1566,7 +1585,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">od-sobr-copy-full-lifecycle</span>
           <span class="sname">Oracle diff: SOBR copy-only full lifecycle trace</span>
-          <span class="meta">150d · 75ms</span>
+          <span class="meta">150d · 69ms</span>
         </summary>
         <div class="body">
           <p class="desc">Copy mode: every new point immediately gets Capacity copy. Oracle tracks Perf+Cap dual occupancy per point, then Archive entry timing for GFS points, then Capacity residue clearing.</p>
@@ -1593,7 +1612,7 @@
           <span class="status pass">PASS</span>
           <span class="mono sid">od-das-wmy-weekly-size-nonzero</span>
           <span class="sname">Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage</span>
-          <span class="meta">730d · 402ms</span>
+          <span class="meta">730d · 434ms</span>
         </summary>
         <div class="body">
           <p class="desc">Regression guard for bug fix: weekly-only GFS SyntheticFull points in a W+M+Y policy must contribute their incremental footprint (fullSize * changeRate) to used storage, not zero. Also validates GFS cardinality matches calendar expectations. Matches the exact user-reported scenario: 2TB source, 5% change, 10% growth, 14d retention, W4+M8+Y2 DAS.</p>
@@ -1615,12 +1634,12 @@
           
         </div>
       </details>
-<details class="scenario-card" data-status="pass" data-layer="4" data-search="od-calculator-parity-347tb-wmy oracle diff: 347tb w4+m6+y2 storage matches veeam calculator within tolerance r-gfs-01 r-gfs-03 r-stor-01">
+<details class="scenario-card" data-status="fail" data-layer="4" data-search="od-calculator-parity-347tb-wmy oracle diff: 347tb w4+m6+y2 storage matches veeam calculator within tolerance r-gfs-01 r-gfs-03 r-stor-01">
         <summary>
-          <span class="status pass">PASS</span>
+          <span class="status fail">FAIL</span>
           <span class="mono sid">od-calculator-parity-347tb-wmy</span>
           <span class="sname">Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance</span>
-          <span class="meta">1095d · 875ms</span>
+          <span class="meta">1095d · 894ms</span>
         </summary>
         <div class="body">
           <p class="desc">Regression guard for block-absorption GFS model. Reference: 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 on a DAS repository. Model assumes ReFS/XFS block cloning is enabled (GFS points store as compressed diffs via bracket table). Simulator stored = 1,214.5 TB, working space = 55.4 TB, total = 1,269.9 TB. This matches forecast exactly (R-STOR-03) and validates the bracket-table GFS sizing. Note: Veeam Calculator without block cloning shows 2,345.6 TB; full parity requires modeling immutability windows and explicit block-clone logic.</p>
@@ -1639,7 +1658,11 @@
               <div class="row"><strong>Final GFS:</strong> 4/6/2</div>
             </div>
           </div>
-          
+          <div class="fail-box"><strong>1 violation(s)</strong>
+                 <table><thead><tr><th>Day</th><th>Date</th><th>Rule</th><th>Actual</th></tr></thead><tbody><tr>
+        <td>1092</td><td class="mono">2029-04-28</td><td class="mono">R-STOR-03</td><td>simulator = 1214.500 TB (delta -52.050 TB)</td>
+      </tr></tbody></table>
+               </div>
         </div>
       </details>
     </section>
