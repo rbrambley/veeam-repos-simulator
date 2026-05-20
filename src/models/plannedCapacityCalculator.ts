@@ -63,7 +63,7 @@ export function computeSimulatorPlanned(
 ): PlannedResult {
   const effectiveMoveEnabled = config.moveEnabled || !config.copyEnabled;
   const resolvedJobType = config.jobType ?? 'ForwardIncremental';
-  const fullIntervalDays = (resolvedJobType === 'SyntheticFull' || resolvedJobType === 'ForwardIncremental') ? 7 : config.retention;
+  const fullIntervalDays = resolvedJobType === 'ForwardIncremental' ? 7 : config.retention;
   const generationPeriodDays = Math.max(1, config.generationPeriodDays ?? 10);
   const performanceImmutabilityDays = Math.max(0, config.performanceImmutabilityDays ?? 7);
   const capacityImmutabilityDays = Math.max(0, config.capacityImmutabilityDays ?? 0);

@@ -40,8 +40,6 @@ export interface SOBRConfig {
 
 export type BackupJobType =
   | 'ForwardIncremental'
-
-  | 'SyntheticFull'
   | 'ActiveFull';
 
 export interface BackupJob {

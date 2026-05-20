@@ -528,7 +528,7 @@ export class VeeamSimulator {
           this.tagGFSRestorePoint(job, rp, currentDate, actions);
           actions.push(`Job '${job.name}' created a GFS SyntheticFull restore point (${rp.sizeGB.toFixed(3)} TB) in Chain ${rp.chainId}.`);
         } else if (
-          (job.type === 'SyntheticFull' || job.type === 'ForwardIncremental') &&
+          job.type === 'ForwardIncremental' &&
           this.isSyntheticFullDay(job, currentDate)
         ) {
           // Scheduled SyntheticFull day reached — close current chain and start a new one

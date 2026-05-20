@@ -109,7 +109,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const peakSourceTB = sourceDataTB * Math.pow(1 + annualGrowthRate / 100, forecastYears);
   const fullSizeTB = peakSourceTB * 0.5;               // ~50% compression ratio
   const incrSizeTB = peakSourceTB * (dailyChangeRate / 100) * 0.5;
-  const fullIntervalDays = (jobType === 'SyntheticFull' || jobType === 'ForwardIncremental') ? 7 : retention;
+  const fullIntervalDays = jobType === 'ForwardIncremental' ? 7 : retention;
   const gfsForecastStats = computeGfsStatsAtYear(Math.max(0, forecastYears));
 
   const estimateTierChainDataTB = (windowDays: number) => {
@@ -321,8 +321,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                 <label>
                   Type:
                   <select value={jobType} onChange={e => setJobType(e.target.value as BackupJobType)}>
-                    <option value="ForwardIncremental">Forward Incremental</option>
-                    <option value="SyntheticFull">Synthetic Full</option>
+                    <option value="ForwardIncremental">Forward Incr w/ Synth Full</option>
                     <option value="ActiveFull">Active Full</option>
                   </select>
                 </label>

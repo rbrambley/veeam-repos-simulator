@@ -160,7 +160,7 @@ function buildInitialState(sc: LifecycleScenario): SimulationState {
   const job: BackupJob = {
     id: jobId,
     name: `Job-${sc.id}`,
-    type: 'SyntheticFull',
+    type: 'ForwardIncremental',
     repositoryId: repoId,
     sourceDataTB: cfg.sourceDataTB,
     dailyChangeRatePct: cfg.dailyChangeRatePct,
@@ -179,7 +179,7 @@ function buildInitialState(sc: LifecycleScenario): SimulationState {
   const extraJobObjects: BackupJob[] = (sc.extraJobs ?? []).map((ej, idx) => ({
     id: `job${idx + 2}-${sc.id}`,
     name: `Job${idx + 2}-${sc.id}`,
-    type: 'SyntheticFull',
+    type: 'ForwardIncremental',
     repositoryId: repoId,
     sourceDataTB: ej.sourceDataTB,
     dailyChangeRatePct: ej.dailyChangeRatePct,
