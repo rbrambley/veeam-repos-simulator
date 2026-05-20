@@ -157,11 +157,12 @@ Phase 4: Planned Next Steps (priority order)
    - Display each job's chains and restore points grouped/labeled in the inventory table.
    - Storage usage should aggregate across all jobs per repository.
 
-5. Visual chain timeline
-   - Horizontal bar chart: one row per backup chain.
-   - Each restore point plotted as a colored marker on its date.
-   - Types color-coded (Full=blue, Incremental=green, SyntheticFull=purple, GFSFull=red).
-   - Makes the chain lifecycle and GFS tagging visually intuitive.
+5. ~~Visual chain timeline~~ **Completed**
+   - SVG horizontal bar chart with one row per backup chain, implemented in `src/components/ChainTimeline.tsx`.
+   - Restore points plotted as shaped markers (diamonds for Fulls/SyntheticFulls, circles for Incrementals).
+   - Types color-coded (Full=blue, Incremental=green, SyntheticFull=purple; GFS: Yearly=red, Monthly=purple, Weekly=blue).
+   - SOBR tier bands (Performance/Capacity/Archive) shown as background strips.
+   - Hover tooltips, immutability segments, and generation snapshot overlays included.
 
 6. SOBR (Scale-Out Backup Repository) simulation
    - SOBR tiering is implemented and requires continued hardening/expansion.
