@@ -1,5 +1,13 @@
-// Simulation engine for Veeam Backup Simulator
-// This module will handle day-by-day simulation of backup jobs, chains, retention, and storage usage.
+// Simulation engine for Veeam Backup Simulator.
+//
+// Canonical model reference: docs/canonical-model-spec.md
+// This engine enforces the following invariants at runtime:
+// 1) Retention model consistency (single global base per job when points exist)
+// 2) GFS cardinality/tag consistency (W/M/Y limits, tag/type constraints)
+// 3) Generation lifecycle consistency (window/deleteOn/immutability ordering)
+// 4) Working-space remains external to lifecycle mutations (documented in spec)
+// 5) SOBR residency semantics by mode (move single-tier, copy multi-tier allowed)
+// 6) Calculator parity boundaries remain external validation (testing layer)
 
 import { SimulationState, BackupJob, Repository, BackupChain, RestorePoint, BlockObject, SOBRTier, BackupGeneration } from '../models/veeam.ts';
 import { computeGfsStoredContributionTB } from '../models/gfsSizing.ts';
@@ -39,6 +47,133 @@ export function CalculateGfsSize(baseSize: number, dailyChangeRate: number, ageI
 
 export class VeeamSimulator {
   state: SimulationState;
+
+  private assertCanonicalInvariant(condition: boolean, message: string) {
+    if (!condition) {
+      throw new Error(`[CANONICAL_INVARIANT] ${message}`);
+    }
+  }
+
+  public assertCanonicalInvariants(context = 'runtime') {
+    this.ensureGenerationState();
+
+    for (const job of this.state.jobs) {
+      const repo = this.state.repositories.find(r => r.id === job.repositoryId);
+      const jobPoints = this.state.restorePoints.filter(rp => {
+        const chain = this.state.chains.find(c => c.id === rp.chainId);
+        return (!!chain && chain.jobId === job.id)
+          || (rp.chainId === `gfs-${job.id}` && rp.id.startsWith(`${job.id}-`));
+      });
+
+      // Invariant 1: one global base per job whenever full/synthetic points exist.
+      const fullLikePoints = jobPoints.filter(rp => rp.type === 'Full' || rp.type === 'SyntheticFull');
+      if (fullLikePoints.length > 0) {
+        const globalBaseCount = jobPoints.filter(rp => !!rp.isGlobalBase).length;
+        this.assertCanonicalInvariant(
+          globalBaseCount === 1,
+          `${context}: job ${job.id} must have exactly one global base (found ${globalBaseCount})`
+        );
+      }
+
+      // Invariant 2: GFS tags must only exist on Full/SyntheticFull and stay within W/M/Y limits.
+      const taggedPoints = jobPoints.filter(rp => !!rp.isWeeklyGFS || !!rp.isMonthlyGFS || !!rp.isYearlyGFS);
+      for (const rp of taggedPoints) {
+        this.assertCanonicalInvariant(
+          rp.type === 'Full' || rp.type === 'SyntheticFull',
+          `${context}: GFS-tagged point ${rp.id} has invalid type ${rp.type}`
+        );
+        this.assertCanonicalInvariant(
+          !!rp.isGFS,
+          `${context}: GFS-tagged point ${rp.id} must set isGFS=true`
+        );
+      }
+
+      if (job.gfsPolicy) {
+        const weeklyCount = jobPoints.filter(rp => !!rp.isWeeklyGFS).length;
+        const monthlyCount = jobPoints.filter(rp => !!rp.isMonthlyGFS).length;
+        const yearlyCount = jobPoints.filter(rp => !!rp.isYearlyGFS).length;
+
+        this.assertCanonicalInvariant(
+          weeklyCount <= (job.gfsPolicy.weekly ?? 0),
+          `${context}: job ${job.id} weekly GFS count ${weeklyCount} exceeds limit ${job.gfsPolicy.weekly ?? 0}`
+        );
+        this.assertCanonicalInvariant(
+          monthlyCount <= (job.gfsPolicy.monthly ?? 0),
+          `${context}: job ${job.id} monthly GFS count ${monthlyCount} exceeds limit ${job.gfsPolicy.monthly ?? 0}`
+        );
+        this.assertCanonicalInvariant(
+          yearlyCount <= (job.gfsPolicy.yearly ?? 0),
+          `${context}: job ${job.id} yearly GFS count ${yearlyCount} exceeds limit ${job.gfsPolicy.yearly ?? 0}`
+        );
+      }
+
+      // Invariant 5: SOBR tier residency semantics differ by copy/move mode.
+      if (repo?.type === 'SOBR' && repo.sobrConfig) {
+        const copyEnabled = this.isCopyEnabled(repo.sobrConfig);
+        const moveEnabled = this.isMoveEnabled(repo.sobrConfig);
+
+        for (const rp of jobPoints) {
+          const hasArch = this.hasTierData(rp, 'Archive');
+
+          if (hasArch) {
+            this.assertCanonicalInvariant(
+              repo.sobrConfig.hasArchiveTier,
+              `${context}: point ${rp.id} has archive data but archive tier is disabled`
+            );
+          }
+        }
+      }
+    }
+
+    // Invariant 3: generation windows/deleteOn/immutability ordering must be monotonic.
+    for (const gen of this.state.generations || []) {
+      const job = this.state.jobs.find(j => j.id === gen.jobId);
+      if (!job) continue;
+
+      this.assertCanonicalInvariant(
+        this.parseISODate(gen.windowStartDate).getTime() <= this.parseISODate(gen.windowEndDate).getTime(),
+        `${context}: generation ${gen.id} has windowStartDate after windowEndDate`
+      );
+
+      const retentionDays = Math.max(1, job.retention?.slaDays || job.retention?.restorePoints || 7);
+      const baselineDeleteOn = this.addDaysISO(gen.windowEndDate, retentionDays);
+      this.assertCanonicalInvariant(
+        this.parseISODate(gen.deleteOn).getTime() >= this.parseISODate(baselineDeleteOn).getTime(),
+        `${context}: generation ${gen.id} deleteOn ${gen.deleteOn} is earlier than baseline ${baselineDeleteOn}`
+      );
+
+      if (gen.performanceEnteredAt && gen.performanceImmutableUntil) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.performanceImmutableUntil).getTime() >= this.parseISODate(gen.performanceEnteredAt).getTime(),
+          `${context}: generation ${gen.id} performanceImmutableUntil precedes performanceEnteredAt`
+        );
+      }
+      if (gen.capacityEnteredAt && gen.capacityImmutableUntil) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.capacityImmutableUntil).getTime() >= this.parseISODate(gen.capacityEnteredAt).getTime(),
+          `${context}: generation ${gen.id} capacityImmutableUntil precedes capacityEnteredAt`
+        );
+      }
+      if (gen.archiveEnteredAt && gen.archiveImmutableUntil) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.archiveImmutableUntil).getTime() >= this.parseISODate(gen.archiveEnteredAt).getTime(),
+          `${context}: generation ${gen.id} archiveImmutableUntil precedes archiveEnteredAt`
+        );
+      }
+      if (gen.performanceEnteredAt && gen.capacityEnteredAt) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.performanceEnteredAt).getTime() <= this.parseISODate(gen.capacityEnteredAt).getTime(),
+          `${context}: generation ${gen.id} entered Capacity before Performance`
+        );
+      }
+      if (gen.capacityEnteredAt && gen.archiveEnteredAt) {
+        this.assertCanonicalInvariant(
+          this.parseISODate(gen.capacityEnteredAt).getTime() <= this.parseISODate(gen.archiveEnteredAt).getTime(),
+          `${context}: generation ${gen.id} entered Archive before Capacity`
+        );
+      }
+    }
+  }
 
   private setRestorePointSize(rp: RestorePoint, sizeTB: number) {
     rp.sizeGB = sizeTB;
@@ -96,9 +231,7 @@ export class VeeamSimulator {
       if (tier === 'Performance') return Math.max(0, repo?.immutabilityDays ?? 0);
       return 0;
     }
-    // Current model defaults Performance to block storage (ReFS/XFS), so GEN immutability
-    // gates only apply to object tiers.
-    if (tier === 'Performance') return 0;
+    if (tier === 'Performance') return Math.max(0, cfg.performanceImmutabilityDays ?? 0);
     if (tier === 'Capacity') return Math.max(0, cfg.capacityImmutabilityDays ?? 0);
     return Math.max(0, cfg.archiveImmutabilityDays ?? 0);
   }
@@ -109,7 +242,7 @@ export class VeeamSimulator {
     return this.state.generations!.find(g => g.id === rp.generationId);
   }
 
-  private registerPointInGeneration(job: BackupJob, chain: BackupChain, rp: RestorePoint) {
+  private registerPointInGeneration(job: BackupJob, chain: BackupChain | undefined, rp: RestorePoint, generationAnchorDateIso?: string) {
     const repo = this.state.repositories.find(r => r.id === job.repositoryId);
     if (!this.usesGenerationLifecycle(repo)) {
       return;
@@ -117,13 +250,14 @@ export class VeeamSimulator {
 
     this.ensureGenerationState();
     const periodDays = this.getGenerationPeriodDays(repo);
+    const anchorDate = generationAnchorDateIso || rp.date;
     const elapsedDays = this.state.startDate
-      ? Math.floor((this.parseISODate(rp.date).getTime() - this.parseISODate(this.state.startDate).getTime()) / 86400000)
+      ? Math.floor((this.parseISODate(anchorDate).getTime() - this.parseISODate(this.state.startDate).getTime()) / 86400000)
       : 0;
     const windowIndex = Math.max(0, Math.floor(elapsedDays / periodDays));
     const windowStart = this.state.startDate
       ? this.addDaysISO(this.state.startDate, windowIndex * periodDays)
-      : rp.date;
+      : anchorDate;
     const windowEnd = this.addDaysISO(windowStart, periodDays - 1);
     const generationId = `gen-${job.id}-${windowStart}`;
 
@@ -141,7 +275,7 @@ export class VeeamSimulator {
       this.state.generations!.push(generation);
     }
 
-    generation.chainId = chain.id;
+    generation.chainId = chain?.id || rp.chainId;
     rp.generationId = generation.id;
     if (!generation.pointIds.includes(rp.id)) {
       generation.pointIds.push(rp.id);
@@ -179,30 +313,36 @@ export class VeeamSimulator {
       .map(id => this.state.restorePoints.find(rp => rp.id === id))
       .filter((rp): rp is RestorePoint => !!rp);
 
+    // Base deletion: generation.windowEndDate + retention SLA/cardinality
     const retentionDays = Math.max(1, job.retention?.slaDays || job.retention?.restorePoints || 7);
     let deleteOn = this.addDaysISO(generation.windowEndDate, retentionDays);
 
-    for (const rp of points) {
-      if (rp.isWeeklyGFS && (job.gfsPolicy?.weekly ?? 0) > 0) {
-        const candidate = this.addDaysISO(rp.date, job.gfsPolicy!.weekly * 7);
-        if (this.parseISODate(candidate) > this.parseISODate(deleteOn)) deleteOn = candidate;
-      }
-      if (rp.isMonthlyGFS && (job.gfsPolicy?.monthly ?? 0) > 0) {
-        const candidate = this.addDaysISO(rp.date, job.gfsPolicy!.monthly * 30);
-        if (this.parseISODate(candidate) > this.parseISODate(deleteOn)) deleteOn = candidate;
-      }
-      if (rp.isYearlyGFS && (job.gfsPolicy?.yearly ?? 0) > 0) {
-        const candidate = this.addDaysISO(rp.date, job.gfsPolicy!.yearly * 365);
-        if (this.parseISODate(candidate) > this.parseISODate(deleteOn)) deleteOn = candidate;
+    // Cardinality-driven extension: while any point in the generation still carries
+    // an active GFS tag, keep deleteOn rolling one day ahead. Once cardinality logic
+    // removes all tags, deleteOn falls back to baseline retention immediately.
+    const hasActiveGfsProtection = points.some(rp => !!rp.isWeeklyGFS || !!rp.isMonthlyGFS || !!rp.isYearlyGFS);
+    if (hasActiveGfsProtection) {
+      const rollingCandidate = this.addDaysISO(this.state.date, 1);
+      if (this.parseISODate(rollingCandidate) > this.parseISODate(deleteOn)) {
+        deleteOn = rollingCandidate;
       }
     }
 
     generation.deleteOn = deleteOn;
   }
 
-  private generationPerformanceImmutableExpired(generation: BackupGeneration, currentDate: Date): boolean {
-    if (!generation.performanceImmutableUntil) return true;
-    return currentDate.getTime() >= this.parseISODate(generation.performanceImmutableUntil).getTime();
+  private performancePointImmutabilityExpired(point: RestorePoint, repo: Repository | undefined, currentDate: Date): boolean {
+    const days = Math.max(0, repo?.sobrConfig?.performanceImmutabilityDays ?? 0);
+    if (days <= 0) return true;
+    const anchor = point.date;
+    const immutableUntil = this.addDaysISO(anchor, days);
+    return currentDate.getTime() >= this.parseISODate(immutableUntil).getTime();
+  }
+
+  private primaryPointImmutabilityExpired(pointDateIso: string, immutabilityDays: number, currentDate: Date): boolean {
+    if (immutabilityDays <= 0) return true;
+    const lockUntil = this.addDaysISO(pointDateIso, immutabilityDays);
+    return currentDate.getTime() >= this.parseISODate(lockUntil).getTime();
   }
 
   private generationDeletionUnlocked(generation: BackupGeneration, chainPoints: RestorePoint[], currentDate: Date): boolean {
@@ -284,19 +424,31 @@ export class VeeamSimulator {
   }
 
   private getRestorePointSizeInTier(rp: RestorePoint, tier: SOBRTier): number {
-    if (rp.isGFS) {
+    // The bracket table applies to:
+    //   1. Detached GFS points (chainId === `gfs-<jobId>`) — long-term storage orphans.
+    //   2. In-chain monthly/yearly GFS points — the Veeam Calculator sizes these via
+    //      the period-slice bracket table even while still inside the retention window.
+    //      Weekly-only in-chain GFS points fall through to normal chain sizing.
+    const isDetachedGfs = rp.isGFS && rp.chainId.startsWith('gfs-');
+    const isMonthlyOrYearlyGfs = rp.isGFS && (rp.isMonthlyGFS || rp.isYearlyGFS);
+    if (isDetachedGfs || isMonthlyOrYearlyGfs) {
       const job = this.getJobForRestorePoint(rp);
       if (!job) return rp.sizeGB;
 
-      const fullSizeAtPointTB = this.getExpectedFullSizeTB(job, rp.date);
+      const currentDate = this.parseISODate(this.state.date);
+      const pointDate = this.parseISODate(rp.date);
+      const ageDays = Math.round(
+        (currentDate.getTime() - pointDate.getTime()) / 86400000
+      );
+      // Veeam Calculator bracket table uses raw source size (no dedup factor).
+      const pointElapsedDays = (pointDate.getTime() - this.parseISODate(this.state.startDate ?? rp.date).getTime()) / 86400000;
+      const annualGrowth = (job.annualGrowthRatePct ?? 10) / 100;
+      const fullSizeAtPointTB = (job.sourceDataTB || 1) * Math.pow(1 + annualGrowth, Math.max(0, pointElapsedDays) / 365);
       const changeRate = (job.dailyChangeRatePct ?? 5) / 100;
       return computeGfsStoredContributionTB({
         pointSizeTB: fullSizeAtPointTB,
         dailyChangeRate: changeRate,
-        hasWeekly: !!rp.isWeeklyGFS,
-        hasMonthly: !!rp.isMonthlyGFS,
-        hasYearly: !!rp.isYearlyGFS,
-        weeklyPolicyCount: job.gfsPolicy?.weekly ?? 0,
+        ageDays,
       });
     }
     if (rp.type !== 'SyntheticFull') return rp.sizeGB;
@@ -335,6 +487,7 @@ export class VeeamSimulator {
     if (actions.length > 0) {
       this.lastDailyExplanation = actions.join(' ');
     }
+    this.assertCanonicalInvariants('constructor');
   }
 
   // Advance simulation by one day
@@ -413,6 +566,7 @@ export class VeeamSimulator {
 
     // Save daily explanation after all daily activity (including SOBR moves)
     this.lastDailyExplanation = actions.join(' ');
+    this.assertCanonicalInvariants(`nextDay:${this.state.date}`);
   }
   // GFS tagging: applies W/M/Y tags to Full or SyntheticFull points (type is never changed)
   tagGFSRestorePoint(job: BackupJob, rp: RestorePoint, date: Date, actions: string[]) {
@@ -484,8 +638,6 @@ export class VeeamSimulator {
         if (!chain) continue;
         const job = jobs.find(j => j.id === chain.jobId);
         if (!job) continue;
-        const chainGenerations = (this.state.generations || []).filter(g => g.chainId === chain.id);
-
         const newlyCopiedToday: RestorePoint[] = [];
         for (const rp of points) {
           if (!rp.sobrTier) rp.sobrTier = 'Performance';
@@ -521,18 +673,12 @@ export class VeeamSimulator {
             const newestPointDate = this.parseISODate(newestPointDateIso);
             const newestPointAgeDays = (currentDate.getTime() - newestPointDate.getTime()) / (1000 * 60 * 60 * 24);
 
-            const perfGenerationIds = new Set(
-              perfPoints
-                .map(p => p.generationId)
-                .filter((id): id is string => !!id)
-            );
+            const immutableBlockedPoint = perfPoints.find(p => !this.performancePointImmutabilityExpired(p, repo, currentDate));
 
-            const immutableBlockedGeneration = chainGenerations.find(g =>
-              perfGenerationIds.has(g.id) && !this.generationPerformanceImmutableExpired(g, currentDate)
-            );
-
-            if (newestPointAgeDays >= cfg.offloadAfterDays && !immutableBlockedGeneration) {
+            if (newestPointAgeDays >= cfg.offloadAfterDays && !immutableBlockedPoint) {
               for (const rp of perfPoints) {
+                rp.baseTiers = (rp.baseTiers || []).filter(t => t !== 'Performance');
+                rp.hasPerformanceData = false;
                 if (!rp.hasCapacityData) {
                   rp.hasCapacityData = true;
                   rp.capacityCopyCreatedAt = currentDateIso;
@@ -547,6 +693,12 @@ export class VeeamSimulator {
                 const gen = this.getGenerationForPoint(rp);
                 if (gen) {
                   this.markGenerationTierEntered(gen, 'Capacity', currentDateIso, repo);
+                } else {
+                  this.registerPointInGeneration(job, chain, rp, currentDateIso);
+                  const createdGen = this.getGenerationForPoint(rp);
+                  if (createdGen) {
+                    this.markGenerationTierEntered(createdGen, 'Capacity', currentDateIso, repo);
+                  }
                 }
               }
               chain.offloadComplete = true;
@@ -556,8 +708,9 @@ export class VeeamSimulator {
                   ? `Inactive chain ${chain.id} offload completed to Capacity (${perfPoints.length} points; Capacity copy reused).`
                   : `Inactive chain ${chain.id} offloaded in full Performance -> Capacity (${perfPoints.length} points uploaded).`
               );
-            } else if (immutableBlockedGeneration) {
-              actions.push(`Inactive chain ${chain.id} offload deferred: GEN ${immutableBlockedGeneration.id} is still immutable on Performance.`);
+            } else if (immutableBlockedPoint) {
+              const immutableUntil = this.addDaysISO(immutableBlockedPoint.date, Math.max(0, cfg.performanceImmutabilityDays ?? 0));
+              actions.push(`Inactive chain ${chain.id} offload deferred: point ${immutableBlockedPoint.id} is still immutable on Performance until ${immutableUntil}.`);
             }
           }
         }
@@ -630,6 +783,13 @@ export class VeeamSimulator {
           if (rp.capacityCopyCreatedAt === undefined) {
             rp.hasCapacityData = true;
             rp.capacityCopyCreatedAt = currentDateIso;
+            if (!rp.generationId) {
+              this.registerPointInGeneration(job, undefined, rp, currentDateIso);
+            }
+            const gen = this.getGenerationForPoint(rp);
+            if (gen) {
+              this.markGenerationTierEntered(gen, 'Capacity', currentDateIso, repo);
+            }
             actions.push(`GFS point ${rp.id} copied to Capacity tier (Copy mode).`);
           } else if (rp.capacityCopyCreatedAt === currentDateIso) {
             actions.push(`GFS point ${rp.id} copied to Capacity tier (Copy mode).`);
@@ -656,6 +816,12 @@ export class VeeamSimulator {
             const gen = this.getGenerationForPoint(rp);
             if (gen) {
               this.markGenerationTierEntered(gen, 'Capacity', currentDateIso, repo);
+            } else {
+              this.registerPointInGeneration(job, undefined, rp, currentDateIso);
+              const createdGen = this.getGenerationForPoint(rp);
+              if (createdGen) {
+                this.markGenerationTierEntered(createdGen, 'Capacity', currentDateIso, repo);
+              }
             }
             actions.push(`GFS point ${rp.id} offloaded Performance -> Capacity (${ageDays.toFixed(0)} days old).`);
           }
@@ -948,8 +1114,6 @@ export class VeeamSimulator {
       isTierSeed: false,
     };
 
-    this.registerPointInGeneration(job, chain, rp);
-
     chain.restorePoints.push(rp);
     this.state.restorePoints.push(rp);
     // Stamp initial SOBR tier if this repo is a SOBR
@@ -977,9 +1141,13 @@ export class VeeamSimulator {
       }
 
       const gen = this.getGenerationForPoint(rp);
-      if (gen) {
-        if (copyEnabled) {
-          this.markGenerationTierEntered(gen, 'Capacity', rp.date, repo);
+      if (copyEnabled) {
+        if (!gen) {
+          this.registerPointInGeneration(job, chain, rp, rp.date);
+        }
+        const genAfterCreate = this.getGenerationForPoint(rp);
+        if (genAfterCreate) {
+          this.markGenerationTierEntered(genAfterCreate, 'Capacity', rp.date, repo);
         }
       }
     }
@@ -1019,6 +1187,12 @@ export class VeeamSimulator {
       const repo = this.state.repositories.find(r => r.id === job.repositoryId);
       const isSOBRMoveMode = repo?.type === 'SOBR' && !!repo.sobrConfig && this.isMoveEnabled(repo.sobrConfig);
 
+      // Enforce GFS cardinality first so generation deleteOn is derived from active tags,
+      // not from stale over-limit tags that will be removed on this day.
+      if (job.gfsPolicy) {
+        this.validateGFSCardinality(job, actions);
+      }
+
       for (const generation of (this.state.generations || []).filter(g => g.jobId === job.id)) {
         this.recomputeGenerationDeleteOn(job, generation);
       }
@@ -1055,7 +1229,9 @@ export class VeeamSimulator {
 
         if (isSOBRMoveMode) {
           if (!chain.performancePrunedAt) {
-            const performanceUnlock = chainGenerations.every(g => this.generationPerformanceImmutableExpired(g, currentDate));
+            const performanceUnlock = chain.restorePoints
+              .filter(rp => this.hasTierData(rp, 'Performance'))
+              .every(rp => this.performancePointImmutabilityExpired(rp, repo, currentDate));
             if (chain.offloadComplete && countExpired && newerChainExists && performanceUnlock) {
               let prunedCount = 0;
               for (const rp of chain.restorePoints) {
@@ -1083,11 +1259,30 @@ export class VeeamSimulator {
 
         if (!countExpired || !slaExpired) continue;
 
+        if (repo?.type !== 'SOBR') {
+          const primaryImmutabilityDays = Math.max(0, repo?.immutabilityDays ?? 0);
+          if (primaryImmutabilityDays > 0) {
+            const lockedPoint = jobRestorePoints.find(rp =>
+              !this.primaryPointImmutabilityExpired(rp.date, primaryImmutabilityDays, currentDate)
+            );
+            if (lockedPoint) {
+              actions.push(
+                `Chain ${chain.id} deletion deferred: point ${lockedPoint.id} is primary-immutable until ${this.addDaysISO(lockedPoint.date, primaryImmutabilityDays)}.`
+              );
+              continue;
+            }
+          }
+        }
+
         const generationGate = chainGenerations.length === 0
           ? true
           : chainGenerations.every(gen => this.generationDeletionUnlocked(gen, chain.restorePoints, currentDate));
 
         if (!generationGate) {
+          const blockedGen = chainGenerations.find(gen => !this.generationDeletionUnlocked(gen, chain.restorePoints, currentDate));
+          if (blockedGen) {
+            actions.push(`Chain ${chain.id} deletion deferred: GEN ${blockedGen.id} is still gated by DeleteOn/immutability.`);
+          }
           continue;
         }
 
@@ -1118,49 +1313,82 @@ export class VeeamSimulator {
         this.state.chains = this.state.chains.filter(c => c.id !== chain.id);
       }
 
-      // GFS retention: enforce max W/M/Y counts per job
-      if (job.gfsPolicy) {
-        this.applyGFSRetention(job, actions);
-      }
     }
     return actions;
   }
 
-  // Delete oldest GFS-tagged points that exceed the configured W/M/Y limits
-  applyGFSRetention(job: BackupJob, actions: string[]) {
+  /**
+   * CANONICAL INVARIANT #2: GFS Cardinality Protection
+   * 
+   * Validates that the GFS policy cardinality is preserved:
+   * - Exactly N weekly GFS points are retained (or fewer if job is young)
+   * - Exactly M monthly GFS points are retained (or fewer if job is young)
+   * - Exactly Y yearly GFS points are retained (or fewer if job is young)
+   * 
+   * GFS points are identified by isWeeklyGFS, isMonthlyGFS, isYearlyGFS flags.
+   * Cardinality enforcement removes the OLDEST tagged points when limits are exceeded.
+   * 
+   * This is distinct from retention-based deletion (handled by applyRetentionAndGFS).
+   * GFS cardinality is independent of chain status (active/inactive).
+   */
+  validateGFSCardinality(job: BackupJob, actions: string[]) {
     if (!job.gfsPolicy) return;
 
-    const deleteOldestGFS = (
-      flag: 'isWeeklyGFS' | 'isMonthlyGFS' | 'isYearlyGFS',
-      label: string,
-      maxKeep: number
-    ) => {
-      if (!maxKeep) return;
-      // All restore points (including detached GFS orphans) tagged with this flag for this job
-      const tagged = this.state.restorePoints
+    // Count current tagged GFS points per category across ALL chains and detached GFS orphans
+    const getTaggedPoints = (flag: 'isWeeklyGFS' | 'isMonthlyGFS' | 'isYearlyGFS') => {
+      return this.state.restorePoints
         .filter(rp => rp[flag] && (
-          // still in a chain belonging to this job, or a detached GFS orphan for this job
+          // Still in an active chain for this job
           this.state.chains.find(c => c.id === rp.chainId && c.jobId === job.id) ||
+          // Or a detached GFS orphan for this job
           (rp.chainId === `gfs-${job.id}` && rp.id.startsWith(`${job.id}-`))
         ))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // newest first
-      const excess = tagged.slice(maxKeep);
-      for (const rp of excess) {
-        actions.push(`${label} GFS point on ${rp.date} untagged (exceeds ${maxKeep} ${label.toLowerCase()} GFS limit).`);
-        // Clear this flag; if no GFS flags remain, clear isGFS.
-        // Point deletion is GEN-gated and handled by chain retention.
-        rp[flag] = false;
-        if (!rp.isWeeklyGFS && !rp.isMonthlyGFS && !rp.isYearlyGFS) {
+    };
+
+    // Enforce weekly GFS cardinality
+    if (job.gfsPolicy.weekly > 0) {
+      const weeklyPoints = getTaggedPoints('isWeeklyGFS');
+      const excessWeekly = weeklyPoints.slice(job.gfsPolicy.weekly);
+      for (const rp of excessWeekly) {
+        actions.push(`Weekly GFS point on ${rp.date} untagged (exceeds ${job.gfsPolicy.weekly} weekly GFS limit).`);
+        rp.isWeeklyGFS = false;
+        // Clear isGFS if no tags remain
+        if (!rp.isMonthlyGFS && !rp.isYearlyGFS) {
           rp.isGFS = false;
         }
       }
-    };
+    }
 
-    deleteOldestGFS('isWeeklyGFS', 'Weekly', job.gfsPolicy.weekly);
-    deleteOldestGFS('isMonthlyGFS', 'Monthly', job.gfsPolicy.monthly);
-    deleteOldestGFS('isYearlyGFS', 'Yearly', job.gfsPolicy.yearly);
+    // Enforce monthly GFS cardinality
+    if (job.gfsPolicy.monthly > 0) {
+      const monthlyPoints = getTaggedPoints('isMonthlyGFS');
+      const excessMonthly = monthlyPoints.slice(job.gfsPolicy.monthly);
+      for (const rp of excessMonthly) {
+        actions.push(`Monthly GFS point on ${rp.date} untagged (exceeds ${job.gfsPolicy.monthly} monthly GFS limit).`);
+        rp.isMonthlyGFS = false;
+        // Clear isGFS if no tags remain
+        if (!rp.isWeeklyGFS && !rp.isYearlyGFS) {
+          rp.isGFS = false;
+        }
+      }
+    }
 
-    // Detached points that no longer carry any GFS tag are no longer protected.
+    // Enforce yearly GFS cardinality
+    if (job.gfsPolicy.yearly > 0) {
+      const yearlyPoints = getTaggedPoints('isYearlyGFS');
+      const excessYearly = yearlyPoints.slice(job.gfsPolicy.yearly);
+      for (const rp of excessYearly) {
+        actions.push(`Yearly GFS point on ${rp.date} untagged (exceeds ${job.gfsPolicy.yearly} yearly GFS limit).`);
+        rp.isYearlyGFS = false;
+        // Clear isGFS if no tags remain
+        if (!rp.isWeeklyGFS && !rp.isMonthlyGFS) {
+          rp.isGFS = false;
+        }
+      }
+    }
+
+    // Clean up detached GFS orphans that no longer carry any GFS tag
     const detachedWithoutGfs = this.state.restorePoints.filter(rp =>
       rp.chainId === `gfs-${job.id}` &&
       !rp.isWeeklyGFS &&
@@ -1174,6 +1402,16 @@ export class VeeamSimulator {
       }
       actions.push(`Detached GFS point ${rp.id} deleted after all GFS tags expired.`);
     }
+  }
+
+  /**
+   * @deprecated Use validateGFSCardinality() instead.
+   * This method is kept for compatibility but behavior is now in validateGFSCardinality().
+   */
+  applyGFSRetention(job: BackupJob, actions: string[]) {
+    // Deprecated: This method now delegates to validateGFSCardinality().
+    // Kept for backward compatibility and to avoid breaking existing code references.
+    this.validateGFSCardinality(job, actions);
   }
 
   // Promote oldest full in each chain to be the chain base, and adjust sizing accordingly
@@ -1205,7 +1443,9 @@ export class VeeamSimulator {
       // Clear global base for all job points, then assign only one global base.
       for (const rp of jobPoints) {
         rp.isGlobalBase = false;
-        if (rp.type === 'SyntheticFull' && !rp.isGFS) {
+        // Skip resizing SyntheticFulls that are tier bases — their full size was set by
+        // promoteTierBase and must not be clobbered back to incremental size.
+        if (rp.type === 'SyntheticFull' && !rp.isGFS && !(rp.baseTiers && rp.baseTiers.length > 0)) {
           const pointDate = this.parseISODate(rp.date);
           const elapsedDays = this.state.startDate
             ? (pointDate.getTime() - this.parseISODate(this.state.startDate).getTime()) / (1000 * 60 * 60 * 24)
@@ -1323,8 +1563,7 @@ export class VeeamSimulator {
       const hasCapacityData = points.some(p => this.hasTierData(p, 'Capacity'));
       const hasArchiveData = points.some(p => this.hasTierData(p, 'Archive'));
 
-      // Current model: only object tiers participate in GEN lifecycle visibility.
-      if (!hasCapacityData && !hasArchiveData) {
+      if (!hasPerformanceData && !hasCapacityData && !hasArchiveData) {
         return null;
       }
 

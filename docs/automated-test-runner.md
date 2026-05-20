@@ -350,32 +350,68 @@ Typical next steps:
 - The runner validates checkpoint flow, final restore-point counts, and key global invariants.
 - It is a regression safety net; keep scenario expectations aligned with intended engine behavior.
 
-## Global Invariant Checklist
+## Pre-Commit Validation Checklist
 
-The simulator behavior model depends on these invariants. Keep them stable across all features.
+**Before committing code changes, verify these invariants and consistency checks to prevent drift.**
 
-1. Single base full per job
+### Core Engine Invariants
+
+1. **Single base full per job**
 	- At most one restore point per job can have base status on any simulation day.
+	- Validate: `npm run test:quality` checks per-day base uniqueness.
 
-2. Base identity is global to the job storage set
+2. **Base identity is global to the job storage set**
 	- The base is the oldest Full or SyntheticFull across all chains for a job.
 	- Active/inactive chain status does not change this identity rule.
+	- Validate: Final base count equals exactly one, and matches oldest full.
 
-3. SyntheticFull sizing normalization
+3. **SyntheticFull sizing normalization**
 	- Base SyntheticFull is full-sized.
 	- Non-base SyntheticFull is incremental-sized.
+	- Validate: `npm run test:quality` checks non-base synthetic sizing.
 
-4. Retention SLA minimum guarantee
+4. **Retention SLA minimum guarantee**
 	- Inactive chains are deleted only when both count window and SLA window are expired.
+
+### UI Consistency Checks (Manual Validation)
+
+**After `npm run test:quality` passes, run the simulator locally and verify:**
+
+5. **Immutability status consistency across UI surfaces**
+	- Run a scenario with GEN config (e.g., `ti-das-3yr-gfs-wmy`).
+	- Check immutability badge in: Catalog table, Tier Contents cards, ChainTimeline, Selected RP Info.
+	- Expected: All surfaces show identical immutability status (Protected/Mutable/N/A).
+	- **Why:** Missing immutability in one surface masks incorrect data flow; silent data integrity bug.
+
+6. **Tier membership accuracy after moves**
+	- Run SOBR move-only offload scenario (e.g., `ti-sobr-move-3yr`).
+	- After offload, verify moved RPs appear **only** in Capacity section, not duplicated in Performance.
+	- Expected: RPs appear in exactly one tier section, matching `sobrTier` value.
+	- **Why:** Historical flags (`hasXData`) vs. current location (`sobrTier`) confusion causes data to appear in wrong sections.
+
+7. **Terminology consistency and clarity**
+	- GEN state labels: Sealed, Immutability Hold, Ready (not: Locked, Unlocked, DeleteOn Pending, Waiting Immutability, Deletable).
+	- Immutability labels: Protected, Mutable, N/A (not: Locked, Unlocked).
+	- Summary badges: S/H/R (not: L/W/D).
+	- Expected: No ambiguous terms used for multiple concepts.
+	- **Why:** "Locked" used for both GEN state and immutability caused confusion; similar terms in UI mask distinct concepts.
+
+8. **Layout compactness and no unnecessary columns**
+	- Catalog table: 9 columns (ID, Created, Type, Role, Chain State, Immutability, Represents, Current Tier, Size). No GEN-specific columns.
+	- Tier Contents cards: Pre-generation RPs = 3 lines; Generation-assigned RPs = 4 lines (with GEN metadata line).
+	- Expected: No extra columns added for temporary debugging; no visual clutter from repeated information.
+	- **Why:** Creeping GEN columns to Catalog breaks layout design and duplicates info already in Tier Contents cards.
 
 ## Current Automated Assertions
 
-The runner currently checks:
+The runner currently checks (items 1–4 of the Pre-Commit checklist):
 
 - Per-day base uniqueness (fails if a job has more than one base on any day)
 - Final restore point count per scenario
 - Final base count equals exactly one
 - Final base identity equals oldest Full/SyntheticFull across all chains
 - Non-base SyntheticFull incremental-size behavior
+
+**Manual checks (items 5–8) are not automated.** Run the simulator locally to verify immutability consistency, tier membership accuracy, terminology clarity, and layout compactness after any change affecting UI output or tier membership logic.
 
 If you add new global behaviors, extend `src/testing/scenarioRunner.ts` with direct assertions before relying on scenario counts alone.

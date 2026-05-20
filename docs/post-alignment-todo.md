@@ -1,8 +1,8 @@
 # Post-Alignment TODO
 
-Last updated: 2026-05-06
+Last updated: 2026-05-17
 
-This list tracks follow-up work after achieving calculator baseline parity (compare:veeam 70/0).
+This list tracks follow-up work after achieving calculator baseline parity (compare:veeam 73/0).
 
 ## 1) Add Explicit Year 1 and Year 2 Calculator Baselines
 

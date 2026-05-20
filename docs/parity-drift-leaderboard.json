@@ -1,0 +1,810 @@
+{
+  "generatedAt": "2026-05-17T12:54:52.810Z",
+  "baseline": "veeam-calculator-baseline",
+  "gfsSizingMode": "reverse",
+  "scenarioCount": 73,
+  "topScenariosByMaxAbsDeltaPct": [
+    {
+      "id": "ix-retention-variant-r7",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 1.131,
+      "maxAbsDeltaPct": 5,
+      "worstMetric": {
+        "label": "Planned Capacity Tier",
+        "actualTB": 0.95,
+        "expectedTB": 1,
+        "deltaTB": -0.05,
+        "deltaPct": 5
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.425,
+          "expectedTB": 1.4,
+          "deltaTB": 0.025,
+          "deltaPct": 1.7857
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 0.95,
+          "expectedTB": 1,
+          "deltaTB": -0.05,
+          "deltaPct": 5
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 0.8,
+          "expectedTB": 0.8,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "das-gfs",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 1.2422,
+      "maxAbsDeltaPct": 4.8186,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 1.5229,
+        "expectedTB": 1.6,
+        "deltaTB": -0.0771,
+        "deltaPct": 4.8186
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 1.5229,
+          "expectedTB": 1.6,
+          "deltaTB": -0.0771,
+          "deltaPct": 4.8186
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.6655,
+          "expectedTB": 0.6655,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.0333,
+          "expectedTB": 0.0333,
+          "deltaTB": 0,
+          "deltaPct": 0.0751
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.0333,
+          "expectedTB": 0.0333,
+          "deltaTB": 0,
+          "deltaPct": 0.0751
+        }
+      ]
+    },
+    {
+      "id": "sobr-copyonly-archive-gating",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 0.9337,
+      "maxAbsDeltaPct": 4.811,
+      "worstMetric": {
+        "label": "Planned Performance Tier",
+        "actualTB": 1.523,
+        "expectedTB": 1.6,
+        "deltaTB": -0.077,
+        "deltaPct": 4.811
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.523,
+          "expectedTB": 1.6,
+          "deltaTB": -0.077,
+          "deltaPct": 4.811
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 1.9964,
+          "expectedTB": 2,
+          "deltaTB": -0.0036,
+          "deltaPct": 0.1776
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 0.4635,
+          "expectedTB": 0,
+          "deltaTB": 0.4635,
+          "deltaPct": 0.4635
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.6655,
+          "expectedTB": 0.6655,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.0333,
+          "expectedTB": 0.0333,
+          "deltaTB": 0,
+          "deltaPct": 0.0751
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.0333,
+          "expectedTB": 0.0333,
+          "deltaTB": 0,
+          "deltaPct": 0.0751
+        }
+      ]
+    },
+    {
+      "id": "ti-sobr-copy-3yr",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 1.9574,
+      "maxAbsDeltaPct": 4.4245,
+      "worstMetric": {
+        "label": "Planned Performance Tier",
+        "actualTB": 1.5664,
+        "expectedTB": 1.5,
+        "deltaTB": 0.0664,
+        "deltaPct": 4.4245
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.5664,
+          "expectedTB": 1.5,
+          "deltaTB": 0.0664,
+          "deltaPct": 4.4245
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 1.8517,
+          "expectedTB": 1.8,
+          "deltaTB": 0.0517,
+          "deltaPct": 2.8725
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 0.6709,
+          "expectedTB": 0.7,
+          "deltaTB": -0.0291,
+          "deltaPct": 4.1643
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5788,
+          "expectedTB": 0.5788,
+          "deltaTB": 0,
+          "deltaPct": 0.0022
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.0289,
+          "expectedTB": 0.0289,
+          "deltaTB": 0,
+          "deltaPct": 0.1406
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.0289,
+          "expectedTB": 0.0289,
+          "deltaTB": 0,
+          "deltaPct": 0.1406
+        }
+      ]
+    },
+    {
+      "id": "lb-gfs-monthly-boundary",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 1.103,
+      "maxAbsDeltaPct": 4.4118,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 1.625,
+        "expectedTB": 1.7,
+        "deltaTB": -0.075,
+        "deltaPct": 4.4118
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 1.625,
+          "expectedTB": 1.7,
+          "deltaTB": -0.075,
+          "deltaPct": 4.4118
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "das-mixed-2w1m1y-large-r7",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 1.0871,
+      "maxAbsDeltaPct": 4.3483,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 30.3216,
+        "expectedTB": 31.7,
+        "deltaTB": -1.3784,
+        "deltaPct": 4.3483
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 30.3216,
+          "expectedTB": 31.7,
+          "deltaTB": -1.3784,
+          "deltaPct": 4.3483
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 6.66,
+          "expectedTB": 6.66,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.666,
+          "expectedTB": 0.666,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.666,
+          "expectedTB": 0.666,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "das-yearly-2-large-r7",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 1.0634,
+      "maxAbsDeltaPct": 4.2536,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 36.4888,
+        "expectedTB": 35,
+        "deltaTB": 1.4888,
+        "deltaPct": 4.2536
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 36.4888,
+          "expectedTB": 35,
+          "deltaTB": 1.4888,
+          "deltaPct": 4.2536
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 6.66,
+          "expectedTB": 6.66,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.666,
+          "expectedTB": 0.666,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.666,
+          "expectedTB": 0.666,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "das-monthly-2-large-r7",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 1.0382,
+      "maxAbsDeltaPct": 4.1527,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 27.1248,
+        "expectedTB": 28.3,
+        "deltaTB": -1.1752,
+        "deltaPct": 4.1527
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 27.1248,
+          "expectedTB": 28.3,
+          "deltaTB": -1.1752,
+          "deltaPct": 4.1527
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 6.66,
+          "expectedTB": 6.66,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.666,
+          "expectedTB": 0.666,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.666,
+          "expectedTB": 0.666,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "ix-gfs-wmy-move-archive",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 1.2092,
+      "maxAbsDeltaPct": 3.8462,
+      "worstMetric": {
+        "label": "Planned Archive Tier",
+        "actualTB": 1.35,
+        "expectedTB": 1.3,
+        "deltaTB": 0.05,
+        "deltaPct": 3.8462
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.4,
+          "expectedTB": 1.4,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 2.275,
+          "expectedTB": 2.2,
+          "deltaTB": 0.075,
+          "deltaPct": 3.4091
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 1.35,
+          "expectedTB": 1.3,
+          "deltaTB": 0.05,
+          "deltaPct": 3.8462
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "ix-retention-variant-r60",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 1.2092,
+      "maxAbsDeltaPct": 3.8462,
+      "worstMetric": {
+        "label": "Planned Archive Tier",
+        "actualTB": 1.35,
+        "expectedTB": 1.3,
+        "deltaTB": 0.05,
+        "deltaPct": 3.8462
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.4,
+          "expectedTB": 1.4,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 2.275,
+          "expectedTB": 2.2,
+          "deltaTB": 0.075,
+          "deltaPct": 3.4091
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 1.35,
+          "expectedTB": 1.3,
+          "deltaTB": 0.05,
+          "deltaPct": 3.8462
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "ix-gfs-only-policy",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 0.9436,
+      "maxAbsDeltaPct": 3.7745,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 5.2925,
+        "expectedTB": 5.1,
+        "deltaTB": 0.1925,
+        "deltaPct": 3.7745
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 5.2925,
+          "expectedTB": 5.1,
+          "deltaTB": 0.1925,
+          "deltaPct": 3.7745
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "lb-das-retention-count",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 0.8929,
+      "maxAbsDeltaPct": 3.5714,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 1.35,
+        "expectedTB": 1.4,
+        "deltaTB": -0.05,
+        "deltaPct": 3.5714
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 1.35,
+          "expectedTB": 1.4,
+          "deltaTB": -0.05,
+          "deltaPct": 3.5714
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "lb-das-sla-overrides-count",
+      "repositoryType": "DAS",
+      "metricCount": 4,
+      "meanAbsDeltaPct": 0.8929,
+      "maxAbsDeltaPct": 3.5714,
+      "worstMetric": {
+        "label": "Planned Capacity",
+        "actualTB": 1.35,
+        "expectedTB": 1.4,
+        "deltaTB": -0.05,
+        "deltaPct": 3.5714
+      },
+      "metrics": [
+        {
+          "label": "Planned Capacity",
+          "actualTB": 1.35,
+          "expectedTB": 1.4,
+          "deltaTB": -0.05,
+          "deltaPct": 3.5714
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "lb-sobr-offload-threshold",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 0.5952,
+      "maxAbsDeltaPct": 3.5714,
+      "worstMetric": {
+        "label": "Planned Performance Tier",
+        "actualTB": 1.35,
+        "expectedTB": 1.4,
+        "deltaTB": -0.05,
+        "deltaPct": 3.5714
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.35,
+          "expectedTB": 1.4,
+          "deltaTB": -0.05,
+          "deltaPct": 3.5714
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 1,
+          "expectedTB": 1,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 0,
+          "expectedTB": 0,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    },
+    {
+      "id": "lb-perf-prune-ordering",
+      "repositoryType": "SOBR",
+      "metricCount": 6,
+      "meanAbsDeltaPct": 0.5952,
+      "maxAbsDeltaPct": 3.5714,
+      "worstMetric": {
+        "label": "Planned Performance Tier",
+        "actualTB": 1.35,
+        "expectedTB": 1.4,
+        "deltaTB": -0.05,
+        "deltaPct": 3.5714
+      },
+      "metrics": [
+        {
+          "label": "Planned Performance Tier",
+          "actualTB": 1.35,
+          "expectedTB": 1.4,
+          "deltaTB": -0.05,
+          "deltaPct": 3.5714
+        },
+        {
+          "label": "Planned Capacity Tier",
+          "actualTB": 1,
+          "expectedTB": 1,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "Planned Archive Tier",
+          "actualTB": 0,
+          "expectedTB": 0,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Full",
+          "actualTB": 0.5,
+          "expectedTB": 0.5,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - Incremental",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        },
+        {
+          "label": "File Type Size - SyntheticFull",
+          "actualTB": 0.025,
+          "expectedTB": 0.025,
+          "deltaTB": 0,
+          "deltaPct": 0
+        }
+      ]
+    }
+  ],
+  "clustersByMeanAbsDeltaPct": [
+    {
+      "cluster": "im",
+      "scenarioCount": 7,
+      "meanAbsDeltaPct": 0.7539,
+      "maxAbsDeltaPct": 3.5714
+    },
+    {
+      "cluster": "sobr",
+      "scenarioCount": 10,
+      "meanAbsDeltaPct": 0.7129,
+      "maxAbsDeltaPct": 4.811
+    },
+    {
+      "cluster": "od",
+      "scenarioCount": 8,
+      "meanAbsDeltaPct": 0.6702,
+      "maxAbsDeltaPct": 3.5714
+    },
+    {
+      "cluster": "das",
+      "scenarioCount": 13,
+      "meanAbsDeltaPct": 0.5424,
+      "maxAbsDeltaPct": 4.8186
+    },
+    {
+      "cluster": "ix",
+      "scenarioCount": 15,
+      "meanAbsDeltaPct": 0.5092,
+      "maxAbsDeltaPct": 5
+    },
+    {
+      "cluster": "ti",
+      "scenarioCount": 8,
+      "meanAbsDeltaPct": 0.5047,
+      "maxAbsDeltaPct": 4.4245
+    },
+    {
+      "cluster": "lb",
+      "scenarioCount": 12,
+      "meanAbsDeltaPct": 0.4567,
+      "maxAbsDeltaPct": 4.4118
+    }
+  ]
+}

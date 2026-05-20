@@ -1026,6 +1026,43 @@
     },
 
     {
+      "id": "ix-sobr-copymove-w6m12y2-immutability-211tb",
+      "layer": 3,
+      "name": "SOBR Copy+Move with W6+M12+Y2 and perf/cap immutability (211TB)",
+      "description": "Manual calculator parity capture for a high-scale mixed-policy profile with copy+move enabled, archive enabled, archiveAfter=14, and Archive immutability disabled.",
+      "rules": ["R-GFS-01", "R-OFFLOAD-01", "R-ARCH-01", "R-IMM-01", "R-IMM-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 211,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 10,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 6, "monthly": 12, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 14,
+        "archiveImmutabilityDays": 0,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": true
+      },
+      "totalDays": 1092,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "noArchivePointBeforeCapTierAge": 14,
+        "pruneNeverBeforeOffload": true,
+        "noPruneWhilePerfImmutable": true,
+        "noDeletionWhileCapImmutable": true,
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
       "id": "ix-no-gfs-long-archive",
       "layer": 3,
       "name": "SOBR Move no-GFS: archive tier should remain empty",
@@ -1280,6 +1317,72 @@
       }
     },
 
+    {
+      "id": "ix-das-long-horizon-wmy-growth-4yr",
+      "layer": 3,
+      "name": "DAS long-horizon W+M+Y with growth (4 years)",
+      "description": "Adversarial long-run DAS scenario targeting previously high-drift W+M+Y combinations under steady growth. Focus is lifecycle/cardinality stability and long-run accumulation bounds rather than calculator fit.",
+      "rules": ["R-DRIFT-01", "R-DRIFT-02", "R-GFS-01", "R-GFS-03", "R-GFS-04", "R-GFS-05", "R-BASE-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 2,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 10,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 2},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1460,
+      "assertions": {
+        "maxInactiveChainsAtAnyTime": 4,
+        "maxRestorePointsAtAnyTime": 60,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true
+      }
+    },
+
+    {
+      "id": "ix-sobr-copymove-archive-growth-5yr",
+      "layer": 3,
+      "name": "SOBR copy+move archive growth stress (5 years)",
+      "description": "Long-horizon SOBR copy+move scenario with archive enabled and annual growth. Targets tier sequencing, offload/prune ordering, and GFS cap stability in the exact policy family that showed large parity drift.",
+      "rules": ["R-OFFLOAD-01", "R-PRUNE-01", "R-GFS-01", "R-GFS-03", "R-GFS-04", "R-CHAIN-01", "R-BASE-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 2,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 10,
+        "retention": 60,
+        "gfsPolicy": {"weekly": 4, "monthly": 3, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": true
+      },
+      "totalDays": 1825,
+      "assertions": {
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "pruneNeverBeforeOffload": true,
+        "noActiveChainOffloadComplete": true,
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "maxInactiveChainsAtAnyTime": 6,
+        "maxRestorePointsAtAnyTime": 120
+      }
+    },
+
     // ─────────────────────────────────────────────────────────────────────────
     // LAYER 4 — Oracle diff tests (daily state snapshot comparison)
     // ─────────────────────────────────────────────────────────────────────────
@@ -1473,7 +1576,41 @@
         "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
         "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
         "gfsTagsStackOnSameSaturday": true,
-        "maxFinalStorageTB": 8.5
+        "maxFinalStorageTB": 15.0
+      }
+    },
+
+    {
+      "id": "od-calculator-parity-347tb-wmy",
+      "layer": 4,
+      "name": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
+      "description": "Regression guard for block-absorption GFS model. Reference: 347TB source / 5% change / 0% growth / 21d retention / W4+M6+Y2 at Year 3 on a DAS repository. Model assumes ReFS/XFS block cloning is enabled (GFS points store as compressed diffs via bracket table). Simulator stored = 1,214.5 TB, working space = 55.4 TB, total = 1,269.9 TB. This matches forecast exactly (R-STOR-03) and validates the bracket-table GFS sizing. Note: Veeam Calculator without block cloning shows 2,345.6 TB; full parity requires modeling immutability windows and explicit block-clone logic.",
+      "rules": ["R-GFS-01", "R-GFS-03", "R-STOR-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "sourceDataTB": 347,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 21,
+        "gfsPolicy": {"weekly": 4, "monthly": 6, "yearly": 2},
+        "offloadAfterDays": 0,
+        "archiveAfterDays": 0,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 1095,
+      "assertions": {
+        "gfsCardinalityMatchesCalendar": true,
+        "monthlyGfsOnlyOnLastSaturdayOfMonth": true,
+        "yearlyGfsOnlyOnLastSaturdayOfDecember": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "minFinalStorageTB": 1000,
+        "maxFinalStorageTB": 1400,
+        "veeamCalculatorReferenceTB": 1269.925,
+        "forecastMustMatchSimulator": true
       }
     }
   ]

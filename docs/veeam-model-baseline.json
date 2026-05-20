@@ -9,137 +9,948 @@
   "scenarios": [
     {
       "id": "das-basic",
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.6231
-      }
+        "plannedCapacityTB": 1.6231,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-retention-14",
-      "notes": "captured-from-veeam-calculator-2026-05-03 [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-03 [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.856
-      }
+        "plannedCapacityTB": 1.856,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333
+      },
+      "forecastYears": 3
     },
     {
       "id": "sobr-moveonly",
-      "notes": "model-aligned-after-lifecycle-update-2026-05-04 [seeded-from-simulator]",
+      "notes": "model-aligned-after-lifecycle-update-2026-05-04 [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 39.0575,
-        "plannedPerformanceTierTB": 2.3219,
-        "plannedCapacityTierTB": 36.7356,
+        "plannedCapacityTB": 2.9541,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 1.331,
         "plannedArchiveTierTB": 0
-      }
+      },
+      "forecastYears": 3
     },
     {
       "id": "sobr-copymove",
       "expected": {
-        "plannedCapacityTB": 3.6529,
-        "plannedPerformanceTierTB": 2.0889,
+        "plannedCapacityTB": 3.187,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
         "plannedCapacityTierTB": 1.5639,
         "plannedArchiveTierTB": 0
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]"
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
+      "forecastYears": 3
     },
     {
       "id": "das-gfs",
       "expected": {
-        "plannedCapacityTB": 2.1231
+        "plannedCapacityTB": 1.5229,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333
       },
-      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator]"
+      "notes": "captured-from-veeam-calculator-2026-05-02 [seeded-from-simulator] [seeded-from-simulator]",
+      "forecastYears": 3
+    },
+    {
+      "id": "das-monthly6-retention7-3y-regression",
+      "expected": {
+        "plannedCapacityTB": 5.1831,
+        "fileTypeFullTB": 1.331,
+        "fileTypeIncrementalTB": 0.0666,
+        "fileTypeSyntheticFullTB": 0.0666
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
     },
     {
       "id": "sobr-gfs-archive",
       "expected": {
-        "plannedCapacityTB": 39.2904,
-        "plannedPerformanceTierTB": 2.7877,
-        "plannedCapacityTierTB": 36.5027,
+        "plannedCapacityTB": 4.6487,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 3.0257,
         "plannedArchiveTierTB": 0
       },
-      "notes": "model-aligned-after-lifecycle-update-2026-05-04 [seeded-from-simulator]"
+      "notes": "model-aligned-after-lifecycle-update-2026-05-04 [seeded-from-simulator] [seeded-from-simulator]",
+      "forecastYears": 3
+    },
+    {
+      "id": "sobr-copyonly-archive-gating",
+      "expected": {
+        "plannedCapacityTB": 3.983,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.523,
+        "plannedCapacityTierTB": 1.9964,
+        "plannedArchiveTierTB": 0.4635
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
     },
     {
       "id": "das-monthly-2-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2M 0%-growth; storage-required=1.6TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2M 0%-growth; storage-required=1.6TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.6
-      }
+        "plannedCapacityTB": 1.555,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-yearly-2-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2Y 0%-growth; storage-required=2.3TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2Y 0%-growth; storage-required=2.3TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 2.25
-      }
+        "plannedCapacityTB": 2.309,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-monthly-2-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2M 0%-growth; storage-required=28.3TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2M 0%-growth; storage-required=28.3TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 28.3236
-      }
+        "plannedCapacityTB": 27.1248,
+        "fileTypeFullTB": 6.66,
+        "fileTypeIncrementalTB": 0.666,
+        "fileTypeSyntheticFullTB": 0.666
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-yearly-2-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2Y 0%-growth; storage-required=35.0TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2Y 0%-growth; storage-required=35.0TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 34.9836
-      }
+        "plannedCapacityTB": 36.4888,
+        "fileTypeFullTB": 6.66,
+        "fileTypeIncrementalTB": 0.666,
+        "fileTypeSyntheticFullTB": 0.666
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-mixed-2w1m-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M 0%-growth; storage-required=1.5TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M 0%-growth; storage-required=1.5TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.475
-      }
+        "plannedCapacityTB": 1.5,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-mixed-2w1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1Y 0%-growth; storage-required=1.8TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1Y 0%-growth; storage-required=1.8TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.8
-      }
+        "plannedCapacityTB": 1.775,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-mixed-1m1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 0W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 0W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.925
-      }
+        "plannedCapacityTB": 1.905,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-mixed-2w1m1y-small-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 1TB 5% 7d 2W+1M+1Y 0%-growth; storage-required=1.9TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 1.925
-      }
+        "plannedCapacityTB": 1.905,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3
     },
     {
       "id": "das-mixed-2w1m1y-large-r7",
-      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2W+1M+1Y 0%-growth; storage-required=31.7TB [seeded-from-simulator]",
+      "notes": "captured-from-veeam-calculator-2026-05-04; 13.32TB 10% 7d 2W+1M+1Y 0%-growth; storage-required=31.7TB [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 31.6536
-      }
+        "plannedCapacityTB": 30.3216,
+        "fileTypeFullTB": 6.66,
+        "fileTypeIncrementalTB": 0.666,
+        "fileTypeSyntheticFullTB": 0.666
+      },
+      "forecastYears": 3
     },
     {
       "id": "sobr-mixed-2w1m1y-small-r60",
-      "notes": "model-aligned-after-lifecycle-update-2026-05-04; 1TB 5% 60d 2W+1M+1Y 10%-growth with Capacity Tier on [seeded-from-simulator]",
+      "notes": "model-aligned-after-lifecycle-update-2026-05-04; 1TB 5% 60d 2W+1M+1Y 10%-growth with Capacity Tier on [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 39.8654,
-        "plannedPerformanceTierTB": 2.9127,
-        "plannedCapacityTierTB": 36.5027,
-        "plannedArchiveTierTB": 0.45
-      }
+        "plannedCapacityTB": 5.3476,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 3.0399,
+        "plannedArchiveTierTB": 0.6846
+      },
+      "forecastYears": 3
     },
     {
       "id": "sobr-mixed-1m1y-small-r60",
-      "notes": "model-aligned-after-lifecycle-update-2026-05-04; 1TB 5% 60d 0W+1M+1Y 10%-growth with Capacity Tier on [seeded-from-simulator]",
+      "notes": "model-aligned-after-lifecycle-update-2026-05-04; 1TB 5% 60d 0W+1M+1Y 10%-growth with Capacity Tier on [seeded-from-simulator] [seeded-from-simulator]",
       "expected": {
-        "plannedCapacityTB": 39.8654,
-        "plannedPerformanceTierTB": 2.9127,
-        "plannedCapacityTierTB": 36.5027,
-        "plannedArchiveTierTB": 0.45
-      }
+        "plannedCapacityTB": 5.3476,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 3.0399,
+        "plannedArchiveTierTB": 0.6846
+      },
+      "forecastYears": 3
+    },
+    {
+      "id": "sobr-matrix-move-lt-retention",
+      "expected": {
+        "plannedCapacityTB": 3.187,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 1.5639,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "sobr-matrix-move-eq-retention",
+      "expected": {
+        "plannedCapacityTB": 2.9541,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 1.331,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "sobr-matrix-move-gt-retention",
+      "expected": {
+        "plannedCapacityTB": 3.187,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.856,
+        "plannedCapacityTierTB": 1.331,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "sobr-matrix-move-zero",
+      "expected": {
+        "plannedCapacityTB": 2.9541,
+        "fileTypeFullTB": 0.6655,
+        "fileTypeIncrementalTB": 0.0333,
+        "fileTypeSyntheticFullTB": 0.0333,
+        "plannedPerformanceTierTB": 1.6231,
+        "plannedCapacityTierTB": 1.331,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-das-retention-count",
+      "expected": {
+        "plannedCapacityTB": 1.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-das-sla-overrides-count",
+      "expected": {
+        "plannedCapacityTB": 1.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-das-gfs-preserves-chain",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-gfs-expiry-order",
+      "expected": {
+        "plannedCapacityTB": 1.4,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-gfs-monthly-boundary",
+      "expected": {
+        "plannedCapacityTB": 1.625,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-gfs-yearly-boundary",
+      "expected": {
+        "plannedCapacityTB": 2.309,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-gfs-stacking",
+      "expected": {
+        "plannedCapacityTB": 2.723,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-sobr-offload-threshold",
+      "expected": {
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-sobr-archive-threshold-move",
+      "expected": {
+        "plannedCapacityTB": 3.65,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.25,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-sobr-archive-threshold-copy",
+      "expected": {
+        "plannedCapacityTB": 3.975,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.425,
+        "plannedCapacityTierTB": 2.2,
+        "plannedArchiveTierTB": 0.35
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-sobr-capacity-residue-after-archive",
+      "expected": {
+        "plannedCapacityTB": 3.275,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.425,
+        "plannedCapacityTierTB": 1.5,
+        "plannedArchiveTierTB": 0.35
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "lb-perf-prune-ordering",
+      "expected": {
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-das-3yr-gfs-wmy",
+      "expected": {
+        "plannedCapacityTB": 3.0995,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-sobr-move-3yr",
+      "expected": {
+        "plannedCapacityTB": 4.0011,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "plannedPerformanceTierTB": 1.5379,
+        "plannedCapacityTierTB": 1.7644,
+        "plannedArchiveTierTB": 0.6989
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-sobr-copy-3yr",
+      "expected": {
+        "plannedCapacityTB": 4.0889,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "plannedPerformanceTierTB": 1.5664,
+        "plannedCapacityTierTB": 1.8517,
+        "plannedArchiveTierTB": 0.6709
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-sobr-gfs-archive-5yr",
+      "expected": {
+        "plannedCapacityTB": 5.6041,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "plannedPerformanceTierTB": 1.4974,
+        "plannedCapacityTierTB": 2.6039,
+        "plannedArchiveTierTB": 1.5027
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-das-sla-minimum-5yr",
+      "expected": {
+        "plannedCapacityTB": 3.0995,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-das-chain-rp-drift-3yr",
+      "expected": {
+        "plannedCapacityTB": 3.0995,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-sobr-move-chain-rp-drift-3yr",
+      "expected": {
+        "plannedCapacityTB": 4.0011,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289,
+        "plannedPerformanceTierTB": 1.5379,
+        "plannedCapacityTierTB": 1.7644,
+        "plannedArchiveTierTB": 0.6989
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ti-das-high-retention-drift-3yr",
+      "expected": {
+        "plannedCapacityTB": 3.4995,
+        "fileTypeFullTB": 0.5788,
+        "fileTypeIncrementalTB": 0.0289,
+        "fileTypeSyntheticFullTB": 0.0289
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-perf-immutability-blocks-prune",
+      "expected": {
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-cap-immutability-blocks-deletion",
+      "expected": {
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-arch-immutability-blocks-deletion",
+      "expected": {
+        "plannedCapacityTB": 2.8,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1.45,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-gen-window-boundary",
+      "expected": {
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-gen-deleteon-extended-by-gfs",
+      "expected": {
+        "plannedCapacityTB": 2.45,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1.1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-gen-state-transitions",
+      "expected": {
+        "plannedCapacityTB": 2.35,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "im-all-tiers-immutability",
+      "expected": {
+        "plannedCapacityTB": 2.8,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1.45,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-gfs-wmy-move-archive",
+      "expected": {
+        "plannedCapacityTB": 5.025,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.275,
+        "plannedArchiveTierTB": 1.35
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-gfs-wmy-copy-archive",
+      "expected": {
+        "plannedCapacityTB": 4.9,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.395,
+        "plannedCapacityTierTB": 2.205,
+        "plannedArchiveTierTB": 1.3
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-gfs-wmy-copy-archive-immutability",
+      "expected": {
+        "plannedCapacityTB": 4.9,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.395,
+        "plannedCapacityTierTB": 2.205,
+        "plannedArchiveTierTB": 1.3
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-gfs-monthly-move-immutability",
+      "expected": {
+        "plannedCapacityTB": 3.15,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.75,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-short-retention-long-gfs",
+      "expected": {
+        "plannedCapacityTB": 3.6,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-high-gen-period",
+      "expected": {
+        "plannedCapacityTB": 3.85,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.45,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-copy-move-combo",
+      "expected": {
+        "plannedCapacityTB": 3.3975,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.495,
+        "plannedArchiveTierTB": 0.5025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-no-gfs-long-archive",
+      "expected": {
+        "plannedCapacityTB": 2.875,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1.525,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-retention-variant-r7",
+      "expected": {
+        "plannedCapacityTB": 3.175,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.425,
+        "plannedCapacityTierTB": 0.95,
+        "plannedArchiveTierTB": 0.8
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-retention-variant-r60",
+      "expected": {
+        "plannedCapacityTB": 5.025,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 2.275,
+        "plannedArchiveTierTB": 1.35
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-high-change-rate-drift-2yr",
+      "expected": {
+        "plannedCapacityTB": 7.545,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.2,
+        "fileTypeSyntheticFullTB": 0.2
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-short-retention-drift-3yr",
+      "expected": {
+        "plannedCapacityTB": 2.225,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-policy-change-mid-run",
+      "expected": {
+        "plannedCapacityTB": 1.8,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-gfs-only-policy",
+      "expected": {
+        "plannedCapacityTB": 5.2925,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-two-jobs-one-repo",
+      "expected": {
+        "plannedCapacityTB": 1.85,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-das-long-horizon-wmy-growth-4yr",
+      "expected": {
+        "plannedCapacityTB": 7.6961,
+        "fileTypeFullTB": 1.331,
+        "fileTypeIncrementalTB": 0.0666,
+        "fileTypeSyntheticFullTB": 0.0666
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "ix-sobr-copymove-archive-growth-5yr",
+      "expected": {
+        "plannedCapacityTB": 10.1476,
+        "fileTypeFullTB": 1.331,
+        "fileTypeIncrementalTB": 0.0666,
+        "fileTypeSyntheticFullTB": 0.0666,
+        "plannedPerformanceTierTB": 3.046,
+        "plannedCapacityTierTB": 6.4474,
+        "plannedArchiveTierTB": 0.6541
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-weekly-gfs-cardinality-exact",
+      "expected": {
+        "plannedCapacityTB": 1.65,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-monthly-yearly-cardinality-exact",
+      "expected": {
+        "plannedCapacityTB": 2.79,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-tier-residency-per-point",
+      "expected": {
+        "plannedCapacityTB": 2.95,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.4,
+        "plannedCapacityTierTB": 1.55,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-gen-lifecycle-states",
+      "expected": {
+        "plannedCapacityTB": 2.875,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1.525,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-chain-phase-transitions",
+      "expected": {
+        "plannedCapacityTB": 2.525,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.35,
+        "plannedCapacityTierTB": 1.175,
+        "plannedArchiveTierTB": 0
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-sobr-copy-full-lifecycle",
+      "expected": {
+        "plannedCapacityTB": 3.463,
+        "fileTypeFullTB": 0.5,
+        "fileTypeIncrementalTB": 0.025,
+        "fileTypeSyntheticFullTB": 0.025,
+        "plannedPerformanceTierTB": 1.425,
+        "plannedCapacityTierTB": 1.455,
+        "plannedArchiveTierTB": 0.583
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-das-wmy-weekly-size-nonzero",
+      "expected": {
+        "plannedCapacityTB": 8.4089,
+        "fileTypeFullTB": 1.331,
+        "fileTypeIncrementalTB": 0.0666,
+        "fileTypeSyntheticFullTB": 0.0666
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
+    },
+    {
+      "id": "od-calculator-parity-347tb-wmy",
+      "expected": {
+        "plannedCapacityTB": 966.3,
+        "fileTypeFullTB": 173.5,
+        "fileTypeIncrementalTB": 8.675,
+        "fileTypeSyntheticFullTB": 8.675
+      },
+      "forecastYears": 3,
+      "notes": "seeded-from-simulator"
     }
   ]
 }

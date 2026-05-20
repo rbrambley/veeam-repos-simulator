@@ -1,30 +1,16 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { computeForecastGfsStatsAtYear, GfsSizingMode } from '../models/gfsSizing.js';
-import { computeVeeamWorkingSpaceTB } from '../models/veeam.js';
+import { GfsSizingMode } from '../models/gfsSizing.js';
+import {
+  computeSimulatorPlanned,
+  ScenarioConfig,
+  PlannedResult,
+  VEEAM_COMPENSATION,
+} from '../models/plannedCapacityCalculator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-interface ScenarioConfig {
-  repositoryType: 'DAS' | 'SOBR';
-  jobType?: string;
-  sourceDataTB: number;
-  annualGrowthRatePct: number;
-  dailyChangeRatePct: number;
-  retention: number;
-  gfsPolicy: { weekly: number; monthly: number; yearly: number };
-  offloadAfterDays: number;
-  archiveAfterDays: number;
-  generationPeriodDays?: number;
-  performanceImmutabilityDays?: number;
-  capacityImmutabilityDays?: number;
-  archiveImmutabilityDays?: number;
-  hasArchiveTier: boolean;
-  copyEnabled: boolean;
-  moveEnabled: boolean;
-}
 
 interface TestScenario {
   id: string;
@@ -53,7 +39,9 @@ interface BaselineExpected {
 interface BaselineScenario {
   id: string;
   notes?: string;
+  startDate?: string;
   forecastYears?: number;
+  fileTypeForecastYears?: number;
   workingSpacePct?: number;
   expected: BaselineExpected;
 }
@@ -69,270 +57,12 @@ interface BaselineFile {
   scenarios: BaselineScenario[];
 }
 
-interface PlannedResult {
-  plannedCapacityTB: number;
-  plannedPerformanceTierTB: number;
-  plannedCapacityTierTB: number;
-  plannedArchiveTierTB: number;
-  fileTypeFullTB: number;
-  fileTypeIncrementalTB: number;
-  fileTypeSyntheticFullTB: number;
+interface TestScenarioFile {
+  scenarios: TestScenario[];
 }
 
-function computeSimulatorPlanned(config: ScenarioConfig, startDate: string, forecastYears: number, gfsSizingMode: GfsSizingMode, totalDays?: number): PlannedResult {
-  const effectiveMoveEnabled = config.moveEnabled || !config.copyEnabled;
-  const resolvedJobType = config.jobType ?? 'ForwardIncremental';
-  const fullIntervalDays = (resolvedJobType === 'SyntheticFull' || resolvedJobType === 'ForwardIncremental') ? 7 : config.retention;
-  const generationPeriodDays = Math.max(1, config.generationPeriodDays ?? 10);
-  const performanceImmutabilityDays = Math.max(0, config.performanceImmutabilityDays ?? 7);
-
-  const computeMoveLifecycleWindows = (retentionDays: number, offloadDays: number) => {
-    const moveGateDays = offloadDays + performanceImmutabilityDays;
-    const generationAlignedGateDays = Math.ceil(moveGateDays / generationPeriodDays) * generationPeriodDays;
-    // Move-only performance tier should hold only the active pre-move interval.
-    // If offload starts after retention, the calculator keeps a full retention chain in Perf.
-    const performanceWindowDays = offloadDays > retentionDays
-      ? retentionDays
-      : Math.max(1, Math.min(generationAlignedGateDays, fullIntervalDays));
-    // Capacity tier is the bounded intermediate residency window before archive/expiry.
-    const capacityWindowDays = Math.max(fullIntervalDays, retentionDays - offloadDays + fullIntervalDays);
-    return {
-      performanceWindowDays,
-      capacityWindowDays,
-    };
-  };
-
-  const yearSourceTB = config.sourceDataTB * Math.pow(1 + config.annualGrowthRatePct / 100, forecastYears);
-  const yearFullSizeTB = yearSourceTB * 0.5;
-  const yearIncrSizeTB = yearSourceTB * (config.dailyChangeRatePct / 100) * 0.5;
-  const effectiveYearIncrSizeTB = yearIncrSizeTB * (config.dailyChangeRatePct > 20 ? 1.2 : 1);
-  const yearWorkingSpaceReserveTB = computeVeeamWorkingSpaceTB(config.sourceDataTB);
-  const yearGfsStats = computeForecastGfsStatsAtYear({
-    sourceDataTB: config.sourceDataTB,
-    annualGrowthRatePct: config.annualGrowthRatePct,
-    dailyChangeRatePct: config.dailyChangeRatePct,
-    retentionDays: config.retention,
-    gfsPolicy: config.gfsPolicy,
-    startDate,
-    yearOffset: forecastYears,
-    copyEnabled: config.copyEnabled,
-    effectiveMoveEnabled,
-    offloadAfterDays: config.offloadAfterDays,
-    archiveAfterDays: config.archiveAfterDays,
-    hasArchiveTier: config.hasArchiveTier,
-    sizingMode: gfsSizingMode,
-  });
-
-  const estimateTierChainDataForYearTB = (windowDays: number) => {
-    if (windowDays <= 0) return 0;
-    const chainsInWindow = Math.max(1, Math.ceil(windowDays / Math.max(1, fullIntervalDays)));
-    // Synthetic fulls are incremental-sized on DAS/ReFS. The base full persists
-    // until the next chain completes, adding one extra chain interval.
-    const effectiveDays = (chainsInWindow + 1) * fullIntervalDays - 1;
-    return yearFullSizeTB + effectiveDays * effectiveYearIncrSizeTB;
-  };
-
-  const yearActiveChainTB = estimateTierChainDataForYearTB(config.retention);
-  const hasMonthlyOrYearlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0 || (config.gfsPolicy?.yearly ?? 0) > 0;
-  const hasAnyGfs = (config.gfsPolicy?.weekly ?? 0) > 0 || hasMonthlyOrYearlyGfs;
-
-  if (config.repositoryType !== 'SOBR') {
-    const longHorizonDasGfsCal = hasMonthlyOrYearlyGfs && (totalDays ?? (forecastYears * 365)) >= 700 ? 0.88 : 1;
-    const yearRepoUsedTB = yearActiveChainTB + (yearGfsStats.additionalFullTB * longHorizonDasGfsCal);
-    return {
-      plannedCapacityTB: yearRepoUsedTB + yearWorkingSpaceReserveTB,
-      plannedPerformanceTierTB: 0,
-      plannedCapacityTierTB: 0,
-      plannedArchiveTierTB: 0,
-      fileTypeFullTB: yearFullSizeTB,
-      fileTypeIncrementalTB: yearIncrSizeTB,
-      fileTypeSyntheticFullTB: yearIncrSizeTB,
-    };
-  }
-
-  let yearPerfUsedTB = 0;
-  let yearCapUsedTB = 0;
-  let yearArchUsedTB = 0;
-
-  if (config.copyEnabled && effectiveMoveEnabled) {
-    // Copy+Move with archive behaves like a short performance residency window.
-    // The calculator's performance tier tracks recent active-chain footprint,
-    // while Capacity/Archive hold the longer-lived copies.
-    const perfWindowDays = config.hasArchiveTier ? fullIntervalDays : config.retention;
-    yearPerfUsedTB = estimateTierChainDataForYearTB(perfWindowDays) + yearGfsStats.additionalPerfFullTB;
-    const capWindowDays = Math.max(fullIntervalDays, config.retention - config.offloadAfterDays + fullIntervalDays);
-    yearCapUsedTB = estimateTierChainDataForYearTB(capWindowDays) + yearGfsStats.additionalCapFullTB;
-    if (config.hasArchiveTier) {
-      yearArchUsedTB = yearGfsStats.additionalArchFullTB;
-    }
-  } else if (config.copyEnabled) {
-    const hasMonthlyOrYearlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0 || (config.gfsPolicy?.yearly ?? 0) > 0;
-    if (config.hasArchiveTier) {
-      const perfWindowDays = fullIntervalDays;
-      const capWindowDays = Math.max(fullIntervalDays, config.retention - config.offloadAfterDays + fullIntervalDays);
-      yearPerfUsedTB = estimateTierChainDataForYearTB(perfWindowDays) + yearGfsStats.additionalPerfFullTB;
-      yearCapUsedTB = hasMonthlyOrYearlyGfs
-        ? estimateTierChainDataForYearTB(capWindowDays) + yearGfsStats.additionalCapFullTB
-        : yearActiveChainTB + yearGfsStats.additionalCapFullTB;
-    } else {
-      yearPerfUsedTB = yearActiveChainTB + yearGfsStats.additionalPerfFullTB;
-      yearCapUsedTB = yearActiveChainTB + yearGfsStats.additionalCapFullTB;
-    }
-    if (config.hasArchiveTier) {
-      yearArchUsedTB = yearGfsStats.additionalArchFullTB;
-    }
-  } else {
-    const windows = computeMoveLifecycleWindows(config.retention, config.offloadAfterDays);
-    if (config.hasArchiveTier && hasMonthlyOrYearlyGfs) {
-      // Move-only + archive behaves like rolling horizons: perf keeps recent window,
-      // capacity keeps the intermediate pre-archive window, archive stores long-tail.
-      const perfWindowDays = fullIntervalDays;
-      const capWindowDays = Math.max(fullIntervalDays, config.retention - config.offloadAfterDays + fullIntervalDays);
-      yearPerfUsedTB = estimateTierChainDataForYearTB(perfWindowDays) + yearGfsStats.additionalPerfFullTB;
-      yearCapUsedTB = estimateTierChainDataForYearTB(capWindowDays) + yearGfsStats.additionalCapFullTB;
-      // Small calibration aligns archive-tier rounding with live calculator captures
-      // for move-only mixed monthly/yearly GFS archive scenarios.
-      const horizonDays = totalDays ?? (forecastYears * 365);
-      const archiveCal = config.annualGrowthRatePct > 0 && horizonDays >= 1825 ? 1.2 : 1.1;
-      yearArchUsedTB = yearGfsStats.additionalArchFullTB * archiveCal;
-    } else {
-      yearPerfUsedTB = estimateTierChainDataForYearTB(windows.performanceWindowDays) + yearGfsStats.additionalPerfFullTB;
-      const isWeeklyOnlyArchiveMove = config.hasArchiveTier
-        && !config.copyEnabled
-        && (config.gfsPolicy?.weekly ?? 0) > 0
-        && (config.gfsPolicy?.monthly ?? 0) === 0
-        && (config.gfsPolicy?.yearly ?? 0) === 0;
-      const moveCapWindowDays = (!hasAnyGfs || isWeeklyOnlyArchiveMove) ? config.retention : windows.capacityWindowDays;
-      yearCapUsedTB = estimateTierChainDataForYearTB(moveCapWindowDays) + yearGfsStats.additionalCapFullTB;
-    }
-  }
-
-  const horizonDays = totalDays ?? (forecastYears * 365);
-
-  // Long-horizon SOBR W+M (no yearly) under growth needs slight cap/perf balancing
-  // to match calculator 3-year drift captures.
-  const isLongHorizonSobrWM = config.repositoryType === 'SOBR'
-    && config.hasArchiveTier
-    && (config.gfsPolicy?.weekly ?? 0) > 0
-    && (config.gfsPolicy?.monthly ?? 0) > 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0
-    && config.annualGrowthRatePct > 0
-    && horizonDays >= 1000;
-  if (isLongHorizonSobrWM) {
-    const capBoostTB = yearFullSizeTB * 0.16;
-    yearCapUsedTB += capBoostTB;
-    if (!config.copyEnabled) {
-      yearPerfUsedTB = Math.max(0, yearPerfUsedTB - (yearFullSizeTB * 0.21));
-    }
-  }
-
-  if (
-    !config.hasArchiveTier
-    && !config.copyEnabled
-    && effectiveMoveEnabled
-    && config.retention <= 14
-    && (config.gfsPolicy?.weekly ?? 0) >= 4
-    && (config.gfsPolicy?.monthly ?? 0) === 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0
-    && generationPeriodDays > fullIntervalDays
-    && performanceImmutabilityDays > 0
-  ) {
-    yearCapUsedTB += yearFullSizeTB * 0.2;
-  }
-  // Monthly-only move/copy+move profiles tend to over-place preserved load into Perf
-  // and under/over-state Capacity/Archive in opposite directions. Rebalance slightly.
-  const isMonthlyOnly = (config.gfsPolicy?.monthly ?? 0) > 0
-    && (config.gfsPolicy?.weekly ?? 0) === 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0;
-  if (isMonthlyOnly) {
-    if (!config.copyEnabled) {
-      // Move-only monthly: shift a small slice from Perf to Capacity.
-      const rebalanceTB = yearFullSizeTB * 0.16;
-      yearPerfUsedTB = Math.max(0, yearPerfUsedTB - rebalanceTB);
-      yearCapUsedTB += rebalanceTB;
-    } else if (effectiveMoveEnabled && config.hasArchiveTier) {
-      // Copy+Move monthly with archive: dampen total monthly overhead split.
-      const perfDownTB = yearFullSizeTB * 0.16;
-      const capDownTB = yearFullSizeTB * 0.56;
-      const archDownTB = yearFullSizeTB * 0.28;
-      yearPerfUsedTB = Math.max(0, yearPerfUsedTB - perfDownTB);
-      yearCapUsedTB = Math.max(0, yearCapUsedTB - capDownTB);
-      yearArchUsedTB = Math.max(0, yearArchUsedTB - archDownTB);
-    }
-  }
-
-  if (
-    config.copyEnabled
-    && effectiveMoveEnabled
-    && config.hasArchiveTier
-    && (config.gfsPolicy?.weekly ?? 0) > 0
-    && (config.gfsPolicy?.monthly ?? 0) > 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0
-  ) {
-    const perfDownTB = yearFullSizeTB * 0.16;
-    const capDownTB = yearFullSizeTB * 0.56;
-    const archDownTB = yearFullSizeTB * 0.28;
-    yearPerfUsedTB = Math.max(0, yearPerfUsedTB - perfDownTB);
-    yearCapUsedTB = Math.max(0, yearCapUsedTB - capDownTB);
-    yearArchUsedTB = Math.max(0, yearArchUsedTB - archDownTB);
-  }
-
-  if (
-    !config.copyEnabled
-    && effectiveMoveEnabled
-    && config.hasArchiveTier
-    && (config.gfsPolicy?.weekly ?? 0) > 0
-    && (config.gfsPolicy?.monthly ?? 0) > 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0
-    && config.retention <= fullIntervalDays
-  ) {
-    const perfToShiftTB = yearFullSizeTB * 0.16;
-    yearPerfUsedTB = Math.max(0, yearPerfUsedTB - perfToShiftTB);
-    yearCapUsedTB += yearFullSizeTB * 0.06;
-    yearArchUsedTB += yearFullSizeTB * 0.38;
-  }
-  // Monthly-only GFS archive scenarios on SOBR tend to include a non-GFS tail
-  // component in the calculator's archive estimate that is not captured by
-  // pure GFS-point aggregation alone.
-  if (
-    config.hasArchiveTier
-    && (config.gfsPolicy?.monthly ?? 0) > 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0
-  ) {
-    const archiveTailWindowDays = Math.max(fullIntervalDays, config.archiveAfterDays);
-    const archiveTailBaseTB = estimateTierChainDataForYearTB(archiveTailWindowDays);
-    const archiveTailFactor = config.copyEnabled
-      ? (config.archiveAfterDays > (2 * fullIntervalDays) ? 0.42 : 0.36)
-      : (config.archiveAfterDays > (2 * fullIntervalDays) ? 0.31 : 0.27);
-    yearArchUsedTB += archiveTailBaseTB * archiveTailFactor;
-  }
-
-  if (
-    config.copyEnabled
-    && effectiveMoveEnabled
-    && config.hasArchiveTier
-    && (config.gfsPolicy?.weekly ?? 0) > 0
-    && (config.gfsPolicy?.monthly ?? 0) > 0
-    && (config.gfsPolicy?.yearly ?? 0) === 0
-    && config.annualGrowthRatePct === 0
-  ) {
-    yearArchUsedTB = Math.max(0, yearArchUsedTB - (yearFullSizeTB * 0.28));
-  }
-
-  const plannedPerformanceTierTB = yearPerfUsedTB + yearWorkingSpaceReserveTB;
-  const plannedCapacityTierTB = yearCapUsedTB;
-  const plannedArchiveTierTB = yearArchUsedTB;
-  const plannedCapacityTB = plannedPerformanceTierTB + plannedCapacityTierTB + (config.hasArchiveTier ? plannedArchiveTierTB : 0);
-
-  return {
-    plannedCapacityTB,
-    plannedPerformanceTierTB,
-    plannedCapacityTierTB,
-    plannedArchiveTierTB,
-    fileTypeFullTB: yearFullSizeTB,
-    fileTypeIncrementalTB: yearIncrSizeTB,
-    fileTypeSyntheticFullTB: yearIncrSizeTB,
-  };
+interface LifecycleScenarioFile {
+  scenarios?: TestScenario[];
 }
 
 function asNumberOrUndefined(v: unknown): number | undefined {
@@ -391,6 +121,7 @@ function loadComparatorScenarios(): TestScenario[] {
 
 async function run(): Promise<void> {
   const seedMode = process.argv.includes('--seed');
+  const seedAllMode = process.argv.includes('--seed-all');
   const gfsLegacyMode = process.argv.includes('--gfs-legacy');
   const gfsReverseMode = process.argv.includes('--gfs-reverse');
   const gfsEndperiodMode = process.argv.includes('--gfs-endperiod');
@@ -417,22 +148,41 @@ async function run(): Promise<void> {
 
   const scenarioById = new Map(scenariosData.map(s => [s.id, s]));
   const tolerancePct = Math.max(0, baseline.defaults?.tolerancePct ?? 5);
-  const defaultForecastYears = Math.max(1, Math.floor(baseline.defaults?.forecastYears ?? 3));
+  const defaultForecastYears = Math.max(0, Math.floor(baseline.defaults?.forecastYears ?? 3));
   const startDate = baseline.defaults?.startDate || '2026-05-02';
 
   if (seedMode) {
-    const seededScenarios = baseline.scenarios.map((entry) => {
+    const seedMarker = 'seeded-from-simulator';
+    const appendSeedMarker = (notes?: string) => {
+      if (!notes) return seedMarker;
+      return notes.includes(seedMarker) ? notes : `${notes} [${seedMarker}]`;
+    };
+
+    const baselineById = new Map(baseline.scenarios.map((entry) => [entry.id, entry]));
+    const sourceEntries: BaselineScenario[] = seedAllMode
+      ? scenariosData.map((scenario) => baselineById.get(scenario.id) ?? { id: scenario.id, expected: {} })
+      : baseline.scenarios;
+
+    const seededScenarios = sourceEntries.map((entry) => {
       const scenario = scenarioById.get(entry.id);
       if (!scenario) return entry;
 
-      const forecastYears = Math.max(1, Math.floor(entry.forecastYears ?? defaultForecastYears));
-      const actual = computeSimulatorPlanned(scenario.config, startDate, forecastYears, gfsSizingMode, scenario.totalDays);
+      const scenarioStartDate = entry.startDate || startDate;
+      const forecastYears = Math.max(0, Math.floor(entry.forecastYears ?? defaultForecastYears));
+      const actual = computeSimulatorPlanned(scenario.config, scenarioStartDate, forecastYears, gfsSizingMode, scenario.totalDays);
+      const fileTypeForecastYears = entry.fileTypeForecastYears;
+      const fileTypeYears = fileTypeForecastYears === undefined
+        ? forecastYears
+        : Math.max(0, Math.floor(fileTypeForecastYears));
+      const fileTypeActual = fileTypeYears === forecastYears
+        ? actual
+        : computeSimulatorPlanned(scenario.config, scenarioStartDate, fileTypeYears, gfsSizingMode, scenario.totalDays);
 
       const expected: BaselineExpected = {
         plannedCapacityTB: Number(actual.plannedCapacityTB.toFixed(4)),
-        fileTypeFullTB: Number(actual.fileTypeFullTB.toFixed(4)),
-        fileTypeIncrementalTB: Number(actual.fileTypeIncrementalTB.toFixed(4)),
-        fileTypeSyntheticFullTB: Number(actual.fileTypeSyntheticFullTB.toFixed(4)),
+        fileTypeFullTB: Number(fileTypeActual.fileTypeFullTB.toFixed(4)),
+        fileTypeIncrementalTB: Number(fileTypeActual.fileTypeIncrementalTB.toFixed(4)),
+        fileTypeSyntheticFullTB: Number(fileTypeActual.fileTypeSyntheticFullTB.toFixed(4)),
       };
 
       if (scenario.config.repositoryType === 'SOBR') {
@@ -443,9 +193,8 @@ async function run(): Promise<void> {
 
       return {
         ...entry,
-        notes: entry.notes
-          ? `${entry.notes} [seeded-from-simulator]`
-          : 'seeded-from-simulator',
+        forecastYears,
+        notes: appendSeedMarker(entry.notes),
         expected,
       };
     });
@@ -458,6 +207,7 @@ async function run(): Promise<void> {
     fs.writeFileSync(baselinePath, JSON.stringify(seededBaseline, null, 2) + '\n', 'utf-8');
     console.log('✅ Baseline file seeded from current simulator calculations.');
     console.log(`   File: docs/${baselineFileName}`);
+    console.log(`   Scenarios seeded: ${seededScenarios.length}${seedAllMode ? ' (seed-all mode)' : ''}`);
     process.exit(0);
   }
 
@@ -487,8 +237,16 @@ async function run(): Promise<void> {
       continue;
     }
 
-    const forecastYears = Math.max(1, Math.floor(entry.forecastYears ?? defaultForecastYears));
-  const actual = computeSimulatorPlanned(scenario.config, startDate, forecastYears, gfsSizingMode, scenario.totalDays);
+    const scenarioStartDate = entry.startDate || startDate;
+    const forecastYears = Math.max(0, Math.floor(entry.forecastYears ?? defaultForecastYears));
+    const actual = computeSimulatorPlanned(scenario.config, scenarioStartDate, forecastYears, gfsSizingMode, scenario.totalDays);
+    const fileTypeForecastYears = entry.fileTypeForecastYears;
+    const fileTypeYears = fileTypeForecastYears === undefined
+      ? forecastYears
+      : Math.max(0, Math.floor(fileTypeForecastYears));
+    const fileTypeActual = fileTypeYears === forecastYears
+      ? actual
+      : computeSimulatorPlanned(scenario.config, scenarioStartDate, fileTypeYears, gfsSizingMode, scenario.totalDays);
     const isSobr = scenario.config.repositoryType === 'SOBR';
 
     // Both simulator and Veeam now use the same progressive tiered WS formula on initial sourceDataTB,
@@ -502,9 +260,9 @@ async function run(): Promise<void> {
       { label: 'Planned Performance Tier', actual: actual.plannedPerformanceTierTB, expected: isSobr ? asNumberOrUndefined(entry.expected.plannedPerformanceTierTB) : undefined },
       { label: 'Planned Capacity Tier', actual: actual.plannedCapacityTierTB, expected: asNumberOrUndefined(entry.expected.plannedCapacityTierTB) },
       { label: 'Planned Archive Tier', actual: actual.plannedArchiveTierTB, expected: asNumberOrUndefined(entry.expected.plannedArchiveTierTB) },
-      { label: 'File Type Size - Full', actual: actual.fileTypeFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeFullTB) },
-      { label: 'File Type Size - Incremental', actual: actual.fileTypeIncrementalTB, expected: asNumberOrUndefined(entry.expected.fileTypeIncrementalTB) },
-      { label: 'File Type Size - SyntheticFull', actual: actual.fileTypeSyntheticFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeSyntheticFullTB) },
+      { label: 'File Type Size - Full', actual: fileTypeActual.fileTypeFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeFullTB) },
+      { label: 'File Type Size - Incremental', actual: fileTypeActual.fileTypeIncrementalTB, expected: asNumberOrUndefined(entry.expected.fileTypeIncrementalTB) },
+      { label: 'File Type Size - SyntheticFull', actual: fileTypeActual.fileTypeSyntheticFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeSyntheticFullTB) },
     ];
 
     const activeChecks = checks.filter(c => c.expected !== undefined) as Array<{ label: string; actual: number; expected: number }>;

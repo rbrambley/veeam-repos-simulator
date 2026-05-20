@@ -98,7 +98,8 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
   function getSimulationDayLabel(date: string) {
     const d = new Date(`${date}T00:00:00.000Z`);
-    const weekday = d.toLocaleDateString(undefined, { weekday: 'long', timeZone: 'UTC' });
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const weekday = days[d.getUTCDay()];
     return `${date} (${weekday})`;
   }
 
@@ -119,12 +120,110 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     [restorePoints]
   );
   const chainById = Object.fromEntries(sim.state.chains.map(chain => [chain.id, chain]));
+  const jobById = useMemo(
+    () => Object.fromEntries(sim.state.jobs.map(job => [job.id, job])),
+    [sim.state.jobs]
+  ) as Record<string, { repositoryId: string; retention?: { restorePoints: number } }>;
+  const repoById = useMemo(
+    () => Object.fromEntries(sim.state.repositories.map(repo => [repo.id, repo])),
+    [sim.state.repositories]
+  ) as Record<string, { type: string; immutabilityDays?: number; sobrConfig?: { performanceImmutabilityDays?: number; capacityImmutabilityDays?: number; archiveImmutabilityDays?: number } }>;
   const generationSnapshots = sim.getCurrentGenerations(currentDate) as GenerationSnapshot[];
   const hasGenerationUi = generationSnapshots.length > 0;
   const generationById = useMemo(
     () => Object.fromEntries(generationSnapshots.map(gen => [gen.id, gen])) as Record<string, GenerationSnapshot>,
     [generationSnapshots]
   );
+
+  const currentDateMs = parseISODate(currentDate).getTime();
+
+  function getRestorePointImmutability(rp: RestorePointRow, tierHint?: 'Performance' | 'Capacity' | 'Archive') {
+    const chain = chainById[rp.chainId];
+    const job = chain ? jobById[chain.jobId] : primaryJob;
+    const repo = job ? repoById[job.repositoryId] : primaryRepo;
+
+    if (!repo) {
+      return { label: 'N/A', detail: 'Repository not found', isLocked: null as boolean | null };
+    }
+
+    if (repo.type === 'SOBR') {
+      const sobrConfig = repo.sobrConfig;
+      if (!sobrConfig) {
+        return { label: 'N/A', detail: 'SOBR config not found', isLocked: null as boolean | null };
+      }
+
+      // Use generation-based immutability if available
+      if (rp.generationId && generationById[rp.generationId]) {
+        const gen = generationById[rp.generationId];
+        const tier = tierHint || (rp.sobrTier || 'Performance');
+        const immutableUntil = tier === 'Performance'
+          ? gen.performanceImmutableUntil
+          : tier === 'Capacity'
+            ? gen.capacityImmutableUntil
+            : gen.archiveImmutableUntil;
+
+        if (!immutableUntil) {
+          return { label: 'N/A', detail: `${tier} immutability not configured`, isLocked: null as boolean | null };
+        }
+
+        const isLocked = parseISODate(immutableUntil).getTime() >= currentDateMs;
+        return {
+          label: isLocked ? 'Locked' : 'Unlocked',
+          detail: isLocked ? `${tier} lock until ${immutableUntil}` : `${tier} lock expired ${immutableUntil}`,
+          isLocked,
+        };
+      }
+
+      // For SOBR points not yet in a generation, calculate from tier immutability + tier entry date
+      const tier = tierHint || (rp.sobrTier || 'Performance');
+      const tierEnteredAt = rp.sobrTierEnteredAt || rp.date; // Use tier entry date if available, else creation date
+      const tierImmutabilityDays = tier === 'Performance'
+        ? sobrConfig.performanceImmutabilityDays ?? 0
+        : tier === 'Capacity'
+          ? sobrConfig.capacityImmutabilityDays ?? 0
+          : sobrConfig.archiveImmutabilityDays ?? 0;
+
+      if (tierImmutabilityDays <= 0) {
+        return { label: 'N/A', detail: `${tier} immutability not configured`, isLocked: null as boolean | null };
+      }
+
+      const unlockIso = new Date(parseISODate(tierEnteredAt).getTime() + tierImmutabilityDays * 86400000).toISOString().slice(0, 10);
+      const isLocked = parseISODate(unlockIso).getTime() >= currentDateMs;
+      return {
+        label: isLocked ? 'Locked' : 'Unlocked',
+        detail: isLocked ? `${tier} lock until ${unlockIso}` : `${tier} lock expired ${unlockIso}`,
+        isLocked,
+      };
+    }
+
+    const immutabilityDays = Math.max(0, repo.immutabilityDays ?? 0);
+    if (immutabilityDays <= 0) {
+      return { label: 'N/A', detail: 'Primary immutability not configured', isLocked: null as boolean | null };
+    }
+
+    const unlockIso = new Date(parseISODate(rp.date).getTime() + immutabilityDays * 86400000).toISOString().slice(0, 10);
+    const isLocked = parseISODate(unlockIso).getTime() >= currentDateMs;
+    return {
+      label: isLocked ? 'Locked' : 'Unlocked',
+      detail: isLocked ? `Primary lock until ${unlockIso}` : `Primary lock expired ${unlockIso}`,
+      isLocked,
+    };
+  }
+
+  function renderImmutabilityChip(rp: RestorePointRow, tierHint?: 'Performance' | 'Capacity' | 'Archive') {
+    const status = getRestorePointImmutability(rp, tierHint);
+    const displayLabel = status.isLocked === true ? 'Protected' : status.isLocked === false ? 'Mutable' : 'N/A';
+    const style = status.isLocked === true
+      ? { bg: '#e3f2fd', fg: '#1565c0' }
+      : status.isLocked === false
+        ? { bg: '#e8f5e9', fg: '#1b5e20' }
+        : { bg: '#eceff1', fg: '#455a64' };
+    return (
+      <span title={status.detail} style={{ background: style.bg, color: style.fg, borderRadius: '3px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>
+        {displayLabel}
+      </span>
+    );
+  }
 
   const genSummary = useMemo(() => {
     const total = generationSnapshots.length;
@@ -181,40 +280,60 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
   };
 
   const getGenerationStateLabel = (state: GenerationSnapshot['lifecycleState']) => {
-    if (state === 'DeleteOn Pending') return 'Locked';
+    if (state === 'DeleteOn Pending') return 'Sealed';
+    if (state === 'Waiting Immutability') return 'Immutability Hold';
+    if (state === 'Deletable') return 'Ready';
     return state;
+  };
+
+  const renderGenMetadataLine = (rp: RestorePointRow) => {
+    if (!hasGenerationUi || !rp.generationId || !generationById[rp.generationId]) return null;
+    const gen = generationById[rp.generationId];
+    const stateLabel = getGenerationStateLabel(gen.lifecycleState);
+    return (
+      <div style={{ fontSize: '0.75rem', color: '#546e7a', marginTop: '2px', fontFamily: 'monospace' }}>
+        📋 {shortId(rp.generationId)} ({stateLabel}, DeleteOn {gen.deleteOn})
+      </div>
+    );
   };
 
   const renderGenTotals = (locked: number, waiting: number, deletable: number) => (
     <div style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
-      <span title="Locked GENs" style={{ background: '#e3f2fd', color: '#1565c0', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
-        L {locked}
+      <span title="Sealed GENs" style={{ background: '#e3f2fd', color: '#1565c0', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        S {locked}
       </span>
-      <span title="Waiting Immutability GENs" style={{ background: '#efebe9', color: '#8d6e63', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
-        W {waiting}
+      <span title="Immutability Hold GENs" style={{ background: '#efebe9', color: '#8d6e63', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        H {waiting}
       </span>
-      <span title="Deletable GENs" style={{ background: '#e8f5e9', color: '#1b5e20', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
-        D {deletable}
+      <span title="Ready GENs" style={{ background: '#e8f5e9', color: '#1b5e20', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+        R {deletable}
       </span>
     </div>
   );
 
   const tierBuckets = useMemo(() => ({
     Performance: sortedRestorePoints.filter(rp => {
-      if (rp.hasPerformanceData !== undefined || rp.hasCapacityData !== undefined || rp.hasArchiveData !== undefined) {
-        return !!rp.hasPerformanceData;
-      }
+      // For SOBR, use sobrTier (current location) exclusively, not hasPerformanceData (historical flag)
       return (rp.sobrTier ?? 'Performance') === 'Performance';
     }),
     Capacity: sortedRestorePoints.filter(rp => {
-      if (rp.hasCapacityData !== undefined) return !!rp.hasCapacityData;
+      // For SOBR, use sobrTier (current location) exclusively, not hasCapacityData (historical flag)
       return rp.sobrTier === 'Capacity';
     }),
     Archive: sortedRestorePoints.filter(rp => {
-      if (rp.hasArchiveData !== undefined) return !!rp.hasArchiveData;
+      // For SOBR, use sobrTier (current location) exclusively, not hasArchiveData (historical flag)
       return rp.sobrTier === 'Archive';
     }),
   }), [sortedRestorePoints]);
+
+  const primaryJob = sim.state.jobs[0];
+  const primaryRepo = primaryJob
+    ? sim.state.repositories.find(r => r.id === primaryJob.repositoryId)
+    : sim.state.repositories[0];
+  const isPrimaryRepoSobr = !!(primaryRepo?.type === 'SOBR' && primaryRepo?.sobrConfig);
+  const visibleTierOrder: Array<'Performance' | 'Capacity' | 'Archive'> = isPrimaryRepoSobr
+    ? ['Performance', 'Capacity', 'Archive']
+    : ['Performance'];
 
   const workingSpaceByRepo = useMemo((): Record<string, { totalTB: number; additionalTB: number; largestFullTB: number; pct?: number; initialSourceTB?: number; byTier: Record<string, number>; byTierAdditional: Record<string, number> }> => {
     return Object.fromEntries(sim.state.repositories.map(repo => {
@@ -494,9 +613,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     <div>
       <div className="output-panel-header">
         <h2 style={{ margin: 0 }}>Simulation Output</h2>
-        <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#555' }}>
-          📅 {currentDate}
-        </span>
       </div>
 
       {/* Storage Usage per Repository + Summary Stats */}
@@ -707,8 +823,34 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         </div>
       </div>
 
+      {/* Section toggle buttons */}
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+        <button
+          onClick={() => setShowChainTimeline(v => !v)}
+          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          {showChainTimeline ? '▼' : '▶'} Chain Timeline
+        </button>
+        <button
+          onClick={() => setShowRestoreCatalog(v => !v)}
+          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          {showRestoreCatalog ? '▼' : '▶'} Restore Point Catalog ({restorePoints.length} restore points)
+        </button>
+        <button
+          onClick={() => setShowTierContents(v => !v)}
+          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
+        </button>
+      </div>
+
       {/* Simulation advance + year-jump controls */}
       <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '0.55rem' }}>
+        <span style={{ fontSize: '0.82rem', color: '#607d8b', fontWeight: 600, marginRight: '0.25rem' }}>
+          Sim Date: <strong>{getSimulationDayLabel(currentDate)}</strong>
+        </span>
+        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
         {([1, 7, 30] as const).map(days => (
           <button
             key={days}
@@ -762,28 +904,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         )}
       </div>
 
-      {/* Section toggle buttons — above the flex row so the sidebar aligns with content */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
-        <button
-          onClick={() => setShowChainTimeline(v => !v)}
-          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          {showChainTimeline ? '▼' : '▶'} Chain Timeline
-        </button>
-        <button
-          onClick={() => setShowRestoreCatalog(v => !v)}
-          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          {showRestoreCatalog ? '▼' : '▶'} Restore Point Catalog ({restorePoints.length} restore points)
-        </button>
-        <button
-          onClick={() => setShowTierContents(v => !v)}
-          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
-        </button>
-      </div>
-
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 820px', minWidth: '340px' }}>
       {/* Chain Timeline */}
@@ -802,9 +922,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             <th>Type</th>
             <th>Role</th>
             <th>Chain State</th>
-            {hasGenerationUi && <th>GEN</th>}
-            {hasGenerationUi && <th>DeleteOn</th>}
-            {hasGenerationUi && <th>GEN State</th>}
+            <th>Immutability</th>
             <th>Represents</th>
             <th>Current Tier</th>
             <th>Size (TB)</th>
@@ -816,7 +934,8 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             const isSobr = !!rp.sobrTier || !!rp.hasPerformanceData || !!rp.hasCapacityData || !!rp.hasArchiveData;
             const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
             const isGlobalBase = !!rp.isGlobalBase;
-            const role = isGlobalBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
+            const isTierBase = isGlobalBase || (rp.baseTiers || []).includes(currentTier);
+            const role = isTierBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
             const displayType = rp.type;
             const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, currentTier);
             const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
@@ -839,12 +958,12 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                 </td>
                 <td>
                   <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', alignItems: 'center' }}>
-                    {isGlobalBase && (
+                    {isTierBase && (
                       <span style={{ background: '#455a64', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                         Base Full
                       </span>
                     )}
-                    {!isGlobalBase && !rp.isGFS && (
+                    {!isTierBase && !rp.isGFS && (
                       <span style={{ background: '#546e7a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                         Daily
                       </span>
@@ -870,15 +989,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     <span style={{ color: '#666' }}>Preserved / Detached</span>
                   )}
                 </td>
-                {hasGenerationUi && <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{shortId(rp.generationId || '-')}</td>}
-                {hasGenerationUi && <td style={{ fontFamily: 'monospace', fontSize: '0.76rem' }}>{rp.generationId ? (generationById[rp.generationId]?.deleteOn || '-') : '-'}</td>}
-                {hasGenerationUi && <td>
-                  {rp.generationId && generationById[rp.generationId] ? (() => {
-                    const genState = generationById[rp.generationId].lifecycleState;
-                    const style = getGenerationStateStyle(genState);
-                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>{getGenerationStateLabel(genState)}</span>;
-                  })() : '-'}
-                </td>}
+                <td>{renderImmutabilityChip(rp, currentTier)}</td>
                 <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                   {rp.representsRestorePointDate ? `${rp.representsRestorePointDate} / ${shortId(rp.representsRestorePointId || '')}` : `${rp.date} / self`}
                 </td>
@@ -901,16 +1012,19 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       {/* Tier Contents */}
       {showTierContents && (
       <>
-      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Tier Contents</h3>
+      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>
+        {isPrimaryRepoSobr ? 'Tier Contents' : 'Primary Storage Contents'}
+      </h3>
       {hasGenerationUi && <StateLegend />}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
-        {(['Performance', 'Capacity', 'Archive'] as const).map((tier) => {
+        {visibleTierOrder.map((tier) => {
           const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
           const list = tierBuckets[tier];
+          const tierLabel = !isPrimaryRepoSobr && tier === 'Performance' ? 'Primary Storage' : tier;
           return (
             <div key={tier} style={{ border: `1px solid ${tierColor[tier]}`, borderRadius: '6px', overflow: 'hidden' }}>
               <div style={{ background: tierColor[tier], color: '#fff', padding: '6px 10px', fontWeight: 'bold', fontSize: '0.9rem' }}>
-                {tier} ({list.length})
+                {tierLabel} ({list.length})
               </div>
               <div style={{ background: '#fafafa' }}>
                 {list.length === 0 ? (
@@ -919,6 +1033,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   list.map((rp) => {
                     const isSelected = selectedRestorePointId === rp.id;
                     const isGlobalBase = !!rp.isGlobalBase;
+                    const isTierBase = isGlobalBase || (rp.baseTiers || []).includes(tier);
                     const displayType = rp.type;
                     const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, tier);
                     const prunedFromCapacity = tier === 'Performance' && wasPrunedFromCapacity(rp);
@@ -941,27 +1056,15 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                           <span style={{ fontSize: '0.8rem', color: '#607d8b' }}>{rp.date}</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center', marginTop: '2px' }}>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isGlobalBase ? ' (Base)' : ''}</span>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isTierBase ? ' (Base)' : ''}</span>
                           <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{formatTB(displaySizeTB)}</span>
                         </div>
+                        {renderGenMetadataLine(rp)}
                         <div style={{ display: 'flex', gap: '3px', marginTop: '3px', flexWrap: 'wrap' }}>
-                          {hasGenerationUi && rp.generationId && (
-                            <span style={{ background: '#eceff1', color: '#455a64', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                              {shortId(rp.generationId)}
-                            </span>
-                          )}
-                          {hasGenerationUi && rp.generationId && generationById[rp.generationId] && (() => {
-                            const genState = generationById[rp.generationId].lifecycleState;
-                            const style = getGenerationStateStyle(genState);
-                            return (
-                              <span style={{ background: style.bg, color: style.color, borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                {getGenerationStateLabel(genState)}
-                              </span>
-                            );
-                          })()}
+                          {renderImmutabilityChip(rp, tier)}
                           {prunedFromCapacity && (
                             <span style={{ background: '#8d6e63', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                              Pruned from Capacity
+                              Pruned
                             </span>
                           )}
                           {rp.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>W</span>}
@@ -1244,7 +1347,28 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                 retentionNote = <>No retention policy configured.</>;
               }
 
-              // --- 4. Archive eligibility ---
+              // --- 4. Immutability status ---
+              const immutabilityStatus = getRestorePointImmutability(selected, currentTier);
+              let immutabilityNote: React.ReactNode = <>Not configured.</>;
+              if (immutabilityStatus.isLocked === true) {
+                const detail = immutabilityStatus.detail;
+                const match = detail.match(/lock until (.+)$/);
+                const lockDate = match ? match[1] : immutabilityStatus.detail;
+                const lockUntilMs = parseISODate(lockDate).getTime();
+                const daysUntilUnlock = Math.ceil((lockUntilMs - currentDateObj.getTime()) / 86400000);
+                immutabilityNote = daysUntilUnlock > 0
+                  ? <>Locked in <strong>{currentTier}</strong> until <strong>{lockDate}</strong> ({daysUntilUnlock}d remaining).</>
+                  : <>Lock in <strong>{currentTier}</strong> expired on <strong>{lockDate}</strong>.</>;
+              } else if (immutabilityStatus.isLocked === false) {
+                const detail = immutabilityStatus.detail;
+                const match = detail.match(/lock expired (.+)$/);
+                const lockDate = match ? match[1] : immutabilityStatus.detail;
+                immutabilityNote = <>Lock in <strong>{currentTier}</strong> expired on <strong>{lockDate}</strong>.</>;
+              } else if (immutabilityStatus.isLocked === null) {
+                immutabilityNote = <>{immutabilityStatus.detail}</>;
+              }
+
+              // --- 5. Archive eligibility ---
               let archiveNote: React.ReactNode = null;
               if (isSobr && sobrCfg?.hasArchiveTier) {
                 const copyEnabled = !!sobrCfg.copyEnabled;
@@ -1352,6 +1476,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   {/* Retention forecast */}
                   {infoRow('Retention', retentionNote)}
 
+                  {/* Immutability status */}
+                  {infoRow('Immutability', immutabilityNote)}
+
                   {/* Archive eligibility */}
                   {archiveNote && infoRow('Archive', archiveNote)}
 
@@ -1404,6 +1531,60 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             )}
           </div>
         </div>
+      </div>
+
+      {/* Bottom controls (duplicate for convenience — no need to scroll back up) */}
+      <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e0e0e0' }}>
+        <span style={{ fontSize: '0.82rem', color: '#607d8b', fontWeight: 600, marginRight: '0.25rem' }}>
+          Sim Date: <strong>{getSimulationDayLabel(currentDate)}</strong>
+        </span>
+        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+        {([1, 7, 30] as const).map(days => (
+          <button
+            key={`bottom-${days}`}
+            onClick={() => { setActivityLogFilter(null); onNextDay(days); }}
+            style={{
+              padding: '3px 13px',
+              borderRadius: '999px',
+              border: '1px solid #90caf9',
+              background: '#e3f2fd',
+              color: '#1565c0',
+              fontWeight: 700,
+              fontSize: '0.81rem',
+              cursor: 'pointer',
+              lineHeight: '1.6',
+            }}
+          >
+            ▶ +{days} Day{days > 1 ? 's' : ''}
+          </button>
+        ))}
+        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+        {([1, 2, 3] as const).map(yr => {
+          const daysLeft = computeDaysToYear(yr);
+          const disabled = daysLeft <= 0;
+          return (
+            <button
+              key={`bottom-year-${yr}`}
+              disabled={disabled}
+              title={disabled ? `Already at or past Year ${yr}` : `Jump to Year ${yr} (${daysLeft} days from now)`}
+              onClick={() => { setActivityLogFilter(30); onNextDay(daysLeft); }}
+              style={{
+                padding: '3px 13px',
+                borderRadius: '999px',
+                border: `1px solid ${disabled ? '#e0e0e0' : '#ffcc80'}`,
+                background: disabled ? '#f5f5f5' : '#fff3e0',
+                color: disabled ? '#bbb' : '#bf360c',
+                fontWeight: 700,
+                fontSize: '0.81rem',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                lineHeight: '1.6',
+                opacity: disabled ? 0.55 : 1,
+              }}
+            >
+              ⏩ Year {yr}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

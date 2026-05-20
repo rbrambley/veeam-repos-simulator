@@ -1,6 +1,6 @@
 ﻿import React, { useMemo, useState } from 'react';
 import { VeeamSimulator } from '../simulator/engine';
-import { BackupChain, RestorePoint, SOBRTier } from '../models/veeam';
+import { BackupChain, RestorePoint, SOBRTier, Repository } from '../models/veeam';
 
 interface ChainTimelineProps {
   sim: VeeamSimulator;
@@ -84,6 +84,7 @@ interface GenerationSnapshot {
 export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, onSelectRestorePoint }) => {
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [timeWindowDays, setTimeWindowDays] = useState<number | 'all'>(90);
+  const currentDateMs = new Date(`${currentDate}T00:00:00.000Z`).getTime();
 
   function formatGenerationStateLabel(state: GenerationSnapshot['lifecycleState']): string {
     return state === 'DeleteOn Pending' ? 'Locked' : state;
@@ -99,7 +100,87 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
     () => Object.fromEntries(generations.map(gen => [gen.id, gen])) as Record<string, GenerationSnapshot>,
     [generations]
   );
+  const chainById = useMemo(
+    () => Object.fromEntries(sim.state.chains.map(chain => [chain.id, chain])) as Record<string, BackupChain>,
+    [sim.state.chains]
+  );
+  const jobById = useMemo(
+    () => Object.fromEntries(sim.state.jobs.map(job => [job.id, job])) as Record<string, { repositoryId: string }>,
+    [sim.state.jobs]
+  );
+  const repoById = useMemo(
+    () => Object.fromEntries(sim.state.repositories.map(repo => [repo.id, repo])) as Record<string, Repository>,
+    [sim.state.repositories]
+  );
   if (allPoints.length === 0) return null;
+
+  function getImmutabilityStatus(rp: RestorePoint) {
+    const tier: SOBRTier = rp.hasArchiveData ? 'Archive' : (rp.hasCapacityData ? 'Capacity' : 'Performance');
+    const chain = chainById[rp.chainId];
+    const job = chain ? jobById[chain.jobId] : sim.state.jobs[0];
+    const repo = job ? repoById[job.repositoryId] : undefined;
+
+    if (repo?.type === 'SOBR') {
+      const sobrConfig = repo.sobrConfig;
+      if (!sobrConfig) {
+        return { label: 'N/A', detail: 'SOBR config not found', isLocked: null as boolean | null };
+      }
+
+      // Use generation-based immutability if available
+      if (rp.generationId && generationById[rp.generationId]) {
+        const gen = generationById[rp.generationId];
+        const immutableUntil = tier === 'Performance'
+          ? gen.performanceImmutableUntil
+          : tier === 'Capacity'
+            ? gen.capacityImmutableUntil
+            : gen.archiveImmutableUntil;
+
+        if (!immutableUntil) {
+          return { label: 'N/A', detail: `${tier} immutability not configured`, isLocked: null as boolean | null };
+        }
+
+        const isLocked = new Date(`${immutableUntil}T00:00:00.000Z`).getTime() >= currentDateMs;
+        return {
+          label: isLocked ? 'Locked' : 'Unlocked',
+          detail: isLocked ? `${tier} lock until ${immutableUntil}` : `${tier} lock expired ${immutableUntil}`,
+          isLocked,
+        };
+      }
+
+      // For SOBR points not yet in a generation, calculate from tier immutability + tier entry date
+      const tierEnteredAt = rp.sobrTierEnteredAt || rp.date;
+      const tierImmutabilityDays = tier === 'Performance'
+        ? sobrConfig.performanceImmutabilityDays ?? 0
+        : tier === 'Capacity'
+          ? sobrConfig.capacityImmutabilityDays ?? 0
+          : sobrConfig.archiveImmutabilityDays ?? 0;
+
+      if (tierImmutabilityDays <= 0) {
+        return { label: 'N/A', detail: `${tier} immutability not configured`, isLocked: null as boolean | null };
+      }
+
+      const unlockIso = new Date(new Date(`${tierEnteredAt}T00:00:00.000Z`).getTime() + tierImmutabilityDays * 86400000).toISOString().slice(0, 10);
+      const isLocked = new Date(`${unlockIso}T00:00:00.000Z`).getTime() >= currentDateMs;
+      return {
+        label: isLocked ? 'Locked' : 'Unlocked',
+        detail: isLocked ? `${tier} lock until ${unlockIso}` : `${tier} lock expired ${unlockIso}`,
+        isLocked,
+      };
+    }
+
+    const immutabilityDays = Math.max(0, repo?.immutabilityDays ?? 0);
+    if (immutabilityDays <= 0) {
+      return { label: 'N/A', detail: 'Primary immutability not configured', isLocked: null as boolean | null };
+    }
+
+    const unlockIso = new Date(new Date(`${rp.date}T00:00:00.000Z`).getTime() + immutabilityDays * 86400000).toISOString().slice(0, 10);
+    const isLocked = new Date(`${unlockIso}T00:00:00.000Z`).getTime() >= currentDateMs;
+    return {
+      label: isLocked ? 'Locked' : 'Unlocked',
+      detail: isLocked ? `Primary lock until ${unlockIso}` : `Primary lock expired ${unlockIso}`,
+      isLocked,
+    };
+  }
 
   const allDates = allPoints.map(rp => rp.date).sort();
   const overallMinDate = allDates[0];
@@ -209,6 +290,13 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
     const isDialog = TYPE_SHAPE[rp.type] === 'diamond';
     const gfsLabel = rp.isGFS ? getGfsLabel(rp) : '';
     const gfsFontSize = gfsLabel.length >= 3 ? 5 : gfsLabel.length === 2 ? 6 : 7;
+    const imm = getImmutabilityStatus(rp);
+    const lockBadgeText = imm.isLocked === true ? 'L' : imm.isLocked === false ? 'U' : '';
+    const lockBadgeStyle = imm.isLocked === true
+      ? { bg: '#1565c0', fg: '#fff' }
+      : imm.isLocked === false
+        ? { bg: '#1b5e20', fg: '#fff' }
+        : { bg: 'transparent', fg: 'transparent' };
 
     const handleMouseEnter = (e: React.MouseEvent<SVGElement>) => setTooltip({ mouseX: e.clientX, mouseY: e.clientY, rp });
     const handleMouseMove  = (e: React.MouseEvent<SVGElement>) => setTooltip(prev => prev ? { ...prev, mouseX: e.clientX, mouseY: e.clientY } : null);
@@ -230,6 +318,12 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
           {rp.isGFS && <polygon points={pts} fill="none" stroke="#f9a825" strokeWidth={3} />}
           <polygon points={pts} fill={color} opacity={0.9} />
           {gfsLabel && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={gfsFontSize} fill="#fff" fontWeight="bold">{gfsLabel}</text>}
+          {lockBadgeText && (
+            <g>
+              <rect x={cx + DOT_R - 2} y={cy - DOT_R - 8} width={10} height={10} rx={2} fill={lockBadgeStyle.bg} />
+              <text x={cx + DOT_R + 3} y={cy - DOT_R - 3} textAnchor="middle" dominantBaseline="middle" fontSize={6} fill={lockBadgeStyle.fg} fontWeight="bold">{lockBadgeText}</text>
+            </g>
+          )}
         </g>
       );
     }
@@ -243,6 +337,12 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         {rp.isGFS && <circle cx={cx} cy={cy} r={DOT_R + 3} fill="none" stroke="#f9a825" strokeWidth={2} />}
         <circle cx={cx} cy={cy} r={DOT_R} fill={color} opacity={0.85} />
         {gfsLabel && <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize={gfsFontSize} fill="#fff" fontWeight="bold">{gfsLabel}</text>}
+        {lockBadgeText && (
+          <g>
+            <rect x={cx + DOT_R - 2} y={cy - DOT_R - 8} width={10} height={10} rx={2} fill={lockBadgeStyle.bg} />
+            <text x={cx + DOT_R + 3} y={cy - DOT_R - 3} textAnchor="middle" dominantBaseline="middle" fontSize={6} fill={lockBadgeStyle.fg} fontWeight="bold">{lockBadgeText}</text>
+          </g>
+        )}
       </g>
     );
   }
@@ -346,6 +446,14 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <svg width={12} height={14}><line x1={6} y1={0} x2={6} y2={14} stroke="#e53935" strokeWidth={2} strokeDasharray="4,3" /></svg>
           Today
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ background: '#1565c0', color: '#fff', borderRadius: '2px', padding: '0 4px', fontSize: '0.7rem', fontWeight: 'bold' }}>L</span>
+          Locked immutability
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ background: '#1b5e20', color: '#fff', borderRadius: '2px', padding: '0 4px', fontSize: '0.7rem', fontWeight: 'bold' }}>U</span>
+          Unlocked immutability
         </span>
         {onSelectRestorePoint && (
           <span style={{ fontSize: '0.75rem', color: '#90a4ae', fontStyle: 'italic' }}>Click any dot to select it</span>
@@ -506,6 +614,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         const currentTier: SOBRTier = rp.hasArchiveData ? 'Archive' : (rp.hasCapacityData ? 'Capacity' : 'Performance');
         const sizeTB = sim.getRestorePointSizeForTier(rp.id, currentTier);
         const gen = rp.generationId ? generationById[rp.generationId] : undefined;
+        const imm = getImmutabilityStatus(rp);
         return (
           <div style={{
             position: 'fixed', left: tooltip.mouseX + 14, top: tooltip.mouseY - 10,
@@ -531,6 +640,8 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
             {rp.generationId && <div>GEN: <strong>{formatRpId(rp.generationId)}</strong></div>}
             {gen && <div>DeleteOn: <strong>{gen.deleteOn}</strong></div>}
             {gen && <div>State: <strong>{formatGenerationStateLabel(gen.lifecycleState)}</strong></div>}
+            <div>Immutability: <strong>{imm.label}</strong></div>
+            <div style={{ fontSize: '0.76rem', color: '#78909c' }}>{imm.detail}</div>
             {rp.isGFS && (
               <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <span style={{ color: '#607d8b' }}>GFS:</span>
