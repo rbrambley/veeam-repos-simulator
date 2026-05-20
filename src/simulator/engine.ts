@@ -219,9 +219,9 @@ export class VeeamSimulator {
   }
 
   private usesGenerationLifecycle(repo?: Repository): boolean {
-    // Current behavior model: generations are for SOBR object tiers.
-    // ObjectStorage repo type support will be added when implemented.
-    return repo?.type === 'SOBR';
+    // Generations are used for SOBR tiers (all tiers when isObjectStorage enabled)
+    // or for direct-to-object backup targets (DAS with isObjectStorage enabled).
+    return repo?.type === 'SOBR' || (repo?.type === 'DAS' && repo.isObjectStorage);
   }
 
   private getTierImmutabilityDays(repo: Repository | undefined, tier: SOBRTier): number {

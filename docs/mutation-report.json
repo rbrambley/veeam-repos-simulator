@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T11:08:22.939Z",
+  "generatedAt": "2026-05-20T11:59:59.385Z",
   "probeScenarioCount": 53,
   "mutationCount": 5,
   "caughtCount": 5,
@@ -55,11 +55,11 @@
       "expectedCatchingRule": "singleGlobalBasePerJobEveryDay",
       "caught": true,
       "catchResult": {
-        "scenarioId": "lb-das-retention-count",
+        "scenarioId": "lb-das-gfs-preserves-chain",
         "day": 14,
         "date": "2026-05-16",
         "rule": "nextDay",
-        "message": "[CANONICAL_INVARIANT] nextDay:2026-05-16: job job-lb-das-retention-count must have exactly one global base (found 0)"
+        "message": "[CANONICAL_INVARIANT] nextDay:2026-05-16: job job-lb-das-gfs-preserves-chain must have exactly one global base (found 0)"
       }
     },
     {

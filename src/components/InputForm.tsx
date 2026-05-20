@@ -12,6 +12,7 @@ interface InputFormProps {
 export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange, onReset }) => {
   const [repoName, setRepoName] = useState(simState.repositories[0]?.name || 'Main Repo');
   const [repoType, setRepoType] = useState<RepositoryType>(simState.repositories[0]?.type || 'DAS');
+  const [isObjectStorage, setIsObjectStorage] = useState(simState.repositories[0]?.isObjectStorage ?? false);
   const [jobName, setJobName] = useState(simState.jobs[0]?.name || 'Daily Backup');
   const [jobType, setJobType] = useState<BackupJobType>(simState.jobs[0]?.type || 'ForwardIncremental');
   const [sourceDataTB, setSourceDataTB] = useState(simState.jobs[0]?.sourceDataTB || 1);
@@ -38,7 +39,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const effectiveCopyEnabled = sobrCopyEnabled;
   const effectiveMoveEnabled = sobrMoveEnabled || !sobrCopyEnabled;
   const supportsTieredImmutability = repoType === 'SOBR';
-  const supportsArchiveImmutability = repoType === 'SOBR' && sobrHasArchive;
+  const supportsArchiveImmutability = repoType === 'SOBR' && sobrHasArchive && isObjectStorage;
 
   const compactNumberInputStyle: React.CSSProperties = {
     width: '84px',
@@ -231,6 +232,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
           id: repoId,
           name: repoName,
           type: repoType,
+          isObjectStorage: isObjectStorage || undefined,
           capacityTB: calcRepoCapTB,
           immutabilityDays: repoType === 'SOBR' ? undefined : Math.max(0, sobrPerformanceImmutabilityDays),
           isImmutable: repoType === 'SOBR' ? undefined : sobrPerformanceImmutabilityDays > 0,
@@ -366,9 +368,16 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   Type:
                   <select value={repoType} onChange={e => setRepoType(e.target.value as RepositoryType)}>
                     <option value="DAS">DAS</option>
-                    <option value="ObjectStorage">Object Storage</option>
                     <option value="SOBR">SOBR</option>
                   </select>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '0.6rem' }}>
+                  <input
+                    type="checkbox"
+                    checked={isObjectStorage}
+                    onChange={e => setIsObjectStorage(e.target.checked)}
+                  />
+                  Use Object Storage
                 </label>
               </div>
               <div className="card-split-col">

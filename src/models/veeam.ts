@@ -3,18 +3,17 @@
 
 export type RepositoryType =
   | 'DAS'
-  | 'ObjectStorage'
   | 'SOBR';
 
 export interface Repository {
   id: string;
   name: string;
   type: RepositoryType;
+  isObjectStorage?: boolean;      // when true: DAS targets object storage directly, or SOBR uses object storage for all tiers
   capacityTB: number;
-  immutabilityDays?: number;
+  immutabilityDays?: number;      // primary/performance tier immutability (used for both DAS and SOBR when isObjectStorage is true)
   isImmutable?: boolean;
   supportsBlockClone?: boolean;
-  supportsDirectToObject?: boolean;
   sobrConfig?: SOBRConfig;
 }
 
