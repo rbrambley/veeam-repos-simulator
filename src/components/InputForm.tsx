@@ -367,9 +367,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   <select value={repoType} onChange={e => setRepoType(e.target.value as RepositoryType)}>
                     <option value="DAS">DAS</option>
                     <option value="NAS">NAS</option>
-                    <option value="DedupAppliance">Dedup Appliance</option>
                     <option value="ObjectStorage">Object Storage</option>
-                    <option value="Tape">Tape</option>
                     <option value="SOBR">SOBR</option>
                   </select>
                 </label>

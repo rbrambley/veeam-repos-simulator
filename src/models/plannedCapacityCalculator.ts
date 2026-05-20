@@ -136,7 +136,7 @@ export function computeSimulatorPlanned(
     : Math.max(config.retention, performanceImmutabilityDays);
   const yearActiveChainTB = estimateTierChainDataForYearTB(dasRetentionWindowDays);
 
-  // Non-SOBR repositories (DAS, NAS, DedupAppliance, ObjectStorage, Tape) all use
+  // Non-SOBR repositories (DAS, NAS, ObjectStorage) all use
   // a single-tier model: stored data + working space = planned capacity.
   if (config.repositoryType !== 'SOBR') {
     // No empirical calibration: use raw model output for all non-SOBR repositories

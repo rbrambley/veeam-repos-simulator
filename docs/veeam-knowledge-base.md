@@ -21,7 +21,7 @@ Use this classification when implementing or reviewing changes.
 	- Job type semantics (Forward Incremental, Reverse Incremental, Active Full, Synthetic Full).
 	- GFS overlays (weekly/monthly/yearly tagging and retention caps).
 	- SOBR tiering semantics (Copy, Move, Archive transitions).
-	- Repository capability differences (DAS/NAS/Dedupe/Object/Tape optimizations).
+	- Repository capability differences (DAS/NAS/Object/SOBR optimizations).
 
 ---
 
@@ -159,14 +159,12 @@ Use this classification when implementing or reviewing changes.
 	- Use lifecycle policies for cost management.
 	- Consider bandwidth and latency for direct backup/restore operations.
 
-### 1.5 Tape
-- Physical tape libraries or drives.
-- Offline, air-gapped, slow access, long-term archival.
-- Use Cases: Compliance, long-term retention, disaster recovery.
+### 1.5 Tape (Out of Simulator Scope)
+- Tape-specific repository modeling is intentionally excluded from the simulator.
 
 ### 1.6 Scale-Out Backup Repository (SOBR)
 - Logical pool of multiple repositories, supporting multiple tiers:
-	- **Performance Tier:** Typically local or fast storage (DAS, NAS, dedupe appliances, or object storage in v12+).
+	- **Performance Tier:** Typically local or fast storage (DAS, NAS, or object storage in v12+).
 	- **Capacity Tier:** Object storage (S3, Azure Blob, etc.) for offloading older backups.
 	- **Archive Tier:** Object storage (e.g., Amazon S3 Glacier, Azure Archive Blob) for long-term retention.
 - Object Storage can be used as an extent in any tier (Performance, Capacity, Archive) depending on Veeam version and workload.
@@ -226,19 +224,17 @@ Use this classification when implementing or reviewing changes.
 
 ## 4. Job Type and Repository Type Interactions
 
-| Job Type             | DAS/NAS         | Dedup Appliance         | Object Storage         | Tape                | SOBR                |
-|----------------------|-----------------|------------------------|-----------------------|---------------------|---------------------|
-| Forward Incremental  | Supported       | Supported (optimized)  | Supported*            | Copy/Archive only   | Supported           |
-| Reverse Incremental  | Supported       | Not recommended        | Not supported         | Not supported       | Supported           |
-| Synthetic Full       | Supported       | Supported (optimized)  | Supported*            | Not supported       | Supported           |
-| Active Full          | Supported       | Supported              | Supported*            | Not supported       | Supported           |
-| GFS                  | Supported       | Supported              | Supported*            | Supported           | Supported           |
+| Job Type             | DAS/NAS         | Object Storage         | SOBR                |
+|----------------------|-----------------|-----------------------|---------------------|
+| Forward Incremental  | Supported       | Supported*            | Supported           |
+| Reverse Incremental  | Supported       | Not supported         | Supported           |
+| Synthetic Full       | Supported       | Supported*            | Supported           |
+| Active Full          | Supported       | Supported*            | Supported           |
+| GFS                  | Supported       | Supported*            | Supported           |
 
 *Object Storage: Supported as a direct backup target for specific workloads (e.g., Veeam Backup for Microsoft 365, Veeam Agent, and VBR v12+ for some jobs). Always supported as SOBR extent (Performance, Capacity, Archive Tiers) for offload and long-term retention.
 
-- Deduplication Appliances: Prefer forward incremental with synthetic fulls; reverse incremental is not recommended due to random I/O.
 - Object Storage: Can be used as a direct backup target for supported workloads and as an extent for all SOBR tiers. For most VBR jobs, object storage is used for offload (Capacity/Archive), but direct-to-object is increasingly supported (check Veeam version and job type).
-- Tape: Used for backup copy/archive, not for primary backup chains.
 
 ---
 

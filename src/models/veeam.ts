@@ -4,9 +4,7 @@
 export type RepositoryType =
   | 'DAS'
   | 'NAS'
-  | 'DedupAppliance'
   | 'ObjectStorage'
-  | 'Tape'
   | 'SOBR';
 
 export interface Repository {
