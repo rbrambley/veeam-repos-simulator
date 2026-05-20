@@ -324,7 +324,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     <option value="ForwardIncremental">Forward Incremental</option>
                     <option value="SyntheticFull">Synthetic Full</option>
                     <option value="ActiveFull">Active Full</option>
-                    <option value="GFS">GFS</option>
                   </select>
                 </label>
                 <label>

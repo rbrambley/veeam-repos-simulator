@@ -42,8 +42,7 @@ export type BackupJobType =
   | 'ForwardIncremental'
 
   | 'SyntheticFull'
-  | 'ActiveFull'
-  | 'GFS';
+  | 'ActiveFull';
 
 export interface BackupJob {
   id: string;
