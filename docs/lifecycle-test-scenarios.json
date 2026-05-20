@@ -1026,6 +1026,43 @@
     },
 
     {
+      "id": "ix-sobr-copymove-w6m12y2-immutability-211tb",
+      "layer": 3,
+      "name": "SOBR Copy+Move with W6+M12+Y2 and perf/cap immutability (211TB)",
+      "description": "Manual calculator parity capture for a high-scale mixed-policy profile with copy+move enabled, archive enabled, archiveAfter=14, and Archive immutability disabled.",
+      "rules": ["R-GFS-01", "R-OFFLOAD-01", "R-ARCH-01", "R-IMM-01", "R-IMM-02"],
+      "config": {
+        "repositoryType": "SOBR",
+        "sourceDataTB": 211,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 10,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 6, "monthly": 12, "yearly": 2},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 14,
+        "archiveImmutabilityDays": 0,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": true,
+        "moveEnabled": true
+      },
+      "totalDays": 1092,
+      "assertions": {
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "gfsMonthlyCountNeverExceedsLimit": true,
+        "gfsYearlyCountNeverExceedsLimit": true,
+        "noArchivePointBeforeCapTierAge": 14,
+        "pruneNeverBeforeOffload": true,
+        "noPruneWhilePerfImmutable": true,
+        "noDeletionWhileCapImmutable": true,
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "singleGlobalBasePerJobEveryDay": true
+      }
+    },
+
+    {
       "id": "ix-no-gfs-long-archive",
       "layer": 3,
       "name": "SOBR Move no-GFS: archive tier should remain empty",

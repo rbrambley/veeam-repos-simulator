@@ -39,7 +39,9 @@ interface BaselineExpected {
 interface BaselineScenario {
   id: string;
   notes?: string;
+  startDate?: string;
   forecastYears?: number;
+  fileTypeForecastYears?: number;
   workingSpacePct?: number;
   expected: BaselineExpected;
 }
@@ -146,7 +148,7 @@ async function run(): Promise<void> {
 
   const scenarioById = new Map(scenariosData.map(s => [s.id, s]));
   const tolerancePct = Math.max(0, baseline.defaults?.tolerancePct ?? 5);
-  const defaultForecastYears = Math.max(1, Math.floor(baseline.defaults?.forecastYears ?? 3));
+  const defaultForecastYears = Math.max(0, Math.floor(baseline.defaults?.forecastYears ?? 3));
   const startDate = baseline.defaults?.startDate || '2026-05-02';
 
   if (seedMode) {
@@ -165,14 +167,22 @@ async function run(): Promise<void> {
       const scenario = scenarioById.get(entry.id);
       if (!scenario) return entry;
 
-      const forecastYears = Math.max(1, Math.floor(entry.forecastYears ?? defaultForecastYears));
-      const actual = computeSimulatorPlanned(scenario.config, startDate, forecastYears, gfsSizingMode, scenario.totalDays);
+      const scenarioStartDate = entry.startDate || startDate;
+      const forecastYears = Math.max(0, Math.floor(entry.forecastYears ?? defaultForecastYears));
+      const actual = computeSimulatorPlanned(scenario.config, scenarioStartDate, forecastYears, gfsSizingMode, scenario.totalDays);
+      const fileTypeForecastYears = entry.fileTypeForecastYears;
+      const fileTypeYears = fileTypeForecastYears === undefined
+        ? forecastYears
+        : Math.max(0, Math.floor(fileTypeForecastYears));
+      const fileTypeActual = fileTypeYears === forecastYears
+        ? actual
+        : computeSimulatorPlanned(scenario.config, scenarioStartDate, fileTypeYears, gfsSizingMode, scenario.totalDays);
 
       const expected: BaselineExpected = {
         plannedCapacityTB: Number(actual.plannedCapacityTB.toFixed(4)),
-        fileTypeFullTB: Number(actual.fileTypeFullTB.toFixed(4)),
-        fileTypeIncrementalTB: Number(actual.fileTypeIncrementalTB.toFixed(4)),
-        fileTypeSyntheticFullTB: Number(actual.fileTypeSyntheticFullTB.toFixed(4)),
+        fileTypeFullTB: Number(fileTypeActual.fileTypeFullTB.toFixed(4)),
+        fileTypeIncrementalTB: Number(fileTypeActual.fileTypeIncrementalTB.toFixed(4)),
+        fileTypeSyntheticFullTB: Number(fileTypeActual.fileTypeSyntheticFullTB.toFixed(4)),
       };
 
       if (scenario.config.repositoryType === 'SOBR') {
@@ -227,8 +237,16 @@ async function run(): Promise<void> {
       continue;
     }
 
-    const forecastYears = Math.max(1, Math.floor(entry.forecastYears ?? defaultForecastYears));
-  const actual = computeSimulatorPlanned(scenario.config, startDate, forecastYears, gfsSizingMode, scenario.totalDays);
+    const scenarioStartDate = entry.startDate || startDate;
+    const forecastYears = Math.max(0, Math.floor(entry.forecastYears ?? defaultForecastYears));
+    const actual = computeSimulatorPlanned(scenario.config, scenarioStartDate, forecastYears, gfsSizingMode, scenario.totalDays);
+    const fileTypeForecastYears = entry.fileTypeForecastYears;
+    const fileTypeYears = fileTypeForecastYears === undefined
+      ? forecastYears
+      : Math.max(0, Math.floor(fileTypeForecastYears));
+    const fileTypeActual = fileTypeYears === forecastYears
+      ? actual
+      : computeSimulatorPlanned(scenario.config, scenarioStartDate, fileTypeYears, gfsSizingMode, scenario.totalDays);
     const isSobr = scenario.config.repositoryType === 'SOBR';
 
     // Both simulator and Veeam now use the same progressive tiered WS formula on initial sourceDataTB,
@@ -242,9 +260,9 @@ async function run(): Promise<void> {
       { label: 'Planned Performance Tier', actual: actual.plannedPerformanceTierTB, expected: isSobr ? asNumberOrUndefined(entry.expected.plannedPerformanceTierTB) : undefined },
       { label: 'Planned Capacity Tier', actual: actual.plannedCapacityTierTB, expected: asNumberOrUndefined(entry.expected.plannedCapacityTierTB) },
       { label: 'Planned Archive Tier', actual: actual.plannedArchiveTierTB, expected: asNumberOrUndefined(entry.expected.plannedArchiveTierTB) },
-      { label: 'File Type Size - Full', actual: actual.fileTypeFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeFullTB) },
-      { label: 'File Type Size - Incremental', actual: actual.fileTypeIncrementalTB, expected: asNumberOrUndefined(entry.expected.fileTypeIncrementalTB) },
-      { label: 'File Type Size - SyntheticFull', actual: actual.fileTypeSyntheticFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeSyntheticFullTB) },
+      { label: 'File Type Size - Full', actual: fileTypeActual.fileTypeFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeFullTB) },
+      { label: 'File Type Size - Incremental', actual: fileTypeActual.fileTypeIncrementalTB, expected: asNumberOrUndefined(entry.expected.fileTypeIncrementalTB) },
+      { label: 'File Type Size - SyntheticFull', actual: fileTypeActual.fileTypeSyntheticFullTB, expected: asNumberOrUndefined(entry.expected.fileTypeSyntheticFullTB) },
     ];
 
     const activeChecks = checks.filter(c => c.expected !== undefined) as Array<{ label: string; actual: number; expected: number }>;

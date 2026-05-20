@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-05-17T08:54:09.471Z",
+  "generatedAt": "2026-05-20T08:40:26.426Z",
   "snapshotDays": [
     365,
     730
@@ -364,6 +364,26 @@
         "gfsMonthlyCount": 3,
         "gfsYearlyCount": 0,
         "storageTB": 7.861
+      }
+    },
+    "ix-sobr-copymove-w6m12y2-immutability-211tb": {
+      "365": {
+        "date": "2027-05-02",
+        "chainCount": 16,
+        "rpCount": 110,
+        "gfsWeeklyCount": 6,
+        "gfsMonthlyCount": 12,
+        "gfsYearlyCount": 1,
+        "storageTB": 1455.254
+      },
+      "730": {
+        "date": "2028-05-01",
+        "chainCount": 17,
+        "rpCount": 119,
+        "gfsWeeklyCount": 6,
+        "gfsMonthlyCount": 12,
+        "gfsYearlyCount": 2,
+        "storageTB": 1941.929
       }
     }
   }

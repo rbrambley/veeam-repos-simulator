@@ -957,6 +957,22 @@
                                        }
                       },
                       {
+                          "id":  "ix-sobr-copymove-w6m12y2-immutability-211tb",
+                          "notes":  "captured-manually-from-user-paste-2026-05-20",
+                          "startDate":  "2026-05-20",
+                          "forecastYears":  3,
+                          "fileTypeForecastYears":  0,
+                          "expected":  {
+                                           "plannedCapacityTB":  270.1,
+                                           "fileTypeFullTB":  105.5,
+                                           "fileTypeIncrementalTB":  5.275,
+                                           "fileTypeSyntheticFullTB":  5.275,
+                                           "plannedPerformanceTierTB":  270.1,
+                                           "plannedCapacityTierTB":  596.8,
+                                           "plannedArchiveTierTB":  617.9
+                                       }
+                      },
+                      {
                           "id":  "ix-no-gfs-long-archive",
                           "notes":  "captured-from-playwright-2026-05-11",
                           "expected":  {
