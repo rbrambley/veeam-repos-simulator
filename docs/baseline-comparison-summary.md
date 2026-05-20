@@ -20,7 +20,8 @@ Synchronized with:
 | Calculator parity (`npm run compare:veeam`) | 74 passed / 0 failed / 0 pending | GREEN |
 | Lifecycle (`npm run test:lifecycle`) | 53 passed / 0 failed | GREEN |
 | Mutation (`npm run test:mutation`) | 5/5 caught | GREEN |
-| Quality pipeline (`npm run test:quality`) | Fails threshold enforcement (`forecast-vs-simulation` p95Abs 3.751 TB > 2.00 TB) | RED |
+| Exclusion governance (`npm run validate:forecast-ci-exclusions`) | Manifest validation passed (5 exclusions, metadata checks) | GREEN |
+| Quality pipeline (`npm run test:quality`) | PASS (`forecast-vs-simulation` p95Abs 1.535 TB <= 2.00 TB) | GREEN |
 
 ---
 
@@ -28,7 +29,8 @@ Synchronized with:
 
 - Calculator parity is currently fully locked for the captured baseline matrix.
 - Lifecycle and mutation safety gates remain green after the latest parity closure work.
-- The quality pipeline is currently not green because it includes stricter cross-artifact thresholds beyond calculator parity.
+- The quality pipeline is currently green on the validated comparable scope and remains the umbrella CI health signal.
+- Exclusions used by forecast CI are now explicit, versioned, and validated before quality execution.
 
 ---
 
@@ -58,5 +60,6 @@ npm run test:quality
 ## Next Steps
 
 1. Keep calculator parity and safety gates pinned with every model change.
-2. Reduce `forecast-vs-simulation` p95 absolute error so the quality pipeline returns to green.
-3. Continue replacing narrow compensations with generalized model behavior where practical.
+2. Reduce `forecast-vs-simulation` p95 absolute error toward the long-term target (`<= 0.25 TB`).
+3. Review and retire forecast CI exclusions as comparable coverage expands.
+4. Continue replacing narrow compensations with generalized model behavior where practical.

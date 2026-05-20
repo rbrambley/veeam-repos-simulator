@@ -98,8 +98,7 @@ Confidence is lower when extrapolating beyond captured baseline classes, especia
 2. High-scale copy+move W/M/Y growth routing is deterministic-only; fallback calibration path has been removed.
 3. Additional captures are still useful for confidence expansion beyond the validated matrix.
 4. Confidence outside captured matrix is directional, not proven by parity capture.
-5. Summary docs are partially stale versus latest runs:
-- [docs/baseline-comparison-summary.md](docs/baseline-comparison-summary.md)
+5. Summary docs are synchronized with latest accepted runs.
 
 ---
 
