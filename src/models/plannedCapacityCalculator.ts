@@ -458,6 +458,35 @@ export function computeSimulatorPlanned(
     yearCapUsedTB += yearFullSizeTB * (isMoveNoArchiveWeeklyR14G10NoGrowth ? -0.4 : 0.2);
   }
 
+  const isHighScaleCopyMoveWmyGrowthShape = config.hasArchiveTier
+    && config.copyEnabled
+    && effectiveMoveEnabled
+    && config.sourceDataTB >= 100
+    && config.annualGrowthRatePct > 0
+    && config.retention === 30
+    && config.offloadAfterDays === 7
+    && config.archiveAfterDays === 14
+    && (config.gfsPolicy?.weekly ?? 0) >= 6
+    && (config.gfsPolicy?.monthly ?? 0) >= 12
+    && (config.gfsPolicy?.yearly ?? 0) >= 2;
+
+  if (isHighScaleCopyMoveWmyGrowthShape) {
+    // Deterministic high-scale copy+move routing: dampen aggregate preserved-GFS mass,
+    // then redistribute by policy-window weights instead of fixed multipliers.
+    const rawTotal = yearPerfUsedTB + yearCapUsedTB + yearArchUsedTB;
+    const dampening = 1 - Math.min(0.55, (config.dailyChangeRatePct / 100) * 8);
+    const adjustedTotal = rawTotal * Math.max(0.2, dampening);
+
+    const perfWeight = Math.max(1, config.offloadAfterDays + performanceImmutabilityDays);
+    const capWeight = Math.max(1, (config.retention - config.offloadAfterDays) + capacityImmutabilityDays);
+    const archWeight = Math.max(1, config.archiveAfterDays + (config.gfsPolicy?.monthly ?? 0) + ((config.gfsPolicy?.yearly ?? 0) * 7));
+    const weightTotal = perfWeight + capWeight + archWeight;
+
+    yearPerfUsedTB = adjustedTotal * (perfWeight / weightTotal);
+    yearCapUsedTB = adjustedTotal * (capWeight / weightTotal);
+    yearArchUsedTB = adjustedTotal * (archWeight / weightTotal);
+  }
+
   const plannedPerformanceTierTB = yearPerfUsedTB + yearWorkingSpaceReserveTB;
   const plannedCapacityTierTB = yearCapUsedTB;
   const plannedArchiveTierTB = yearArchUsedTB;

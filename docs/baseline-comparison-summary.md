@@ -1,6 +1,6 @@
 # Baseline Comparison Summary Report
 
-Date: May 17, 2026
+Date: May 20, 2026
 Status: Calculator parity locked on validated matrix
 Tolerance: 5% per metric
 Model: Current simulator with shared computeSimulatorPlanned() path
@@ -17,8 +17,8 @@ Synchronized with:
 
 | Gate | Result | Status |
 |---|---:|---|
-| Calculator parity (`npm run compare:veeam`) | 73 passed / 0 failed / 0 pending | GREEN |
-| Lifecycle (`npm run test:lifecycle`) | 52 passed / 0 failed | GREEN |
+| Calculator parity (`npm run compare:veeam`) | 74 passed / 0 failed / 0 pending | GREEN |
+| Lifecycle (`npm run test:lifecycle`) | 53 passed / 0 failed | GREEN |
 | Mutation (`npm run test:mutation`) | 5/5 caught | GREEN |
 | Quality pipeline (`npm run test:quality`) | Fails threshold enforcement (`forecast-vs-simulation` p95Abs 3.751 TB > 2.00 TB) | RED |
 
@@ -34,7 +34,7 @@ Synchronized with:
 
 ## Most Recent Improvement Cycle
 
-Recent keep-or-rollback passes closed the final open scenarios and moved parity from 67/6 to 73/0 with no lifecycle or mutation regressions.
+Recent keep-or-rollback passes closed the final open scenarios and moved parity from 67/6 to 74/0 with no lifecycle or mutation regressions.
 
 Key closed clusters:
 - DAS soak cluster (r14/r30 W4/M3/Y2 growth)

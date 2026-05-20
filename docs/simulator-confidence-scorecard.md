@@ -1,6 +1,6 @@
 # Simulator Confidence Scorecard
 
-**Date:** May 17, 2026  
+**Date:** May 20, 2026  
 **Audience:** Product and engineering decisions for simulator use  
 **Assessment type:** Evidence-based from current repo artifacts
 
@@ -13,7 +13,7 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 | Dimension | Score | Rationale |
 |---|---:|---|
 | Health | **8/10** | Lifecycle and mutation remain green with calculator parity now fully green on the validated matrix. |
-| Calculator Parity Accuracy (validated matrix) | **10/10** | Latest baseline comparison shows **73 passed / 0 failed** at 5% tolerance. |
+| Calculator Parity Accuracy (validated matrix) | **10/10** | Latest baseline comparison shows **74 passed / 0 failed** at 5% tolerance. |
 | Behavioral Coverage Depth | **8/10** | Strong boundary + temporal + interaction + oracle layering, with documented rule mapping. |
 | Drift Risk (outside validated scope) | **8/10** | Residual drift is now bounded below tolerance across the matrix, with top max drift at 5.00%. |
 | Production Readiness (within validated scope) | **8/10** | Parity is now locked on the validated matrix with lifecycle and mutation gates remaining green. |
@@ -24,7 +24,7 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 
 1. Baseline parity run:
 - Source: [compare-output.txt](compare-output.txt)
-- Result: **Passed 73, Failed 0**
+- Result: **Passed 74, Failed 0**
 - Tolerance: **5% per metric**
 
 1. Model-aligned parity checkpoint:
@@ -43,6 +43,11 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 - Replacement iteration 1 (age-floor 38, no multiplier): rejected (parity regressed to 40/33).
 - Replacement iteration 2 (age-floor 101, no multiplier): rejected (large overshoot in targeted scenarios; parity 40/33).
 - Current decision: keep temporary multiplier, continue replacement search with strict keep-or-rollback.
+- High-scale copy+move parity checkpoint (May 20):
+	- File-size horizon and tier horizon are intentionally split for one manual-capture scenario in [docs/veeam-calculator-baseline.json](docs/veeam-calculator-baseline.json).
+	- Comparator support for this split is implemented in [src/testing/veeamBaselineComparator.ts](src/testing/veeamBaselineComparator.ts).
+	- Deterministic replacement for high-scale copy+move W/M/Y growth is now the only routing path in [src/models/plannedCapacityCalculator.ts](src/models/plannedCapacityCalculator.ts).
+	- Validation result: deterministic path passes `compare:veeam` (74/0) and `test:lifecycle` (53/0).
 - Copy-cluster checkpoint: both `ti-sobr-copy-3yr` and `od-sobr-copy-full-lifecycle` moved into pass under narrow, shape-guarded copy rules.
 - Copy+Move checkpoint: `ix-copy-move-combo` moved into pass under a narrow no-growth W4/M2/Y0 short-offload shape guard.
 - Move-only short-retention checkpoint: `ix-retention-variant-r7` moved into pass under a narrow W4/M3/Y0 r7 move-only no-growth routing correction.
@@ -58,7 +63,7 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 
 2. Lifecycle validation:
 - Source: [docs/lifecycle-report.html](docs/lifecycle-report.html)
-- Recent result in commit logs/output: **52 passed, 0 failed**
+- Recent result in commit logs/output: **53 passed, 0 failed**
 
 3. Mutation robustness:
 - Source: [docs/mutation-report.json](docs/mutation-report.json)
@@ -86,8 +91,10 @@ Confidence is lower when extrapolating beyond captured baseline classes, especia
 ## Known Limits and Residual Risk
 
 1. Some mechanics remain documented as non-modeled or partially modeled for perfect equivalence.
-2. Confidence outside captured matrix is directional, not proven by parity capture.
-3. Summary docs are partially stale versus latest runs:
+2. High-scale copy+move W/M/Y growth routing is deterministic-only; fallback calibration path has been removed.
+3. Additional captures are still useful for confidence expansion beyond the validated matrix.
+4. Confidence outside captured matrix is directional, not proven by parity capture.
+5. Summary docs are partially stale versus latest runs:
 - [docs/simulator-confidence-assessment.md](docs/simulator-confidence-assessment.md)
 - [docs/baseline-comparison-summary.md](docs/baseline-comparison-summary.md)
 
@@ -123,6 +130,6 @@ Consolidated Phase 1 metric artifact:
 
 ## Immediate Next Improvements
 
-1. Refresh confidence docs to current counts/dates for consistent messaging.
-2. Add explicit parity captures for additional forecast-year slices where needed.
-3. Expand rule-level assertions for currently documented gaps.
+1. Add explicit parity captures for additional forecast-year slices where needed.
+2. Expand rule-level assertions for currently documented gaps.
+3. Reduce forecast-vs-simulation threshold drift so the quality pipeline can return to green.

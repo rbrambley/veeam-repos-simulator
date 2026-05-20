@@ -1,13 +1,13 @@
 # Simulator vs Veeam Calculator - Confidence Assessment
 
 Audience: Veeam SEs evaluating simulator usage for calculator-aligned sizing
-Last updated: 2026-05-17
+Last updated: 2026-05-20
 Baseline source: [docs/veeam-calculator-baseline.json](docs/veeam-calculator-baseline.json)
 
 ## Current Validation Snapshot
 
-- `npm run compare:veeam`: 73 passed, 0 failed, 0 pending
-- `npm run test:lifecycle`: 52 passed, 0 failed
+- `npm run compare:veeam`: 74 passed, 0 failed, 0 pending
+- `npm run test:lifecycle`: 53 passed, 0 failed
 - `npm run test:mutation`: 5/5 mutations caught
 - `npm run test:quality`: FAIL (threshold enforcement in forecast-vs-simulation stage)
 
@@ -18,7 +18,7 @@ Related quick scorecard:
 
 ## TL;DR
 
-Confidence is high for calculator-equivalent sizing within the captured scenario matrix because parity is 73/0 and safety gates are green. Do not treat `test:quality` as equivalent to calculator parity; it currently includes stricter forecast-threshold checks that remain red.
+Confidence is high for calculator-equivalent sizing within the captured scenario matrix because parity is 74/0 and safety gates are green. Do not treat `test:quality` as equivalent to calculator parity; it currently includes stricter forecast-threshold checks that remain red.
 
 ---
 
@@ -26,8 +26,8 @@ Confidence is high for calculator-equivalent sizing within the captured scenario
 
 | Gate | Confidence Signal | Current State |
 |---|---|---|
-| Calculator parity (`compare:veeam`) | Direct calculator alignment | HIGH (73/0) |
-| Lifecycle (`test:lifecycle`) | State machine and lifecycle invariants | HIGH (52/0) |
+| Calculator parity (`compare:veeam`) | Direct calculator alignment | HIGH (74/0) |
+| Lifecycle (`test:lifecycle`) | State machine and lifecycle invariants | HIGH (53/0) |
 | Mutation (`test:mutation`) | Defect detection robustness | HIGH (5/5 caught) |
 | Quality pipeline (`test:quality`) | Multi-metric CI envelope including forecast thresholds | PARTIAL (currently failing threshold) |
 
