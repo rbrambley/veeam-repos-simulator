@@ -47,7 +47,8 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 	- File-size horizon and tier horizon are intentionally split for one manual-capture scenario in [docs/veeam-calculator-baseline.json](docs/veeam-calculator-baseline.json).
 	- Comparator support for this split is implemented in [src/testing/veeamBaselineComparator.ts](src/testing/veeamBaselineComparator.ts).
 	- Deterministic replacement for high-scale copy+move W/M/Y growth is now the only routing path in [src/models/plannedCapacityCalculator.ts](src/models/plannedCapacityCalculator.ts).
-	- Validation result: deterministic path passes `compare:veeam` (74/0) and `test:lifecycle` (53/0).
+	- Validation result: deterministic path passes `compare:veeam` (74/0) and `test:lifecycle` (57/0).
+	- Object-mode matrix extension: explicit DAS/SOBR x object true/false scenarios now pass, with DAS object-storage generation lifecycle fixed in [src/simulator/engine.ts](src/simulator/engine.ts).
 - Copy-cluster checkpoint: both `ti-sobr-copy-3yr` and `od-sobr-copy-full-lifecycle` moved into pass under narrow, shape-guarded copy rules.
 - Copy+Move checkpoint: `ix-copy-move-combo` moved into pass under a narrow no-growth W4/M2/Y0 short-offload shape guard.
 - Move-only short-retention checkpoint: `ix-retention-variant-r7` moved into pass under a narrow W4/M3/Y0 r7 move-only no-growth routing correction.
@@ -63,7 +64,7 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 
 2. Lifecycle validation:
 - Source: [docs/lifecycle-report.html](docs/lifecycle-report.html)
-- Recent result in commit logs/output: **53 passed, 0 failed**
+- Recent result in commit logs/output: **57 passed, 0 failed**
 
 3. Mutation robustness:
 - Source: [docs/mutation-report.json](docs/mutation-report.json)

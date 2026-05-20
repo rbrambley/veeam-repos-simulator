@@ -47,6 +47,7 @@ import {
 interface ScenarioAssertions extends DailyAssertionConfig {
   oracleDiff?: boolean;
   oracleChecks?: string[];
+  requireGenerationLifecycle?: boolean;
   genWindowBoundaryCorrect?: boolean;
   genDeleteOnEqualsWindowEndPlusSla?: boolean;
   genDeleteOnExtendedByGfs?: boolean;
@@ -90,6 +91,7 @@ interface ScenarioAssertions extends DailyAssertionConfig {
 }
 interface ScenarioConfig {
   repositoryType: 'DAS' | 'SOBR';
+  isObjectStorage?: boolean;
   sourceDataTB: number;
   dailyChangeRatePct: number;
   annualGrowthRatePct: number;
@@ -138,6 +140,7 @@ function buildInitialState(sc: LifecycleScenario): SimulationState {
     id: repoId,
     name: `Repo-${sc.id}`,
     type: cfg.repositoryType,
+    isObjectStorage: cfg.isObjectStorage,
     capacityTB: 999,
     sobrConfig: cfg.repositoryType === 'SOBR'
       ? {
@@ -859,6 +862,28 @@ function runScenario(sc: LifecycleScenario, goldenSnapshots: GoldenSnapshotManag
   );
   const finalSnapshot = allSnapshots[allSnapshots.length - 1] ?? snapshotFromState(0, START_DATE, sim.state, sim);
 
+  if (assertions.requireGenerationLifecycle !== undefined) {
+    const hasGenerations = (sim.state.generations?.length ?? 0) > 0;
+    if (assertions.requireGenerationLifecycle && !hasGenerations) {
+      violations.push({
+        day: sc.totalDays,
+        date: finalSnapshot.date,
+        violatedRule: 'R-OBJ-01',
+        expected: 'generation lifecycle active (at least one generation exists)',
+        actual: 'no generations were created for this scenario',
+      });
+    }
+    if (!assertions.requireGenerationLifecycle && hasGenerations) {
+      violations.push({
+        day: sc.totalDays,
+        date: finalSnapshot.date,
+        violatedRule: 'R-OBJ-02',
+        expected: 'generation lifecycle inactive (no generations expected)',
+        actual: `found ${(sim.state.generations?.length ?? 0)} generation(s)`,
+      });
+    }
+  }
+
   const goldenResult = goldenSnapshots.evaluateScenario(sc.id, sc.totalDays, allSnapshots);
   for (const gv of goldenResult.violations) {
     violations.push({
@@ -1040,6 +1065,8 @@ const RULE_DESCRIPTIONS: Record<string, string> = {
   'R-IMM-01': 'No Performance data deleted while Performance tier immutable',
   'R-IMM-02': 'No chain deleted while Capacity tier immutable',
   'R-IMM-03': 'No chain deleted while Archive tier immutable',
+  'R-OBJ-01': 'Object-storage mode must activate generation lifecycle',
+  'R-OBJ-02': 'Non-object DAS mode must not activate generation lifecycle',
   'R-SNAP-01': 'Golden snapshot state (day 365/730) matches approved baseline',
 };
 
@@ -1074,6 +1101,8 @@ function getAssertionLabels(a: ScenarioAssertions): string[] {
   if (a.noArchivePointBeforeCapTierAge)        out.push('No archive before minimum Capacity age');
   if (a.slaMinimumNeverViolated)               out.push('SLA minimum always satisfied');
   if (a.chainDeletionRequiresAllGensUnlocked)  out.push('Chain deletion requires all GENs unlocked');
+  if (a.requireGenerationLifecycle !== undefined)
+    out.push(a.requireGenerationLifecycle ? 'Generation lifecycle required' : 'Generation lifecycle disabled');
   if (a.genStateTransitionsMonotonic)          out.push('GEN state transitions monotonic');
   if (a.noDeletionWhileCapImmutable)           out.push('No deletion while Capacity immutable');
   if (a.noDeletionWhileArchImmutable)          out.push('No deletion while Archive immutable');
@@ -1086,6 +1115,7 @@ function getAssertionLabels(a: ScenarioAssertions): string[] {
 
 function cfgSummary(cfg: ScenarioConfig): string {
   const parts: string[] = [cfg.repositoryType];
+  if (cfg.isObjectStorage) parts.push('ObjectStorage');
   parts.push(`Ret:${cfg.retention}`);
   const { weekly = 0, monthly = 0, yearly = 0 } = cfg.gfsPolicy;
   if (weekly + monthly + yearly > 0) parts.push(`GFS:${weekly}W/${monthly}M/${yearly}Y`);

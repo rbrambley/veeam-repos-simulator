@@ -25,6 +25,22 @@
 - `test:quality`: PASS
 - Forecast CI p95 moved from previous failing state to passing state within current threshold.
 
+## Update: Object-Storage Lifecycle Completion (Same Branch)
+
+1. Implemented DAS object-storage generation activation at ingest in [src/simulator/engine.ts](src/simulator/engine.ts).
+2. Added explicit mode matrix coverage (DAS/SOBR x object true/false) through scenario harness support:
+   - [src/testing/lifecycleRunner.ts](src/testing/lifecycleRunner.ts)
+   - [src/testing/scenarioRunner.ts](src/testing/scenarioRunner.ts)
+   - [docs/lifecycle-test-scenarios.json](docs/lifecycle-test-scenarios.json)
+3. Resolved failing rule `R-OBJ-01` for `ix-mode-das-objectstorage-gen`.
+
+### Final Gate Status (post-fix)
+
+- `npm run test:lifecycle -- --skip-html-report` -> PASS (57/57)
+- `npm run compare:veeam` -> PASS (74/0/0)
+- `npm run test:mutation` -> PASS (5/5)
+- `npm run report:forecast-vs-simulation -- --enforce-thresholds` -> PASS
+
 ## Notes
 
 - Exclusions are now transparent and governed by a tracked file instead of in-code constants.
@@ -33,7 +49,7 @@
 ## PR Checklist
 
 - [x] Calculator parity green (`compare:veeam` 74/0)
-- [x] Lifecycle green (`test:lifecycle` 53/0)
+- [x] Lifecycle green (`test:lifecycle` 57/0)
 - [x] Mutation green (`test:mutation` 5/5)
 - [x] Forecast CI gate green (`test:quality` PASS)
 - [x] Exclusion manifest added and reviewed (`docs/forecast-ci-exclusions.json`)

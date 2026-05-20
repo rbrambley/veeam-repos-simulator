@@ -1118,6 +1118,17 @@ export class VeeamSimulator {
     this.state.restorePoints.push(rp);
     // Stamp initial SOBR tier if this repo is a SOBR
     const repo = this.state.repositories.find(r => r.id === job.repositoryId);
+    if (repo?.type === 'DAS' && repo.isObjectStorage) {
+      // DAS direct-to-object mode participates in generation lifecycle at ingest time.
+      let gen = this.getGenerationForPoint(rp);
+      if (!gen) {
+        this.registerPointInGeneration(job, chain, rp, rp.date);
+        gen = this.getGenerationForPoint(rp);
+      }
+      if (gen) {
+        this.markGenerationTierEntered(gen, 'Performance', rp.date, repo);
+      }
+    }
     if (repo?.type === 'SOBR' && repo.sobrConfig) {
       const copyEnabled = this.isCopyEnabled(repo.sobrConfig);
       rp.sobrTier = 'Performance';

@@ -85,6 +85,15 @@ Maps every contract rule to the test IDs that exercise it, across all 4 layers o
 
 ---
 
+### R-OBJ — Object Mode Activation Rules
+
+| Rule | Description | Test IDs |
+|------|-------------|----------|
+| R-OBJ-01 | Object-storage mode must activate generation lifecycle | `ix-mode-das-objectstorage-gen`, `ix-mode-sobr-nonobject-gen`, `ix-mode-sobr-objectstorage-gen` |
+| R-OBJ-02 | Non-object DAS mode must not activate generation lifecycle | `ix-mode-das-nonobject-baseline` |
+
+---
+
 ### R-IMM — Immutability Lock Rules
 
 | Rule | Description | Test IDs |
@@ -100,10 +109,10 @@ Maps every contract rule to the test IDs that exercise it, across all 4 layers o
 | Layer | Count | Focus |
 |-------|-------|-------|
 | 1 — Boundary | 12 | Exact day before/on/after each threshold |
-| 2 — Temporal invariants | 6 | Daily scanning over 3–5 year runs |
-| 3 — Interaction matrix | 18 | Pairwise + 3-way cross-feature combos |
-| 4 — Oracle diff | 6 | Per-day expected vs actual state diff |
-| **Total** | **42** | |
+| 2 — Temporal invariants | 8 | Daily scanning over 3–5 year runs |
+| 3 — Interaction matrix | 29 | Pairwise + 3-way cross-feature combos, including mode activation checks |
+| 4 — Oracle diff | 8 | Per-day expected vs actual state diff |
+| **Total** | **57** | |
 
 ---
 
@@ -129,6 +138,9 @@ Maps every contract rule to the test IDs that exercise it, across all 4 layers o
 - `ti-sobr-copy-3yr` — R-ARCH-02, R-ARCH-03
 - `ti-sobr-gfs-archive-5yr` — R-RET-01/02/03, R-GFS-01/03, R-OFFLOAD-01, R-PRUNE-01, R-BASE-01, R-CHAIN-01
 - `ti-das-sla-minimum-5yr` — R-RET-01, R-RET-03
+- `ti-das-chain-rp-drift-3yr` — R-RET-01, R-BASE-01
+- `ti-sobr-move-chain-rp-drift-3yr` — R-DRIFT-01, R-RET-01, R-CHAIN-01
+- `ti-das-high-retention-drift-3yr` — R-RET-01, R-BASE-01
 
 ### Layer 3 — Interaction Matrix
 - `im-perf-immutability-blocks-prune` — R-IMM-01
@@ -148,6 +160,10 @@ Maps every contract rule to the test IDs that exercise it, across all 4 layers o
 - `ix-no-gfs-long-archive` — R-ARCH-04
 - `ix-retention-variant-r7` — R-RET-01, R-GFS-01/04
 - `ix-retention-variant-r60` — R-RET-01, R-BASE-01, R-GFS-01
+- `ix-mode-das-nonobject-baseline` — R-OBJ-02
+- `ix-mode-das-objectstorage-gen` — R-OBJ-01
+- `ix-mode-sobr-nonobject-gen` — R-OBJ-01
+- `ix-mode-sobr-objectstorage-gen` — R-OBJ-01
 
 ### Layer 4 — Oracle Diff Tests
 - `od-weekly-gfs-cardinality-exact` — R-GFS-01, R-GFS-03
@@ -156,6 +172,8 @@ Maps every contract rule to the test IDs that exercise it, across all 4 layers o
 - `od-gen-lifecycle-states` — R-GEN-01/02/03/04, R-IMM-01/02
 - `od-chain-phase-transitions` — R-CHAIN-01, R-OFFLOAD-01, R-PRUNE-01, R-RET-01
 - `od-sobr-copy-full-lifecycle` — R-ARCH-02/03, R-CHAIN-01
+- `od-das-wmy-weekly-size-nonzero` — R-DRIFT-01
+- `od-calculator-parity-347tb-wmy` — R-DRIFT-01
 
 ---
 

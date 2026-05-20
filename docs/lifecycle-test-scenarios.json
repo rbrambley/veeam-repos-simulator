@@ -1384,6 +1384,135 @@
     },
 
     // ─────────────────────────────────────────────────────────────────────────
+    // LAYER 3 — Object storage mode coverage matrix (DAS/SOBR × object on/off)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    {
+      "id": "ix-mode-das-nonobject-baseline",
+      "layer": 3,
+      "name": "Mode matrix: DAS without object storage",
+      "description": "DAS baseline mode should remain non-generation-based while core chain/GFS invariants stay stable.",
+      "rules": ["R-BASE-01", "R-RET-01", "R-OBJ-02"],
+      "config": {
+        "repositoryType": "DAS",
+        "isObjectStorage": false,
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 60,
+      "assertions": {
+        "requireGenerationLifecycle": false,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true,
+        "maxInactiveChainsAtAnyTime": 3
+      }
+    },
+
+    {
+      "id": "ix-mode-das-objectstorage-gen",
+      "layer": 3,
+      "name": "Mode matrix: DAS with object storage",
+      "description": "DAS direct-to-object mode must activate generation lifecycle behavior and preserve standard invariants.",
+      "rules": ["R-GEN-01", "R-GEN-04", "R-OBJ-01"],
+      "config": {
+        "repositoryType": "DAS",
+        "isObjectStorage": true,
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "generationPeriodDays": 10,
+        "performanceImmutabilityDays": 7,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": false
+      },
+      "totalDays": 80,
+      "assertions": {
+        "requireGenerationLifecycle": true,
+        "genWindowBoundaryCorrect": true,
+        "genStateTransitionsMonotonic": true,
+        "singleGlobalBasePerJobEveryDay": true,
+        "gfsWeeklyCountNeverExceedsLimit": true
+      }
+    },
+
+    {
+      "id": "ix-mode-sobr-nonobject-gen",
+      "layer": 3,
+      "name": "Mode matrix: SOBR without object storage",
+      "description": "Current SOBR mode should continue to use generation lifecycle and offload/prune ordering in non-object configuration.",
+      "rules": ["R-OFFLOAD-01", "R-PRUNE-01", "R-OBJ-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "isObjectStorage": false,
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 30,
+        "performanceImmutabilityDays": 7,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 70,
+      "assertions": {
+        "requireGenerationLifecycle": true,
+        "pruneNeverBeforeOffload": true,
+        "noPruneWhilePerfImmutable": true,
+        "genStateTransitionsMonotonic": true
+      }
+    },
+
+    {
+      "id": "ix-mode-sobr-objectstorage-gen",
+      "layer": 3,
+      "name": "Mode matrix: SOBR with object storage",
+      "description": "SOBR object-storage mode should retain generation lifecycle and archive gating behavior with tier immutability rules intact.",
+      "rules": ["R-ARCH-01", "R-IMM-03", "R-OBJ-01"],
+      "config": {
+        "repositoryType": "SOBR",
+        "isObjectStorage": true,
+        "sourceDataTB": 1,
+        "dailyChangeRatePct": 5,
+        "annualGrowthRatePct": 0,
+        "retention": 30,
+        "gfsPolicy": {"weekly": 2, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 7,
+        "archiveAfterDays": 14,
+        "performanceImmutabilityDays": 7,
+        "capacityImmutabilityDays": 14,
+        "archiveImmutabilityDays": 21,
+        "generationPeriodDays": 10,
+        "hasArchiveTier": true,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 120,
+      "assertions": {
+        "requireGenerationLifecycle": true,
+        "chainDeletionRequiresAllGensUnlocked": true,
+        "noDeletionWhileArchImmutable": true,
+        "gfsWeeklyCountNeverExceedsLimit": true
+      }
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
     // LAYER 4 — Oracle diff tests (daily state snapshot comparison)
     // ─────────────────────────────────────────────────────────────────────────
 

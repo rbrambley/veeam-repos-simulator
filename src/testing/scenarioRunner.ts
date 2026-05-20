@@ -13,6 +13,7 @@ interface TestScenario {
   description: string;
   config: {
     repositoryType: 'DAS' | 'SOBR';
+    isObjectStorage?: boolean;
     jobType: string;
     startDate?: string;
     sourceDataTB: number;
@@ -177,6 +178,7 @@ function createInitialState(config: TestScenario['config']): SimulationState {
     id: repoId,
     name: 'Test Repository',
     type: config.repositoryType,
+    isObjectStorage: config.isObjectStorage,
     capacityTB: 500,
     sobrConfig,
   };
