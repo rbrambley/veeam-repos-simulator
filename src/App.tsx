@@ -36,6 +36,17 @@ export const App: React.FC = () => {
   const [sim, setSim] = useState(() => new VeeamSimulator({ ...defaultState }));
   const [currentDate, setCurrentDate] = useState(defaultState.date);
   const [simulationStarted, setSimulationStarted] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+
+  const handleReset = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const fresh: SimulationState = { ...defaultState, date: today, startDate: today };
+    setSimState({ ...fresh });
+    setSim(new VeeamSimulator({ ...fresh }));
+    setCurrentDate(today);
+    setSimulationStarted(false);
+    setResetKey(k => k + 1);
+  };
 
   // Handler to update simulation state from InputForm
   const handleScenarioChange = (newState: SimulationState) => {
@@ -70,8 +81,10 @@ export const App: React.FC = () => {
     <div className="app-container">
       <h1>Veeam Backup Simulator</h1>
       <InputForm
+        key={resetKey}
         simState={simState}
         onScenarioChange={handleScenarioChange}
+        onReset={handleReset}
       />
       <hr />
       {simulationStarted && (

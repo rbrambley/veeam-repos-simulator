@@ -6,9 +6,10 @@ import { computeSimulatorPlanned, ScenarioConfig } from '../models/plannedCapaci
 interface InputFormProps {
   simState: SimulationState;
   onScenarioChange: (newState: SimulationState) => void;
+  onReset?: () => void;
 }
 
-export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange }) => {
+export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange, onReset }) => {
   const [repoName, setRepoName] = useState(simState.repositories[0]?.name || 'Main Repo');
   const [repoType, setRepoType] = useState<RepositoryType>(simState.repositories[0]?.type || 'DAS');
   const [jobName, setJobName] = useState(simState.jobs[0]?.name || 'Daily Backup');
@@ -493,7 +494,17 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               </div>
             </div>
           )}
-          <button type="submit" className="apply-btn">Simulate</button>
+          <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+            <button type="submit" className="apply-btn">Simulate</button>
+            <button
+              type="button"
+              className="reset-btn"
+              onClick={onReset}
+              title="Reset all inputs and simulation to defaults"
+            >
+              Reset
+            </button>
+          </div>
         </form>
 
         {/* ── Right column: calculated capacity requirements ── */}
