@@ -21,7 +21,7 @@ Use this classification when implementing or reviewing changes.
 	- Job type semantics (Forward Incremental, Reverse Incremental, Active Full, Synthetic Full).
 	- GFS overlays (weekly/monthly/yearly tagging and retention caps).
 	- SOBR tiering semantics (Copy, Move, Archive transitions).
-	- Repository capability differences (DAS/NAS/Object/SOBR optimizations).
+	- Repository capability differences (DAS/Object/SOBR optimizations).
 
 ---
 
@@ -137,10 +137,10 @@ Use this classification when implementing or reviewing changes.
 - Fast access, limited scalability, low cost.
 - Use Cases: Small environments, test labs, short-term retention.
 
-### 1.2 Network Attached Storage (NAS)
-- Network shares (SMB/CIFS, NFS).
-- Shared access, moderate performance, easy expansion.
-- Use Cases: Medium environments, file-level backups, shared storage.
+### 1.2 Network Attached Storage (NAS) (Out of Simulator Scope)
+- NAS repository modeling is intentionally deferred and will be combined with Active Full implementation.
+- Both NAS and Active Full operate without block-level cloning features (SMB/NFS shares and Active Full both read full source data).
+- When Active Full is implemented, NAS will use the same logic path.
 
 ### 1.3 Deduplication Appliances
 - Purpose-built storage with deduplication (e.g., HPE StoreOnce, Dell EMC Data Domain).
@@ -164,7 +164,7 @@ Use this classification when implementing or reviewing changes.
 
 ### 1.6 Scale-Out Backup Repository (SOBR)
 - Logical pool of multiple repositories, supporting multiple tiers:
-	- **Performance Tier:** Typically local or fast storage (DAS, NAS, or object storage in v12+).
+	- **Performance Tier:** Typically local or fast storage (DAS or object storage in v12+).
 	- **Capacity Tier:** Object storage (S3, Azure Blob, etc.) for offloading older backups.
 	- **Archive Tier:** Object storage (e.g., Amazon S3 Glacier, Azure Archive Blob) for long-term retention.
 - Object Storage can be used as an extent in any tier (Performance, Capacity, Archive) depending on Veeam version and workload.
@@ -224,8 +224,8 @@ Use this classification when implementing or reviewing changes.
 
 ## 4. Job Type and Repository Type Interactions
 
-| Job Type             | DAS/NAS         | Object Storage         | SOBR                |
-|----------------------|-----------------|-----------------------|---------------------|
+| Job Type             | DAS             | Object Storage         | SOBR                |
+|---------------------|-----------------|------------------------|-----------------------|
 | Forward Incremental  | Supported       | Supported*            | Supported           |
 | Reverse Incremental  | Supported       | Not supported         | Supported           |
 | Synthetic Full       | Supported       | Supported*            | Supported           |

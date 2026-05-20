@@ -3,7 +3,6 @@
 
 export type RepositoryType =
   | 'DAS'
-  | 'NAS'
   | 'ObjectStorage'
   | 'SOBR';
 

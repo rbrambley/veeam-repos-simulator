@@ -201,3 +201,10 @@ Known Issues / Remaining Gaps (as of May 3, 2026)
    - Proper Active Full would require full runtime + forecast parity work (new full-from-source scheduling, chain lifecycle changes, GFS/SOBR/immutability interactions).
    - **Impact**: None for current default Veeam workflows (Forward Incremental with Synthetic Full remains the active modeled path).
    - **Status**: Deferred to a dedicated future branch (recommended: `feature/active-full-mode`).
+
+6. **NAS (Network Attached Storage) is intentionally deferred**
+   - NAS is removed from the current simulator UI/model to defer its implementation.
+   - NAS shares (SMB/NFS) do not support block-level cloning (ReFS/XFS copy-on-write features), making their behavior fundamentally similar to Active Full (read entire source, no synthetic optimization).
+   - When Active Full is properly implemented, NAS will use the same code path since both require full-source-read semantics.
+   - **Impact**: None for current default Veeam workflows (DAS remains the primary local storage option).
+   - **Status**: Deferred to be combined with Active Full implementation (recommended: `feature/active-full-mode`).
