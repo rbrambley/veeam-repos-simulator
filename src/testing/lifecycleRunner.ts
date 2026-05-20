@@ -8,6 +8,7 @@
  * Usage:  npx tsx src/testing/lifecycleRunner.ts
  *         npx tsx src/testing/lifecycleRunner.ts <scenario-id>   (run one)
  *         npx tsx src/testing/lifecycleRunner.ts --update-snapshots
+ *         npx tsx src/testing/lifecycleRunner.ts --skip-html-report
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'fs';
@@ -2527,6 +2528,8 @@ function main() {
 
   const args = process.argv.slice(2);
   const updateSnapshots = args.includes('--update-snapshots');
+  const skipHtmlReport =
+    args.includes('--skip-html-report') || process.env.SKIP_LIFECYCLE_HTML_REPORT === '1';
   const filterById = args.find((a) => !a.startsWith('--'));
   const scenarios = filterById
     ? data.scenarios.filter((s) => s.id === filterById)
@@ -2575,13 +2578,17 @@ function main() {
     console.log(`Golden snapshots updated: docs/golden-snapshots.json`);
   }
 
-  // Write HTML report
-  const reportPath = join(process.cwd(), 'docs', 'lifecycle-report.html');
-  const mutationReport = readMutationReport();
-  const gfsSizingTestStatus = readGfsSizingTestStatusFromEnv();
-  const gfsSizingReport = readGfsSizingReport();
-  writeHtmlReportV2(scenarios, results, reportPath, mutationReport, gfsSizingTestStatus, gfsSizingReport);
-  console.log(`\nReport: docs/lifecycle-report.html`);
+  if (skipHtmlReport) {
+    console.log(`\nReport skipped: docs/lifecycle-report.html (hook/no-report mode)`);
+  } else {
+    // Write HTML report
+    const reportPath = join(process.cwd(), 'docs', 'lifecycle-report.html');
+    const mutationReport = readMutationReport();
+    const gfsSizingTestStatus = readGfsSizingTestStatusFromEnv();
+    const gfsSizingReport = readGfsSizingReport();
+    writeHtmlReportV2(scenarios, results, reportPath, mutationReport, gfsSizingTestStatus, gfsSizingReport);
+    console.log(`\nReport: docs/lifecycle-report.html`);
+  }
 
   if (failed > 0) {
     console.log(`\n=== Failures ===\n`);
