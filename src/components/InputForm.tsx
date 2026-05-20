@@ -297,7 +297,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </label>
             <label>
               Forecast (y):
-              <input type="number" value={forecastYears} min={1} max={10} step={1} onChange={e => setForecastYears(Number(e.target.value))} style={compactNumberInputStyle} />
+              <input type="number" value={forecastYears} min={0} max={10} step={1} onChange={e => setForecastYears(Number(e.target.value))} style={compactNumberInputStyle} />
             </label>
             <label>
               Daily Change (%):
