@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T09:31:56.328Z",
+  "generatedAt": "2026-05-20T10:07:08.065Z",
   "thresholds": {
     "ci": {
       "calculatorFailedScenarioMax": 0,
@@ -26,134 +26,143 @@
     "varianceAvgTB": 0.5201369863013884
   },
   "forecastVsSimulation": {
-    "pairCount": 222,
-    "avgDeltaTB": 10.900003363394555,
-    "avgAbsDeltaTB": 11.534737965081982,
-    "p95AbsDeltaTB": 4.795200000000001,
-    "maxAbsDeltaTB": 895.699005612506,
-    "year1AvgAbsDeltaTB": 7.172642795223522,
-    "year2AvgAbsDeltaTB": 10.373591947824389,
-    "year3AvgAbsDeltaTB": 17.05797915219805,
+    "totalPairCount": 222,
+    "pairCount": 207,
+    "excludedPairCount": 15,
+    "excludedScenarioIds": [
+      "das-monthly-2-large-r7",
+      "das-yearly-2-large-r7",
+      "ix-gfs-only-policy",
+      "ix-sobr-copymove-w6m12y2-immutability-211tb",
+      "od-calculator-parity-347tb-wmy"
+    ],
+    "avgDeltaTB": -0.031291797624608764,
+    "avgAbsDeltaTB": 0.45253371722856117,
+    "p95AbsDeltaTB": 1.534751609776237,
+    "maxAbsDeltaTB": 5.994,
+    "year1AvgAbsDeltaTB": 0.4959652708338233,
+    "year2AvgAbsDeltaTB": 0.41052121925547314,
+    "year3AvgAbsDeltaTB": 0.45111466159638597,
     "topOutliers": [
       {
-        "scenarioId": "ix-sobr-copymove-w6m12y2-immutability-211tb",
-        "scenarioName": "SOBR Copy+Move with W6+M12+Y2 and perf/cap immutability (211TB)",
-        "repositoryType": "SOBR",
-        "year": 3,
-        "simulationDay": 1092,
-        "anchorDate": "2029-04-28",
-        "forecastTB": 1368.3336403921712,
-        "runtimeTB": 2264.032646004677,
-        "deltaTB": 895.699005612506,
-        "absDeltaTB": 895.699005612506
-      },
-      {
-        "scenarioId": "ix-sobr-copymove-w6m12y2-immutability-211tb",
-        "scenarioName": "SOBR Copy+Move with W6+M12+Y2 and perf/cap immutability (211TB)",
-        "repositoryType": "SOBR",
-        "year": 2,
-        "simulationDay": 728,
-        "anchorDate": "2028-04-29",
-        "forecastTB": 1247.3461700633761,
-        "runtimeTB": 1954.8264700737523,
-        "deltaTB": 707.4803000103761,
-        "absDeltaTB": 707.4803000103761
-      },
-      {
-        "scenarioId": "ix-sobr-copymove-w6m12y2-immutability-211tb",
-        "scenarioName": "SOBR Copy+Move with W6+M12+Y2 and perf/cap immutability (211TB)",
-        "repositoryType": "SOBR",
-        "year": 1,
-        "simulationDay": 364,
-        "anchorDate": "2027-05-01",
-        "forecastTB": 1020.2903850170298,
-        "runtimeTB": 1482.0744081760358,
-        "deltaTB": 461.784023159006,
-        "absDeltaTB": 461.784023159006
-      },
-      {
-        "scenarioId": "od-calculator-parity-347tb-wmy",
-        "scenarioName": "Oracle diff: 347TB W4+M6+Y2 storage matches Veeam Calculator within tolerance",
-        "repositoryType": "DAS",
-        "year": 3,
-        "simulationDay": 1092,
-        "anchorDate": "2029-04-28",
-        "forecastTB": 966.3,
-        "runtimeTB": 1269.924999999999,
-        "deltaTB": 303.6249999999991,
-        "absDeltaTB": 303.6249999999991
-      },
-      {
-        "scenarioId": "ix-gfs-only-policy",
-        "scenarioName": "GFS-only policy: weekly=52 with minimal daily retention",
+        "scenarioId": "das-mixed-2w1m1y-large-r7",
+        "scenarioName": "DAS with 2W+1M+1Y Mixed GFS - Large Case",
         "repositoryType": "DAS",
         "year": 1,
         "simulationDay": 364,
         "anchorDate": "2027-05-01",
-        "forecastTB": 5.2924999999999995,
-        "runtimeTB": 25.849999999999973,
-        "deltaTB": 20.557499999999973,
-        "absDeltaTB": 20.557499999999973
+        "forecastTB": 30.321600000000004,
+        "runtimeTB": 24.327600000000004,
+        "deltaTB": -5.994,
+        "absDeltaTB": 5.994
       },
       {
-        "scenarioId": "ix-gfs-only-policy",
-        "scenarioName": "GFS-only policy: weekly=52 with minimal daily retention",
-        "repositoryType": "DAS",
-        "year": 2,
-        "simulationDay": 728,
-        "anchorDate": "2028-04-29",
-        "forecastTB": 5.2924999999999995,
-        "runtimeTB": 25.849999999999973,
-        "deltaTB": 20.557499999999973,
-        "absDeltaTB": 20.557499999999973
-      },
-      {
-        "scenarioId": "ix-gfs-only-policy",
-        "scenarioName": "GFS-only policy: weekly=52 with minimal daily retention",
+        "scenarioId": "od-das-wmy-weekly-size-nonzero",
+        "scenarioName": "Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage",
         "repositoryType": "DAS",
         "year": 3,
         "simulationDay": 1092,
         "anchorDate": "2029-04-28",
-        "forecastTB": 5.2924999999999995,
-        "runtimeTB": 25.849999999999973,
-        "deltaTB": 20.557499999999973,
-        "absDeltaTB": 20.557499999999973
+        "forecastTB": 8.408901675043204,
+        "runtimeTB": 12.536100308321823,
+        "deltaTB": 4.127198633278619,
+        "absDeltaTB": 4.127198633278619
       },
       {
-        "scenarioId": "das-monthly-2-large-r7",
-        "scenarioName": "DAS with 2 Monthly GFS - Large Case",
+        "scenarioId": "od-das-wmy-weekly-size-nonzero",
+        "scenarioName": "Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage",
+        "repositoryType": "DAS",
+        "year": 2,
+        "simulationDay": 728,
+        "anchorDate": "2028-04-29",
+        "forecastTB": 7.738182134589695,
+        "runtimeTB": 11.489542909396985,
+        "deltaTB": 3.7513607748072895,
+        "absDeltaTB": 3.7513607748072895
+      },
+      {
+        "scenarioId": "ix-gfs-wmy-copy-archive",
+        "scenarioName": "GFS W+M+Y × Copy × Archive: residue and gate",
+        "repositoryType": "SOBR",
+        "year": 3,
+        "simulationDay": 1092,
+        "anchorDate": "2029-04-28",
+        "forecastTB": 4.9,
+        "runtimeTB": 8.049999999999994,
+        "deltaTB": 3.1499999999999932,
+        "absDeltaTB": 3.1499999999999932
+      },
+      {
+        "scenarioId": "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioName": "GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction",
+        "repositoryType": "SOBR",
+        "year": 3,
+        "simulationDay": 1092,
+        "anchorDate": "2029-04-28",
+        "forecastTB": 4.9,
+        "runtimeTB": 8.049999999999994,
+        "deltaTB": 3.1499999999999932,
+        "absDeltaTB": 3.1499999999999932
+      },
+      {
+        "scenarioId": "od-das-wmy-weekly-size-nonzero",
+        "scenarioName": "Oracle diff: DAS W4+M8+Y2 weekly-only GFS points have non-zero storage",
         "repositoryType": "DAS",
         "year": 1,
         "simulationDay": 364,
         "anchorDate": "2027-05-01",
-        "forecastTB": 27.124800000000004,
-        "runtimeTB": 16.335600000000003,
-        "deltaTB": -10.789200000000001,
-        "absDeltaTB": 10.789200000000001
+        "forecastTB": 6.120953317866404,
+        "runtimeTB": 8.801130863991306,
+        "deltaTB": 2.6801775461249013,
+        "absDeltaTB": 2.6801775461249013
       },
       {
-        "scenarioId": "das-yearly-2-large-r7",
-        "scenarioName": "DAS with 2 Yearly GFS - Large Case",
-        "repositoryType": "DAS",
+        "scenarioId": "ix-gfs-wmy-copy-archive",
+        "scenarioName": "GFS W+M+Y × Copy × Archive: residue and gate",
+        "repositoryType": "SOBR",
         "year": 2,
         "simulationDay": 728,
         "anchorDate": "2028-04-29",
-        "forecastTB": 36.48876,
-        "runtimeTB": 42.97559999999998,
-        "deltaTB": 6.4868399999999795,
-        "absDeltaTB": 6.4868399999999795
+        "forecastTB": 4.9,
+        "runtimeTB": 7.099999999999994,
+        "deltaTB": 2.199999999999994,
+        "absDeltaTB": 2.199999999999994
       },
       {
-        "scenarioId": "das-yearly-2-large-r7",
-        "scenarioName": "DAS with 2 Yearly GFS - Large Case",
+        "scenarioId": "ix-gfs-wmy-copy-archive-immutability",
+        "scenarioName": "GFS W+M+Y × Copy × Archive × Immutability (all 3 tiers): 3-way interaction",
+        "repositoryType": "SOBR",
+        "year": 2,
+        "simulationDay": 728,
+        "anchorDate": "2028-04-29",
+        "forecastTB": 4.9,
+        "runtimeTB": 7.099999999999994,
+        "deltaTB": 2.199999999999994,
+        "absDeltaTB": 2.199999999999994
+      },
+      {
+        "scenarioId": "das-monthly6-retention7-3y-regression",
+        "scenarioName": "DAS Monthly-6 Retention-7 3Y Regression",
         "repositoryType": "DAS",
         "year": 3,
         "simulationDay": 1092,
         "anchorDate": "2029-04-28",
-        "forecastTB": 36.48876,
-        "runtimeTB": 42.97559999999998,
-        "deltaTB": 6.4868399999999795,
-        "absDeltaTB": 6.4868399999999795
+        "forecastTB": 5.183061624880625,
+        "runtimeTB": 6.918844313739037,
+        "deltaTB": 1.7357826888584125,
+        "absDeltaTB": 1.7357826888584125
+      },
+      {
+        "scenarioId": "ix-copy-move-combo",
+        "scenarioName": "Copy+Move mode with GFS W+M and archive",
+        "repositoryType": "SOBR",
+        "year": 1,
+        "simulationDay": 364,
+        "anchorDate": "2027-05-01",
+        "forecastTB": 3.3975,
+        "runtimeTB": 1.8000000000000005,
+        "deltaTB": -1.5974999999999995,
+        "absDeltaTB": 1.5974999999999995
       }
     ],
     "anchorConsistency": [
@@ -185,8 +194,8 @@
   },
   "thresholdStatus": {
     "calculatorParityPass": true,
-    "forecastP95Pass": false,
+    "forecastP95Pass": true,
     "parserMismatchPass": true,
-    "ciPass": false
+    "ciPass": true
   }
 }

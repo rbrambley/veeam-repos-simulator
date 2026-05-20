@@ -12,11 +12,11 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 
 | Dimension | Score | Rationale |
 |---|---:|---|
-| Health | **8/10** | Lifecycle and mutation remain green with calculator parity now fully green on the validated matrix. |
+| Health | **9/10** | Lifecycle, mutation, parity, and forecast CI guardrails are green on the current validated scope. |
 | Calculator Parity Accuracy (validated matrix) | **10/10** | Latest baseline comparison shows **74 passed / 0 failed** at 5% tolerance. |
 | Behavioral Coverage Depth | **8/10** | Strong boundary + temporal + interaction + oracle layering, with documented rule mapping. |
 | Drift Risk (outside validated scope) | **8/10** | Residual drift is now bounded below tolerance across the matrix, with top max drift at 5.00%. |
-| Production Readiness (within validated scope) | **8/10** | Parity is now locked on the validated matrix with lifecycle and mutation gates remaining green. |
+| Production Readiness (within validated scope) | **9/10** | Parity is locked on the validated matrix with lifecycle, mutation, and forecast CI gates green. |
 
 ---
 
@@ -71,7 +71,7 @@ Current run context: post-targeted parity recovery with strict keep-or-rollback 
 
 4. Quality pipeline status:
 - Source: [docs/forecast-vs-simulation-summary.json](docs/forecast-vs-simulation-summary.json)
-- Latest run: **FAIL** on threshold enforcement (`p95Abs 3.751 TB > 2.00 TB`) while calculator parity remains green in `compare:veeam`.
+- Latest run: **PASS** on threshold enforcement (`p95Abs 1.535 TB <= 2.00 TB`) with calculator parity green in `compare:veeam`.
 
 5. Coverage mapping and traceability:
 - Source: [docs/lifecycle-coverage-ledger.md](docs/lifecycle-coverage-ledger.md)
@@ -132,4 +132,4 @@ Consolidated Phase 1 metric artifact:
 
 1. Add explicit parity captures for additional forecast-year slices where needed.
 2. Expand rule-level assertions for currently documented gaps.
-3. Reduce forecast-vs-simulation threshold drift so the quality pipeline can return to green.
+3. Continue reducing forecast-vs-simulation drift toward the tighter target threshold (`p95Abs <= 0.25 TB`).

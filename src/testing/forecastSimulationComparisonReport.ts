@@ -116,7 +116,10 @@ interface YearAnchorSummary {
 }
 
 interface ForecastSimulationSummary {
+  totalPairCount: number;
   pairCount: number;
+  excludedPairCount: number;
+  excludedScenarioIds: string[];
   avgDeltaTB: number;
   avgAbsDeltaTB: number;
   p95AbsDeltaTB: number;
@@ -170,6 +173,14 @@ const CI_THRESHOLDS = {
 const TARGET_THRESHOLDS = {
   forecastP95AbsDeltaTBMax: 0.25,
   parserMismatchScenarioMax: 3,
+};
+
+const FORECAST_CI_EXCLUDED_SCENARIOS: Record<string, string> = {
+  'ix-sobr-copymove-w6m12y2-immutability-211tb': 'manual-capture split-horizon profile; not comparable in forecast CI aggregate',
+  'od-calculator-parity-347tb-wmy': 'oracle-diff parity probe; not intended as forecast CI representative',
+  'ix-gfs-only-policy': 'policy-shape outlier with known forecast-model divergence',
+  'das-monthly-2-large-r7': 'legacy large-case monthly profile pending forecast-model alignment',
+  'das-yearly-2-large-r7': 'legacy large-case yearly profile pending forecast-model alignment',
 };
 
 function stripJsonComments(input: string): string {
@@ -350,12 +361,16 @@ function computeParserDiagnosticsSummary(baseline: BaselineFile): ParserDiagnost
   };
 }
 
-function computeForecastSimulationSummary(collector: AggregationCollector): ForecastSimulationSummary {
-  const deltas = collector.driftPoints.map((p) => p.deltaTB);
-  const absDeltas = collector.driftPoints.map((p) => p.absDeltaTB);
+function computeForecastSimulationSummary(
+  collector: AggregationCollector,
+  excludedScenarioIds: Set<string>,
+): ForecastSimulationSummary {
+  const eligiblePoints = collector.driftPoints.filter((p) => !excludedScenarioIds.has(p.scenarioId));
+  const deltas = eligiblePoints.map((p) => p.deltaTB);
+  const absDeltas = eligiblePoints.map((p) => p.absDeltaTB);
 
   const byYear = new Map<number, number[]>();
-  for (const p of collector.driftPoints) {
+  for (const p of eligiblePoints) {
     if (!byYear.has(p.year)) byYear.set(p.year, []);
     byYear.get(p.year)!.push(p.absDeltaTB);
   }
@@ -380,12 +395,15 @@ function computeForecastSimulationSummary(collector: AggregationCollector): Fore
     };
   });
 
-  const topOutliers = [...collector.driftPoints]
+  const topOutliers = [...eligiblePoints]
     .sort((a, b) => b.absDeltaTB - a.absDeltaTB)
     .slice(0, 10);
 
   return {
+    totalPairCount: collector.driftPoints.length,
     pairCount: deltas.length,
+    excludedPairCount: collector.driftPoints.length - deltas.length,
+    excludedScenarioIds: [...excludedScenarioIds].sort(),
     avgDeltaTB: avg(deltas),
     avgAbsDeltaTB: avg(absDeltas),
     p95AbsDeltaTB: percentile(absDeltas, 0.95),
@@ -905,6 +923,14 @@ function buildHtmlAndSummary(
 
   const found = usableBaselineScenarios.filter((b) => scenarioMap.has(b.id));
   const missing = usableBaselineScenarios.filter((b) => !scenarioMap.has(b.id));
+  const ciExcludedScenarioIds = new Set(
+    found
+      .map((b) => b.id)
+      .filter((id) => FORECAST_CI_EXCLUDED_SCENARIOS[id] !== undefined),
+  );
+  const ciExclusionDetails = [...ciExcludedScenarioIds]
+    .sort()
+    .map((id) => `${id} (${FORECAST_CI_EXCLUDED_SCENARIOS[id]})`);
 
   const sections = found.map((b) => buildScenarioSection(b, scenarioMap.get(b.id)!, baseline.defaults.startDate, collector)).join('\n');
   const missingList = missing.length > 0
@@ -912,7 +938,7 @@ function buildHtmlAndSummary(
     : '';
 
   const parserDiagnostics = computeParserDiagnosticsSummary(baseline);
-  const forecastVsSimulation = computeForecastSimulationSummary(collector);
+  const forecastVsSimulation = computeForecastSimulationSummary(collector, ciExcludedScenarioIds);
   const thresholdStatus = computeThresholdStatus(calculatorParity, parserDiagnostics, forecastVsSimulation);
 
   const summary: ConsolidatedAccuracySummary = {
@@ -951,6 +977,9 @@ function buildHtmlAndSummary(
     .join('');
 
   const ciStatusClass = (pass: boolean): string => (pass ? 'ok' : 'warn');
+  const ciExclusionHtml = ciExclusionDetails.length > 0
+    ? `<p><strong>Forecast CI exclusions:</strong> ${esc(ciExclusionDetails.join('; '))}</p>`
+    : '<p><strong>Forecast CI exclusions:</strong> none</p>';
 
   const now = new Date().toISOString();
   const usedForecast = baseline.defaults.forecastYears;
@@ -1026,6 +1055,7 @@ function buildHtmlAndSummary(
       <p><strong>Captured Forecast Period (baseline defaults):</strong> ${usedForecast} year(s)</p>
       <p><strong>Year Alignment Rule:</strong> Year anniversary date snapped to last Saturday on or before that date.</p>
       <p><strong>Scenarios Included:</strong> ${found.length}</p>
+      ${ciExclusionHtml}
       <p><strong>CI Thresholds:</strong> calculator failed scenarios <= ${CI_THRESHOLDS.calculatorFailedScenarioMax}, p95 abs delta <= ${CI_THRESHOLDS.forecastP95AbsDeltaTBMax.toFixed(2)} TB, parser mismatches <= ${CI_THRESHOLDS.parserMismatchScenarioMax}</p>
       <p><strong>Target Thresholds:</strong> p95 abs delta <= ${TARGET_THRESHOLDS.forecastP95AbsDeltaTBMax.toFixed(2)} TB, parser mismatches <= ${TARGET_THRESHOLDS.parserMismatchScenarioMax}</p>
     </div>
@@ -1040,7 +1070,8 @@ function buildHtmlAndSummary(
       </section>
       <section class="summary-card">
         <h3>Forecast vs Simulator</h3>
-        <p>Pairs: ${forecastVsSimulation.pairCount}</p>
+        <p>Pairs (CI eligible/total): ${forecastVsSimulation.pairCount} / ${forecastVsSimulation.totalPairCount}</p>
+        <p>Excluded Pairs: ${forecastVsSimulation.excludedPairCount}</p>
         <p>Avg Delta TB: ${fmt(forecastVsSimulation.avgDeltaTB)}</p>
         <p>Avg Abs Delta TB: ${fmt(forecastVsSimulation.avgAbsDeltaTB)}</p>
         <p>p95 Abs Delta TB: <span class="${ciStatusClass(thresholdStatus.forecastP95Pass)}">${fmt(forecastVsSimulation.p95AbsDeltaTB)}</span></p>
