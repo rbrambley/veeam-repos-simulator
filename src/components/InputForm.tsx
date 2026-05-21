@@ -129,13 +129,14 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   let calcCapTB = 0;
   let calcArchTB = 0;
 
-  const clampedForecast = Math.max(1, Math.floor(forecastYears || 1));
-  // Always show min 3, max 5 columns. When forecast > 5, the last column is the actual
-  // forecast year so the totals always match what Apply will set.
-  const visibleYears = Math.min(5, Math.max(3, clampedForecast));
-  const yearColumns: number[] = clampedForecast > 5
-    ? [1, 2, 3, 4, clampedForecast]
-    : Array.from({ length: visibleYears }, (_, i) => i + 1);
+  const appliedForecastYear = Math.max(0, Math.floor(forecastYears || 0));
+  // Keep preview columns stable but preserve explicit Year 0 when the user selects Forecast=0.
+  const yearColumns: number[] = appliedForecastYear === 0
+    ? [0, 1, 2]
+    : appliedForecastYear > 5
+      ? [1, 2, 3, 4, appliedForecastYear]
+      : Array.from({ length: Math.min(5, Math.max(3, appliedForecastYear)) }, (_, i) => i + 1);
+  const displayedYearCount = yearColumns.length;
 
   const computeYearlyRequirements = (year: number) => {
     const yearSourceTB = sourceDataTB * Math.pow(1 + annualGrowthRate / 100, year);
@@ -208,7 +209,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   };
 
   const yearlyRequirements = yearColumns.map(y => ({ year: y, ...computeYearlyRequirements(y) }));
-  const appliedRequirements = computeYearlyRequirements(clampedForecast);
+  const appliedRequirements = computeYearlyRequirements(appliedForecastYear);
 
   if (repoType !== 'SOBR') {
     calcRepoCapTB = appliedRequirements.repoTotalTB;
@@ -521,7 +522,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             📐 Calculated Capacity Requirements
             <span
               style={tooltipBadgeStyle}
-              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${clampedForecast > 5 ? `Years 1-4 plus year ${clampedForecast} are shown.` : `Years 1-${visibleYears} are shown.`} ★ marks the applied forecast year.`}
+              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${appliedForecastYear === 0 ? 'Years 0-2 are shown.' : appliedForecastYear > 5 ? `Years 1-4 plus year ${appliedForecastYear} are shown.` : `Years 1-${displayedYearCount} are shown.`} ★ marks the applied forecast year.`}
               aria-label="Capacity assumptions"
             >
               ?
@@ -529,13 +530,13 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
           </div>
 
           <div style={{ overflowX: 'auto', paddingBottom: '0.2rem' }}>
-            <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: `${160 + (visibleYears * 115)}px`, fontSize: '0.82rem' }}>
+            <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: `${160 + (displayedYearCount * 115)}px`, fontSize: '0.82rem' }}>
               <thead>
                 <tr>
                   <th style={{ textAlign: 'left', padding: '6px 8px', borderBottom: '1px solid #c5cae9', color: '#1a237e' }}>Metric</th>
                   {yearColumns.map(year => (
-                    <th key={`year-col-${year}`} style={{ textAlign: 'right', padding: '6px 8px', borderBottom: '1px solid #c5cae9', color: year === clampedForecast ? '#b71c1c' : '#1a237e', whiteSpace: 'nowrap', fontWeight: year === clampedForecast ? 'bold' : undefined }}>
-                      Year {year}{year === clampedForecast ? ' ★' : ''}
+                    <th key={`year-col-${year}`} style={{ textAlign: 'right', padding: '6px 8px', borderBottom: '1px solid #c5cae9', color: year === appliedForecastYear ? '#b71c1c' : '#1a237e', whiteSpace: 'nowrap', fontWeight: year === appliedForecastYear ? 'bold' : undefined }}>
+                      Year {year}{year === appliedForecastYear ? ' ★' : ''}
                     </th>
                   ))}
                 </tr>
