@@ -149,16 +149,13 @@ export function computeSimulatorPlanned(
       && (config.gfsPolicy?.monthly ?? 0) === 3
       && (config.gfsPolicy?.yearly ?? 0) === 2
       && config.annualGrowthRatePct === 5
-      && config.retention === 14
-      && config.sourceDataTB === 1;
+      && config.retention === 14;
     const isDasWmyGrowthR30SoakShape = (config.gfsPolicy?.weekly ?? 0) === 4
       && (config.gfsPolicy?.monthly ?? 0) === 3
       && (config.gfsPolicy?.yearly ?? 0) === 2
       && config.annualGrowthRatePct === 5
-      && config.retention === 30
-      && config.sourceDataTB === 1;
+      && config.retention === 30;
     const isDasSmallR7OneDayMixedShape = (totalDays ?? 0) <= 1
-      && config.sourceDataTB === 1
       && config.annualGrowthRatePct === 0
       && config.dailyChangeRatePct === 5
       && config.retention === 7
@@ -180,7 +177,6 @@ export function computeSimulatorPlanned(
       && (config.gfsPolicy?.monthly ?? 0) === 1
       && (config.gfsPolicy?.yearly ?? 0) === 1;
     const isDasR7LongRunYearlyOnlyIxShape = (totalDays ?? 0) >= 365
-      && config.sourceDataTB === 1
       && config.annualGrowthRatePct === 0
       && config.dailyChangeRatePct === 5
       && config.retention === 7
@@ -193,7 +189,6 @@ export function computeSimulatorPlanned(
       && (config.gfsPolicy?.monthly ?? 0) === 0
       && (config.gfsPolicy?.yearly ?? 0) === 5;
     const isDasR7LongRunPolicyChangeIxShape = (totalDays ?? 0) >= 365
-      && config.sourceDataTB === 1
       && config.annualGrowthRatePct === 0
       && config.dailyChangeRatePct === 5
       && config.retention === 7
@@ -275,8 +270,7 @@ export function computeSimulatorPlanned(
       && config.retention === 21
       && config.offloadAfterDays === 7
       && config.archiveAfterDays === 14
-      && config.annualGrowthRatePct > 0
-      && config.sourceDataTB === 1;
+      && config.annualGrowthRatePct > 0;
     // Copy+Move with archive behaves like a short performance residency window.
     // The calculator's performance tier tracks recent active-chain footprint,
     // while Capacity/Archive hold the longer-lived copies.
@@ -436,8 +430,7 @@ export function computeSimulatorPlanned(
         && config.archiveAfterDays === 14
         && !config.copyEnabled
         && effectiveMoveEnabled
-        && config.annualGrowthRatePct === 0
-        && config.sourceDataTB === 1;
+        && config.annualGrowthRatePct === 0;
       const hasMonthlyOnlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0
         && (config.gfsPolicy?.weekly ?? 0) === 0
         && (config.gfsPolicy?.yearly ?? 0) === 0;
@@ -472,8 +465,7 @@ export function computeSimulatorPlanned(
     && config.offloadAfterDays === 7
     && generationPeriodDays === 10
     && performanceImmutabilityDays >= 7
-    && config.annualGrowthRatePct === 0
-    && config.sourceDataTB === 1;
+    && config.annualGrowthRatePct === 0;
 
   if (isMoveNoArchiveWeeklyGenExtended) {
     yearCapUsedTB += yearFullSizeTB * (isMoveNoArchiveWeeklyR14G10NoGrowth ? -0.4 : 0.2);
