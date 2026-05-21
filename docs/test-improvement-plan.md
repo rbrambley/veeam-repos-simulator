@@ -82,3 +82,67 @@ The generated report is now `Veeam Simulator — Quality & Validation Report` an
 - mutation testing status
 - golden snapshot registry
 - linked scenario sections and rule coverage
+
+---
+
+## Phase 4 - Forecast Drift Reduction Campaign (Current)
+
+Goal: push forecast-vs-simulation p95 abs delta from 1.597 TB toward the long-term target 0.25 TB while preserving parity and lifecycle quality gates.
+
+Reference baseline:
+- [docs/forecast-vs-simulation-summary.json](docs/forecast-vs-simulation-summary.json)
+- Current p95 abs delta: 1.597 TB
+- Current max abs delta: 5.994 TB
+
+### Top-5 remediation classes
+
+1. DAS mixed GFS large-profile residue
+- Representative scenario: `das-mixed-2w1m1y-large-r7`
+- Signal: 5.994 TB abs delta (year 1)
+- Action: align forecast residue carryover with runtime lifecycle survival rules for mixed W/M/Y points.
+
+2. DAS weekly-heavy W+M+Y long horizon
+- Representative scenario: `od-das-wmy-weekly-size-nonzero`
+- Signal: 2.680-4.127 TB abs deltas across year 1-3
+- Action: synchronize weekly cardinality/pruning order assumptions between forecast and runtime.
+
+3. SOBR move-only high-volume class
+- Representative scenario: `sobr-moveonly-27tb-forecast0`
+- Signal: ~4.05 TB abs delta in years 1 and 2
+- Action: recalibrate move-only capacity-tier residency using year-anchor runtime snapshots.
+
+4. SOBR copy+archive W/M/Y interaction
+- Representative scenarios: `ix-gfs-wmy-copy-archive`, `ix-gfs-wmy-copy-archive-immutability`
+- Signal: up to 3.15 TB abs delta in year 3
+- Action: model copy+archive+GFS interaction explicitly in forecast, with immutability-aware checks.
+
+5. Year-anchor accumulation consistency (cross-cutting)
+- Scope: classes 1-4
+- Signal: persistent high-tail drift despite CI pass
+- Action: add anchor-consistency regression checks against lifecycle snapshots for year 1/2/3.
+
+### Execution protocol
+
+1. Implement classes 1-2 and rerun:
+- `npm run report:forecast-vs-simulation -- --enforce-thresholds`
+- `npm run compare:veeam`
+
+2. If p95 remains > 1.20 TB, implement class 3 and rerun full quality:
+- `npm run test:quality`
+
+3. Implement classes 4-5 and rerun full gates:
+- `npm run gate:push`
+
+### Wave acceptance criteria
+
+1. Parity remains 75 passed / 0 failed.
+2. Lifecycle and mutation remain green.
+3. Forecast p95 abs delta <= 1.00 TB (wave target).
+4. No increase in CI exclusions.
+
+### Expected confidence lift
+
+If classes 1-5 are addressed without regressions, expected confidence movement is:
+1. Forecaster vs Simulator Consistency: 8/10 -> 8.5-9/10
+2. Drift Risk (outside validated scope): 7/10 -> 7.5-8/10
+3. Production Readiness (within validated scope): 9/10 -> 9/10 (unchanged, but with tighter forecast envelope)

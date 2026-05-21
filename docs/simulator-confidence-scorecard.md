@@ -90,3 +90,30 @@ Long-term targets:
 1. Keep replacing narrow shape-specific logic with generalized, formula-driven behavior when parity is retained.
 2. Add targeted captures for remaining top outlier classes in forecast-vs-simulation summary.
 3. Continue reducing p95 absolute drift toward 0.25 TB target.
+
+---
+
+## Top-5 Drift Reduction Plan (May 21, 2026)
+
+Goal: reduce forecast-vs-simulation p95 abs delta from 1.597 TB toward 0.25 TB without regressing calculator parity (75/0) or lifecycle quality (57/0).
+
+Prioritization source: [docs/forecast-vs-simulation-summary.json](docs/forecast-vs-simulation-summary.json) top outlier set and CI aggregate metrics.
+
+| Priority | Drift Class | Representative Scenarios | Current Signal | Primary Hypothesis | Planned Fix Pattern | Expected Confidence Lift |
+|---|---|---|---|---|---|---|
+| P1 | DAS mixed GFS large-profile residue | `das-mixed-2w1m1y-large-r7` | max abs delta 5.994 TB (Year 1) | Forecast underestimates GFS residue carryover for large source volumes under mixed W/M/Y cadence. | Reconcile mixed-GFS retention residue accounting to use lifecycle-consistent per-point survival at year anchors. | p95 likely improves by ~0.20-0.35 TB; max outlier band reduced materially. |
+| P2 | DAS weekly-heavy W+M+Y long horizon | `od-das-wmy-weekly-size-nonzero` | abs deltas 2.680-4.127 TB (Y1-Y3) | Weekly GFS contribution and long-horizon accumulation shape differ between forecast and runtime pruning order. | Align weekly-cardinality and pruning-order assumptions with oracle lifecycle ordering used in runtime. | p95 likely improves by ~0.10-0.20 TB and narrows year-over-year spread. |
+| P3 | SOBR move-only high-volume forecast0 class | `sobr-moveonly-27tb-forecast0` | abs delta ~4.05 TB (Y1/Y2) | Capacity-tier residency and move threshold interactions are still forecast-biased at high volume despite class generalization. | Apply class-level recalibration for move-only capacity residency using year-anchor state snapshots from runtime. | p95 likely improves by ~0.10-0.20 TB; reduces persistent multi-year bias. |
+| P4 | SOBR copy+archive W/M/Y interaction | `ix-gfs-wmy-copy-archive`, `ix-gfs-wmy-copy-archive-immutability` | abs deltas up to 3.15 TB (Y3) | Forecast misses compounded effect of copy + archive gating + GFS retention at later years. | Add explicit interaction term in forecast logic for copy-archive residue under W/M/Y (including immutability-on/off parity checks). | p95 likely improves by ~0.08-0.15 TB; lowers high-tail variance in Y2/Y3. |
+| P5 | Year-anchor accumulation consistency in long-horizon classes | Cross-cutting over P1-P4 | p95 1.597 TB remains far above target 0.25 TB | Even with class fixes, anchor-date accumulation drift can remain if yearly aggregation shortcuts diverge from day-level lifecycle state. | Introduce anchor-consistency regression checks against lifecycle snapshots for year 1/2/3 on top drift classes. | p95 likely improves by ~0.05-0.10 TB and prevents recurrence. |
+
+Delivery sequence:
+1. Implement P1 and P2 first and rerun `npm run report:forecast-vs-simulation -- --enforce-thresholds`.
+2. If p95 remains > 1.20 TB, implement P3.
+3. Implement P4 and P5 together and rerun full gate stack.
+
+Success criteria for this wave:
+1. Calculator parity stays at 75 passed / 0 failed.
+2. Lifecycle and mutation gates remain green.
+3. Forecast p95 abs delta reaches <= 1.00 TB (wave target) with no new CI exclusions.
+4. Post-wave target remains <= 0.25 TB via additional follow-on refinement.
