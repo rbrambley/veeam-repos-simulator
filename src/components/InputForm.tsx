@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { computeForecastGfsStatsAtYear } from '../models/gfsSizing';
+import { normalizeForecastYears } from '../models/forecast';
 import { SimulationState, BackupJobType, RepositoryType, computeVeeamWorkingSpaceTB } from '../models/veeam';
 import { computeSimulatorPlanned, ScenarioConfig } from '../models/plannedCapacityCalculator';
 
@@ -18,7 +19,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const [sourceDataTB, setSourceDataTB] = useState(simState.jobs[0]?.sourceDataTB || 1);
   const [dailyChangeRate, setDailyChangeRate] = useState(simState.jobs[0]?.dailyChangeRatePct ?? 5);
   const [annualGrowthRate, setAnnualGrowthRate] = useState(simState.jobs[0]?.annualGrowthRatePct ?? 0);
-  const [forecastYears, setForecastYears] = useState(simState.jobs[0]?.forecastYears ?? 0);
+  const [forecastYears, setForecastYears] = useState(normalizeForecastYears(simState.jobs[0]?.forecastYears));
   const [retention, setRetention] = useState(simState.jobs[0]?.retention.restorePoints || 14);
   const [gfsWeekly, setGfsWeekly] = useState(simState.jobs[0]?.gfsPolicy?.weekly || 0);
   const [gfsMonthly, setGfsMonthly] = useState(simState.jobs[0]?.gfsPolicy?.monthly || 0);
@@ -107,11 +108,12 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   };
 
   // ── Calculated capacity requirements (derived from scenario inputs) ───────────
-  const peakSourceTB = sourceDataTB * Math.pow(1 + annualGrowthRate / 100, forecastYears);
+  const appliedForecastYear = normalizeForecastYears(forecastYears);
+  const peakSourceTB = sourceDataTB * Math.pow(1 + annualGrowthRate / 100, appliedForecastYear);
   const fullSizeTB = peakSourceTB * 0.5;               // ~50% compression ratio
   const incrSizeTB = peakSourceTB * (dailyChangeRate / 100) * 0.5;
   const fullIntervalDays = jobType === 'ForwardIncremental' ? 7 : retention;
-  const gfsForecastStats = computeGfsStatsAtYear(Math.max(0, forecastYears));
+  const gfsForecastStats = computeGfsStatsAtYear(appliedForecastYear);
 
   const estimateTierChainDataTB = (windowDays: number) => {
     if (windowDays <= 0) return 0;
@@ -129,11 +131,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   let calcCapTB = 0;
   let calcArchTB = 0;
 
-  const appliedForecastYear = Math.max(0, Math.floor(forecastYears || 0));
-  // Keep preview columns stable but preserve explicit Year 0 when the user selects Forecast=0.
-  const yearColumns: number[] = appliedForecastYear === 0
-    ? [0, 1, 2]
-    : appliedForecastYear > 5
+  const yearColumns: number[] = appliedForecastYear > 5
       ? [1, 2, 3, 4, appliedForecastYear]
       : Array.from({ length: Math.min(5, Math.max(3, appliedForecastYear)) }, (_, i) => i + 1);
   const displayedYearCount = yearColumns.length;
@@ -262,7 +260,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
           sourceDataTB,
           dailyChangeRatePct: dailyChangeRate,
           annualGrowthRatePct: annualGrowthRate,
-          forecastYears,
+          forecastYears: appliedForecastYear,
           schedule: { frequency: 'Daily', timeOfDay: '02:00' },
           retention: { restorePoints: retention, slaDays: retention },
           gfsPolicy: (gfsWeekly || gfsMonthly || gfsYearly)
@@ -300,7 +298,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </label>
             <label>
               Forecast (y):
-              <input type="number" value={forecastYears} min={0} max={10} step={1} onChange={e => setForecastYears(Number(e.target.value))} style={compactNumberInputStyle} />
+              <input type="number" value={forecastYears} min={1} max={10} step={1} onChange={e => setForecastYears(normalizeForecastYears(Number(e.target.value)))} style={compactNumberInputStyle} />
             </label>
             <label>
               Daily Change (%):
@@ -522,7 +520,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             📐 Calculated Capacity Requirements
             <span
               style={tooltipBadgeStyle}
-              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${appliedForecastYear === 0 ? 'Years 0-2 are shown.' : appliedForecastYear > 5 ? `Years 1-4 plus year ${appliedForecastYear} are shown.` : `Years 1-${displayedYearCount} are shown.`} ★ marks the applied forecast year.`}
+              title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${appliedForecastYear > 5 ? `Years 1-4 plus year ${appliedForecastYear} are shown.` : `Years 1-${displayedYearCount} are shown.`} ★ marks the applied forecast year.`}
               aria-label="Capacity assumptions"
             >
               ?

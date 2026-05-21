@@ -19,7 +19,7 @@ const defaultState: SimulationState = {
       sourceDataTB: 1,
       dailyChangeRatePct: 5,
       annualGrowthRatePct: 0,
-      forecastYears: 0,
+      forecastYears: 1,
       schedule: { frequency: 'Daily', timeOfDay: '02:00' },
       retention: { restorePoints: 14, slaDays: 14 },
     },

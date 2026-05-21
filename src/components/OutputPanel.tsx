@@ -3,6 +3,7 @@ import { VeeamSimulator } from '../simulator/engine';
 import { ChainTimeline } from './ChainTimeline';
 import { StateLegend } from './StateLegend';
 import { computeVeeamWorkingSpaceTB } from '../models/veeam';
+import { normalizeForecastYears } from '../models/forecast';
 
 interface OutputPanelProps {
   sim: VeeamSimulator;
@@ -349,7 +350,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         }];
       }
 
-      const forecastYears = Math.max(0, repoJob.forecastYears ?? 0);
+      const forecastYears = normalizeForecastYears(repoJob.forecastYears);
       const annualGrowth = (repoJob.annualGrowthRatePct ?? 10) / 100;
       const effectiveSourceTB = (repoJob.sourceDataTB || 1) * Math.pow(1 + annualGrowth, forecastYears);
       const largestFullTB = effectiveSourceTB * 0.5;

@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-05-21T22:16:54.481Z",
+  "status": "PASS",
+  "totalCases": 9,
+  "passedCases": 9,
+  "failedCases": 0,
+  "cases": [
+    {
+      "id": "normalize-undefined",
+      "status": "pass",
+      "description": "Undefined forecast defaults to year 1",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "normalize-null",
+      "status": "pass",
+      "description": "Null forecast defaults to year 1",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "normalize-zero",
+      "status": "pass",
+      "description": "Year 0 normalizes to year 1",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "normalize-negative",
+      "status": "pass",
+      "description": "Negative forecast normalizes to year 1",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "normalize-decimal",
+      "status": "pass",
+      "description": "Decimal forecast is floored after normalization",
+      "expected": "2",
+      "actual": "2"
+    },
+    {
+      "id": "normalized-forecast-value",
+      "status": "pass",
+      "description": "Forecast 0 normalizes to forecast year 1",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "normalized-matches-year1-total",
+      "status": "pass",
+      "description": "Normalized forecast produces the same planned total capacity as year 1",
+      "expected": "delta <= 1e-9",
+      "actual": "delta=0.000e+0"
+    },
+    {
+      "id": "normalized-matches-year1-gfs",
+      "status": "pass",
+      "description": "Normalized forecast produces the same GFS storage as year 1",
+      "expected": "delta <= 1e-9",
+      "actual": "delta=0.000e+0"
+    },
+    {
+      "id": "year0-differs-year1-total",
+      "status": "pass",
+      "description": "Year 0 and year 1 planned total capacity remain distinct for this growth scenario",
+      "expected": "delta > 1e-9",
+      "actual": "delta=1.263e+1"
+    }
+  ]
+}

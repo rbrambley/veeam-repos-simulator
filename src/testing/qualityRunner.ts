@@ -44,6 +44,7 @@ function main() {
   };
   const forecastReportCode = runWithEnv('npm', ['run', 'report:forecast-vs-simulation', '--', '--enforce-thresholds'], reportEnv);
   const gfsSizingCode = run('npm', ['run', 'test:gfs-sizing']);
+  const forecastNormalizationCode = run('npm', ['run', 'test:forecast-normalization']);
   const generalizationCode = run('npm', ['run', 'test:generalization']);
   const mutationCode = run('npm', ['run', 'test:mutation']);
   const lifecycleArgs = updateSnapshots
@@ -62,6 +63,7 @@ function main() {
     || compareCode !== 0
     || forecastReportCode !== 0
     || gfsSizingCode !== 0
+    || forecastNormalizationCode !== 0
     || generalizationCode !== 0
     || mutationCode !== 0
     || lifecycleCode !== 0
