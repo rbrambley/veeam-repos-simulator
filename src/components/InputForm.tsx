@@ -11,6 +11,27 @@ interface InputFormProps {
 }
 
 export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange, onReset }) => {
+  const normalizeNonNegativeInt = (value: number): number => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return 0;
+    return Math.max(0, Math.floor(numericValue));
+  };
+
+  const syncForecastWithGfs = (
+    candidateForecastYears: number,
+    weekly: number,
+    monthly: number,
+    yearly: number,
+  ): number => {
+    const maxGfsSetting = Math.max(
+      normalizeNonNegativeInt(weekly),
+      normalizeNonNegativeInt(monthly),
+      normalizeNonNegativeInt(yearly),
+    );
+    const minForecastFromGfs = maxGfsSetting > 0 ? maxGfsSetting + 1 : 1;
+    return Math.max(normalizeForecastYears(candidateForecastYears), minForecastFromGfs);
+  };
+
   const [repoName, setRepoName] = useState(simState.repositories[0]?.name || 'Main Repo');
   const [repoType, setRepoType] = useState<RepositoryType>(simState.repositories[0]?.type || 'DAS');
   const [isObjectStorage, setIsObjectStorage] = useState(simState.repositories[0]?.isObjectStorage ?? false);
@@ -19,7 +40,14 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const [sourceDataTB, setSourceDataTB] = useState(simState.jobs[0]?.sourceDataTB || 1);
   const [dailyChangeRate, setDailyChangeRate] = useState(simState.jobs[0]?.dailyChangeRatePct ?? 5);
   const [annualGrowthRate, setAnnualGrowthRate] = useState(simState.jobs[0]?.annualGrowthRatePct ?? 0);
-  const [forecastYears, setForecastYears] = useState(normalizeForecastYears(simState.jobs[0]?.forecastYears));
+  const [forecastYears, setForecastYears] = useState(
+    syncForecastWithGfs(
+      simState.jobs[0]?.forecastYears ?? 1,
+      simState.jobs[0]?.gfsPolicy?.weekly ?? 0,
+      simState.jobs[0]?.gfsPolicy?.monthly ?? 0,
+      simState.jobs[0]?.gfsPolicy?.yearly ?? 0,
+    )
+  );
   const [retention, setRetention] = useState(simState.jobs[0]?.retention.restorePoints || 14);
   const [gfsWeekly, setGfsWeekly] = useState(simState.jobs[0]?.gfsPolicy?.weekly || 0);
   const [gfsMonthly, setGfsMonthly] = useState(simState.jobs[0]?.gfsPolicy?.monthly || 0);
@@ -298,7 +326,18 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </label>
             <label>
               Forecast (y):
-              <input type="number" value={forecastYears} min={1} max={10} step={1} onChange={e => setForecastYears(normalizeForecastYears(Number(e.target.value)))} style={compactNumberInputStyle} />
+              <input
+                type="number"
+                value={forecastYears}
+                min={1}
+                max={10}
+                step={1}
+                onChange={e => {
+                  const nextForecast = normalizeForecastYears(Number(e.target.value));
+                  setForecastYears(syncForecastWithGfs(nextForecast, gfsWeekly, gfsMonthly, gfsYearly));
+                }}
+                style={compactNumberInputStyle}
+              />
             </label>
             <label>
               Daily Change (%):
@@ -340,15 +379,45 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                 </div>
                 <label>
                   Weekly:
-                  <input type="number" value={gfsWeekly} min={0} onChange={e => setGfsWeekly(Number(e.target.value))} style={compactNumberInputStyle} />
+                  <input
+                    type="number"
+                    value={gfsWeekly}
+                    min={0}
+                    onChange={e => {
+                      const nextWeekly = normalizeNonNegativeInt(Number(e.target.value));
+                      setGfsWeekly(nextWeekly);
+                      setForecastYears(prev => syncForecastWithGfs(prev, nextWeekly, gfsMonthly, gfsYearly));
+                    }}
+                    style={compactNumberInputStyle}
+                  />
                 </label>
                 <label>
                   Monthly:
-                  <input type="number" value={gfsMonthly} min={0} onChange={e => setGfsMonthly(Number(e.target.value))} style={compactNumberInputStyle} />
+                  <input
+                    type="number"
+                    value={gfsMonthly}
+                    min={0}
+                    onChange={e => {
+                      const nextMonthly = normalizeNonNegativeInt(Number(e.target.value));
+                      setGfsMonthly(nextMonthly);
+                      setForecastYears(prev => syncForecastWithGfs(prev, gfsWeekly, nextMonthly, gfsYearly));
+                    }}
+                    style={compactNumberInputStyle}
+                  />
                 </label>
                 <label>
                   Yearly:
-                  <input type="number" value={gfsYearly} min={0} onChange={e => setGfsYearly(Number(e.target.value))} style={compactNumberInputStyle} />
+                  <input
+                    type="number"
+                    value={gfsYearly}
+                    min={0}
+                    onChange={e => {
+                      const nextYearly = normalizeNonNegativeInt(Number(e.target.value));
+                      setGfsYearly(nextYearly);
+                      setForecastYears(prev => syncForecastWithGfs(prev, gfsWeekly, gfsMonthly, nextYearly));
+                    }}
+                    style={compactNumberInputStyle}
+                  />
                 </label>
               </div>
             </div>

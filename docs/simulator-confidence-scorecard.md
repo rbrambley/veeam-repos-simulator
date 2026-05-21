@@ -47,6 +47,15 @@ Current run context: post-parity recovery and post cross-volume guard generaliza
 - Latest update: remaining size-anchored shape guards were generalized to scale by policy/lifecycle conditions rather than fixed source volume anchors.
 - Commit reference: 22c5a44 on main.
 
+6. Forecast year normalization safeguard (new)
+- Sources:
+	- [src/models/forecast.ts](src/models/forecast.ts)
+	- [src/testing/forecastYearNormalizationRunner.ts](src/testing/forecastYearNormalizationRunner.ts)
+	- [docs/forecast-year-normalization-report.json](docs/forecast-year-normalization-report.json)
+- Behavior correction: forecast input value `0` is now normalized to year `1` for applied planning/output calculations, removing user-facing Year 0 semantics.
+- Regression coverage: automated normalization checks are now part of quick and push quality paths.
+- Commit reference: 6bfe7d5 on main.
+
 ---
 
 ## Confidence Envelope
