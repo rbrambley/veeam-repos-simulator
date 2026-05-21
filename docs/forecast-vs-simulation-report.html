@@ -65,10 +65,10 @@
     <h1>Forecast vs Simulation Comparison Report</h1>
     <p class="intro">Veeam Calculator values, Forecaster estimates, and Simulator day snapshots for Year 1/2/3. No parser rerun required.</p>
     <div class="meta">
-      <p><strong>Generated:</strong> 2026-05-20T13:04:55.286Z</p>
+      <p><strong>Generated:</strong> 2026-05-21T16:29:58.268Z</p>
       <p><strong>Captured Forecast Period (baseline defaults):</strong> 3 year(s)</p>
       <p><strong>Year Alignment Rule:</strong> Year anniversary date snapped to last Saturday on or before that date.</p>
-      <p><strong>Scenarios Included:</strong> 74</p>
+      <p><strong>Scenarios Included:</strong> 75</p>
       <p><strong>Forecast CI exclusions:</strong> das-monthly-2-large-r7 (Legacy large-case monthly profile pending forecast model alignment.); das-yearly-2-large-r7 (Legacy large-case yearly profile pending forecast model alignment.); ix-gfs-only-policy (Policy-shape outlier with known forecast model divergence.); ix-sobr-copymove-w6m12y2-immutability-211tb (Manual-capture split-horizon profile is not directly comparable in forecast CI aggregate.); od-calculator-parity-347tb-wmy (Oracle-diff parity probe is not intended as a forecast-representative CI datapoint.)</p>
       <p><strong>CI Thresholds:</strong> calculator failed scenarios <= 0, p95 abs delta <= 2.00 TB, parser mismatches <= 3</p>
       <p><strong>Target Thresholds:</strong> p95 abs delta <= 0.25 TB, parser mismatches <= 3</p>
@@ -78,17 +78,17 @@
       <section class="summary-card">
         <h3>Calculator Parity</h3>
         <p>Available: Yes</p>
-        <p>Scenarios: 74</p>
-        <p>Passed: <span class="ok">74</span></p>
+        <p>Scenarios: 75</p>
+        <p>Passed: <span class="ok">75</span></p>
         <p>Failed: <span class="ok">0</span></p>
       </section>
       <section class="summary-card">
         <h3>Forecast vs Simulator</h3>
-        <p>Pairs (CI eligible/total): 207 / 222</p>
+        <p>Pairs (CI eligible/total): 210 / 225</p>
         <p>Excluded Pairs: 15</p>
-        <p>Avg Delta TB: -0.031</p>
-        <p>Avg Abs Delta TB: 0.453</p>
-        <p>p95 Abs Delta TB: <span class="ok">1.535</span></p>
+        <p>Avg Delta TB: -0.066</p>
+        <p>Avg Abs Delta TB: 0.488</p>
+        <p>p95 Abs Delta TB: <span class="ok">1.597</span></p>
         <p>Max Abs Delta TB: 5.994</p>
       </section>
       <section class="summary-card">
@@ -178,6 +178,22 @@
       <td class="num warn">4.127</td>
       <td class="num warn">4.127</td>
     </tr><tr>
+      <td>sobr-moveonly-27tb-forecast0</td>
+      <td>1</td>
+      <td>SOBR</td>
+      <td class="num">59.225</td>
+      <td class="num">55.175</td>
+      <td class="num warn">-4.050</td>
+      <td class="num warn">4.050</td>
+    </tr><tr>
+      <td>sobr-moveonly-27tb-forecast0</td>
+      <td>2</td>
+      <td>SOBR</td>
+      <td class="num">59.225</td>
+      <td class="num">55.175</td>
+      <td class="num warn">-4.050</td>
+      <td class="num warn">4.050</td>
+    </tr><tr>
       <td>od-das-wmy-weekly-size-nonzero</td>
       <td>2</td>
       <td>DAS</td>
@@ -225,22 +241,6 @@
       <td class="num">7.100</td>
       <td class="num warn">2.200</td>
       <td class="num warn">2.200</td>
-    </tr><tr>
-      <td>das-monthly6-retention7-3y-regression</td>
-      <td>3</td>
-      <td>DAS</td>
-      <td class="num">5.183</td>
-      <td class="num">6.919</td>
-      <td class="num warn">1.736</td>
-      <td class="num warn">1.736</td>
-    </tr><tr>
-      <td>ix-copy-move-combo</td>
-      <td>1</td>
-      <td>SOBR</td>
-      <td class="num">3.397</td>
-      <td class="num">1.800</td>
-      <td class="num warn">-1.597</td>
-      <td class="num warn">1.597</td>
     </tr>
         </tbody>
       </table>
@@ -257,7 +257,7 @@
       </select>
       <button id="expand-all" type="button">Expand All</button>
       <button id="collapse-all" type="button">Collapse All</button>
-      <span id="filter-count" class="subnote" style="margin:0;">Showing 74 of 74</span>
+      <span id="filter-count" class="subnote" style="margin:0;">Showing 75 of 75</span>
     </div>
     
     
@@ -34497,6 +34497,506 @@
     <td class="num">N/A</td>
     <td class="num ">N/A</td>
     <td class="num">8.675</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+        </tbody>
+      </table>
+    
+    </details>
+  
+
+    <details class="scenario" data-scenario-id="sobr-moveonly-27tb-forecast0" data-repository-type="SOBR" open>
+      <summary>
+        <h3>sobr-moveonly-27tb-forecast0 <span class="name">SOBR Move-Only 27 TB Forecast=0 - Capacity Tier Parity</span></h3>
+      </summary>
+      <p class="subnote">Repository: SOBR · Retention: 14d · GFS: 0W/0M/0Y</p>
+      <p class="subnote">Veeam Calculator note: captured-manual-2026-05-21</p>
+
+      
+    <h4>Input Settings</h4>
+    <div class="input-groups">
+      
+      <div class="input-group">
+        <h5>Core</h5>
+        <table class="inputs-table">
+          <tbody>
+      <tr>
+        <td>Repository Type</td>
+        <td class="num">SOBR</td>
+      </tr>
+      <tr>
+        <td>Job Type</td>
+        <td class="num">ForwardIncremental</td>
+      </tr>
+      <tr>
+        <td>Source Data</td>
+        <td class="num">27 TB</td>
+      </tr>
+      <tr>
+        <td>Daily Change Rate</td>
+        <td class="num">5%</td>
+      </tr>
+      <tr>
+        <td>Annual Growth Rate</td>
+        <td class="num">0%</td>
+      </tr>
+      <tr>
+        <td>Simulation Days</td>
+        <td class="num">35</td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      
+      <div class="input-group">
+        <h5>Retention &amp; GFS</h5>
+        <table class="inputs-table">
+          <tbody>
+      <tr>
+        <td>Retention (Days)</td>
+        <td class="num">14</td>
+      </tr>
+      <tr>
+        <td>GFS Weekly</td>
+        <td class="num">0</td>
+      </tr>
+      <tr>
+        <td>GFS Monthly</td>
+        <td class="num">0</td>
+      </tr>
+      <tr>
+        <td>GFS Yearly</td>
+        <td class="num">0</td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+    
+      
+      <div class="input-group">
+        <h5>Tiering &amp; Policies</h5>
+        <table class="inputs-table">
+          <tbody>
+      <tr>
+        <td>Offload After</td>
+        <td class="num">14 days</td>
+      </tr>
+      <tr>
+        <td>Archive After</td>
+        <td class="num">30 days</td>
+      </tr>
+      <tr>
+        <td>Archive Tier Enabled</td>
+        <td class="num">No</td>
+      </tr>
+      <tr>
+        <td>Copy Policy Enabled</td>
+        <td class="num">No</td>
+      </tr>
+      <tr>
+        <td>Move Policy Enabled</td>
+        <td class="num">Yes</td>
+      </tr>
+      <tr>
+        <td>Generation Period</td>
+        <td class="num">N/A</td>
+      </tr>
+      <tr>
+        <td>Perf Immutability</td>
+        <td class="num">N/A</td>
+      </tr>
+      <tr>
+        <td>Capacity Immutability</td>
+        <td class="num">N/A</td>
+      </tr>
+      <tr>
+        <td>Archive Immutability</td>
+        <td class="num">N/A</td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+    
+    </div>
+  
+
+      
+    <h4>Calculator Diagnostics</h4>
+    <table class="diag-table">
+      <thead>
+        <tr>
+          <th>Calculator RP Count</th>
+          <th>Parsed RP Count</th>
+          <th>RP Count Difference</th>
+          <th>RP Sum Difference TB</th>
+          <th>Count Flag</th>
+          <th>Sum Flag</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num">N/A</td>
+          <td class="num">N/A</td>
+          <td class="num ok">N/A</td>
+          <td class="num ok">N/A</td>
+          <td class="num ">N/A</td>
+          <td class="num ">N/A</td>
+        </tr>
+      </tbody>
+    </table>
+  
+
+      <h4>Forecaster/Simulator Day Alignment</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Forecast Year</th>
+            <th>Simulation Day</th>
+            <th>Date</th>
+            <th>Day Of Week</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+    <td>Year 1</td>
+    <td class="num">364</td>
+    <td>2027-05-01</td>
+    <td>Saturday</td>
+  </tr><tr>
+    <td>Year 2</td>
+    <td class="num">728</td>
+    <td>2028-04-29</td>
+    <td>Saturday</td>
+  </tr><tr>
+    <td>Year 3</td>
+    <td class="num">1092</td>
+    <td>2029-04-28</td>
+    <td>Saturday</td>
+  </tr>
+        </tbody>
+      </table>
+
+      
+      <h4>Year 1 Comparison</h4>
+      <div class="subnote">Simulation Day 364 · 2027-05-01 (Saturday)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Veeam Calculator TB</th>
+            <th>Calculator - Forecaster TB</th>
+            <th>Forecaster TB</th>
+            <th>Simulator TB</th>
+            <th>Simulator - Forecaster TB</th>
+            <th title="Percent difference between Simulator and Forecaster: ((Simulator - Forecaster) / Forecaster) * 100">Difference %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+    <td>Repository Total TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">59.225</td>
+    <td class="num">55.175</td>
+    <td class="num warn">-4.050</td>
+    <td class="num warn">-6.84%</td>
+  </tr>
+<tr>
+    <td>RP Sum TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">49.275</td>
+    <td class="num">45.225</td>
+    <td class="num warn">-4.050</td>
+    <td class="num warn">-8.22%</td>
+  </tr>
+<tr>
+    <td>Working Space TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">9.950</td>
+    <td class="num">9.950</td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Repository Difference TB</td>
+    <td class="num">N/A </td>
+    <td class="num ">N/A</td>
+    <td class="num">9.950 <span class="variance-wrap"><span class="variance-bar" style="width:64px;background:#3a9f55;"></span></span></td>
+    <td class="num">9.950 <span class="variance-wrap"><span class="variance-bar" style="width:64px;background:#3a9f55;"></span></span></td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Performance Tier TB</td>
+    <td class="num">33.100</td>
+    <td class="num warn">0.875</td>
+    <td class="num">32.225</td>
+    <td class="num">32.900</td>
+    <td class="num warn">0.675</td>
+    <td class="num warn">2.09%</td>
+  </tr>
+<tr>
+    <td>Capacity Tier TB</td>
+    <td class="num">17.600</td>
+    <td class="num warn">-9.400</td>
+    <td class="num">27.000</td>
+    <td class="num">22.275</td>
+    <td class="num warn">-4.725</td>
+    <td class="num warn">-17.50%</td>
+  </tr>
+<tr>
+    <td>Archive Tier TB</td>
+    <td class="num">0.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num">0.000</td>
+    <td class="num">0.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Full TB</td>
+    <td class="num">13.500</td>
+    <td class="num ok">0.000</td>
+    <td class="num">13.500</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Incremental TB</td>
+    <td class="num">0.675</td>
+    <td class="num ok">0.000</td>
+    <td class="num">0.675</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Synthetic Full TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">0.675</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+        </tbody>
+      </table>
+    
+      <h4>Year 2 Comparison</h4>
+      <div class="subnote">Simulation Day 728 · 2028-04-29 (Saturday)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Veeam Calculator TB</th>
+            <th>Calculator - Forecaster TB</th>
+            <th>Forecaster TB</th>
+            <th>Simulator TB</th>
+            <th>Simulator - Forecaster TB</th>
+            <th title="Percent difference between Simulator and Forecaster: ((Simulator - Forecaster) / Forecaster) * 100">Difference %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+    <td>Repository Total TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">59.225</td>
+    <td class="num">55.175</td>
+    <td class="num warn">-4.050</td>
+    <td class="num warn">-6.84%</td>
+  </tr>
+<tr>
+    <td>RP Sum TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">49.275</td>
+    <td class="num">45.225</td>
+    <td class="num warn">-4.050</td>
+    <td class="num warn">-8.22%</td>
+  </tr>
+<tr>
+    <td>Working Space TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">9.950</td>
+    <td class="num">9.950</td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Repository Difference TB</td>
+    <td class="num">N/A </td>
+    <td class="num ">N/A</td>
+    <td class="num">9.950 <span class="variance-wrap"><span class="variance-bar" style="width:64px;background:#3a9f55;"></span></span></td>
+    <td class="num">9.950 <span class="variance-wrap"><span class="variance-bar" style="width:64px;background:#3a9f55;"></span></span></td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Performance Tier TB</td>
+    <td class="num">33.100</td>
+    <td class="num warn">0.875</td>
+    <td class="num">32.225</td>
+    <td class="num">32.900</td>
+    <td class="num warn">0.675</td>
+    <td class="num warn">2.09%</td>
+  </tr>
+<tr>
+    <td>Capacity Tier TB</td>
+    <td class="num">17.600</td>
+    <td class="num warn">-9.400</td>
+    <td class="num">27.000</td>
+    <td class="num">22.275</td>
+    <td class="num warn">-4.725</td>
+    <td class="num warn">-17.50%</td>
+  </tr>
+<tr>
+    <td>Archive Tier TB</td>
+    <td class="num">0.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num">0.000</td>
+    <td class="num">0.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Full TB</td>
+    <td class="num">13.500</td>
+    <td class="num ok">0.000</td>
+    <td class="num">13.500</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Incremental TB</td>
+    <td class="num">0.675</td>
+    <td class="num ok">0.000</td>
+    <td class="num">0.675</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Synthetic Full TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">0.675</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+        </tbody>
+      </table>
+    
+      <h4>Year 3 Comparison</h4>
+      <div class="subnote">Simulation Day 1092 · 2029-04-28 (Saturday)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Veeam Calculator TB</th>
+            <th>Calculator - Forecaster TB</th>
+            <th>Forecaster TB</th>
+            <th>Simulator TB</th>
+            <th>Simulator - Forecaster TB</th>
+            <th title="Percent difference between Simulator and Forecaster: ((Simulator - Forecaster) / Forecaster) * 100">Difference %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+    <td>Repository Total TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">59.225</td>
+    <td class="num">59.900</td>
+    <td class="num warn">0.675</td>
+    <td class="num warn">1.14%</td>
+  </tr>
+<tr>
+    <td>RP Sum TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">49.275</td>
+    <td class="num">49.950</td>
+    <td class="num warn">0.675</td>
+    <td class="num warn">1.37%</td>
+  </tr>
+<tr>
+    <td>Working Space TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">9.950</td>
+    <td class="num">9.950</td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Repository Difference TB</td>
+    <td class="num">N/A </td>
+    <td class="num ">N/A</td>
+    <td class="num">9.950 <span class="variance-wrap"><span class="variance-bar" style="width:64px;background:#3a9f55;"></span></span></td>
+    <td class="num">9.950 <span class="variance-wrap"><span class="variance-bar" style="width:64px;background:#3a9f55;"></span></span></td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Performance Tier TB</td>
+    <td class="num">33.100</td>
+    <td class="num warn">0.875</td>
+    <td class="num">32.225</td>
+    <td class="num">32.900</td>
+    <td class="num warn">0.675</td>
+    <td class="num warn">2.09%</td>
+  </tr>
+<tr>
+    <td>Capacity Tier TB</td>
+    <td class="num">17.600</td>
+    <td class="num warn">-9.400</td>
+    <td class="num">27.000</td>
+    <td class="num">27.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num ok">0.00%</td>
+  </tr>
+<tr>
+    <td>Archive Tier TB</td>
+    <td class="num">0.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num">0.000</td>
+    <td class="num">0.000</td>
+    <td class="num ok">0.000</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Full TB</td>
+    <td class="num">13.500</td>
+    <td class="num ok">0.000</td>
+    <td class="num">13.500</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Incremental TB</td>
+    <td class="num">0.675</td>
+    <td class="num ok">0.000</td>
+    <td class="num">0.675</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num ">N/A</td>
+  </tr>
+<tr>
+    <td>Synthetic Full TB</td>
+    <td class="num">N/A</td>
+    <td class="num ">N/A</td>
+    <td class="num">0.675</td>
     <td class="num">N/A</td>
     <td class="num ">N/A</td>
     <td class="num ">N/A</td>

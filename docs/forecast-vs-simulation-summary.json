@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T13:04:55.286Z",
+  "generatedAt": "2026-05-21T16:29:58.267Z",
   "thresholds": {
     "ci": {
       "calculatorFailedScenarioMax": 0,
@@ -12,8 +12,8 @@
     }
   },
   "calculatorParity": {
-    "scenarioCount": 74,
-    "passedScenarioCount": 74,
+    "scenarioCount": 75,
+    "passedScenarioCount": 75,
     "failedScenarioCount": 0,
     "available": true
   },
@@ -26,8 +26,8 @@
     "varianceAvgTB": 0.5201369863013884
   },
   "forecastVsSimulation": {
-    "totalPairCount": 222,
-    "pairCount": 207,
+    "totalPairCount": 225,
+    "pairCount": 210,
     "excludedPairCount": 15,
     "excludedScenarioIds": [
       "das-monthly-2-large-r7",
@@ -36,13 +36,13 @@
       "ix-sobr-copymove-w6m12y2-immutability-211tb",
       "od-calculator-parity-347tb-wmy"
     ],
-    "avgDeltaTB": -0.031291797624608764,
-    "avgAbsDeltaTB": 0.45253371722856117,
-    "p95AbsDeltaTB": 1.534751609776237,
+    "avgDeltaTB": -0.06620191480139971,
+    "avgAbsDeltaTB": 0.487854664125296,
+    "p95AbsDeltaTB": 1.5974999999999995,
     "maxAbsDeltaTB": 5.994,
-    "year1AvgAbsDeltaTB": 0.4959652708338233,
-    "year2AvgAbsDeltaTB": 0.41052121925547314,
-    "year3AvgAbsDeltaTB": 0.45111466159638597,
+    "year1AvgAbsDeltaTB": 0.5467371955361969,
+    "year2AvgAbsDeltaTB": 0.4625137732661089,
+    "year3AvgAbsDeltaTB": 0.45431302357358083,
     "topOutliers": [
       {
         "scenarioId": "das-mixed-2w1m1y-large-r7",
@@ -67,6 +67,30 @@
         "runtimeTB": 12.536100308321823,
         "deltaTB": 4.127198633278619,
         "absDeltaTB": 4.127198633278619
+      },
+      {
+        "scenarioId": "sobr-moveonly-27tb-forecast0",
+        "scenarioName": "SOBR Move-Only 27 TB Forecast=0 - Capacity Tier Parity",
+        "repositoryType": "SOBR",
+        "year": 1,
+        "simulationDay": 364,
+        "anchorDate": "2027-05-01",
+        "forecastTB": 59.225,
+        "runtimeTB": 55.175000000000026,
+        "deltaTB": -4.049999999999976,
+        "absDeltaTB": 4.049999999999976
+      },
+      {
+        "scenarioId": "sobr-moveonly-27tb-forecast0",
+        "scenarioName": "SOBR Move-Only 27 TB Forecast=0 - Capacity Tier Parity",
+        "repositoryType": "SOBR",
+        "year": 2,
+        "simulationDay": 728,
+        "anchorDate": "2028-04-29",
+        "forecastTB": 59.225,
+        "runtimeTB": 55.175000000000026,
+        "deltaTB": -4.049999999999976,
+        "absDeltaTB": 4.049999999999976
       },
       {
         "scenarioId": "od-das-wmy-weekly-size-nonzero",
@@ -139,30 +163,6 @@
         "runtimeTB": 7.099999999999994,
         "deltaTB": 2.199999999999994,
         "absDeltaTB": 2.199999999999994
-      },
-      {
-        "scenarioId": "das-monthly6-retention7-3y-regression",
-        "scenarioName": "DAS Monthly-6 Retention-7 3Y Regression",
-        "repositoryType": "DAS",
-        "year": 3,
-        "simulationDay": 1092,
-        "anchorDate": "2029-04-28",
-        "forecastTB": 5.183061624880625,
-        "runtimeTB": 6.918844313739037,
-        "deltaTB": 1.7357826888584125,
-        "absDeltaTB": 1.7357826888584125
-      },
-      {
-        "scenarioId": "ix-copy-move-combo",
-        "scenarioName": "Copy+Move mode with GFS W+M and archive",
-        "repositoryType": "SOBR",
-        "year": 1,
-        "simulationDay": 364,
-        "anchorDate": "2027-05-01",
-        "forecastTB": 3.3975,
-        "runtimeTB": 1.8000000000000005,
-        "deltaTB": -1.5974999999999995,
-        "absDeltaTB": 1.5974999999999995
       }
     ],
     "anchorConsistency": [
