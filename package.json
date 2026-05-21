@@ -27,6 +27,8 @@
     "test:quality": "tsx src/testing/qualityRunner.ts",
     "test:quality:update-snapshots": "tsx src/testing/qualityRunner.ts --update-snapshots",
     "report:parity-drift": "tsx src/testing/parityDriftLeaderboard.ts",
+    "gate:quick": "npm run test:gfs-sizing",
+    "gate:push": "npm run compare:veeam && npm run test:lifecycle -- --skip-html-report && npm run test:mutation && npm run report:forecast-vs-simulation -- --enforce-thresholds",
     "pr:sync": "node scripts/pr-sync.mjs",
     "pr:sync:draft": "node scripts/pr-sync.mjs --draft",
     "validate:all": "npm run capture:veeam && npm run compare:veeam && npm run verify:known-veeam-deltas && npm run test:quality",

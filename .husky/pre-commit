@@ -1,1 +1,2 @@
-npm run test:lifecycle -- --skip-html-report
+echo "[husky] pre-commit: running quick checks (gate:quick)"
+npm run gate:quick

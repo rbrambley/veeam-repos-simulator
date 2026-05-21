@@ -1,0 +1,2 @@
+echo "[husky] pre-push: running full quality gates (gate:push)"
+npm run gate:push
