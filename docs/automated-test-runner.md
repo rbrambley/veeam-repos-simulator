@@ -39,6 +39,7 @@ It uses:
 
 - `src/testing/lifecycleRunner.ts`
 - `src/testing/mutationRunner.ts`
+- `src/testing/generalizationRunner.ts`
 - `src/testing/qualityRunner.ts`
 - `src/testing/goldenSnapshots.ts`
 
@@ -65,15 +66,19 @@ npm run test:quality
 This runs:
 
 - `tsx src/testing/qualityRunner.ts`
+- `npm run test:generalization`
 - `npm run test:mutation`
 - `npm run test:lifecycle`
 
 To run phases individually:
 
 ```bash
+npm run test:generalization
 npm run test:mutation
 npm run test:lifecycle
 ```
+
+`test:generalization` enforces class-level scaling behavior across representative DAS/SOBR policy shapes and multiple source-volume magnitudes, and writes `docs/generalization-report.json`.
 
 To update the locked golden baselines after an intentional model change:
 
@@ -118,7 +123,7 @@ This runs sequentially:
 1. `npm run capture:veeam` — Playwright scraper captures baseline
 2. `npm run compare:veeam` — Compares simulator to captured values
 3. `npm run verify:known-veeam-deltas` — Verifies only approved deltas exist
-4. `npm run test:quality` — Full quality pipeline (lifecycle + mutations + GFS sizing)
+4. `npm run test:quality` — Full quality pipeline (lifecycle + mutations + GFS sizing + class-level generalization checks)
 
 The sequence stops at the first failure, preventing cascading errors. This is the recommended approach for end-to-end validation.
 

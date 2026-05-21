@@ -1,0 +1,1395 @@
+{
+  "generatedAt": "2026-05-21T20:57:15.953Z",
+  "status": "PASS",
+  "totalCases": 198,
+  "passedCases": 198,
+  "failedCases": 0,
+  "cases": [
+    {
+      "id": "das-wmy-growth-r14-year0-src5-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src5-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src5-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src5-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.229e-3 (expected=2.457500)",
+      "actual": "actual=2.457500 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src27-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src27-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src27-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src27-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 6.635e-3 (expected=13.270500)",
+      "actual": "actual=13.270500 delta=1.776e-15"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src211-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src211-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src211-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year0-src211-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 5.185e-2 (expected=103.706500)",
+      "actual": "actual=103.706500 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src5-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.313e-3 (expected=2.625000)",
+      "actual": "actual=2.625000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src5-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.131250)",
+      "actual": "actual=0.131250 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src5-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.131250)",
+      "actual": "actual=0.131250 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src5-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.665e-3 (expected=5.330375)",
+      "actual": "actual=5.330375 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src27-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 7.088e-3 (expected=14.175000)",
+      "actual": "actual=14.175000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src27-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.708750)",
+      "actual": "actual=0.708750 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src27-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.708750)",
+      "actual": "actual=0.708750 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src27-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.439e-2 (expected=28.784025)",
+      "actual": "actual=28.784025 delta=3.553e-15"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src211-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.539e-2 (expected=110.775000)",
+      "actual": "actual=110.775000 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src211-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.769e-3 (expected=5.538750)",
+      "actual": "actual=5.538750 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src211-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.769e-3 (expected=5.538750)",
+      "actual": "actual=5.538750 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year1-src211-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.125e-1 (expected=224.941825)",
+      "actual": "actual=224.941825 delta=2.842e-14"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src5-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.447e-3 (expected=2.894063)",
+      "actual": "actual=2.894063 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src5-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.144703)",
+      "actual": "actual=0.144703 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src5-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.144703)",
+      "actual": "actual=0.144703 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src5-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 3.922e-3 (expected=7.844863)",
+      "actual": "actual=7.844863 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src27-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 7.814e-3 (expected=15.627938)",
+      "actual": "actual=15.627938 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src27-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.781397)",
+      "actual": "actual=0.781397 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src27-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.781397)",
+      "actual": "actual=0.781397 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src27-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.118e-2 (expected=42.362263)",
+      "actual": "actual=42.362263 delta=7.105e-15"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src211-full",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.106e-2 (expected=122.129438)",
+      "actual": "actual=122.129438 delta=0.000e+0"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src211-incr",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 3.053e-3 (expected=6.106472)",
+      "actual": "actual=6.106472 delta=8.882e-16"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src211-synth",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 3.053e-3 (expected=6.106472)",
+      "actual": "actual=6.106472 delta=8.882e-16"
+    },
+    {
+      "id": "das-wmy-growth-r14-year3-src211-das-stored",
+      "status": "pass",
+      "description": "DAS W+M+Y growth retention14: DAS stored footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.655e-1 (expected=331.053237)",
+      "actual": "actual=331.053237 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src5-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src5-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src5-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.063e-3 (expected=4.125000)",
+      "actual": "actual=4.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.813e-3 (expected=7.625000)",
+      "actual": "actual=7.625000 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src27-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src27-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src27-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.114e-2 (expected=22.275000)",
+      "actual": "actual=22.275000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.059e-2 (expected=41.175000)",
+      "actual": "actual=41.175000 delta=7.105e-15"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src211-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src211-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src211-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 8.704e-2 (expected=174.075000)",
+      "actual": "actual=174.075000 delta=2.842e-14"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.609e-1 (expected=321.775000)",
+      "actual": "actual=321.775000 delta=5.684e-14"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year0-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src5-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src5-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src5-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.063e-3 (expected=4.125000)",
+      "actual": "actual=4.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.813e-3 (expected=7.625000)",
+      "actual": "actual=7.625000 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src27-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src27-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src27-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.114e-2 (expected=22.275000)",
+      "actual": "actual=22.275000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.059e-2 (expected=41.175000)",
+      "actual": "actual=41.175000 delta=7.105e-15"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src211-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src211-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src211-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 8.704e-2 (expected=174.075000)",
+      "actual": "actual=174.075000 delta=2.842e-14"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.609e-1 (expected=321.775000)",
+      "actual": "actual=321.775000 delta=5.684e-14"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year1-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src5-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src5-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src5-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.063e-3 (expected=4.125000)",
+      "actual": "actual=4.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.813e-3 (expected=7.625000)",
+      "actual": "actual=7.625000 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src27-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src27-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src27-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.114e-2 (expected=22.275000)",
+      "actual": "actual=22.275000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.059e-2 (expected=41.175000)",
+      "actual": "actual=41.175000 delta=7.105e-15"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src211-full",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src211-incr",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src211-synth",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 8.704e-2 (expected=174.075000)",
+      "actual": "actual=174.075000 delta=2.842e-14"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.609e-1 (expected=321.775000)",
+      "actual": "actual=321.775000 delta=5.684e-14"
+    },
+    {
+      "id": "sobr-moveonly-nogfs-r30-year3-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR move-only no-GFS retention30: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src5-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src5-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src5-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.063e-3 (expected=4.125000)",
+      "actual": "actual=4.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.938e-3 (expected=5.875000)",
+      "actual": "actual=5.875000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src27-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src27-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src27-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.114e-2 (expected=22.275000)",
+      "actual": "actual=22.275000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.586e-2 (expected=31.725000)",
+      "actual": "actual=31.725000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src211-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src211-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src211-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 8.704e-2 (expected=174.075000)",
+      "actual": "actual=174.075000 delta=2.842e-14"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.240e-1 (expected=247.925000)",
+      "actual": "actual=247.925000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year0-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src5-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.313e-3 (expected=2.625000)",
+      "actual": "actual=2.625000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src5-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.131250)",
+      "actual": "actual=0.131250 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src5-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.131250)",
+      "actual": "actual=0.131250 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.166e-3 (expected=4.331250)",
+      "actual": "actual=4.331250 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.084e-3 (expected=6.168750)",
+      "actual": "actual=6.168750 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src27-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 7.088e-3 (expected=14.175000)",
+      "actual": "actual=14.175000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src27-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.708750)",
+      "actual": "actual=0.708750 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src27-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.708750)",
+      "actual": "actual=0.708750 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.169e-2 (expected=23.388750)",
+      "actual": "actual=23.388750 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.666e-2 (expected=33.311250)",
+      "actual": "actual=33.311250 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src211-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.539e-2 (expected=110.775000)",
+      "actual": "actual=110.775000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src211-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.769e-3 (expected=5.538750)",
+      "actual": "actual=5.538750 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src211-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.769e-3 (expected=5.538750)",
+      "actual": "actual=5.538750 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 9.139e-2 (expected=182.778750)",
+      "actual": "actual=182.778750 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.302e-1 (expected=260.321250)",
+      "actual": "actual=260.321250 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year1-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src5-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.447e-3 (expected=2.894063)",
+      "actual": "actual=2.894063 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src5-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.144703)",
+      "actual": "actual=0.144703 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src5-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.144703)",
+      "actual": "actual=0.144703 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.388e-3 (expected=4.775203)",
+      "actual": "actual=4.775203 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.401e-3 (expected=6.801047)",
+      "actual": "actual=6.801047 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src27-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 7.814e-3 (expected=15.627938)",
+      "actual": "actual=15.627938 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src27-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.781397)",
+      "actual": "actual=0.781397 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src27-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.781397)",
+      "actual": "actual=0.781397 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.289e-2 (expected=25.786097)",
+      "actual": "actual=25.786097 delta=7.105e-15"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.836e-2 (expected=36.725653)",
+      "actual": "actual=36.725653 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src211-full",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.106e-2 (expected=122.129438)",
+      "actual": "actual=122.129438 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src211-incr",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 3.053e-3 (expected=6.106472)",
+      "actual": "actual=6.106472 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src211-synth",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 3.053e-3 (expected=6.106472)",
+      "actual": "actual=6.106472 delta=8.882e-16"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.008e-1 (expected=201.513572)",
+      "actual": "actual=201.513572 delta=2.842e-14"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 1.435e-1 (expected=287.004178)",
+      "actual": "actual=287.004178 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copymove-nogfs-r21-growth-year3-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy+move no-GFS retention21 growth: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src5-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src5-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src5-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.175e-3 (expected=4.350000)",
+      "actual": "actual=4.350000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 5.388e-3 (expected=10.775000)",
+      "actual": "actual=10.775000 delta=1.776e-15"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src27-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src27-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src27-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.175e-2 (expected=23.490000)",
+      "actual": "actual=23.490000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.909e-2 (expected=58.185000)",
+      "actual": "actual=58.185000 delta=7.105e-15"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src211-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src211-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src211-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 9.178e-2 (expected=183.570000)",
+      "actual": "actual=183.570000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.274e-1 (expected=454.705000)",
+      "actual": "actual=454.705000 delta=5.684e-14"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year0-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.000000)",
+      "actual": "actual=0.000000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src5-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src5-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src5-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.175e-3 (expected=4.350000)",
+      "actual": "actual=4.350000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 5.575e-3 (expected=11.150000)",
+      "actual": "actual=11.150000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=1.665e-16"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src27-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src27-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src27-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.175e-2 (expected=23.490000)",
+      "actual": "actual=23.490000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.010e-2 (expected=60.210000)",
+      "actual": "actual=60.210000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=2.220e-16"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src211-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src211-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src211-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 9.178e-2 (expected=183.570000)",
+      "actual": "actual=183.570000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.353e-1 (expected=470.530000)",
+      "actual": "actual=470.530000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year1-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 2.637e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=1.776e-15"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src5-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 1.250e-3 (expected=2.500000)",
+      "actual": "actual=2.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src5-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src5-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.125000)",
+      "actual": "actual=0.125000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src5-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 2.175e-3 (expected=4.350000)",
+      "actual": "actual=4.350000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src5-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 5.575e-3 (expected=11.150000)",
+      "actual": "actual=11.150000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src5-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 1.187e-3 (expected=2.375000)",
+      "actual": "actual=2.375000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src27-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 6.750e-3 (expected=13.500000)",
+      "actual": "actual=13.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src27-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src27-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 5.000e-4 (expected=0.675000)",
+      "actual": "actual=0.675000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src27-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 1.175e-2 (expected=23.490000)",
+      "actual": "actual=23.490000 delta=3.553e-15"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src27-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 3.010e-2 (expected=60.210000)",
+      "actual": "actual=60.210000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src27-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 6.413e-3 (expected=12.825000)",
+      "actual": "actual=12.825000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src211-full",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: full file size scales with source size",
+      "expected": "|actual - expected| <= 5.275e-2 (expected=105.500000)",
+      "actual": "actual=105.500000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src211-incr",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: incremental file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src211-synth",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: synthetic full file size scales with source size",
+      "expected": "|actual - expected| <= 2.638e-3 (expected=5.275000)",
+      "actual": "actual=5.275000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src211-sobr-perf-nows",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR performance footprint (excluding WS) scales with source size",
+      "expected": "|actual - expected| <= 9.178e-2 (expected=183.570000)",
+      "actual": "actual=183.570000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src211-sobr-cap",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR capacity tier scales with source size",
+      "expected": "|actual - expected| <= 2.353e-1 (expected=470.530000)",
+      "actual": "actual=470.530000 delta=0.000e+0"
+    },
+    {
+      "id": "sobr-copyonly-wmy-r60-year3-src211-sobr-arch",
+      "status": "pass",
+      "description": "SOBR copy-only W+M+Y retention60: SOBR archive tier scales with source size",
+      "expected": "|actual - expected| <= 5.011e-2 (expected=100.225000)",
+      "actual": "actual=100.225000 delta=0.000e+0"
+    }
+  ]
+}

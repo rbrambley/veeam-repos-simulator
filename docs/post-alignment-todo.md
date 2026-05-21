@@ -1,28 +1,33 @@
 # Post-Alignment TODO
 
-Last updated: 2026-05-17
+Last updated: 2026-05-21
 
-This list tracks follow-up work after achieving calculator baseline parity (compare:veeam 73/0).
+This list tracks follow-up work after achieving calculator baseline parity and cross-volume guard generalization.
 
-## 1) Add Explicit Year 1 and Year 2 Calculator Baselines
+## Completed Since Last Plan
+
+1. Calculator parity advanced to 75/0 on current matrix.
+2. Lifecycle and mutation suites remain green in operational runs.
+3. Forecast-vs-simulation CI gate is green at p95Abs 1.5975 TB.
+4. Remaining size-anchored guards in planned capacity calculator were generalized for cross-volume scaling (commit 22c5a44).
+
+## 1) Expand Direct Capture Coverage for Outlier Forecast Drift Clusters
 
 Goal:
-- Convert inferred confidence for Year 1 and Year 2 into directly measured confidence.
+- Reduce top outliers between forecaster and simulator while preserving calculator parity.
 
 Tasks:
-- Add year-specific entries to docs/veeam-calculator-baseline.json using forecastYears = 1 and forecastYears = 2.
-- Prioritize representative coverage across:
-  - DAS no-GFS
-  - DAS mixed GFS (W+M+Y)
-  - SOBR move-only no-GFS
-  - SOBR copy+move
-  - SOBR with archive and mixed GFS
-- Keep Year 3 entries for continuity and trend checks.
+- Add or refresh captures for top outlier scenarios listed in docs/forecast-vs-simulation-summary.json topOutliers.
+- Prioritize high-impact classes:
+  - DAS mixed large W/M/Y
+  - SOBR move-only 27 TB forecast0 path
+  - Copy+archive W/M/Y interaction paths
+- Confirm whether delta source is expected structural difference, forecaster approximation, or simulator behavior gap.
 
 Validation:
 - Run npm run compare:veeam.
-- Confirm pass/fail by year and by output section.
-- Update docs/simulator-confidence-assessment.md with measured Year 1/2/3 confidence.
+- Run npm run report:forecast-vs-simulation -- --enforce-thresholds.
+- Track movement in p95Abs and top outlier values after each accepted change.
 
 ## 2) Resolve compare:model Positioning
 
@@ -37,22 +42,19 @@ Validation:
 - If Option A: run npm run compare:model and target zero failures.
 - If Option B: verify CI does not block on compare:model failures.
 
-## 3) CI and Reporting Cleanup
+## 3) Pre-push Hook Stability and Reporting Determinism
 
 Goal:
-- Ensure automated reporting reflects current strategy.
+- Ensure hooks are deterministic and do not block pushes due to non-functional artifact churn.
 
 Tasks:
-- Update CI docs and pipeline comments to emphasize:
-  - Required: npm run compare:veeam, npm run verify:known-veeam-deltas, npm run test:quality
-  - Informational: npm run compare:model
-- Add a short job summary section that prints:
-  - compare:veeam totals
-  - quality suite status
-  - mutation caught/blind-spot counts
+- Keep timestamp-stability logic in generated reports as a maintained contract.
+- Investigate and harden the intermittent pre-push stall around the final forecast report step.
+- Add a concise push troubleshooting note to developer docs.
 
 Validation:
-- Run pipeline once and confirm summary output is present and accurate.
+- Perform two back-to-back gate runs and verify no timestamp-only file churn.
+- Validate successful push with hooks enabled in a clean state.
 
 ## 4) Confidence Doc Maintenance Cadence
 
@@ -64,4 +66,17 @@ Tasks:
 - Include date, compare:veeam totals, and quality totals in each update.
 
 Validation:
-- Spot-check after next comparator change.
+- Spot-check after next comparator or forecast model change.
+
+## 5) Precision Target Track (Long Horizon)
+
+Goal:
+- Move forecast-vs-simulation from CI-green to precision-target-green.
+
+Tasks:
+- Drive p95Abs from 1.5975 TB toward <= 0.25 TB.
+- Reduce maxAbs drift through targeted scenario-class corrections, not broad overfitting.
+- Keep calculator parity fixed at zero failures while reducing forecast drift.
+
+Validation:
+- Quality summary shows p95Abs <= 0.25 TB with calculator parity still 0 failed.
