@@ -1,6 +1,6 @@
 import { CalculateGfsSize, VeeamSimulator } from '../simulator/engine.ts';
 import { BackupJob, BackupChain, Repository, SimulationState } from '../models/veeam.ts';
-import { writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 type GfsSizingTestCategory =
@@ -30,6 +30,26 @@ interface GfsSizingReport {
 }
 
 const results: GfsSizingCaseResult[] = [];
+
+function resolveStableGeneratedAt(reportPath: string): string {
+  const override = process.env.REPORT_GENERATED_AT?.trim();
+  if (override) {
+    return override;
+  }
+
+  if (existsSync(reportPath)) {
+    try {
+      const existing = JSON.parse(readFileSync(reportPath, 'utf8')) as Partial<GfsSizingReport>;
+      if (typeof existing.generatedAt === 'string' && existing.generatedAt.length > 0) {
+        return existing.generatedAt;
+      }
+    } catch {
+      // Ignore stale or malformed report content and fall back to current time.
+    }
+  }
+
+  return new Date().toISOString();
+}
 
 function recordNumericCase(
   id: string,
@@ -71,8 +91,9 @@ function recordBooleanCase(
 function writeReportAndFailIfNeeded(): void {
   const passedCases = results.filter(r => r.status === 'pass').length;
   const failedCases = results.length - passedCases;
+  const reportPath = join(process.cwd(), 'docs', 'gfs-sizing-report.json');
   const report: GfsSizingReport = {
-    generatedAt: new Date().toISOString(),
+    generatedAt: resolveStableGeneratedAt(reportPath),
     status: failedCases === 0 ? 'PASS' : 'FAIL',
     totalCases: results.length,
     passedCases,
@@ -80,7 +101,6 @@ function writeReportAndFailIfNeeded(): void {
     cases: results,
   };
 
-  const reportPath = join(process.cwd(), 'docs', 'gfs-sizing-report.json');
   writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
 
   if (failedCases > 0) {

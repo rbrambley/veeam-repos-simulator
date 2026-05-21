@@ -10,7 +10,7 @@
  *         npm run test:mutation
  */
 
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { VeeamSimulator } from '../simulator/engine.ts';
 import type {
@@ -194,6 +194,26 @@ interface MutationReport {
   blindSpotCount: number;
   status: 'PASS' | 'FAIL';
   outcomes: MutationOutcome[];
+}
+
+function resolveStableGeneratedAt(reportPath: string): string {
+  const override = process.env.REPORT_GENERATED_AT?.trim();
+  if (override) {
+    return override;
+  }
+
+  if (existsSync(reportPath)) {
+    try {
+      const existing = JSON.parse(readFileSync(reportPath, 'utf8')) as Partial<MutationReport>;
+      if (typeof existing.generatedAt === 'string' && existing.generatedAt.length > 0) {
+        return existing.generatedAt;
+      }
+    } catch {
+      // Ignore stale or malformed report content and fall back to current time.
+    }
+  }
+
+  return new Date().toISOString();
 }
 
 function runProbeScenario(sc: ProbeScenario): CatchResult | null {
@@ -394,8 +414,9 @@ function main() {
 
   console.log('\n' + '═'.repeat(72));
   const caught = mutations.length - blindSpots;
+  const reportPath = join(process.cwd(), 'docs', 'mutation-report.json');
   const report: MutationReport = {
-    generatedAt: new Date().toISOString(),
+    generatedAt: resolveStableGeneratedAt(reportPath),
     probeScenarioCount: probes.length,
     mutationCount: mutations.length,
     caughtCount: caught,
@@ -403,7 +424,6 @@ function main() {
     status: blindSpots > 0 ? 'FAIL' : 'PASS',
     outcomes,
   };
-  const reportPath = join(process.cwd(), 'docs', 'mutation-report.json');
   writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
 
   console.log(`Results: ${caught}/${mutations.length} mutations caught`);

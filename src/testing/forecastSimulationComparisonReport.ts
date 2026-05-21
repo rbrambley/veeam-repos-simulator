@@ -138,6 +138,34 @@ interface ThresholdSummary {
   ciPass: boolean;
 }
 
+function resolveStableGeneratedAt(summaryPath: string, reportPath: string): string {
+  const override = process.env.REPORT_GENERATED_AT?.trim();
+  if (override) {
+    return override;
+  }
+
+  if (fs.existsSync(summaryPath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(summaryPath, 'utf-8')) as { generatedAt?: unknown };
+      if (typeof existing.generatedAt === 'string' && existing.generatedAt.length > 0) {
+        return existing.generatedAt;
+      }
+    } catch {
+      // Ignore malformed summary and try extracting from HTML.
+    }
+  }
+
+  if (fs.existsSync(reportPath)) {
+    const html = fs.readFileSync(reportPath, 'utf-8');
+    const match = html.match(/<strong>Generated:\/strong>\s*([^<]+)/i);
+    if (match?.[1]) {
+      return match[1].trim();
+    }
+  }
+
+  return new Date().toISOString();
+}
+
 interface ConsolidatedAccuracySummary {
   generatedAt: string;
   thresholds: {
@@ -941,6 +969,7 @@ function buildHtmlAndSummary(
   scenarios: TestScenario[],
   selectedIds: Set<string>,
   calculatorParity: CalculatorParitySummary,
+  generatedAt: string,
 ): { html: string; summary: ConsolidatedAccuracySummary } {
   const scenarioMap = new Map(scenarios.map((sc) => [sc.id, sc]));
   const collector: AggregationCollector = {
@@ -972,7 +1001,7 @@ function buildHtmlAndSummary(
   const thresholdStatus = computeThresholdStatus(calculatorParity, parserDiagnostics, forecastVsSimulation);
 
   const summary: ConsolidatedAccuracySummary = {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     thresholds: {
       ci: { ...CI_THRESHOLDS },
       target: { ...TARGET_THRESHOLDS },
@@ -1011,7 +1040,7 @@ function buildHtmlAndSummary(
     ? `<p><strong>Forecast CI exclusions:</strong> ${esc(ciExclusionDetails.join('; '))}</p>`
     : '<p><strong>Forecast CI exclusions:</strong> none</p>';
 
-  const now = new Date().toISOString();
+  const now = generatedAt;
   const usedForecast = baseline.defaults.forecastYears;
 
   const html = `<!doctype html>
@@ -1264,7 +1293,8 @@ function main(): void {
     : Number.NaN;
   const compareExitCode = Number.isFinite(parsedCompareExitCode) ? parsedCompareExitCode : undefined;
   const calculatorParity = loadCalculatorParitySummary(comparisonDetailedPath, baseline.scenarios.length, compareExitCode);
-  const result = buildHtmlAndSummary(baseline, scenarios, selectedIds, calculatorParity);
+  const generatedAt = resolveStableGeneratedAt(summaryPath, reportPath);
+  const result = buildHtmlAndSummary(baseline, scenarios, selectedIds, calculatorParity, generatedAt);
   fs.writeFileSync(reportPath, result.html, 'utf-8');
   fs.writeFileSync(summaryPath, JSON.stringify(result.summary, null, 2), 'utf-8');
 
