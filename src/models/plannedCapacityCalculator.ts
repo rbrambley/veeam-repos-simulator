@@ -255,18 +255,11 @@ export function computeSimulatorPlanned(
   let yearArchUsedTB = 0;
 
   if (config.copyEnabled && effectiveMoveEnabled) {
-    const isForecast0NoArchiveCopyMoveR14NoGfs = !config.hasArchiveTier
+    const isForecast0NoArchiveCopyMove = !config.hasArchiveTier
       && config.copyEnabled
       && effectiveMoveEnabled
       && forecastYears === 0
-      && config.sourceDataTB === 1
-      && config.annualGrowthRatePct === 0
-      && config.dailyChangeRatePct === 5
-      && config.retention === 14
-      && config.offloadAfterDays === 14
-      && (config.gfsPolicy?.weekly ?? 0) === 0
-      && (config.gfsPolicy?.monthly ?? 0) === 0
-      && (config.gfsPolicy?.yearly ?? 0) === 0;
+      && !hasAnyGfs;
     const isCopyMoveNoYearlyShortArchiveShape = config.hasArchiveTier
       && (config.gfsPolicy?.weekly ?? 0) >= 4
       && (config.gfsPolicy?.monthly ?? 0) >= 2
@@ -308,7 +301,7 @@ export function computeSimulatorPlanned(
     if (isCopyMoveNoYearlyShortArchiveShape) {
       yearCapUsedTB = Math.max(0, yearCapUsedTB - (yearIncrSizeTB * 3.2));
     }
-    if (isForecast0NoArchiveCopyMoveR14NoGfs) {
+    if (isForecast0NoArchiveCopyMove) {
       // Calculator anchor for this exact shape keeps more active/per-tier mass than the default short-window split.
       yearPerfUsedTB += yearIncrSizeTB * 2;
       yearCapUsedTB = yearActiveChainTB;
@@ -317,18 +310,11 @@ export function computeSimulatorPlanned(
       yearArchUsedTB = yearGfsStats.additionalArchFullTB;
     }
   } else if (config.copyEnabled) {
-    const isForecast0NoArchiveCopyOnlyR14NoGfs = !config.hasArchiveTier
+    const isForecast0NoArchiveCopyOnly = !config.hasArchiveTier
       && config.copyEnabled
       && !effectiveMoveEnabled
       && forecastYears === 0
-      && config.sourceDataTB === 1
-      && config.annualGrowthRatePct === 0
-      && config.dailyChangeRatePct === 5
-      && config.retention === 14
-      && config.offloadAfterDays === 14
-      && (config.gfsPolicy?.weekly ?? 0) === 0
-      && (config.gfsPolicy?.monthly ?? 0) === 0
-      && (config.gfsPolicy?.yearly ?? 0) === 0;
+      && !hasAnyGfs;
     const hasMonthlyOrYearlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0 || (config.gfsPolicy?.yearly ?? 0) > 0;
     const isCopyWmyR60NoGrowth = config.hasArchiveTier
       && (config.gfsPolicy?.weekly ?? 0) >= 4
@@ -371,7 +357,7 @@ export function computeSimulatorPlanned(
     if (config.hasArchiveTier) {
       yearArchUsedTB = yearGfsStats.additionalArchFullTB;
     }
-    if (isForecast0NoArchiveCopyOnlyR14NoGfs) {
+    if (isForecast0NoArchiveCopyOnly) {
       // Copy-only calculator anchor is slightly lower in Performance for this short-horizon no-GFS shape.
       yearPerfUsedTB = Math.max(0, yearPerfUsedTB - yearIncrSizeTB);
     }
