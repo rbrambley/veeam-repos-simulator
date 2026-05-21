@@ -441,18 +441,6 @@ export function computeSimulatorPlanned(
             performanceImmutabilityDays
           )
         : windows.performanceWindowDays;
-      const isForecast0NoArchiveMoveOnlyR14NoGfs = !config.hasArchiveTier
-        && !config.copyEnabled
-        && effectiveMoveEnabled
-        && forecastYears === 0
-        && config.sourceDataTB === 1
-        && config.annualGrowthRatePct === 0
-        && config.dailyChangeRatePct === 5
-        && config.retention === 14
-        && config.offloadAfterDays === 14
-        && (config.gfsPolicy?.weekly ?? 0) === 0
-        && (config.gfsPolicy?.monthly ?? 0) === 0
-        && (config.gfsPolicy?.yearly ?? 0) === 0;
       const isMoveArchiveNoGfsR30 = config.hasArchiveTier
         && (config.gfsPolicy?.weekly ?? 0) === 0
         && (config.gfsPolicy?.monthly ?? 0) === 0
@@ -467,23 +455,19 @@ export function computeSimulatorPlanned(
       const hasMonthlyOnlyGfs = (config.gfsPolicy?.monthly ?? 0) > 0
         && (config.gfsPolicy?.weekly ?? 0) === 0
         && (config.gfsPolicy?.yearly ?? 0) === 0;
-      const noArchiveMoveCapWindowDays = Math.max(
-        fullIntervalDays,
-        hasMonthlyOnlyGfs ? config.retention : (config.retention + fullIntervalDays),
-        capacityImmutabilityDays
-      );
+      const noArchiveMoveCapWindowDays = (forecastYears === 0 && !hasAnyGfs)
+        ? Math.max(fullIntervalDays, capacityImmutabilityDays)
+        : Math.max(
+            fullIntervalDays,
+            hasMonthlyOnlyGfs ? config.retention : (config.retention + fullIntervalDays),
+            capacityImmutabilityDays
+          );
       yearPerfUsedTB = estimateTierChainDataForYearTB(noArchiveMovePerfWindowDays) + yearGfsStats.additionalPerfFullTB;
       yearCapUsedTB = estimateTierChainDataForYearTB(
         config.hasArchiveTier
           ? (isMoveArchiveNoGfsR30 ? Math.max(windows.capacityWindowDays, config.retention + fullIntervalDays) : windows.capacityWindowDays)
           : noArchiveMoveCapWindowDays
       ) + yearGfsStats.additionalCapFullTB;
-      if (isForecast0NoArchiveMoveOnlyR14NoGfs) {
-        // Calculator anchor shows ~0.70 TB cap-tier for this exact short-horizon move-only shape.
-        // Use a narrow adjustment to prevent broad behavior changes while we collect cross-mode captures.
-        yearPerfUsedTB += yearIncrSizeTB * 2;
-        yearCapUsedTB = Math.max(0, yearCapUsedTB - (yearIncrSizeTB * 12));
-      }
     }
   }
 

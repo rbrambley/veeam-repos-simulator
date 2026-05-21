@@ -553,6 +553,30 @@
         {"day": 8, "description": "First sealed chain should offload immediately"}
       ],
       "finalState": {}
+    },
+    {
+      "id": "sobr-moveonly-27tb-forecast0",
+      "name": "SOBR Move-Only 27 TB Forecast=0 - Capacity Tier Parity",
+      "description": "Regression guard: 27 TB source, move-only, offload=retention=14, forecast=0. Capacity tier must match calculator (17.6 TB), not the full 21-day planning estimate.",
+      "config": {
+        "repositoryType": "SOBR",
+        "jobType": "ForwardIncremental",
+        "sourceDataTB": 27,
+        "annualGrowthRatePct": 0,
+        "dailyChangeRatePct": 5,
+        "retention": 14,
+        "gfsPolicy": {"weekly": 0, "monthly": 0, "yearly": 0},
+        "offloadAfterDays": 14,
+        "archiveAfterDays": 30,
+        "hasArchiveTier": false,
+        "copyEnabled": false,
+        "moveEnabled": true
+      },
+      "totalDays": 35,
+      "checkpoints": [
+        {"day": 21, "description": "Capacity tier should hold single offloaded chain fragment"}
+      ],
+      "finalState": {}
     }
   ]
 }

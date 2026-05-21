@@ -1243,6 +1243,19 @@
                                            "calculatorSummaryRestorePointCount":  36,
                                            "parsedRestorePointCount":  36
                                        }
+                      },
+                      {
+                          "id":  "sobr-moveonly-27tb-forecast0",
+                          "notes":  "captured-manual-2026-05-21",
+                          "forecastYears":  0,
+                          "startDate":  "2026-05-21",
+                          "expected":  {
+                                           "plannedPerformanceTierTB":  33.1,
+                                           "plannedCapacityTierTB":  17.6,
+                                           "plannedArchiveTierTB":  0,
+                                           "fileTypeFullTB":  13.5,
+                                           "fileTypeIncrementalTB":  0.675
+                                       }
                       }
                   ]
 }
