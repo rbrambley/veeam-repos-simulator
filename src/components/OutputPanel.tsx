@@ -138,6 +138,17 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     const weekday = days[d.getUTCDay()];
     return `${date} (${weekday})`;
   }
+  
+  function getSimulationDayMeta(date: string) {
+    const d = new Date(`${date}T00:00:00.000Z`);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const weekday = days[d.getUTCDay()];
+    return {
+      isoDate: date,
+      weekday,
+      isWeekend: d.getUTCDay() === 0 || d.getUTCDay() === 6,
+    };
+  }
 
   function parseISODate(date: string) {
     return new Date(`${date}T00:00:00.000Z`);
@@ -282,6 +293,19 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       nextImmutabilityExpiry: immutabilityDates[0],
     };
   }, [generationSnapshots]);
+  
+  const simDateMeta = useMemo(() => {
+    const meta = getSimulationDayMeta(currentDate);
+    const startDate = sim.state.startDate || currentDate;
+    const elapsedDays = Math.max(
+      0,
+      Math.floor((parseISODate(currentDate).getTime() - parseISODate(startDate).getTime()) / 86400000)
+    );
+    return {
+      ...meta,
+      elapsedDays,
+    };
+  }, [currentDate, sim.state.startDate]);
 
   const immutabilitySummary = useMemo(() => {
     const primaryJob = sim.state.jobs[0];
@@ -988,11 +1012,47 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       </div>
 
       {/* Simulation advance + year-jump controls */}
-      <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '0.55rem' }}>
-        <span style={{ fontSize: '0.82rem', color: '#607d8b', fontWeight: 600, marginRight: '0.25rem' }}>
-          Sim Date: <strong>{getSimulationDayLabel(currentDate)}</strong>
-        </span>
-        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+      <div style={{ position: 'sticky', top: 0, zIndex: 3, marginBottom: '0.55rem' }}>
+        <div style={{
+          display: 'flex',
+          gap: '0.45rem',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
+          border: '1px solid #d9e6f2',
+          borderRadius: '10px',
+          padding: '0.45rem 0.5rem',
+          boxShadow: '0 8px 20px rgba(25, 118, 210, 0.10)'
+        }}>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            borderRadius: '999px',
+            background: '#e3f2fd',
+            border: '1px solid #90caf9',
+            color: '#0d47a1',
+            fontSize: '0.88rem',
+            fontWeight: 700,
+            marginRight: '0.25rem',
+            padding: '4px 11px'
+          }}>
+            <span style={{ letterSpacing: '0.03em' }}>Simulation Date</span>
+            <strong>{simDateMeta.isoDate}</strong>
+            <span style={{
+              borderRadius: '999px',
+              padding: '1px 7px',
+              border: `1px solid ${simDateMeta.isWeekend ? '#ffd08a' : '#b3d4fc'}`,
+              background: simDateMeta.isWeekend ? '#fff3e0' : '#eaf3ff',
+              color: simDateMeta.isWeekend ? '#b65d00' : '#1565c0',
+              fontWeight: 700,
+              fontSize: '0.76rem'
+            }}>
+              {simDateMeta.weekday}
+            </span>
+            <span style={{ color: '#455a64', fontWeight: 600, fontSize: '0.75rem' }}>Day +{simDateMeta.elapsedDays}</span>
+          </span>
+          <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
         {([1, 7, 30] as const).map(days => (
           <button
             key={days}
@@ -1044,6 +1104,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             Activity Log: last {activityLogFilter} days only
           </span>
         )}
+      </div>
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -1677,8 +1738,21 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
       {/* Bottom controls (duplicate for convenience — no need to scroll back up) */}
       <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e0e0e0' }}>
-        <span style={{ fontSize: '0.82rem', color: '#607d8b', fontWeight: 600, marginRight: '0.25rem' }}>
-          Sim Date: <strong>{getSimulationDayLabel(currentDate)}</strong>
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.3rem',
+          borderRadius: '999px',
+          background: '#eef3f7',
+          border: '1px solid #d7e1e8',
+          color: '#455a64',
+          fontSize: '0.8rem',
+          fontWeight: 600,
+          marginRight: '0.25rem',
+          padding: '2px 8px'
+        }}>
+          <span>{simDateMeta.isoDate}</span>
+          <span style={{ color: '#607d8b' }}>{simDateMeta.weekday}</span>
         </span>
         <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
         {([1, 7, 30] as const).map(days => (
