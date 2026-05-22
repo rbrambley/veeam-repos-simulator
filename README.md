@@ -36,9 +36,32 @@ Expected: calculator parity 75/75, lifecycle 57/57, mutation 5/5, forecast CI PA
 ## Quick Links
 
 - Automated test runner guide: [docs/automated-test-runner.md](docs/automated-test-runner.md)
+- Calculator integration handoff: [docs/calculator-integration-handoff.md](docs/calculator-integration-handoff.md)
 - Scenario definitions: [docs/test-scenarios.json](docs/test-scenarios.json)
 - Verification reference scenarios: [docs/test-scenarios-verification.md](docs/test-scenarios-verification.md)
 - Quality improvement plan: [docs/test-improvement-plan.md](docs/test-improvement-plan.md)
+
+## Coworker Handoff Readiness
+
+For integration with the real Veeam Calculator implementation, use:
+
+- [docs/calculator-integration-handoff.md](docs/calculator-integration-handoff.md)
+
+Recommended sequence for your coworker:
+
+```bash
+npm install
+npm run gate:quick
+npm run compare:veeam
+npm run gate:push
+```
+
+Integration scope is intentionally limited to:
+
+- `src/models/gfsSizing.ts`
+- `src/models/plannedCapacityCalculator.ts`
+
+All other simulator/runtime logic should remain unchanged unless a validated contract update is required.
 
 ## Run The Project
 
