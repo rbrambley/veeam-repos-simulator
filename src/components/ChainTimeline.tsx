@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { VeeamSimulator } from '../simulator/engine';
 import { BackupChain, RestorePoint, SOBRTier, Repository } from '../models/veeam';
 
@@ -84,7 +84,31 @@ interface GenerationSnapshot {
 export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, onSelectRestorePoint }) => {
   const [tooltip, setTooltip] = useState<TooltipInfo | null>(null);
   const [timeWindowDays, setTimeWindowDays] = useState<number | 'all'>(90);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
   const currentDateMs = new Date(`${currentDate}T00:00:00.000Z`).getTime();
+
+  useEffect(() => {
+    if (!tooltip || !tooltipRef.current) return;
+
+    const el = tooltipRef.current;
+    const pad = 12;
+    const offsetX = 14;
+    const offsetY = -10;
+
+    // Start from cursor-relative position, then clamp to viewport.
+    let left = tooltip.mouseX + offsetX;
+    let top = tooltip.mouseY + offsetY;
+
+    const rect = el.getBoundingClientRect();
+    const maxLeft = Math.max(pad, window.innerWidth - rect.width - pad);
+    const maxTop = Math.max(pad, window.innerHeight - rect.height - pad);
+
+    left = Math.min(maxLeft, Math.max(pad, left));
+    top = Math.min(maxTop, Math.max(pad, top));
+
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+  }, [tooltip]);
 
   function formatGenerationStateLabel(state: GenerationSnapshot['lifecycleState']): string {
     return state === 'DeleteOn Pending' ? 'Locked' : state;
@@ -312,7 +336,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         <g key={key}
           onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave} onClick={handleClick}
-          style={{ cursor: 'pointer' }}
+          cursor="pointer"
         >
           {rp.isGlobalBase && <polygon points={ptsO} fill="none" stroke="#37474f" strokeWidth={1.5} />}
           {rp.isGFS && <polygon points={pts} fill="none" stroke="#f9a825" strokeWidth={3} />}
@@ -332,7 +356,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
       <g key={key}
         onMouseEnter={handleMouseEnter} onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave} onClick={handleClick}
-        style={{ cursor: 'pointer' }}
+        cursor="pointer"
       >
         {rp.isGFS && <circle cx={cx} cy={cy} r={DOT_R + 3} fill="none" stroke="#f9a825" strokeWidth={2} />}
         <circle cx={cx} cy={cy} r={DOT_R} fill={color} opacity={0.85} />
@@ -371,11 +395,11 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
 
   return (
     <div>
-      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Chain Timeline</h3>
+      <h3 className="chain-timeline-title">Chain Timeline</h3>
 
       {/* Window selector */}
-      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '0.55rem' }}>
-        <span style={{ fontSize: '0.82rem', color: '#666', fontWeight: 'bold' }}>Window:</span>
+      <div className="chain-window-row">
+        <span className="chain-window-label">Window:</span>
         {([
           { label: '30d',  value: 30 as number | 'all' },
           { label: '90d',  value: 90 as number | 'all' },
@@ -384,28 +408,22 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         ]).map(opt => {
           const active = timeWindowDays === opt.value;
           return (
-            <button key={opt.label} onClick={() => setTimeWindowDays(opt.value)} style={{
-              border: `1px solid ${active ? '#1565c0' : '#ccc'}`,
-              background: active ? '#e3f2fd' : '#fff',
-              color: active ? '#1565c0' : '#555',
-              borderRadius: '999px', fontSize: '0.76rem', fontWeight: 'bold',
-              padding: '4px 10px', cursor: 'pointer',
-            }}>{opt.label}</button>
+            <button key={opt.label} onClick={() => setTimeWindowDays(opt.value)} className={`chain-window-btn${active ? ' active' : ''}`}>{opt.label}</button>
           );
         })}
-        <span style={{ fontSize: '0.75rem', color: '#888', marginLeft: '0.25rem' }}>
+        <span className="chain-window-note">
           {timeWindowDays === 'all' ? 'Showing full history' : `Showing last ${timeWindowDays} days`}
         </span>
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap', fontSize: '0.8rem', alignItems: 'center' }}>
+      <div className="chain-legend-row">
         {([
           ['Full', '#1e6bb8', 'diamond'] as const,
           ['SyntheticFull / Base Full', '#6a1b9a', 'diamond'] as const,
           ['Incremental', '#2e7d32', 'circle'] as const,
         ]).map(([label, color, shape]) => (
-          <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span key={label} className="chain-legend-item">
             {shape === 'diamond'
               ? <svg width={14} height={14}><polygon points="7,1 13,7 7,13 1,7" fill={color} /></svg>
               : <svg width={14} height={14}><circle cx={7} cy={7} r={6} fill={color} /></svg>}
@@ -413,7 +431,7 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
           </span>
         ))}
         {([['W', GFS_FLAG_COLORS.weekly], ['M', GFS_FLAG_COLORS.monthly], ['Y', GFS_FLAG_COLORS.yearly]] as const).map(([label, clr]) => (
-          <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+          <span key={label} className="chain-legend-item compact-gap">
             <svg width={14} height={14}>
               <polygon points="7,1 13,7 7,13 1,7" fill={clr} opacity={0.9} />
               <text x={7} y={8} textAnchor="middle" dominantBaseline="middle" fontSize={7} fill="#fff" fontWeight="bold">{label}</text>
@@ -421,47 +439,47 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
             GFS-{label === 'W' ? 'Weekly' : label === 'M' ? 'Monthly' : 'Yearly'}
           </span>
         ))}
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span className="chain-legend-item">
           <svg width={14} height={14}><polygon points="7,1 13,7 7,13 1,7" fill={GFS_FLAG_COLORS.yearly} opacity={0.9} /><text x={7} y={8} textAnchor="middle" dominantBaseline="middle" fontSize={5} fill="#fff" fontWeight="bold">YM</text></svg>
           Multi-flag
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span className="chain-legend-item">
           {(['Performance', 'Capacity', 'Archive'] as const).map(t => (
             <svg key={t} width={18} height={8}><rect x={0} y={0} width={18} height={8} fill={TIER_BAND_FILL[t]} stroke={TIER_BAND_STROKE_COLOR[t]} strokeWidth={0.8} rx={2} /></svg>
           ))}
           Band = current tier (badge = P/C/A)
         </span>
         {offloadX !== null && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span className="chain-legend-item">
             <svg width={12} height={14}><line x1={6} y1={0} x2={6} y2={14} stroke="#f57c00" strokeWidth={1.5} strokeDasharray="3,2" /></svg>
             Offload threshold
           </span>
         )}
         {archiveX !== null && (
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span className="chain-legend-item">
             <svg width={12} height={14}><line x1={6} y1={0} x2={6} y2={14} stroke="#7b1fa2" strokeWidth={1.5} strokeDasharray="3,2" /></svg>
             Archive threshold
           </span>
         )}
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span className="chain-legend-item">
           <svg width={12} height={14}><line x1={6} y1={0} x2={6} y2={14} stroke="#e53935" strokeWidth={2} strokeDasharray="4,3" /></svg>
           Today
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ background: '#1565c0', color: '#fff', borderRadius: '2px', padding: '0 4px', fontSize: '0.7rem', fontWeight: 'bold' }}>L</span>
+        <span className="chain-legend-item">
+          <span className="chain-lock-chip locked">L</span>
           Locked immutability
         </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ background: '#1b5e20', color: '#fff', borderRadius: '2px', padding: '0 4px', fontSize: '0.7rem', fontWeight: 'bold' }}>U</span>
+        <span className="chain-legend-item">
+          <span className="chain-lock-chip unlocked">U</span>
           Unlocked immutability
         </span>
         {onSelectRestorePoint && (
-          <span style={{ fontSize: '0.75rem', color: '#90a4ae', fontStyle: 'italic' }}>Click any dot to select it</span>
+          <span className="chain-legend-note">Click any dot to select it</span>
         )}
       </div>
 
-      <div style={{ overflowX: 'auto', border: '1px solid #ddd', borderRadius: '6px', background: '#fafafa' }}>
-        <svg width={totalW} height={SVG_H} style={{ display: 'block' }}>
+      <div className="chain-svg-wrap">
+        <svg width={totalW} height={SVG_H} className="chain-svg">
 
           {/* X-axis grid lines and labels */}
           {ticks.map(d => {
@@ -616,42 +634,36 @@ export const ChainTimeline: React.FC<ChainTimelineProps> = ({ sim, currentDate, 
         const gen = rp.generationId ? generationById[rp.generationId] : undefined;
         const imm = getImmutabilityStatus(rp);
         return (
-          <div style={{
-            position: 'fixed', left: tooltip.mouseX + 14, top: tooltip.mouseY - 10,
-            pointerEvents: 'none', zIndex: 9999,
-            background: '#fff', border: '1px solid #ccc', borderRadius: '6px',
-            padding: '8px 12px', fontSize: '0.85rem',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)', minWidth: '210px',
-          }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '3px' }}>
+          <div ref={tooltipRef} className="chain-tooltip-card">
+            <div className="chain-tooltip-title">
               {rp.isGlobalBase ? 'Base Full' : rp.type}
               {rp.isGlobalBase && rp.type === 'SyntheticFull' && (
-                <span style={{ fontWeight: 'normal', color: '#90a4ae', fontSize: '0.77rem', marginLeft: '5px' }}>
+                <span className="chain-tooltip-subtitle">
                   (created as SyntheticFull)
                 </span>
               )}
             </div>
-            <div style={{ fontFamily: 'monospace', fontSize: '0.77rem', color: '#90a4ae', marginBottom: '5px' }}>
+            <div className="chain-tooltip-id">
               {formatRpId(rp.id)}
             </div>
             <div>Date: <strong>{rp.date}</strong></div>
             <div>Size: <strong>{sizeTB.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} TB</strong></div>
-            <div>Tier: <strong style={{ color: TIER_LABEL_COLOR[currentTier] }}>{currentTier}</strong></div>
+            <div>Tier: <strong className={`chain-tier-text ${currentTier.toLowerCase()}`}>{currentTier}</strong></div>
             {rp.generationId && <div>GEN: <strong>{formatRpId(rp.generationId)}</strong></div>}
             {gen && <div>DeleteOn: <strong>{gen.deleteOn}</strong></div>}
             {gen && <div>State: <strong>{formatGenerationStateLabel(gen.lifecycleState)}</strong></div>}
             <div>Immutability: <strong>{imm.label}</strong></div>
-            <div style={{ fontSize: '0.76rem', color: '#78909c' }}>{imm.detail}</div>
+            <div className="chain-tooltip-immutability">{imm.detail}</div>
             {rp.isGFS && (
-              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <span style={{ color: '#607d8b' }}>GFS:</span>
-                {rp.isWeeklyGFS  && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '1px 5px', fontSize: '0.75rem' }}>W</span>}
-                {rp.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '1px 5px', fontSize: '0.75rem' }}>M</span>}
-                {rp.isYearlyGFS  && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '1px 5px', fontSize: '0.75rem' }}>Y</span>}
+              <div className="chain-tooltip-gfs-row">
+                <span className="chain-tooltip-gfs-label">GFS:</span>
+                {rp.isWeeklyGFS  && <span className="chain-tooltip-gfs-chip weekly">W</span>}
+                {rp.isMonthlyGFS && <span className="chain-tooltip-gfs-chip monthly">M</span>}
+                {rp.isYearlyGFS  && <span className="chain-tooltip-gfs-chip yearly">Y</span>}
               </div>
             )}
             {onSelectRestorePoint && (
-              <div style={{ marginTop: '6px', fontSize: '0.75rem', color: '#90a4ae', fontStyle: 'italic' }}>
+              <div className="chain-tooltip-note">
                 Click to view details below ↓
               </div>
             )}

@@ -260,13 +260,13 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
   function renderImmutabilityChip(rp: RestorePointRow, tierHint?: 'Performance' | 'Capacity' | 'Archive') {
     const status = getRestorePointImmutability(rp, tierHint);
     const displayLabel = status.isLocked === true ? 'Protected' : status.isLocked === false ? 'Mutable' : 'N/A';
-    const style = status.isLocked === true
-      ? { bg: '#e3f2fd', fg: '#1565c0' }
+    const stateClass = status.isLocked === true
+      ? 'protected'
       : status.isLocked === false
-        ? { bg: '#e8f5e9', fg: '#1b5e20' }
-        : { bg: '#eceff1', fg: '#455a64' };
+        ? 'mutable'
+        : 'na';
     return (
-      <span title={status.detail} style={{ background: style.bg, color: style.fg, borderRadius: '3px', padding: '1px 6px', fontSize: '0.72rem', fontWeight: 700 }}>
+      <span title={status.detail} className={`immutability-chip ${stateClass}`}>
         {displayLabel}
       </span>
     );
@@ -329,14 +329,10 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     return `Immutability: Primary ${primary}d`;
   }, [sim.state.jobs, sim.state.repositories]);
 
-  const getGenerationStateStyle = (state: GenerationSnapshot['lifecycleState']) => {
-    if (state === 'Deletable') {
-      return { color: '#1b5e20', bg: '#e8f5e9' };
-    }
-    if (state === 'Waiting Immutability') {
-      return { color: '#8d6e63', bg: '#efebe9' };
-    }
-    return { color: '#1565c0', bg: '#e3f2fd' };
+  const getGenerationStateClass = (state: GenerationSnapshot['lifecycleState']) => {
+    if (state === 'Deletable') return 'deletable';
+    if (state === 'Waiting Immutability') return 'waiting';
+    return 'sealed';
   };
 
   const getGenerationStateLabel = (state: GenerationSnapshot['lifecycleState']) => {
@@ -351,21 +347,21 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     const gen = generationById[rp.generationId];
     const stateLabel = getGenerationStateLabel(gen.lifecycleState);
     return (
-      <div style={{ fontSize: '0.75rem', color: '#546e7a', marginTop: '2px', fontFamily: 'monospace' }}>
+      <div className="gen-metadata-line">
         📋 {shortId(rp.generationId)} ({stateLabel}, DeleteOn {gen.deleteOn})
       </div>
     );
   };
 
   const renderGenTotals = (locked: number, waiting: number, deletable: number) => (
-    <div style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
-      <span title="Sealed GENs" style={{ background: '#e3f2fd', color: '#1565c0', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+    <div className="gen-totals-wrap">
+      <span title="Sealed GENs" className="gen-total-chip sealed">
         S {locked}
       </span>
-      <span title="Immutability Hold GENs" style={{ background: '#efebe9', color: '#8d6e63', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+      <span title="Immutability Hold GENs" className="gen-total-chip waiting">
         H {waiting}
       </span>
-      <span title="Ready GENs" style={{ background: '#e8f5e9', color: '#1b5e20', borderRadius: '3px', padding: '0 5px', fontSize: '0.72rem', fontWeight: 700 }}>
+      <span title="Ready GENs" className="gen-total-chip deletable">
         R {deletable}
       </span>
     </div>
@@ -764,12 +760,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     return 'ok';
   };
 
-  const typeColors: Record<string, string> = {
-    Full: '#1e6bb8',
-    Incremental: '#2e7d32',
-    SyntheticFull: '#6a1b9a',
-  };
-
   return (
     <div>
       <div className="output-panel-header">
@@ -1043,19 +1033,19 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1 1 820px', minWidth: '340px' }}>
+      <div className="catalog-layout-row">
+        <div className="catalog-main-column">
       {/* Chain Timeline */}
       {showChainTimeline && <ChainTimeline sim={sim} currentDate={currentDate} onSelectRestorePoint={setSelectedRestorePointId} />}
 
       {/* Restore Point Catalog */}
       {showRestoreCatalog && (
       <>
-      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Restore Point Catalog</h3>
+      <h3 className="catalog-title">Restore Point Catalog</h3>
       {hasGenerationUi && <StateLegend />}
-      <table border={1} cellPadding={6} className="backup-table" style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1rem' }}>
+      <table border={1} cellPadding={6} className="backup-table restore-catalog-table">
         <thead>
-          <tr style={{ background: '#f5f5f5' }}>
+          <tr className="restore-catalog-header-row">
             <th>RP ID</th>
             <th>Created</th>
             <th>Type</th>
@@ -1074,67 +1064,65 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             const currentTier = (rp.sobrTier || 'Performance') as 'Performance' | 'Capacity' | 'Archive';
             const isGlobalBase = !!rp.isGlobalBase;
             const isTierBase = isGlobalBase || (rp.baseTiers || []).includes(currentTier);
-            const role = isTierBase ? 'Base Full' : (rp.isGFS ? 'GFS' : 'Daily');
             const displayType = rp.type;
             const displaySizeTB = sim.getRestorePointSizeForTier(rp.id, currentTier);
-            const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
             const chain = chainById[rp.chainId];
+            const rpTypeClass = rp.type === 'Full' ? 'full' : rp.type === 'Incremental' ? 'incremental' : 'synthetic';
+            const chainStateClass = chain?.status === 'Inactive' ? 'inactive' : 'active';
+            const tierClass = (rp.sobrTier || 'Performance').toLowerCase();
             return (
               <tr
                 key={rp.id}
                 onClick={() => setSelectedRestorePointId(rp.id)}
-                style={{
-                  background: isSelected ? '#e3f2fd' : (rp.isGFS ? '#fff9c4' : undefined),
-                  cursor: 'pointer',
-                }}
+                className={`restore-catalog-row${isSelected ? ' selected' : ''}${rp.isGFS ? ' gfs-row' : ''}`}
               >
-                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{shortId(rp.id)}</td>
+                <td className="cell-mono-small">{shortId(rp.id)}</td>
                 <td>{rp.date}</td>
                 <td>
-                  <span style={{ color: typeColors[rp.type] || '#333', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                  <span className={`rp-type-chip ${rpTypeClass}`}>
                     {displayType}
                   </span>
                 </td>
                 <td>
-                  <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div className="rp-role-badges">
                     {isTierBase && (
-                      <span style={{ background: '#455a64', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                      <span className="tag role-base">
                         Base Full
                       </span>
                     )}
                     {!isTierBase && !rp.isGFS && (
-                      <span style={{ background: '#546e7a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                      <span className="tag role-daily">
                         Daily
                       </span>
                     )}
                     {rp.isWeeklyGFS && (
-                      <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>W</span>
+                      <span className="tag gfs-weekly">W</span>
                     )}
                     {rp.isMonthlyGFS && (
-                      <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>M</span>
+                      <span className="tag gfs-monthly">M</span>
                     )}
                     {rp.isYearlyGFS && (
-                      <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>Y</span>
+                      <span className="tag gfs-yearly">Y</span>
                     )}
                   </div>
                 </td>
-                <td style={{ fontSize: '0.8rem' }}>
+                <td className="cell-small">
                   {chain ? (
                     <>
-                      <div style={{ fontWeight: 'bold', color: chain.status === 'Inactive' ? '#b26a00' : '#2e7d32' }}>{chain.status}</div>
-                      {chain.inactiveSince && <div style={{ color: '#666' }}>since {chain.inactiveSince}</div>}
+                      <div className={`chain-state ${chainStateClass}`}>{chain.status}</div>
+                      {chain.inactiveSince && <div className="chain-since">since {chain.inactiveSince}</div>}
                     </>
                   ) : (
-                    <span style={{ color: '#666' }}>Preserved / Detached</span>
+                    <span className="chain-preserved">Preserved / Detached</span>
                   )}
                 </td>
                 <td>{renderImmutabilityChip(rp, currentTier)}</td>
-                <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                <td className="cell-mono-small">
                   {rp.representsRestorePointDate ? `${rp.representsRestorePointDate} / ${shortId(rp.representsRestorePointId || '')}` : `${rp.date} / self`}
                 </td>
-                <td style={{ textAlign: 'center' }}>
+                <td className="cell-center">
                   {isSobr ? (
-                    <span style={{ background: tierColor[rp.sobrTier || 'Performance'] ?? '#888', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem' }}>
+                    <span className={`tier-pill ${tierClass}`}>
                       {rp.sobrTier}
                     </span>
                   ) : '-'}
@@ -1151,23 +1139,23 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       {/* Tier Contents */}
       {showTierContents && (
       <>
-      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>
+      <h3 className="catalog-title">
         {isPrimaryRepoSobr ? 'Tier Contents' : 'Primary Storage Contents'}
       </h3>
       {hasGenerationUi && <StateLegend />}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
+      <div className="tier-contents-grid">
         {visibleTierOrder.map((tier) => {
           const tierColor: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
           const list = tierBuckets[tier];
           const tierLabel = !isPrimaryRepoSobr && tier === 'Performance' ? 'Primary Storage' : tier;
           return (
-            <div key={tier} style={{ border: `1px solid ${tierColor[tier]}`, borderRadius: '6px', overflow: 'hidden' }}>
-              <div style={{ background: tierColor[tier], color: '#fff', padding: '6px 10px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            <div key={tier} className={`tier-card tier-${tier.toLowerCase()}`}>
+              <div className="tier-card-header">
                 {tierLabel} ({list.length})
               </div>
-              <div style={{ background: '#fafafa' }}>
+              <div className="tier-card-body">
                 {list.length === 0 ? (
-                  <div style={{ padding: '8px 10px', color: '#777', fontSize: '0.85rem' }}>No restore points currently in this tier.</div>
+                  <div className="tier-empty">No restore points currently in this tier.</div>
                 ) : (
                   list.map((rp) => {
                     const isSelected = selectedRestorePointId === rp.id;
@@ -1180,35 +1168,27 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       <button
                         key={`${tier}-${rp.id}`}
                         onClick={() => setSelectedRestorePointId(rp.id)}
-                        style={{
-                          width: '100%',
-                          textAlign: 'left',
-                          border: 'none',
-                          borderBottom: '1px solid #eceff1',
-                          background: isSelected ? '#e3f2fd' : '#fff',
-                          padding: '7px 10px',
-                          cursor: 'pointer',
-                        }}
+                        className={`tier-rp-btn${isSelected ? ' selected' : ''}`}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center' }}>
-                          <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#455a64' }}>{shortId(rp.id)}</span>
-                          <span style={{ fontSize: '0.8rem', color: '#607d8b' }}>{rp.date}</span>
+                        <div className="tier-rp-row">
+                          <span className="tier-rp-id">{shortId(rp.id)}</span>
+                          <span className="tier-rp-date">{rp.date}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', alignItems: 'center', marginTop: '2px' }}>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#37474f' }}>{displayType}{isTierBase ? ' (Base)' : ''}</span>
-                          <span style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{formatTB(displaySizeTB)}</span>
+                        <div className="tier-rp-row tier-rp-row-secondary">
+                          <span className="tier-rp-type">{displayType}{isTierBase ? ' (Base)' : ''}</span>
+                          <span className="tier-rp-size">{formatTB(displaySizeTB)}</span>
                         </div>
                         {renderGenMetadataLine(rp)}
-                        <div style={{ display: 'flex', gap: '3px', marginTop: '3px', flexWrap: 'wrap' }}>
+                        <div className="tier-rp-badges">
                           {renderImmutabilityChip(rp, tier)}
                           {prunedFromCapacity && (
-                            <span style={{ background: '#8d6e63', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                            <span className="tag pruned">
                               Pruned
                             </span>
                           )}
-                          {rp.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>W</span>}
-                          {rp.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>M</span>}
-                          {rp.isYearlyGFS && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '0px 5px', fontSize: '0.7rem', fontWeight: 'bold' }}>Y</span>}
+                          {rp.isWeeklyGFS && <span className="tag gfs-weekly">W</span>}
+                          {rp.isMonthlyGFS && <span className="tag gfs-monthly">M</span>}
+                          {rp.isYearlyGFS && <span className="tag gfs-yearly">Y</span>}
                         </div>
                       </button>
                     );
@@ -1223,13 +1203,13 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       )}
         </div>
 
-        <div style={{ flex: '0 1 360px', minWidth: '300px', alignSelf: 'flex-start', marginTop: bodyAlignmentOffset }}>
-          <div style={{ border: '1px solid #f9a825', borderRadius: '6px', background: '#fffde7', padding: '0.7rem 0.9rem', marginBottom: '0.8rem' }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '0.4rem' }}>Activity Log</div>
-            <div style={{ fontSize: '0.78rem', color: '#795548', marginBottom: '0.45rem' }}>
+        <div className={`activity-column${bodyAlignmentOffset !== '0' ? ' shifted' : ''}`}>
+          <div className="activity-log-card">
+            <div className="activity-log-title">Activity Log</div>
+            <div className="activity-log-date">
               Simulation Date: {getSimulationDayLabel(currentDate)}
             </div>
-            <div style={{ fontSize: '0.85rem', color: '#5d4037' }}>
+            <div className="activity-log-content">
               {dailyExplanation
                 ? (() => {
                     // Parse activity into per-event items while preserving the source day.
@@ -1282,28 +1262,28 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     });
 
                     // Categorise each item for grouping
-                    const categorise = (s: string): { label: string; color: string; bg: string } => {
+                    const categorise = (s: string): { label: string; className: string } => {
                       if (/GEN summary|DeleteOn|immutability|generation/i.test(s))
-                        return { label: 'GEN', color: '#283593', bg: '#e8eaf6' };
+                        return { label: 'GEN', className: 'cat-gen' };
                       if (/pruned .*Capacity point|pruned from Capacity/i.test(s))
-                        return { label: 'Prune', color: '#6d4c41', bg: '#efebe9' };
+                        return { label: 'Prune', className: 'cat-prune' };
                       if (/copied to Capacity tier.*Copy mode|GFS point.*copied to Capacity/i.test(s))
-                        return { label: 'Copy', color: '#00695c', bg: '#e0f2f1' };
+                        return { label: 'Copy', className: 'cat-copy' };
                       if (/move finalized|offloaded in full Performance\s*->|GFS point.*offloaded.*Performance/i.test(s))
-                        return { label: 'Move', color: '#1565c0', bg: '#e3f2fd' };
+                        return { label: 'Move', className: 'cat-move' };
                       if (/offloaded.*Capacity.*Archive|Capacity\s*->|GFS point.*offloaded.*Capacity/i.test(s))
-                        return { label: 'Tier Move', color: '#1565c0', bg: '#e3f2fd' };
+                        return { label: 'Tier Move', className: 'cat-tier-move' };
                       if (/tagged as GFS/i.test(s))
-                        return { label: 'GFS Tag', color: '#6a1b9a', bg: '#f3e5f5' };
+                        return { label: 'GFS Tag', className: 'cat-gfs-tag' };
                       if (/GFS.*deleted|exceeds.*GFS limit/i.test(s))
-                        return { label: 'GFS Expiry', color: '#b71c1c', bg: '#ffebee' };
+                        return { label: 'GFS Expiry', className: 'cat-gfs-expiry' };
                       if (/promoted as|base full|set as.*base/i.test(s))
-                        return { label: 'Promotion', color: '#37474f', bg: '#eceff1' };
+                        return { label: 'Promotion', className: 'cat-promotion' };
                       if (/created a.*restore point|SyntheticFull|Full restore/i.test(s))
-                        return { label: 'Backup', color: '#1b5e20', bg: '#e8f5e9' };
+                        return { label: 'Backup', className: 'cat-backup' };
                       if (/deleted due to retention|Chain.*deleted/i.test(s))
-                        return { label: 'Retention', color: '#e65100', bg: '#fff3e0' };
-                      return { label: 'Info', color: '#4e342e', bg: '#f5f5f5' };
+                        return { label: 'Retention', className: 'cat-retention' };
+                      return { label: 'Info', className: 'cat-info' };
                     };
 
                     type GroupedActivity = { day: string; text: string };
@@ -1343,12 +1323,12 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     const hiddenDayCount = groupedDays.length - filteredGroupedDays.length;
 
                     return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.2rem' }}>
+                      <div className="activity-feed-list">
                         {hiddenDayCount > 0 && (
-                          <div style={{ fontSize: '0.74rem', color: '#888', fontStyle: 'italic', padding: '0.2rem 0.35rem', borderRadius: '4px', background: '#f5f5f5' }}>
+                          <div className="activity-hidden-note">
                             {hiddenDayCount} earlier day{hiddenDayCount > 1 ? 's' : ''} hidden — showing last {activityLogFilter} days only.{' '}
                             <span
-                              style={{ color: '#1565c0', cursor: 'pointer', textDecoration: 'underline' }}
+                              className="activity-show-all"
                               onClick={() => setActivityLogFilter(null)}
                             >Show all</span>
                           </div>
@@ -1365,20 +1345,20 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                             .join(', ');
 
                           return (
-                            <details key={day} open={day === currentDate} style={{ border: '1px solid #f0d6a8', borderRadius: '6px', background: '#fffef8' }}>
-                              <summary style={{ cursor: 'pointer', listStyle: 'none', fontSize: '0.74rem', fontWeight: 700, color: '#6d4c41', padding: '0.34rem 0.5rem' }}>
+                            <details key={day} open={day === currentDate} className="activity-day-group">
+                              <summary className="activity-day-summary">
                                 {day === currentDate ? `${day} (current)` : day}
-                                <span style={{ fontWeight: 400, marginLeft: '0.5rem' }}>- {summaryText}</span>
+                                <span className="activity-day-summary-text">- {summaryText}</span>
                               </summary>
-                              <ul style={{ margin: 0, padding: '0 0.35rem 0.35rem', listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                              <ul className="activity-day-list">
                                 {dayItems.map((entry, i) => {
                                   const cat = categorise(entry.text);
                                   return (
-                                  <li key={`${day}-${i}`} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', background: cat.bg, borderRadius: '6px', padding: '0.28rem 0.45rem' }}>
-                                    <span style={{ fontSize: '0.68rem', fontWeight: 800, color: cat.color, whiteSpace: 'nowrap', marginTop: '0.05rem', minWidth: '54px', letterSpacing: '0.02em' }}>
+                                  <li key={`${day}-${i}`} className={`activity-item ${cat.className}`}>
+                                    <span className="activity-item-label">
                                       {cat.label}
                                     </span>
-                                    <span style={{ lineHeight: '1.4' }}>{normalizeActivityText(entry.text)}.</span>
+                                    <span className="activity-item-text">{normalizeActivityText(entry.text)}.</span>
                                   </li>
                                 );
                                 })}
@@ -1389,16 +1369,16 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       </div>
                     );
                   })()
-                : <span style={{ color: '#888' }}>No activity yet. Run +1 Day, +7 Days, or +30 Days to generate activity.</span>}
+                : <span className="activity-empty-text">No activity yet. Run +1 Day, +7 Days, or +30 Days to generate activity.</span>}
             </div>
 
           </div>
 
-          <div style={{ border: '1px solid #cfd8dc', borderRadius: '6px', padding: '0.7rem 0.9rem', background: '#fafcfd' }}>
-            <div style={{ fontWeight: 'bold', marginBottom: '0.4rem' }}>Selected Restore Point Info</div>
+          <div className="selected-rp-card">
+            <div className="selected-rp-title">Selected Restore Point Info</div>
             {selectedRestorePointId && (() => {
               const selected = sortedRestorePoints.find(rp => rp.id === selectedRestorePointId);
-              if (!selected) return <div style={{ fontSize: '0.85rem', color: '#607d8b' }}>Select a restore point from the catalog or tier contents.</div>;
+              if (!selected) return <div className="selected-rp-empty">Select a restore point from the catalog or tier contents.</div>;
 
               const selectedChain = chainById[selected.chainId];
               const selectedWasPrunedFromCapacity = wasPrunedFromCapacity(selected);
@@ -1417,7 +1397,6 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               const retentionDays = selJob?.retention?.restorePoints || 0;
 
               // --- 1. Tier journey with dwell times ---
-              const tierBg: Record<string, string> = { Performance: '#1976d2', Capacity: '#388e3c', Archive: '#7b1fa2' };
               const history = selected.tierMoveHistory || [];
               const journeySteps = history.map((step, idx) => {
                 const enteredMs = parseISODate(step.date).getTime();
@@ -1449,7 +1428,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                 const intermediates = chainPointsAsc.slice(anchorIdx + 1, idxOfSelected + 1);
                 dependencyNote = (
                   <>
-                    Requires <strong>{anchor.type}</strong> from <span style={{ fontFamily: 'monospace' }}>{anchor.date}</span>
+                    Requires <strong>{anchor.type}</strong> from <span className="mono-date-text">{anchor.date}</span>
                     {intermediates.length > 0 && (
                       <> + <strong>{intermediates.length}</strong> incremental{intermediates.length > 1 ? 's' : ''} ({intermediates[0].date}{intermediates.length > 1 ? ` – ${intermediates[intermediates.length - 1].date}` : ''})</>
                     )}.
@@ -1548,46 +1527,45 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                 }
               }
 
-              // GFS tag badges
-              const gfsBadges = (
-                <>
-                  {selected.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>W</span>}
-                  {selected.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>M</span>}
-                  {selected.isYearlyGFS && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>Y</span>}
-                  {selected.isGlobalBase && <span style={{ background: '#455a64', color: '#fff', borderRadius: '3px', padding: '1px 6px', fontSize: '0.75rem', fontWeight: 'bold' }}>Base Full</span>}
-                </>
-              );
-
               const infoRow = (label: string, value: React.ReactNode) => (
-                <div style={{ display: 'flex', gap: '0.5rem', fontSize: '0.84rem', marginBottom: '0.28rem' }}>
-                  <span style={{ color: '#78909c', minWidth: '120px', flexShrink: 0 }}>{label}</span>
-                  <span style={{ color: '#263238' }}>{value}</span>
+                <div className="selected-rp-info-row">
+                  <span className="selected-rp-info-label">{label}</span>
+                  <span className="selected-rp-info-value">{value}</span>
                 </div>
               );
+
+              const selectedTypeClass = selected.isGlobalBase
+                ? 'base'
+                : selected.type === 'Full'
+                  ? 'full'
+                  : selected.type === 'Incremental'
+                    ? 'incremental'
+                    : 'synthetic';
+              const selectedTierClass = currentTier.toLowerCase();
 
               return (
                 <>
                   {/* Quick-facts header */}
-                  <div style={{ marginBottom: '0.55rem' }}>
+                  <div className="selected-rp-header">
                     {/* ID line — muted, truncated if needed */}
-                    <div style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#90a4ae', marginBottom: '0.35rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div className="selected-rp-id-line">
                       {normalizeActivityText(selected.id)}
                     </div>
                     {/* All badges on one line — type badge shows present role */}
-                    <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'nowrap' }}>
-                      <span style={{ background: selected.isGlobalBase ? '#455a64' : ((typeColors as Record<string,string>)[selected.type] || '#546e7a'), color: '#fff', borderRadius: '4px', padding: '2px 9px', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                    <div className="selected-rp-badge-row">
+                      <span className={`selected-rp-badge type-${selectedTypeClass}`}>
                         {selected.isGlobalBase ? 'Base Full' : selected.type}
                       </span>
-                      <span style={{ color: '#b0bec5', fontSize: '0.85rem' }}>in</span>
-                      <span style={{ background: tierBg[currentTier] || '#546e7a', color: '#fff', borderRadius: '4px', padding: '2px 9px', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                      <span className="selected-rp-separator-word">in</span>
+                      <span className={`selected-rp-badge tier-${selectedTierClass}`}>
                         {currentTier}
                       </span>
                       {(selected.isWeeklyGFS || selected.isMonthlyGFS || selected.isYearlyGFS) && (
-                        <span style={{ color: '#b0bec5', fontSize: '0.85rem' }}>·</span>
+                        <span className="selected-rp-dot">·</span>
                       )}
-                      {selected.isWeeklyGFS && <span style={{ background: '#1565c0', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>W</span>}
-                      {selected.isMonthlyGFS && <span style={{ background: '#6a1b9a', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>M</span>}
-                      {selected.isYearlyGFS && <span style={{ background: '#b71c1c', color: '#fff', borderRadius: '4px', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>Y</span>}
+                      {selected.isWeeklyGFS && <span className="selected-rp-badge gfs-weekly">W</span>}
+                      {selected.isMonthlyGFS && <span className="selected-rp-badge gfs-monthly">M</span>}
+                      {selected.isYearlyGFS && <span className="selected-rp-badge gfs-yearly">Y</span>}
                     </div>
                   </div>
 
@@ -1599,15 +1577,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   {hasGenerationUi && selected.generationId && generationById[selected.generationId] && infoRow('DeleteOn', generationById[selected.generationId].deleteOn)}
                   {hasGenerationUi && selected.generationId && generationById[selected.generationId] && infoRow('GEN state', (() => {
                     const genState = generationById[selected.generationId!].lifecycleState;
-                    const style = getGenerationStateStyle(genState);
-                    return <span style={{ background: style.bg, color: style.color, borderRadius: '4px', padding: '1px 6px', fontSize: '0.78rem', fontWeight: 700 }}>{getGenerationStateLabel(genState)}</span>;
+                    return <span className={`generation-state-chip ${getGenerationStateClass(genState)}`}>{getGenerationStateLabel(genState)}</span>;
                   })())}
                   {selected.isGlobalBase && infoRow('Created as', selected.type)}
                   {infoRow('Chain', selectedChain
-                    ? <><strong style={{ color: selectedChain.status === 'Inactive' ? '#b26a00' : '#2e7d32' }}>{selectedChain.status}</strong>{selectedChain.inactiveSince ? ` since ${selectedChain.inactiveSince}` : ''}</>
+                    ? <><strong className={`chain-state ${selectedChain.status === 'Inactive' ? 'inactive' : 'active'}`}>{selectedChain.status}</strong>{selectedChain.inactiveSince ? ` since ${selectedChain.inactiveSince}` : ''}</>
                     : 'Detached (GFS orphan)')}
 
-                  <div style={{ borderTop: '1px solid #eceff1', margin: '0.5rem 0' }} />
+                  <div className="selected-rp-divider" />
 
                   {/* Restore dependency */}
                   {infoRow('To restore', dependencyNote)}
@@ -1623,48 +1600,39 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
                   {/* Pruned-from-capacity note */}
                   {selectedWasPrunedFromCapacity && (
-                    <div style={{ fontSize: '0.82rem', marginTop: '0.4rem', color: '#6d4c41', background: '#efebe9', border: '1px solid #d7ccc8', borderRadius: '6px', padding: '0.4rem 0.5rem' }}>
+                    <div className="selected-rp-pruned-note">
                       This point was copied to Capacity, then pruned after the chain's GFS full was preserved in Archive.
                     </div>
                   )}
 
-                  <div style={{ borderTop: '1px solid #eceff1', margin: '0.5rem 0' }} />
+                  <div className="selected-rp-divider" />
 
                   {/* Tier journey timeline */}
-                  <div style={{ fontSize: '0.78rem', color: '#78909c', marginBottom: '0.3rem' }}>Tier journey</div>
+                  <div className="tier-journey-title">Tier journey</div>
                   {journeySteps.length > 0 ? (
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
+                    <div className="tier-journey-wrap">
                       {journeySteps.map((step, idx) => (
                         <React.Fragment key={`${selected.id}-journey-${idx}`}>
-                          <div style={{
-                            background: tierBg[step.tier] || '#607d8b',
-                            color: '#fff',
-                            borderRadius: '4px',
-                            padding: '3px 9px',
-                            fontSize: '0.8rem',
-                            fontWeight: step.isCurrent ? 'bold' : 'normal',
-                            outline: step.isCurrent ? '2px solid #37474f' : 'none',
-                            outlineOffset: '1px',
-                          }}>
+                          <div className={`tier-journey-step tier-${step.tier.toLowerCase()}${step.isCurrent ? ' current' : ''}`}>
                             {step.tier}
-                            <span style={{ marginLeft: '5px', opacity: 0.85, fontWeight: 'normal' }}>
+                            <span className="tier-journey-days">
                               {step.isCurrent ? `${step.daysInTier}d ★` : `${step.daysInTier}d`}
                             </span>
                           </div>
                           {idx < journeySteps.length - 1 && (
-                            <span style={{ color: '#90a4ae', fontSize: '1rem' }}>→</span>
+                            <span className="tier-journey-arrow">→</span>
                           )}
                         </React.Fragment>
                       ))}
                     </div>
                   ) : (
-                    <div style={{ fontSize: '0.82rem', color: '#90a4ae' }}>No tier history recorded (point has not moved tiers yet).</div>
+                    <div className="tier-journey-empty">No tier history recorded (point has not moved tiers yet).</div>
                   )}
                 </>
               );
             })()}
             {!selectedRestorePointId && (
-              <div style={{ fontSize: '0.85rem', color: '#607d8b' }}>
+              <div className="selected-rp-empty">
                 Select a restore point from the catalog or tier contents to view its info.
               </div>
             )}

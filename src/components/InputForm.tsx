@@ -70,35 +70,6 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
   const supportsTieredImmutability = repoType === 'SOBR';
   const supportsArchiveImmutability = repoType === 'SOBR' && sobrHasArchive && isObjectStorage;
 
-  const compactNumberInputStyle: React.CSSProperties = {
-    width: '84px',
-    textAlign: 'right',
-    fontVariantNumeric: 'tabular-nums',
-  };
-
-  const tooltipHintStyle: React.CSSProperties = {
-    cursor: 'help',
-    borderBottom: '1px dotted #607d8b',
-    color: '#455a64',
-    fontSize: '0.74rem',
-  };
-
-  const tooltipBadgeStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '16px',
-    height: '16px',
-    borderRadius: '50%',
-    background: '#e3f2fd',
-    border: '1px solid #90caf9',
-    color: '#1565c0',
-    fontSize: '0.7rem',
-    fontWeight: 700,
-    lineHeight: 1,
-    cursor: 'help',
-  };
-
   const computeGfsStatsAtYear = (yearOffset: number) => {
     const stats = computeForecastGfsStatsAtYear({
       sourceDataTB,
@@ -307,8 +278,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
 
   return (
     <div>
-      <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.15rem', fontWeight: 700, color: '#1a237e', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-        <span style={{ display: 'inline-block', width: '4px', height: '20px', background: '#1a237e', borderRadius: '2px', flexShrink: 0 }} />
+      <h2 className="scenario-config-title">
+        <span className="scenario-config-title-accent" />
         Configure Backup Scenario
       </h2>
       <div className="scenario-layout">
@@ -322,7 +293,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             <div className="form-card-body two-col">
             <label>
               Start Date:
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={{ width: '150px' }} />
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="input-date-compact" />
             </label>
             <label>
               Forecast (y):
@@ -336,16 +307,16 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   const nextForecast = normalizeForecastYears(Number(e.target.value));
                   setForecastYears(syncForecastWithGfs(nextForecast, gfsWeekly, gfsMonthly, gfsYearly));
                 }}
-                style={compactNumberInputStyle}
+                className="input-number-compact"
               />
             </label>
             <label>
               Daily Change (%):
-              <input type="number" value={dailyChangeRate} min={0.1} max={100} step={0.1} onChange={e => setDailyChangeRate(Number(e.target.value))} style={compactNumberInputStyle} />
+              <input type="number" value={dailyChangeRate} min={0.1} max={100} step={0.1} onChange={e => setDailyChangeRate(Number(e.target.value))} className="input-number-compact" />
             </label>
             <label>
               Annual Growth (%):
-              <input type="number" value={annualGrowthRate} min={0} max={100} step={1} onChange={e => setAnnualGrowthRate(Number(e.target.value))} style={compactNumberInputStyle} />
+              <input type="number" value={annualGrowthRate} min={0} max={100} step={1} onChange={e => setAnnualGrowthRate(Number(e.target.value))} className="input-number-compact" />
             </label>
             </div>
           </div>
@@ -366,11 +337,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                 </label>
                 <label>
                   Source (TB):
-                  <input type="number" value={sourceDataTB} min={0.1} step={0.1} onChange={e => setSourceDataTB(Number(e.target.value))} style={compactNumberInputStyle} />
+                  <input type="number" value={sourceDataTB} min={0.1} step={0.1} onChange={e => setSourceDataTB(Number(e.target.value))} className="input-number-compact" />
                 </label>
                 <label>
                   Retention (d):
-                  <input type="number" value={retention} min={1} onChange={e => setRetention(Number(e.target.value))} style={compactNumberInputStyle} />
+                  <input type="number" value={retention} min={1} onChange={e => setRetention(Number(e.target.value))} className="input-number-compact" />
                 </label>
               </div>
               <div className="card-split-col">
@@ -388,7 +359,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                       setGfsWeekly(nextWeekly);
                       setForecastYears(prev => syncForecastWithGfs(prev, nextWeekly, gfsMonthly, gfsYearly));
                     }}
-                    style={compactNumberInputStyle}
+                    className="input-number-compact"
                   />
                 </label>
                 <label>
@@ -402,7 +373,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                       setGfsMonthly(nextMonthly);
                       setForecastYears(prev => syncForecastWithGfs(prev, gfsWeekly, nextMonthly, gfsYearly));
                     }}
-                    style={compactNumberInputStyle}
+                    className="input-number-compact"
                   />
                 </label>
                 <label>
@@ -416,7 +387,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                       setGfsYearly(nextYearly);
                       setForecastYears(prev => syncForecastWithGfs(prev, gfsWeekly, gfsMonthly, nextYearly));
                     }}
-                    style={compactNumberInputStyle}
+                    className="input-number-compact"
                   />
                 </label>
               </div>
@@ -439,8 +410,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     <option value="SOBR">SOBR</option>
                   </select>
                 </label>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.6rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <div className="repo-object-row">
+                  <label className="inline-checkbox-label">
                     Use Object Storage
                     <input
                       type="checkbox"
@@ -461,7 +432,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     value={sobrPerformanceImmutabilityDays}
                     min={0}
                     onChange={e => setSobrPerformanceImmutabilityDays(Number(e.target.value))}
-                    style={compactNumberInputStyle}
+                    className="input-number-compact"
                   />
                 </label>
                 <label>
@@ -472,7 +443,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     min={0}
                     disabled={!supportsTieredImmutability}
                     onChange={e => setSobrCapacityImmutabilityDays(Number(e.target.value))}
-                    style={{ ...compactNumberInputStyle, opacity: supportsTieredImmutability ? 1 : 0.55 }}
+                    className={`input-number-compact${supportsTieredImmutability ? '' : ' is-disabled'}`}
                   />
                 </label>
                 <label>
@@ -483,17 +454,17 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     min={0}
                     disabled={!supportsArchiveImmutability}
                     onChange={e => setSobrArchiveImmutabilityDays(Number(e.target.value))}
-                    style={{ ...compactNumberInputStyle, opacity: supportsArchiveImmutability ? 1 : 0.55 }}
+                    className={`input-number-compact${supportsArchiveImmutability ? '' : ' is-disabled'}`}
                   />
                 </label>
-                <div style={{ fontSize: '0.76rem', color: '#666', marginTop: '0.45rem' }}>
+                <div className="form-muted-note">
                   {repoType === 'SOBR'
                     ? 'SOBR selected: all tier immutability controls are available based on enabled tiers.'
                     : `${repoType} selected: primary immutability applies; Capacity/Archive controls are disabled.`}
                 </div>
-                <div style={{ marginTop: '0.45rem' }}>
+                <div className="help-badge-row">
                   <span
-                    style={tooltipBadgeStyle}
+                    className="help-badge"
                     title="Primary/Performance immutability delays generation delete eligibility. Capacity and Archive immutability are only applicable when using SOBR tiers."
                     aria-label="Immutability policy notes"
                   >
@@ -508,8 +479,8 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             <div className="form-card">
               <div className="form-card-header">SOBR Tier Policy</div>
               <div className="form-card-body two-col">
-              <div className="full-row" style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <div className="full-row sobr-mode-row">
+                <label className="inline-checkbox-label">
                   <input
                     type="checkbox"
                     checked={sobrCopyEnabled}
@@ -521,7 +492,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   />
                   Capacity Tier Copy
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <label className="inline-checkbox-label">
                   <input
                     type="checkbox"
                     checked={effectiveMoveEnabled}
@@ -534,29 +505,29 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                   Capacity Tier Move
                 </label>
               </div>
-              <div className="full-row" style={{ fontSize: '0.76rem', color: '#666', marginBottom: '0.55rem' }}>
+              <div className="full-row form-muted-note mode-row-note">
                 Mode: {effectiveCopyEnabled && effectiveMoveEnabled ? 'Copy + Move' : effectiveCopyEnabled ? 'Copy only' : 'Move only'}
               </div>
               <label>Offload after (d):
-                <input type="number" value={sobrOffloadDays} min={1} onChange={e => setSobrOffloadDays(Number(e.target.value))} style={compactNumberInputStyle} />
+                <input type="number" value={sobrOffloadDays} min={1} onChange={e => setSobrOffloadDays(Number(e.target.value))} className="input-number-compact" />
               </label>
               <label>GEN period (d):
-                <input type="number" value={sobrGenerationPeriodDays} min={1} onChange={e => setSobrGenerationPeriodDays(Number(e.target.value))} style={compactNumberInputStyle} />
+                <input type="number" value={sobrGenerationPeriodDays} min={1} onChange={e => setSobrGenerationPeriodDays(Number(e.target.value))} className="input-number-compact" />
               </label>
-              <label className="full-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-start' }}>
+              <label className="full-row inline-checkbox-label">
                 <input type="checkbox" checked={sobrHasArchive} onChange={e => setSobrHasArchive(e.target.checked)} />
                 Enable Archive Tier
               </label>
               {sobrHasArchive && (
                 <>
                   <label>Archive after (d):
-                    <input type="number" value={sobrArchiveDays} min={1} onChange={e => setSobrArchiveDays(Number(e.target.value))} style={compactNumberInputStyle} />
+                    <input type="number" value={sobrArchiveDays} min={1} onChange={e => setSobrArchiveDays(Number(e.target.value))} className="input-number-compact" />
                   </label>
                 </>
               )}
-              <div className="full-row" style={{ marginTop: '0.55rem' }}>
+              <div className="full-row help-badge-row">
                 <span
-                  style={tooltipBadgeStyle}
+                  className="help-badge"
                   title="GEN period defines fixed object-generation windows (default 10 days). Performance immutability delays move/prune eligibility for sealed chains. Capacity and Archive immutability extend how long a GEN must stay before delete is allowed after DeleteOn is reached."
                   aria-label="GEN timing notes"
                 >
@@ -566,7 +537,7 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               </div>
             </div>
           )}
-          <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+          <div className="scenario-actions-row">
             <button type="submit" className="apply-btn">Simulate</button>
             <button
               type="button"
@@ -580,15 +551,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
         </form>
 
         {/* ── Right column: calculated capacity requirements ── */}
-        <div className="scenario-column" style={{
-          background: '#f0f4ff', border: '1px solid #c5cae9',
-          borderRadius: '6px', padding: '1rem',
-          alignSelf: 'flex-start', position: 'sticky', top: '1rem',
-        }}>
-          <div style={{ fontWeight: 'bold', fontSize: '0.95rem', marginBottom: '0.6rem', color: '#1a237e', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+        <div className="scenario-column requirements-panel">
+          <div className="requirements-title-row">
             📐 Calculated Capacity Requirements
             <span
-              style={tooltipBadgeStyle}
+              className="help-badge"
               title={`Annual view with ${annualGrowthRate}% growth. Working space uses the Veeam tiered scale on initial source size. ${appliedForecastYear > 5 ? `Years 1-4 plus year ${appliedForecastYear} are shown.` : `Years 1-${displayedYearCount} are shown.`} ★ marks the applied forecast year.`}
               aria-label="Capacity assumptions"
             >
@@ -596,13 +563,13 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
             </span>
           </div>
 
-          <div style={{ overflowX: 'auto', paddingBottom: '0.2rem' }}>
-            <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: `${160 + (displayedYearCount * 115)}px`, fontSize: '0.82rem' }}>
+          <div className="requirements-table-wrap">
+            <table className="requirements-table">
               <thead>
                 <tr>
-                  <th style={{ textAlign: 'left', padding: '6px 8px', borderBottom: '1px solid #c5cae9', color: '#1a237e' }}>Metric</th>
+                  <th className="req-th req-th-metric">Metric</th>
                   {yearColumns.map(year => (
-                    <th key={`year-col-${year}`} style={{ textAlign: 'right', padding: '6px 8px', borderBottom: '1px solid #c5cae9', color: year === appliedForecastYear ? '#b71c1c' : '#1a237e', whiteSpace: 'nowrap', fontWeight: year === appliedForecastYear ? 'bold' : undefined }}>
+                    <th key={`year-col-${year}`} className={`req-th req-th-year${year === appliedForecastYear ? ' applied' : ''}`}>
                       Year {year}{year === appliedForecastYear ? ' ★' : ''}
                     </th>
                   ))}
@@ -610,28 +577,28 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
               </thead>
               <tbody>
                 <tr>
-                  <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>Peak Source Data</td>
+                  <td className="req-td req-label">Peak Source Data</td>
                   {yearlyRequirements.map(row => (
-                    <td key={`peak-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.peakSourceTB)}</td>
+                    <td key={`peak-${row.year}`} className="req-td req-value req-value-primary">{fmtTB(row.peakSourceTB)}</td>
                   ))}
                 </tr>
                 <tr>
-                  <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>Full Backup Size</td>
+                  <td className="req-td req-label">Full Backup Size</td>
                   {yearlyRequirements.map(row => (
-                    <td key={`full-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.fullBackupTB)}</td>
+                    <td key={`full-${row.year}`} className="req-td req-value req-value-primary">{fmtTB(row.fullBackupTB)}</td>
                   ))}
                 </tr>
                 <tr>
-                  <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>Daily Incremental</td>
+                  <td className="req-td req-label">Daily Incremental</td>
                   {yearlyRequirements.map(row => (
-                    <td key={`incr-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.incrementalTB)}</td>
+                    <td key={`incr-${row.year}`} className="req-td req-value req-value-primary">{fmtTB(row.incrementalTB)}</td>
                   ))}
                 </tr>
                 <tr>
-                  <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>
+                  <td className="req-td req-label">
                     Working Space (tiered){' '}
                     <span
-                      style={tooltipBadgeStyle}
+                      className="help-badge"
                       title="Working Space uses the Veeam progressive tiered scale on initial source TB (<10 x1.05, 10-20 x0.66, 20-100 x0.40, 100-500 x0.25, >500 x0.10, then x50% compression). Planned Capacity includes working space. SOBR tier rows are planning recommendations, not live utilization."
                       aria-label="Working-space details"
                     >
@@ -639,66 +606,66 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     </span>
                   </td>
                   {yearlyRequirements.map(row => (
-                    <td key={`working-space-needed-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.workingSpaceNeededTB)}</td>
+                    <td key={`working-space-needed-${row.year}`} className="req-td req-value req-value-primary">{fmtTB(row.workingSpaceNeededTB)}</td>
                   ))}
                 </tr>
                 {gfsForecastStats.distinctPoints > 0 && (
                   <tr>
-                    <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#555' }}>
+                    <td className="req-td req-label">
                       GFS Total Storage ({gfsForecastStats.distinctPoints} pts)
                     </td>
                     {yearlyRequirements.map(row => (
-                      <td key={`gfs-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1a237e', fontWeight: 'bold' }}>{fmtTB(row.gfsTB)}</td>
+                      <td key={`gfs-${row.year}`} className="req-td req-value req-value-primary">{fmtTB(row.gfsTB)}</td>
                     ))}
                   </tr>
                 )}
                 {repoType !== 'SOBR' ? (
                   <>
                     <tr>
-                      <td style={{ padding: '7px 8px', borderBottom: '1px solid #e8eaf6', color: '#555', fontWeight: 'bold' }}>Projected Used (No Working Space)</td>
+                      <td className="req-td req-label req-label-strong">Projected Used (No Working Space)</td>
                       {yearlyRequirements.map(row => (
-                        <td key={`repo-used-${row.year}`} style={{ padding: '7px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#555', fontWeight: 'bold' }}>{fmtTB(row.repoUsedTB)}</td>
+                        <td key={`repo-used-${row.year}`} className="req-td req-value req-value-strong">{fmtTB(row.repoUsedTB)}</td>
                       ))}
                     </tr>
                     <tr>
-                      <td style={{ padding: '7px 8px', borderBottom: '1px solid #c5cae9', color: '#555', fontWeight: 'bold' }}>Planned Capacity (Includes Working Space)</td>
+                      <td className="req-td req-label req-label-strong req-last-row">Planned Capacity (Includes Working Space)</td>
                       {yearlyRequirements.map(row => (
-                        <td key={`repo-total-${row.year}`} style={{ padding: '7px 8px', borderBottom: '1px solid #c5cae9', textAlign: 'right', fontFamily: 'monospace', color: '#b71c1c', fontWeight: 'bold' }}>{fmtTB(row.repoTotalTB)}</td>
+                        <td key={`repo-total-${row.year}`} className="req-td req-value req-value-total req-last-row">{fmtTB(row.repoTotalTB)}</td>
                       ))}
                     </tr>
                   </>
                 ) : (
                   <>
                     <tr>
-                      <td style={{ padding: '7px 8px', borderBottom: '1px solid #e8eaf6', color: '#555', fontWeight: 'bold' }}>Projected SOBR Used (No Working Space)</td>
+                      <td className="req-td req-label req-label-strong">Projected SOBR Used (No Working Space)</td>
                       {yearlyRequirements.map(row => (
-                        <td key={`sobr-used-${row.year}`} style={{ padding: '7px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#555', fontWeight: 'bold' }}>{fmtTB(row.sobrUsedTB)}</td>
+                        <td key={`sobr-used-${row.year}`} className="req-td req-value req-value-strong">{fmtTB(row.sobrUsedTB)}</td>
                       ))}
                     </tr>
                     <tr>
-                      <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#1976d2' }}>Planned Performance Tier Capacity</td>
+                      <td className="req-td req-label req-tier-performance">Planned Performance Tier Capacity</td>
                       {yearlyRequirements.map(row => (
-                        <td key={`perf-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#1976d2', fontWeight: 'bold' }}>{fmtTB(row.perfTB)}</td>
+                        <td key={`perf-${row.year}`} className="req-td req-value req-tier-performance">{fmtTB(row.perfTB)}</td>
                       ))}
                     </tr>
                     <tr>
-                      <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#388e3c' }}>Planned Capacity Tier Capacity</td>
+                      <td className="req-td req-label req-tier-capacity">Planned Capacity Tier Capacity</td>
                       {yearlyRequirements.map(row => (
-                        <td key={`cap-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#388e3c', fontWeight: 'bold' }}>{fmtTB(row.capTB)}</td>
+                        <td key={`cap-${row.year}`} className="req-td req-value req-tier-capacity">{fmtTB(row.capTB)}</td>
                       ))}
                     </tr>
                     {sobrHasArchive && (
                       <tr>
-                        <td style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', color: '#7b1fa2' }}>Planned Archive Tier Capacity</td>
+                        <td className="req-td req-label req-tier-archive">Planned Archive Tier Capacity</td>
                         {yearlyRequirements.map(row => (
-                          <td key={`arch-${row.year}`} style={{ padding: '6px 8px', borderBottom: '1px solid #e8eaf6', textAlign: 'right', fontFamily: 'monospace', color: '#7b1fa2', fontWeight: 'bold' }}>{fmtTB(row.archTB)}</td>
+                          <td key={`arch-${row.year}`} className="req-td req-value req-tier-archive">{fmtTB(row.archTB)}</td>
                         ))}
                       </tr>
                     )}
                     <tr>
-                      <td style={{ padding: '7px 8px', borderBottom: '1px solid #c5cae9', color: '#555', fontWeight: 'bold' }}>Planned SOBR Capacity (Includes Working Space)</td>
+                      <td className="req-td req-label req-label-strong req-last-row">Planned SOBR Capacity (Includes Working Space)</td>
                       {yearlyRequirements.map(row => (
-                        <td key={`sobr-total-${row.year}`} style={{ padding: '7px 8px', borderBottom: '1px solid #c5cae9', textAlign: 'right', fontFamily: 'monospace', color: '#b71c1c', fontWeight: 'bold' }}>{fmtTB(row.sobrTotalTB)}</td>
+                        <td key={`sobr-total-${row.year}`} className="req-td req-value req-value-total req-last-row">{fmtTB(row.sobrTotalTB)}</td>
                       ))}
                     </tr>
                   </>
@@ -708,9 +675,9 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
           </div>
 
           {repoType === 'SOBR' && !effectiveCopyEnabled && effectiveMoveEnabled && (
-            <div style={{ marginTop: '0.55rem' }}>
+            <div className="move-only-note-row">
               <span
-                style={{ ...tooltipBadgeStyle, background: '#fff3e0', border: '1px solid #ffcc80', color: '#5d4037' }}
+                className="help-badge move-only"
                 title="Move-only lifecycle assumption: sealed chains offload when newest point age reaches the offload threshold, then remain in Capacity until a newer chain exists and the oldest point reaches retention. This increases planned Capacity versus the older simplified window model."
                 aria-label="Move-only lifecycle note"
               >
