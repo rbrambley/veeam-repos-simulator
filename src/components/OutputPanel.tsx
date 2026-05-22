@@ -452,7 +452,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
           priority: 'medium',
           finding: `Repository ${repo.name} is nearing effective capacity limits.`,
           impact: 'Reduced growth headroom increases the risk of cost spikes and policy pressure.',
-          evidence: `Projected temporary-space-adjusted usage is ${combinedPct.toFixed(1)}% (${combinedTB.toFixed(2)} TB of ${capacityTB.toFixed(2)} TB).`,
+          evidence: `Used + temporary workspace = ${combinedPct.toFixed(1)}% (${usedTB.toFixed(2)} TB + ${neededTB.toFixed(2)} TB = ${combinedTB.toFixed(2)} TB of ${capacityTB.toFixed(2)} TB).`,
           recommendation: 'Add headroom to target 20-30% free capacity or reduce retention pressure.',
         });
       }
