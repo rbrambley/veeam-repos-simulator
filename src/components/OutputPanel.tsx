@@ -751,11 +751,17 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             }
     : null;
 
-  const itemPriorityStyle: Record<InsightPriority, { bg: string; fg: string; border: string; label: string }> = {
-    high: { bg: '#fce8e6', fg: '#b42318', border: '#f7c7c3', label: 'High' },
-    medium: { bg: '#fff4dd', fg: '#9a4d00', border: '#f5d4a0', label: 'Medium' },
-    low: { bg: '#e8f1fd', fg: '#1e5ea8', border: '#c9ddf7', label: 'Low' },
-    info: { bg: '#eceff1', fg: '#455a64', border: '#d8dee3', label: 'Info' },
+  const itemPriorityLabel: Record<InsightPriority, string> = {
+    high: 'High',
+    medium: 'Medium',
+    low: 'Low',
+    info: 'Info',
+  };
+
+  const getUsagePctClass = (value: number) => {
+    if (value > 100) return 'critical';
+    if (value > 85) return 'warn';
+    return 'ok';
   };
 
   const typeColors: Record<string, string> = {
@@ -767,15 +773,15 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
   return (
     <div>
       <div className="output-panel-header">
-        <h2 style={{ margin: 0 }}>Simulation Output</h2>
+        <h2 className="output-title">Simulation Output</h2>
       </div>
 
       {/* Storage Usage per Repository + Summary Stats */}
-      <h3 style={{ marginTop: 0, marginBottom: '0.4rem' }}>Repository Storage Usage</h3>
+      <h3 className="repository-storage-title">Repository Storage Usage</h3>
       {hasGenerationUi && <StateLegend />}
-      <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'stretch', flexWrap: 'nowrap', marginBottom: '1.2rem' }}>
-        <div style={{ flex: '1 1 0', minWidth: 0, overflowX: 'hidden', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)', display: 'flex', flexDirection: 'column' }}>
-          <table className="storage-table" style={{ flex: '1 1 auto' }}>
+      <div className="storage-layout-row">
+        <div className="storage-table-card">
+          <table className="storage-table storage-table-fill">
         <thead>
           <tr>
             <th>Repository</th>
@@ -816,10 +822,10 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   {hasGenerationUi && <td>{repoNextDeleteOn || '-'}</td>}
                   <td>{formatTB(repo.capacityTB)}</td>
                   <td>
-                    <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '12px', width: '68px', display: 'inline-block', verticalAlign: 'middle' }}>
-                      <div style={{ background: pct > 100 ? '#7b1fa2' : pct > 85 ? '#d32f2f' : '#1976d2', width: `${Math.min(100, pct)}%`, height: '100%', borderRadius: '3px' }} />
-                    </div>
-                    {' '}<span style={{ color: pct > 100 ? '#7b1fa2' : pct > 85 ? '#d32f2f' : undefined, fontWeight: pct > 100 ? 'bold' : undefined }}>{pct.toFixed(1)}%</span>
+                    <span className={`usage-pill ${getUsagePctClass(pct)}`}>
+                      <progress className={`usage-progress ${getUsagePctClass(pct)}`} value={Math.min(100, pct)} max={100} />
+                      <span className={`usage-text ${getUsagePctClass(pct)}`}>{pct.toFixed(1)}%</span>
+                    </span>
                   </td>
                 </tr>
                 {isSobr && repo.sobrConfig && ['Performance', 'Capacity', ...(repo.sobrConfig.hasArchiveTier ? ['Archive'] : [])].map(tier => {
@@ -831,9 +837,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                     : repo.sobrConfig!.archiveCapacityTB;
                   const tierPct = tierCap > 0 ? (tierUsed / tierCap) * 100 : 0;
                   return (
-                    <tr key={tier} style={{ background: '#f9f9f9', fontSize: '0.85rem' }}>
-                      <td style={{ paddingLeft: '1.5rem', color: tierColors[tier], fontWeight: 'bold' }}>↳ {tier}</td>
-                      <td style={{ color: '#999' }}>SOBR Tier</td>
+                    <tr key={tier} className="storage-tier-row">
+                      <td className={`storage-tier-name tier-${tier.toLowerCase()}`}>↳ {tier}</td>
+                      <td className="storage-tier-type">SOBR Tier</td>
                       <td>{formatTB(tierUsed)}</td>
                       <td title={tier === 'Performance' ? `${formatTB(tierWorkingSpaceAdditionalTB)} (tiered scale on ${formatTB(initialSourceTB)} initial source)` : 'No working-space requirement on this tier'}>{formatTB(tierWorkingSpaceNeededTB)}</td>
                       {hasGenerationUi && <td>{renderGenTotals(
@@ -853,10 +859,10 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                       {hasGenerationUi && <td>-</td>}
                       <td>{formatTB(tierCap)}</td>
                       <td>
-                        <div style={{ background: '#e0e0e0', borderRadius: '3px', height: '9px', width: '58px', display: 'inline-block', verticalAlign: 'middle' }}>
-                          <div style={{ background: tierPct > 100 ? '#7b1fa2' : tierPct > 85 ? '#d32f2f' : tierColors[tier], width: `${Math.min(100, tierPct)}%`, height: '100%', borderRadius: '3px' }} />
-                        </div>
-                        {' '}<span style={{ color: tierPct > 100 ? '#7b1fa2' : tierPct > 85 ? '#d32f2f' : undefined, fontWeight: tierPct > 100 ? 'bold' : undefined }}>{tierPct.toFixed(1)}%</span>
+                        <span className={`usage-pill ${getUsagePctClass(tierPct)}`}>
+                          <progress className={`usage-progress ${getUsagePctClass(tierPct)}`} value={Math.min(100, tierPct)} max={100} />
+                          <span className={`usage-text ${getUsagePctClass(tierPct)}`}>{tierPct.toFixed(1)}%</span>
+                        </span>
                       </td>
                     </tr>
                   );
@@ -868,117 +874,98 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
           </table>
         </div>
 
-        <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '0.85rem', border: '1px solid #d9e3ea', borderRadius: '10px', background: 'linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%)', padding: '0.85rem', boxShadow: '0 6px 18px rgba(44, 62, 80, 0.08)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.8rem', alignItems: 'stretch' }}>
-            <div style={{ background: '#e3f2fd', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d5e8f7', boxShadow: '0 6px 16px rgba(30, 107, 184, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Total Restore Points</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{restorePoints.length}</div>
+        <div className="storage-insights-card">
+          <div className="storage-stat-grid">
+            <div className="storage-stat stat-blue">
+              <div className="storage-stat-label">Total Restore Points</div>
+              <div className="storage-stat-value">{restorePoints.length}</div>
             </div>
-            <div style={{ background: '#e8f5e9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6ead8', boxShadow: '0 6px 16px rgba(56, 142, 60, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Total Used Storage</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{formatTB(totalUsedTB)}</div>
+            <div className="storage-stat stat-green">
+              <div className="storage-stat-label">Total Used Storage</div>
+              <div className="storage-stat-value">{formatTB(totalUsedTB)}</div>
             </div>
-            <div style={{ background: '#fff8e1', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #f5e4b6', boxShadow: '0 6px 16px rgba(186, 137, 0, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Working Space Needed</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{formatTB(totalWorkingSpaceTB)}</div>
+            <div className="storage-stat stat-amber">
+              <div className="storage-stat-label">Working Space Needed</div>
+              <div className="storage-stat-value">{formatTB(totalWorkingSpaceTB)}</div>
             </div>
-            <div style={{ background: '#f3e5f5', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #ead9ef', boxShadow: '0 6px 16px rgba(122, 31, 162, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>Active Chains</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{activeChains}</div>
+            <div className="storage-stat stat-purple">
+              <div className="storage-stat-label">Active Chains</div>
+              <div className="storage-stat-value">{activeChains}</div>
             </div>
-            <div style={{ background: '#fce4ec', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #f4d5df', boxShadow: '0 6px 16px rgba(194, 24, 91, 0.10)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#555' }}>GFS Points</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{gfsCount}</div>
+            <div className="storage-stat stat-pink">
+              <div className="storage-stat-label">GFS Points</div>
+              <div className="storage-stat-value">{gfsCount}</div>
             </div>
             {hasGenerationUi && (
               <>
-                <div style={{ background: '#e8eaf6', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6dbf5', boxShadow: '0 6px 16px rgba(63, 81, 181, 0.10)' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#555' }}>Total GENs</div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.total}</div>
+                <div className="storage-stat stat-indigo">
+                  <div className="storage-stat-label">Total GENs</div>
+                  <div className="storage-stat-value">{genSummary.total}</div>
                 </div>
-                <div style={{ background: '#efebe9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #ddd6d2', boxShadow: '0 6px 16px rgba(93, 64, 55, 0.10)' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#555' }}>Locked GENs</div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.locked}</div>
+                <div className="storage-stat stat-stone">
+                  <div className="storage-stat-label">Locked GENs</div>
+                  <div className="storage-stat-value">{genSummary.locked}</div>
                 </div>
-                <div style={{ background: '#e8f5e9', borderRadius: '10px', padding: '10px 16px', minWidth: '140px', border: '1px solid #d6ead8', boxShadow: '0 6px 16px rgba(46, 125, 50, 0.10)' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#555' }}>Deletable GENs</div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>{genSummary.deletable}</div>
+                <div className="storage-stat stat-green">
+                  <div className="storage-stat-label">Deletable GENs</div>
+                  <div className="storage-stat-value">{genSummary.deletable}</div>
                 </div>
               </>
             )}
           </div>
 
           {policyInsight ? (
-            <div style={{ border: `1px solid ${policyVisual!.border}`, borderRadius: '14px', background: policyVisual!.panelBg, padding: '0.95rem 1rem', minWidth: '320px', boxShadow: policyVisual!.shadow, borderLeft: `6px solid ${policyVisual!.accent}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                <div style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: policyVisual!.titleColor }}>
+            <div className={`policy-insight-card priority-${policyInsight.highestPriority}`}>
+              <div className="policy-insight-header-row">
+                <div className="policy-insight-kicker">
                   Policy Insight
                 </div>
-                <span style={{
-                  marginLeft: 'auto',
-                  borderRadius: '999px',
-                  border: `1px solid ${itemPriorityStyle[policyInsight.highestPriority].border}`,
-                  background: itemPriorityStyle[policyInsight.highestPriority].bg,
-                  color: itemPriorityStyle[policyInsight.highestPriority].fg,
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  padding: '2px 8px',
-                }}>
-                  {itemPriorityStyle[policyInsight.highestPriority].label}
+                <span className={`policy-priority-badge priority-${policyInsight.highestPriority}`}>
+                  {itemPriorityLabel[policyInsight.highestPriority]}
                 </span>
               </div>
-              <div style={{ fontSize: '0.92rem', color: '#37474f', marginBottom: '0.45rem', lineHeight: '1.45' }}>
+              <div className="policy-insight-title">
                 {policyInsight.title}
               </div>
-              <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: '0.35rem', fontWeight: 600 }}>
+              <div className="policy-immutability-summary">
                 {immutabilitySummary}
               </div>
               {hasSobrRepo && (
-                <div style={{ marginBottom: '0.35rem' }}>
+                <div className="policy-legend-wrap">
                   <StateLegend />
                 </div>
               )}
               {hasSobrRepo && (
                 <>
-                  <div style={{ fontSize: '0.82rem', color: '#607d8b', marginBottom: '0.25rem', fontWeight: 600 }}>
+                  <div className="policy-retention-summary">
                     Retention: {policyInsight.retentionDays}d | Offload: {policyInsight.offloadDays}d | Oldest inactive chain: {policyInsight.oldestInactiveDays}d
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: '0.45rem' }}>
+                  <div className="policy-gen-summary">
                     GENs: {genSummary.total} total, {genSummary.locked} locked, {genSummary.deletable} deletable
                     {genSummary.nextDeleteOn ? ` | Next DeleteOn: ${genSummary.nextDeleteOn}` : ''}
                     {genSummary.nextImmutabilityExpiry ? ` | Next immutability expiry: ${genSummary.nextImmutabilityExpiry}` : ''}
                   </div>
                 </>
               )}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div className="policy-item-list">
                 {policyInsight.items.map(item => (
-                  <div key={item.id} style={{ border: `1px solid ${itemPriorityStyle[item.priority].border}`, borderRadius: '9px', background: '#fff', padding: '0.5rem 0.6rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
-                      <span style={{
-                        borderRadius: '999px',
-                        border: `1px solid ${itemPriorityStyle[item.priority].border}`,
-                        background: itemPriorityStyle[item.priority].bg,
-                        color: itemPriorityStyle[item.priority].fg,
-                        fontSize: '0.68rem',
-                        fontWeight: 700,
-                        padding: '1px 7px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                      }}>
-                        {itemPriorityStyle[item.priority].label}
+                  <div key={item.id} className={`policy-item priority-${item.priority}`}>
+                    <div className="policy-item-header">
+                      <span className={`policy-item-priority priority-${item.priority}`}>
+                        {itemPriorityLabel[item.priority]}
                       </span>
-                      <span style={{ fontSize: '0.83rem', fontWeight: 700, color: '#37474f' }}>{item.finding}</span>
+                      <span className="policy-item-finding">{item.finding}</span>
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: '#546e7a', marginBottom: '0.15rem' }}><strong>Impact:</strong> {item.impact}</div>
-                    <div style={{ fontSize: '0.78rem', color: '#546e7a', marginBottom: item.recommendation ? '0.15rem' : 0 }}><strong>Evidence:</strong> {item.evidence}</div>
+                    <div className="policy-item-line"><strong>Impact:</strong> {item.impact}</div>
+                    <div className={`policy-item-line${item.recommendation ? ' with-rec' : ''}`}><strong>Evidence:</strong> {item.evidence}</div>
                     {item.recommendation && (
-                      <div style={{ fontSize: '0.78rem', color: '#455a64' }}><strong>Recommendation:</strong> {item.recommendation}</div>
+                      <div className="policy-item-line rec"><strong>Recommendation:</strong> {item.recommendation}</div>
                     )}
                   </div>
                 ))}
               </div>
               {policyInsight.contextNotes.length > 0 && (
-                <div style={{ marginTop: '0.4rem', fontSize: '0.79rem', color: '#78909c' }}>
+                <div className="policy-context-notes">
                   {policyInsight.contextNotes.map((note, idx) => (
                     <div key={idx}>Context: {note}</div>
                   ))}
