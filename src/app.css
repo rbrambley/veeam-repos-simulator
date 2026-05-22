@@ -574,10 +574,19 @@ hr {
   cursor: pointer;
 }
 
-.report-btn.secondary {
-  border-color: var(--border-soft);
-  background: var(--panel-bg);
-  color: var(--text-main);
+.report-btn-advisor {
+  border-color: #2a4f8f;
+  background: linear-gradient(180deg, #254a86 0%, #1d3b6b 100%);
+}
+
+.report-btn-capacity {
+  border-color: #196d57;
+  background: linear-gradient(180deg, #1f7f67 0%, #17614f 100%);
+}
+
+.report-btn-protection {
+  border-color: #8c4d16;
+  background: linear-gradient(180deg, #a65e20 0%, #804713 100%);
 }
 
 .report-btn:disabled {
@@ -2121,10 +2130,19 @@ hr {
   color: #e8f0ff;
 }
 
-:root[data-theme='dark'] .report-btn.secondary {
-  border-color: #3b4f72;
-  background: #18263d;
-  color: #dce7f7;
+:root[data-theme='dark'] .report-btn-advisor {
+  border-color: #5e83c1;
+  background: linear-gradient(180deg, #355b97 0%, #2a486f 100%);
+}
+
+:root[data-theme='dark'] .report-btn-capacity {
+  border-color: #4d9b87;
+  background: linear-gradient(180deg, #2b7f69 0%, #225f4f 100%);
+}
+
+:root[data-theme='dark'] .report-btn-protection {
+  border-color: #b48459;
+  background: linear-gradient(180deg, #95602f 0%, #73471f 100%);
 }
 
 :root[data-theme='dark'] .sim-date-chip {

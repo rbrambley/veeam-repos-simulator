@@ -4,7 +4,14 @@ import { ChainTimeline } from './ChainTimeline';
 import { StateLegend } from './StateLegend';
 import { computeVeeamWorkingSpaceTB } from '../models/veeam';
 import { normalizeForecastYears } from '../models/forecast';
-import { buildInAppAdvisorReport, renderInAppAdvisorReportHtml } from '../models/inAppAdvisorReport';
+import {
+  buildInAppAdvisorReport,
+  buildInAppCapacityPlanningReport,
+  buildInAppProtectionComplianceReport,
+  renderInAppAdvisorReportHtml,
+  renderInAppCapacityPlanningReportHtml,
+  renderInAppProtectionComplianceReportHtml,
+} from '../models/inAppAdvisorReport';
 
 interface OutputPanelProps {
   sim: VeeamSimulator;
@@ -773,7 +780,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     URL.revokeObjectURL(url);
   };
 
-  const exportAdvisorReport = (format: 'json' | 'html') => {
+  const buildReportInput = () => {
     if (!primaryJob || !primaryRepo) return;
 
     const hasAnyGfs = !!primaryJob.gfsPolicy && (
@@ -805,7 +812,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       moveEnabled: !!primaryRepo.sobrConfig?.moveEnabled,
     };
 
-    const report = buildInAppAdvisorReport({
+    return {
       scenarioName: primaryJob.name,
       startDate: sim.state.startDate || currentDate,
       simulationDate: currentDate,
@@ -817,21 +824,44 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       policyHighestPriority: policyInsight?.highestPriority ?? 'info',
       immutabilitySummary,
       hasAnyGfs,
-    });
+    };
+  };
+
+  const exportAdvisorReport = () => {
+    const reportInput = buildReportInput();
+    if (!reportInput) return;
+    const report = buildInAppAdvisorReport(reportInput);
 
     const stamp = currentDate.replace(/-/g, '');
-    if (format === 'json') {
-      downloadFile(
-        `storage-planning-advisor-${stamp}.json`,
-        JSON.stringify(report, null, 2),
-        'application/json',
-      );
-      return;
-    }
-
     downloadFile(
       `storage-planning-advisor-${stamp}.html`,
       renderInAppAdvisorReportHtml(report),
+      'text/html',
+    );
+  };
+
+  const exportCapacityPlanningReport = () => {
+    const reportInput = buildReportInput();
+    if (!reportInput) return;
+    const report = buildInAppCapacityPlanningReport(reportInput);
+
+    const stamp = currentDate.replace(/-/g, '');
+    downloadFile(
+      `capacity-planning-${stamp}.html`,
+      renderInAppCapacityPlanningReportHtml(report),
+      'text/html',
+    );
+  };
+
+  const exportProtectionComplianceReport = () => {
+    const reportInput = buildReportInput();
+    if (!reportInput) return;
+    const report = buildInAppProtectionComplianceReport(reportInput);
+
+    const stamp = currentDate.replace(/-/g, '');
+    downloadFile(
+      `protection-compliance-${stamp}.html`,
+      renderInAppProtectionComplianceReportHtml(report),
       'text/html',
     );
   };
@@ -1046,18 +1076,25 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       <div className="output-controls-sticky">
         <div className="report-actions-row">
           <button
-            onClick={() => exportAdvisorReport('html')}
-            className="report-btn"
+            onClick={exportAdvisorReport}
+            className="report-btn report-btn-advisor"
             disabled={!primaryJob || !primaryRepo}
           >
-            Generate Advisor Report (HTML)
+            Generate Advisor Report
           </button>
           <button
-            onClick={() => exportAdvisorReport('json')}
-            className="report-btn secondary"
+            onClick={exportCapacityPlanningReport}
+            className="report-btn report-btn-capacity"
             disabled={!primaryJob || !primaryRepo}
           >
-            Export Advisor Data (JSON)
+            Generate Capacity Report
+          </button>
+          <button
+            onClick={exportProtectionComplianceReport}
+            className="report-btn report-btn-protection"
+            disabled={!primaryJob || !primaryRepo}
+          >
+            Generate Protection Report
           </button>
         </div>
 
