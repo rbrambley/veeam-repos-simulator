@@ -2,6 +2,37 @@
 
 Simulator for backup repository behavior, retention, tiering, and GFS lifecycle modeling.
 
+## Architecture
+
+The project has three layers:
+
+| Layer | Location | Purpose |
+|---|---|---|
+| **Forecaster** | `src/models/gfsSizing.ts`, `src/models/plannedCapacityCalculator.ts` | Calculates planned storage requirements by year for the UI and comparator. Currently an emulation of the Veeam Calculator model. |
+| **Simulator engine** | `src/simulator/engine.ts` | Day-by-day lifecycle simulation of backup chains, retention, GFS expiry, and SOBR tiering. Treated as the canonical runtime reference. |
+| **Test harness** | `src/testing/` | Comparator, lifecycle oracle, mutation runner, and forecast-vs-simulation drift report. Validates both layers independently and jointly. |
+
+### Integration seam (for Calculator developer)
+
+When the real Veeam Calculator engine source is available, two functions are the replacement targets:
+
+- `computeForecastGfsStatsAtYear(...)` in `src/models/gfsSizing.ts` — GFS point contribution math
+- `computeSimulatorPlanned(...)` in `src/models/plannedCapacityCalculator.ts` — full tier sizing output
+
+Both are annotated with `INTEGRATION SEAM` / `EMULATION CALIBRATION CONSTANTS` comments explaining what to replace and why. The `ScenarioConfig` input shape and `PlannedResult` output shape in `plannedCapacityCalculator.ts` define the integration contract.
+
+### Verifying nothing is broken
+
+Run the full gate suite before and after any model change:
+
+```bash
+npm run gate:push
+```
+
+Expected: calculator parity 75/75, lifecycle 57/57, mutation 5/5, forecast CI PASS (p95Abs ≤ 2.00 TB).
+
+---
+
 ## Quick Links
 
 - Automated test runner guide: [docs/automated-test-runner.md](docs/automated-test-runner.md)
