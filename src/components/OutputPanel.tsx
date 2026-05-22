@@ -967,25 +967,27 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       </div>
 
       {/* Section toggle buttons */}
-      <div className="panel-toggle-row">
-        <button
-          onClick={() => setShowChainTimeline(v => !v)}
-          className="panel-toggle-btn"
-        >
-          {showChainTimeline ? '▼' : '▶'} Chain Timeline
-        </button>
-        <button
-          onClick={() => setShowRestoreCatalog(v => !v)}
-          className="panel-toggle-btn"
-        >
-          {showRestoreCatalog ? '▼' : '▶'} Restore Point Catalog ({restorePoints.length} restore points)
-        </button>
-        <button
-          onClick={() => setShowTierContents(v => !v)}
-          className="panel-toggle-btn"
-        >
-          {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
-        </button>
+      <div className="panel-toggle-sticky">
+        <div className="panel-toggle-row">
+          <button
+            onClick={() => setShowChainTimeline(v => !v)}
+            className="panel-toggle-btn"
+          >
+            {showChainTimeline ? '▼' : '▶'} Chain Timeline
+          </button>
+          <button
+            onClick={() => setShowRestoreCatalog(v => !v)}
+            className="panel-toggle-btn"
+          >
+            {showRestoreCatalog ? '▼' : '▶'} Restore Point Catalog ({restorePoints.length} restore points)
+          </button>
+          <button
+            onClick={() => setShowTierContents(v => !v)}
+            className="panel-toggle-btn"
+          >
+            {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
+          </button>
+        </div>
       </div>
 
       {/* Simulation advance + year-jump controls */}

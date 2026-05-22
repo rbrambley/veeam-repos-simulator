@@ -554,6 +554,16 @@ hr {
   flex-wrap: wrap;
   margin-bottom: 0.4rem;
 }
+.panel-toggle-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  margin-bottom: 0.35rem;
+  padding: 0.2rem 0 0.1rem;
+  background: color-mix(in srgb, var(--app-bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
 
 .panel-toggle-btn {
   padding: 6px 10px;
@@ -1779,6 +1789,14 @@ hr {
 }
 
 @media (max-width: 840px) {
+  .panel-toggle-sticky {
+    position: static;
+    top: auto;
+    padding: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
   .sim-controls-sticky {
     position: static;
   }
@@ -2062,6 +2080,9 @@ hr {
   background: linear-gradient(180deg, #16213a 0%, #111b30 100%);
   border-color: #30466f;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+:root[data-theme='dark'] .panel-toggle-sticky {
+  background: color-mix(in srgb, #0f172a 92%, transparent);
 }
 
 :root[data-theme='dark'] .sim-date-chip {
