@@ -2,6 +2,25 @@
 
 This document is the handoff package for integrating the app with the real Veeam Calculator implementation.
 
+## Start Here (5 min)
+
+1. Pull latest main and install dependencies:
+   - git pull origin main
+   - npm install
+2. Confirm baseline is healthy before touching model code:
+   - npm run gate:quick
+   - npm run compare:veeam
+3. Only modify these two files for integration:
+   - src/models/gfsSizing.ts
+   - src/models/plannedCapacityCalculator.ts
+4. Before opening PR, run full validation:
+   - npm run gate:push
+5. If parity drifts, capture and compare a targeted scenario:
+   - npm run capture:veeam -- --id <scenario-id>
+   - npm run compare:veeam
+
+If all checks pass, your branch is ready for review.
+
 ## Goal
 
 Replace the current forecast emulation logic with real calculator logic while preserving simulator behavior, UI contracts, and quality gates.
