@@ -1,8 +1,8 @@
 {
   "generatedAt": "2026-05-21T22:16:54.481Z",
   "status": "PASS",
-  "totalCases": 9,
-  "passedCases": 9,
+  "totalCases": 15,
+  "passedCases": 15,
   "failedCases": 0,
   "cases": [
     {
@@ -39,6 +39,48 @@
       "description": "Decimal forecast is floored after normalization",
       "expected": "2",
       "actual": "2"
+    },
+    {
+      "id": "gfs-horizon-weekly-unit-aware",
+      "status": "pass",
+      "description": "Weekly GFS count is interpreted in weeks (4w does not force 5 forecast years)",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "gfs-horizon-monthly-unit-aware",
+      "status": "pass",
+      "description": "Monthly GFS count is interpreted in months (4m fits in 1 forecast year)",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "gfs-horizon-yearly-dominant",
+      "status": "pass",
+      "description": "Yearly GFS count remains year-based and sets minimum forecast years",
+      "expected": "2",
+      "actual": "2"
+    },
+    {
+      "id": "gfs-reconcile-auto-downward",
+      "status": "pass",
+      "description": "When forecast was auto-clamped, reducing GFS lowers forecast to the new minimum",
+      "expected": "1",
+      "actual": "1"
+    },
+    {
+      "id": "gfs-reconcile-preserve-manual",
+      "status": "pass",
+      "description": "When forecast is manually above prior minimum, lowering GFS does not force it down",
+      "expected": "5",
+      "actual": "5"
+    },
+    {
+      "id": "gfs-reconcile-upward-clamp",
+      "status": "pass",
+      "description": "Raising GFS still clamps forecast upward to the new minimum",
+      "expected": "4",
+      "actual": "4"
     },
     {
       "id": "normalized-forecast-value",

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { normalizeForecastYears } from '../models/forecast.ts';
+import { minimumForecastYearsFromGfs, normalizeForecastYears, reconcileForecastYearsWithGfs } from '../models/forecast.ts';
 import { computeSimulatorPlanned, ScenarioConfig } from '../models/plannedCapacityCalculator.ts';
 
 type Status = 'pass' | 'fail';
@@ -74,6 +74,56 @@ function runNormalizationChecks(): void {
   assertEqual('normalize-zero', 'Year 0 normalizes to year 1', 1, normalizeForecastYears(0));
   assertEqual('normalize-negative', 'Negative forecast normalizes to year 1', 1, normalizeForecastYears(-3));
   assertEqual('normalize-decimal', 'Decimal forecast is floored after normalization', 2, normalizeForecastYears(2.9));
+
+  assertEqual(
+    'gfs-horizon-weekly-unit-aware',
+    'Weekly GFS count is interpreted in weeks (4w does not force 5 forecast years)',
+    1,
+    minimumForecastYearsFromGfs({ weekly: 4, monthly: 0, yearly: 0 }),
+  );
+  assertEqual(
+    'gfs-horizon-monthly-unit-aware',
+    'Monthly GFS count is interpreted in months (4m fits in 1 forecast year)',
+    1,
+    minimumForecastYearsFromGfs({ weekly: 0, monthly: 4, yearly: 0 }),
+  );
+  assertEqual(
+    'gfs-horizon-yearly-dominant',
+    'Yearly GFS count remains year-based and sets minimum forecast years',
+    2,
+    minimumForecastYearsFromGfs({ weekly: 4, monthly: 4, yearly: 2 }),
+  );
+
+  assertEqual(
+    'gfs-reconcile-auto-downward',
+    'When forecast was auto-clamped, reducing GFS lowers forecast to the new minimum',
+    1,
+    reconcileForecastYearsWithGfs(
+      2,
+      { weekly: 4, monthly: 4, yearly: 2 },
+      { weekly: 4, monthly: 4, yearly: 0 },
+    ),
+  );
+  assertEqual(
+    'gfs-reconcile-preserve-manual',
+    'When forecast is manually above prior minimum, lowering GFS does not force it down',
+    5,
+    reconcileForecastYearsWithGfs(
+      5,
+      { weekly: 4, monthly: 4, yearly: 2 },
+      { weekly: 4, monthly: 4, yearly: 0 },
+    ),
+  );
+  assertEqual(
+    'gfs-reconcile-upward-clamp',
+    'Raising GFS still clamps forecast upward to the new minimum',
+    4,
+    reconcileForecastYearsWithGfs(
+      2,
+      { weekly: 4, monthly: 4, yearly: 2 },
+      { weekly: 4, monthly: 4, yearly: 4 },
+    ),
+  );
 }
 
 function runPlannerRegressionCheck(): void {

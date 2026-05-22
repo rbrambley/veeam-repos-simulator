@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { computeForecastGfsStatsAtYear } from '../models/gfsSizing';
-import { normalizeForecastYears } from '../models/forecast';
+import { minimumForecastYearsFromGfs, normalizeForecastYears, reconcileForecastYearsWithGfs } from '../models/forecast';
 import { SimulationState, BackupJobType, RepositoryType, computeVeeamWorkingSpaceTB } from '../models/veeam';
 import { computeSimulatorPlanned, ScenarioConfig } from '../models/plannedCapacityCalculator';
 
@@ -23,12 +23,11 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
     monthly: number,
     yearly: number,
   ): number => {
-    const maxGfsSetting = Math.max(
-      normalizeNonNegativeInt(weekly),
-      normalizeNonNegativeInt(monthly),
-      normalizeNonNegativeInt(yearly),
-    );
-    const minForecastFromGfs = maxGfsSetting > 0 ? maxGfsSetting + 1 : 1;
+    const minForecastFromGfs = minimumForecastYearsFromGfs({
+      weekly: normalizeNonNegativeInt(weekly),
+      monthly: normalizeNonNegativeInt(monthly),
+      yearly: normalizeNonNegativeInt(yearly),
+    });
     return Math.max(normalizeForecastYears(candidateForecastYears), minForecastFromGfs);
   };
 
@@ -356,8 +355,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     min={0}
                     onChange={e => {
                       const nextWeekly = normalizeNonNegativeInt(Number(e.target.value));
+                      const currentPolicy = { weekly: gfsWeekly, monthly: gfsMonthly, yearly: gfsYearly };
+                      const nextPolicy = { weekly: nextWeekly, monthly: gfsMonthly, yearly: gfsYearly };
                       setGfsWeekly(nextWeekly);
-                      setForecastYears(prev => syncForecastWithGfs(prev, nextWeekly, gfsMonthly, gfsYearly));
+                      setForecastYears(prev => reconcileForecastYearsWithGfs(prev, currentPolicy, nextPolicy));
                     }}
                     className="input-number-compact"
                   />
@@ -370,8 +371,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     min={0}
                     onChange={e => {
                       const nextMonthly = normalizeNonNegativeInt(Number(e.target.value));
+                      const currentPolicy = { weekly: gfsWeekly, monthly: gfsMonthly, yearly: gfsYearly };
+                      const nextPolicy = { weekly: gfsWeekly, monthly: nextMonthly, yearly: gfsYearly };
                       setGfsMonthly(nextMonthly);
-                      setForecastYears(prev => syncForecastWithGfs(prev, gfsWeekly, nextMonthly, gfsYearly));
+                      setForecastYears(prev => reconcileForecastYearsWithGfs(prev, currentPolicy, nextPolicy));
                     }}
                     className="input-number-compact"
                   />
@@ -384,8 +387,10 @@ export const InputForm: React.FC<InputFormProps> = ({ simState, onScenarioChange
                     min={0}
                     onChange={e => {
                       const nextYearly = normalizeNonNegativeInt(Number(e.target.value));
+                      const currentPolicy = { weekly: gfsWeekly, monthly: gfsMonthly, yearly: gfsYearly };
+                      const nextPolicy = { weekly: gfsWeekly, monthly: gfsMonthly, yearly: nextYearly };
                       setGfsYearly(nextYearly);
-                      setForecastYears(prev => syncForecastWithGfs(prev, gfsWeekly, gfsMonthly, nextYearly));
+                      setForecastYears(prev => reconcileForecastYearsWithGfs(prev, currentPolicy, nextPolicy));
                     }}
                     className="input-number-compact"
                   />
