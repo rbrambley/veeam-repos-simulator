@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { InputForm } from './components/InputForm';
 import { OutputPanel } from './components/OutputPanel';
 import { SimulationState } from './models/veeam';
 import { VeeamSimulator } from './simulator/engine';
+
+type ThemeMode = 'light' | 'dark' | 'system';
+
+const THEME_STORAGE_KEY = 'veeam-simulator-theme-mode';
+
+function getStoredThemeMode(): ThemeMode {
+  if (typeof window === 'undefined') return 'system';
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+}
+
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 const todayDate = new Date().toISOString().slice(0, 10);
 
@@ -37,6 +52,41 @@ export const App: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(defaultState.date);
   const [simulationStarted, setSimulationStarted] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getStoredThemeMode());
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme());
+
+  const resolvedTheme = useMemo(
+    () => (themeMode === 'system' ? systemTheme : themeMode),
+    [themeMode, systemTheme]
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (event: MediaQueryListEvent) => {
+      setSystemTheme(event.matches ? 'dark' : 'light');
+    };
+
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', handler);
+      return () => media.removeEventListener('change', handler);
+    }
+
+    media.addListener(handler);
+    return () => media.removeListener(handler);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', resolvedTheme);
+    }
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    }
+  }, [themeMode]);
 
   const handleReset = () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -79,7 +129,21 @@ export const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <h1>Veeam Backup Simulator</h1>
+      <div className="app-header-row">
+        <h1>Veeam Backup Simulator</h1>
+        <div className="theme-toggle" role="group" aria-label="Theme selection">
+          {(['light', 'dark', 'system'] as const).map(mode => (
+            <button
+              key={mode}
+              type="button"
+              className={`theme-toggle-btn${themeMode === mode ? ' active' : ''}`}
+              onClick={() => setThemeMode(mode)}
+            >
+              {mode[0].toUpperCase() + mode.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
       <InputForm
         key={resetKey}
         simState={simState}

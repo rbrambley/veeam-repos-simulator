@@ -1,3 +1,141 @@
+:root {
+  --app-bg: #f5f7fb;
+  --panel-bg: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #546e7a;
+  --border-soft: #d7e1e8;
+  --shadow-soft: 0 10px 24px rgba(15, 23, 42, 0.08);
+  --accent: #1a237e;
+  --accent-2: #1565c0;
+}
+
+:root[data-theme='dark'] {
+  --app-bg: #0f172a;
+  --panel-bg: #111827;
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+  --border-soft: #334155;
+  --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.45);
+  --accent: #8ea2ff;
+  --accent-2: #7fb8ff;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text-main);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-container {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 1rem;
+  color: var(--text-main);
+}
+
+.app-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  gap: 0.35rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 0.2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.theme-toggle-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.26rem 0.64rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.theme-toggle-btn.active {
+  background: color-mix(in srgb, var(--accent-2) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent-2) 55%, var(--border-soft));
+  color: var(--text-main);
+}
+
+.theme-toggle-btn:hover {
+  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+  color: var(--text-main);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border-soft);
+}
+
+.form-card,
+.output-panel-header {
+  box-shadow: var(--shadow-soft);
+}
+
+.output-panel-header {
+  background: color-mix(in srgb, var(--panel-bg) 85%, var(--accent-2) 15%);
+  border-left-color: var(--accent);
+}
+
+.section-heading {
+  color: var(--text-main);
+  border-bottom-color: var(--accent);
+}
+
+:root[data-theme='dark'] .form-card {
+  border-color: #394b76;
+}
+
+:root[data-theme='dark'] .form-card-header {
+  background: #22306b;
+}
+
+:root[data-theme='dark'] .form-card-body {
+  background: #131d37;
+}
+
+:root[data-theme='dark'] .form-card-body > label,
+:root[data-theme='dark'] .card-split-col > label,
+:root[data-theme='dark'] .card-split-col-header,
+:root[data-theme='dark'] .output-panel-header,
+:root[data-theme='dark'] .section-heading {
+  color: #dbe3ef;
+}
+
+:root[data-theme='dark'] .storage-table thead tr {
+  background: #22306b;
+}
+
+:root[data-theme='dark'] .storage-table td {
+  border-bottom-color: #2d3d5f;
+}
+
+:root[data-theme='dark'] .storage-table tbody tr:nth-child(even) {
+  background: #18213d;
+}
+
+:root[data-theme='dark'] .storage-table tbody tr:hover {
+  background: #1f2a4c;
+}
+
 /* ── Form section cards ── */
 .form-card {
   margin-bottom: 0.65rem;
