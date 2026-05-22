@@ -990,89 +990,49 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       </div>
 
       {/* Section toggle buttons */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+      <div className="panel-toggle-row">
         <button
           onClick={() => setShowChainTimeline(v => !v)}
-          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+          className="panel-toggle-btn"
         >
           {showChainTimeline ? '▼' : '▶'} Chain Timeline
         </button>
         <button
           onClick={() => setShowRestoreCatalog(v => !v)}
-          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+          className="panel-toggle-btn"
         >
           {showRestoreCatalog ? '▼' : '▶'} Restore Point Catalog ({restorePoints.length} restore points)
         </button>
         <button
           onClick={() => setShowTierContents(v => !v)}
-          style={{ padding: '6px 10px', fontWeight: 'bold', cursor: 'pointer' }}
+          className="panel-toggle-btn"
         >
           {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
         </button>
       </div>
 
       {/* Simulation advance + year-jump controls */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 3, marginBottom: '0.55rem' }}>
-        <div style={{
-          display: 'flex',
-          gap: '0.45rem',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)',
-          border: '1px solid #d9e6f2',
-          borderRadius: '10px',
-          padding: '0.45rem 0.5rem',
-          boxShadow: '0 8px 20px rgba(25, 118, 210, 0.10)'
-        }}>
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            borderRadius: '999px',
-            background: '#e3f2fd',
-            border: '1px solid #90caf9',
-            color: '#0d47a1',
-            fontSize: '0.88rem',
-            fontWeight: 700,
-            marginRight: '0.25rem',
-            padding: '4px 11px'
-          }}>
-            <span style={{ letterSpacing: '0.03em' }}>Simulation Date</span>
+      <div className="sim-controls-sticky">
+        <div className="sim-controls-bar">
+          <span className="sim-date-chip">
+            <span className="sim-date-label">Simulation Date</span>
             <strong>{simDateMeta.isoDate}</strong>
-            <span style={{
-              borderRadius: '999px',
-              padding: '1px 7px',
-              border: `1px solid ${simDateMeta.isWeekend ? '#ffd08a' : '#b3d4fc'}`,
-              background: simDateMeta.isWeekend ? '#fff3e0' : '#eaf3ff',
-              color: simDateMeta.isWeekend ? '#b65d00' : '#1565c0',
-              fontWeight: 700,
-              fontSize: '0.76rem'
-            }}>
+            <span className={`sim-weekday-chip ${simDateMeta.isWeekend ? 'weekend' : 'weekday'}`}>
               {simDateMeta.weekday}
             </span>
-            <span style={{ color: '#455a64', fontWeight: 600, fontSize: '0.75rem' }}>Day +{simDateMeta.elapsedDays}</span>
+            <span className="sim-day-offset">Day +{simDateMeta.elapsedDays}</span>
           </span>
-          <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+          <span className="sim-separator">|</span>
         {([1, 7, 30] as const).map(days => (
           <button
             key={days}
             onClick={() => { setActivityLogFilter(null); onNextDay(days); }}
-            style={{
-              padding: '3px 13px',
-              borderRadius: '999px',
-              border: '1px solid #90caf9',
-              background: '#e3f2fd',
-              color: '#1565c0',
-              fontWeight: 700,
-              fontSize: '0.81rem',
-              cursor: 'pointer',
-              lineHeight: '1.6',
-            }}
+            className="sim-btn sim-btn-day"
           >
             ▶ +{days} Day{days > 1 ? 's' : ''}
           </button>
         ))}
-        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+        <span className="sim-separator">|</span>
         {([1, 2, 3] as const).map(yr => {
           const daysLeft = computeDaysToYear(yr);
           const disabled = daysLeft <= 0;
@@ -1082,25 +1042,14 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               disabled={disabled}
               title={disabled ? `Already at or past Year ${yr}` : `Jump to Year ${yr} (${daysLeft} days from now)`}
               onClick={() => { setActivityLogFilter(30); onNextDay(daysLeft); }}
-              style={{
-                padding: '3px 13px',
-                borderRadius: '999px',
-                border: `1px solid ${disabled ? '#e0e0e0' : '#ffcc80'}`,
-                background: disabled ? '#f5f5f5' : '#fff3e0',
-                color: disabled ? '#bbb' : '#bf360c',
-                fontWeight: 700,
-                fontSize: '0.81rem',
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                lineHeight: '1.6',
-                opacity: disabled ? 0.55 : 1,
-              }}
+              className={`sim-btn sim-btn-year${disabled ? ' disabled' : ''}`}
             >
               ⏩ Year {yr}
             </button>
           );
         })}
         {activityLogFilter !== null && (
-          <span style={{ fontSize: '0.76rem', color: '#bf360c', fontStyle: 'italic', marginLeft: '0.3rem' }}>
+          <span className="sim-activity-filter-note">
             Activity Log: last {activityLogFilter} days only
           </span>
         )}
@@ -1737,44 +1686,22 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       </div>
 
       {/* Bottom controls (duplicate for convenience — no need to scroll back up) */}
-      <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e0e0e0' }}>
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.3rem',
-          borderRadius: '999px',
-          background: '#eef3f7',
-          border: '1px solid #d7e1e8',
-          color: '#455a64',
-          fontSize: '0.8rem',
-          fontWeight: 600,
-          marginRight: '0.25rem',
-          padding: '2px 8px'
-        }}>
+      <div className="sim-controls-bottom">
+        <span className="sim-date-chip compact">
           <span>{simDateMeta.isoDate}</span>
-          <span style={{ color: '#607d8b' }}>{simDateMeta.weekday}</span>
+          <span className="sim-weekday-compact">{simDateMeta.weekday}</span>
         </span>
-        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+        <span className="sim-separator">|</span>
         {([1, 7, 30] as const).map(days => (
           <button
             key={`bottom-${days}`}
             onClick={() => { setActivityLogFilter(null); onNextDay(days); }}
-            style={{
-              padding: '3px 13px',
-              borderRadius: '999px',
-              border: '1px solid #90caf9',
-              background: '#e3f2fd',
-              color: '#1565c0',
-              fontWeight: 700,
-              fontSize: '0.81rem',
-              cursor: 'pointer',
-              lineHeight: '1.6',
-            }}
+            className="sim-btn sim-btn-day"
           >
             ▶ +{days} Day{days > 1 ? 's' : ''}
           </button>
         ))}
-        <span style={{ color: '#d0d0d0', margin: '0 0.2rem', userSelect: 'none' }}>│</span>
+        <span className="sim-separator">|</span>
         {([1, 2, 3] as const).map(yr => {
           const daysLeft = computeDaysToYear(yr);
           const disabled = daysLeft <= 0;
@@ -1784,18 +1711,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
               disabled={disabled}
               title={disabled ? `Already at or past Year ${yr}` : `Jump to Year ${yr} (${daysLeft} days from now)`}
               onClick={() => { setActivityLogFilter(30); onNextDay(daysLeft); }}
-              style={{
-                padding: '3px 13px',
-                borderRadius: '999px',
-                border: `1px solid ${disabled ? '#e0e0e0' : '#ffcc80'}`,
-                background: disabled ? '#f5f5f5' : '#fff3e0',
-                color: disabled ? '#bbb' : '#bf360c',
-                fontWeight: 700,
-                fontSize: '0.81rem',
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                lineHeight: '1.6',
-                opacity: disabled ? 0.55 : 1,
-              }}
+              className={`sim-btn sim-btn-year${disabled ? ' disabled' : ''}`}
             >
               ⏩ Year {yr}
             </button>
