@@ -966,8 +966,8 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
         </div>
       </div>
 
-      {/* Section toggle buttons */}
-      <div className="panel-toggle-sticky">
+      {/* Section toggle + simulation controls share one sticky stack */}
+      <div className="output-controls-sticky">
         <div className="panel-toggle-row">
           <button
             onClick={() => setShowChainTimeline(v => !v)}
@@ -988,10 +988,9 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             {showTierContents ? '▼' : '▶'} Tier Contents (Current Placement)
           </button>
         </div>
-      </div>
 
-      {/* Simulation advance + year-jump controls */}
-      <div className="sim-controls-sticky">
+        {/* Simulation advance + year-jump controls */}
+        <div className="sim-controls-sticky">
         <div className="sim-controls-bar">
           <span className="sim-date-chip">
             <span className="sim-date-label">Simulation Date</span>
@@ -1032,6 +1031,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
             Activity Log: last {activityLogFilter} days only
           </span>
         )}
+        </div>
       </div>
       </div>
 
