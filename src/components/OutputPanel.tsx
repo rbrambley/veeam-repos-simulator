@@ -58,6 +58,41 @@ interface GenerationSnapshot {
   lifecycleState: 'DeleteOn Pending' | 'Waiting Immutability' | 'Deletable';
 }
 
+type InsightPriority = 'high' | 'medium' | 'low' | 'info';
+
+interface PolicyInsightItem {
+  id: string;
+  priority: InsightPriority;
+  finding: string;
+  impact: string;
+  evidence: string;
+  recommendation?: string;
+}
+
+interface PolicyInsightModel {
+  title: string;
+  offloadDays: number;
+  retentionDays: number;
+  oldestInactiveDays: number;
+  items: PolicyInsightItem[];
+  contextNotes: string[];
+  highestPriority: InsightPriority;
+}
+
+const PRIORITY_RANK: Record<InsightPriority, number> = {
+  info: 0,
+  low: 1,
+  medium: 2,
+  high: 3,
+};
+
+function getHighestPriority(items: PolicyInsightItem[]): InsightPriority {
+  if (items.length === 0) return 'info';
+  return items.reduce((highest, item) => (
+    PRIORITY_RANK[item.priority] > PRIORITY_RANK[highest] ? item.priority : highest
+  ), 'info' as InsightPriority);
+}
+
 export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNextDay }) => {
   const [showChainTimeline, setShowChainTimeline] = useState(true);
   const [showRestoreCatalog, setShowRestoreCatalog] = useState(true);
@@ -385,51 +420,72 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     [workingSpaceByRepo]
   );
 
-  const temporarySpacePlanningStatus = useMemo(() => {
-    const pressureByRepo = sim.state.repositories.map(repo => {
+  const temporarySpacePlanningItems = useMemo((): PolicyInsightItem[] => {
+    const items: PolicyInsightItem[] = [];
+
+    sim.state.repositories.forEach(repo => {
       const usedTB = storageUsage[repo.id] || 0;
       const neededTB = workingSpaceByRepo[repo.id]?.totalTB ?? 0;
       const capacityTB = repo.capacityTB || 0;
+      if (capacityTB <= 0) return;
+
       const combinedTB = usedTB + neededTB;
-      const combinedPct = capacityTB > 0 ? (combinedTB / capacityTB) * 100 : 0;
-      return { combinedTB, combinedPct, capacityTB };
+      const combinedPct = (combinedTB / capacityTB) * 100;
+      const freeTB = Math.max(0, capacityTB - usedTB);
+      const deficitTB = Math.max(0, neededTB - freeTB);
+
+      if (combinedTB > capacityTB + 0.000001) {
+        items.push({
+          id: `INS-001-${repo.id}`,
+          priority: 'high',
+          finding: `Temporary workspace demand exceeds available capacity for repository ${repo.name}.`,
+          impact: 'Backup processing can fail or force emergency capacity expansion.',
+          evidence: `Used ${usedTB.toFixed(2)} TB + workspace ${neededTB.toFixed(2)} TB > capacity ${capacityTB.toFixed(2)} TB (deficit ${deficitTB.toFixed(2)} TB).`,
+          recommendation: `Increase capacity by at least ${deficitTB.toFixed(2)} TB or reduce retention and GFS density.`,
+        });
+        return;
+      }
+
+      if (combinedPct >= 85) {
+        items.push({
+          id: `INS-002-${repo.id}`,
+          priority: 'medium',
+          finding: `Repository ${repo.name} is nearing effective capacity limits.`,
+          impact: 'Reduced growth headroom increases the risk of cost spikes and policy pressure.',
+          evidence: `Projected temporary-space-adjusted usage is ${combinedPct.toFixed(1)}% (${combinedTB.toFixed(2)} TB of ${capacityTB.toFixed(2)} TB).`,
+          recommendation: 'Add headroom to target 20-30% free capacity or reduce retention pressure.',
+        });
+      }
     });
 
-    const hasAlert = pressureByRepo.some(r => r.capacityTB > 0 && r.combinedTB > r.capacityTB + 0.000001);
-    if (hasAlert) {
-      return {
-        level: 'alert',
-        message: 'Alert: Temporary space planning exceeds available repository capacity in the current scenario.',
-      };
-    }
-
-    const hasWarning = pressureByRepo.some(r => r.capacityTB > 0 && r.combinedPct >= 85);
-    if (hasWarning) {
-      return {
-        level: 'warn',
-        message: 'Warn: Temporary space planning is close to repository capacity in the current scenario.',
-      };
-    }
-
-    return {
-      level: 'confirm',
-      message: 'Confirm: Temporary space planning is within repository capacity in the current scenario.',
-    };
+    return items;
   }, [sim.state.repositories, storageUsage, workingSpaceByRepo]);
 
-  const policyInsight = useMemo(() => {
+  const policyInsight = useMemo<PolicyInsightModel | null>(() => {
+    const items: PolicyInsightItem[] = [...temporarySpacePlanningItems];
+    const contextNotes: string[] = [];
     const repo = sim.state.repositories.find(r => r.type === 'SOBR' && r.sobrConfig);
     if (!repo?.sobrConfig) {
-      const level = temporarySpacePlanningStatus.level;
-      const severity = level === 'alert' ? 'danger' : level === 'warn' ? 'warning' : 'ok';
+      if (items.length === 0) {
+        items.push({
+          id: 'INS-009',
+          priority: 'info',
+          finding: 'No active risks detected for current policy.',
+          impact: 'Current temporary-space and retention settings are within configured limits.',
+          evidence: 'No repository exceeded 85% temporary-space-adjusted utilization.',
+        });
+      }
+      contextNotes.push('SOBR-specific offload and archive checks are not applicable because no SOBR repository is configured.');
       return {
-        title: temporarySpacePlanningStatus.message,
+        title: items.some(item => item.priority === 'high' || item.priority === 'medium' || item.priority === 'low')
+          ? 'Policy risks detected in current configuration.'
+          : 'No active risks detected for current policy.',
         offloadDays: 0,
         retentionDays: 0,
         oldestInactiveDays: 0,
-        recommendations: [],
-        infoNotes: ['Switch repository type to SOBR to also view offload and retention guidance.'],
-        severity,
+        items,
+        contextNotes,
+        highestPriority: getHighestPriority(items),
       };
     }
 
@@ -468,31 +524,65 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     const eligibleButNotYetOffloaded = inactiveChainStats.filter(s => !s.pastThreshold && s.hasPerformance).length;
     const invalidArchiveOrdering = hasArchiveTier && archiveDays > 0 && archiveDays < offloadDays;
 
-    const recommendations: string[] = [];
-    const infoNotes: string[] = [];
+    const performanceImmutabilityDays = Math.max(0, repo.sobrConfig.performanceImmutabilityDays ?? 0);
+    const capacityImmutabilityDays = Math.max(0, repo.sobrConfig.capacityImmutabilityDays ?? 0);
+    const archiveImmutabilityDays = Math.max(0, repo.sobrConfig.archiveImmutabilityDays ?? 0);
+
     if (invalidArchiveOrdering) {
-      recommendations.push(`Archive threshold (${archiveDays}d) is shorter than the offload threshold (${offloadDays}d). Archive will only begin after ${offloadDays + archiveDays}d total age.`);
+      items.push({
+        id: 'INS-004',
+        priority: 'medium',
+        finding: 'Archive timing is configured ahead of offload timing.',
+        impact: 'Archive behavior can appear delayed or counterintuitive in Capacity-to-Archive transitions.',
+        evidence: `Offload ${offloadDays}d, Archive ${archiveDays}d (archive threshold is shorter than offload threshold).`,
+        recommendation: `Set Archive >= Offload + intended Capacity dwell time. Current effective earliest archive age is ${offloadDays + archiveDays}d.`,
+      });
     }
     if (riskyWindow) {
-      recommendations.push(`Fix: Increase retention to at least ${offloadDays + 7}d (currently ${retentionDays}d) so it exceeds the offload threshold (${offloadDays}d).`);
+      items.push({
+        id: 'INS-003',
+        priority: 'high',
+        finding: 'Retention window is too short for move offload to execute reliably.',
+        impact: 'Expected movement from Performance to Capacity may not complete before data expires.',
+        evidence: `Retention ${retentionDays}d <= Offload ${offloadDays}d.`,
+        recommendation: `Increase retention to at least ${offloadDays + 7}d or lower offload threshold.`,
+      });
     }
     if (moveEnabled && overdueInactiveCount > 0) {
-      recommendations.push(`${overdueInactiveCount} inactive chain(s) are older than the offload threshold (${offloadDays}d) but still have data in Performance.`);
+      items.push({
+        id: 'INS-005',
+        priority: 'high',
+        finding: 'Inactive chains are overdue for offload.',
+        impact: 'Performance tier retains data longer than policy intent, increasing cost pressure.',
+        evidence: `${overdueInactiveCount} inactive chain(s) older than ${offloadDays}d still hold Performance data.`,
+        recommendation: 'Review offload eligibility constraints and chain-state transitions for blocked movement.',
+      });
     }
     if (moveEnabled && !riskyWindow && overdueInactiveCount === 0 && oldestInactiveDays < offloadDays) {
-      infoNotes.push(`Oldest inactive chain is ${oldestInactiveDays}d old; offload starts at ${offloadDays}d.`);
-    }
-    if (moveEnabled && (job.type === 'ForwardIncremental' || job.type === 'SyntheticFull') && retentionDays <= offloadDays) {
-      recommendations.push(`Chains are not offloading to Capacity — retention (${retentionDays}d) must be greater than the offload threshold (${offloadDays}d).`);
+      contextNotes.push(`Oldest inactive chain is ${oldestInactiveDays}d; offload starts at ${offloadDays}d.`);
     }
     if (job.gfsPolicy && hasArchiveTier === false) {
-      recommendations.push(`GFS policy is configured but Archive tier is disabled — GFS points will stay in Capacity. Enable Archive tier for long-term cold storage.`);
+      items.push({
+        id: 'INS-006',
+        priority: 'medium',
+        finding: 'GFS policy is enabled while Archive tier is disabled.',
+        impact: 'Long-term GFS points remain in Capacity, increasing cost versus cold-tier storage.',
+        evidence: 'GFS is configured and Archive tier is not enabled.',
+        recommendation: 'Enable Archive tier for long-term retention points or reduce long-horizon GFS settings.',
+      });
     }
     if (hasArchiveTier && !job.gfsPolicy) {
-      recommendations.push(`Archive tier is enabled but no GFS policy is configured — Archive will remain empty (only GFS-tagged points move to Archive).`);
+      items.push({
+        id: 'INS-007',
+        priority: 'medium',
+        finding: 'Archive tier is enabled but no GFS policy is configured.',
+        impact: 'Archive capacity remains unused while still adding operational complexity.',
+        evidence: 'Archive is enabled and all GFS retention counts are effectively zero.',
+        recommendation: 'Configure weekly/monthly/yearly GFS retention or disable Archive tier.',
+      });
     }
     if (!job.gfsPolicy && !hasArchiveTier) {
-      infoNotes.push(`No GFS policy configured — no weekly, monthly, or yearly retention marks will be applied.`);
+      contextNotes.push('No GFS policy configured; weekly, monthly, and yearly retention marks are disabled.');
     }
 
     const hasAnyGfs = !!job.gfsPolicy && (
@@ -511,7 +601,7 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
       const startDay = new Date(`${sim.state.startDate}T00:00:00.000Z`).getUTCDay(); // 0=Sun,6=Sat
       if (startDay !== 6) {
         const daysUntilSat = (6 - startDay + 7) % 7;
-        infoNotes.push(
+        contextNotes.push(
           `Job starts on a non-Saturday (${daysUntilSat}d until first GFS tag). ` +
           `The initial chain has no GFS flag and will be removed by retention — it will not archive.`
         );
@@ -519,10 +609,10 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     }
 
     if (hasArchiveTier && hasAnyGfs) {
-      recommendations.push(
+      contextNotes.push(
         hasMixedMonthlyYearly
-          ? 'Forecast confidence note: SOBR + Archive + mixed GFS (W/M/Y) can overestimate total capacity versus the Veeam Calculator. Treat this as directional until block-generation-period modeling is implemented.'
-          : 'Forecast confidence note: SOBR + Archive + GFS can overestimate total capacity versus the Veeam Calculator. Treat this as directional until block-generation-period modeling is implemented.'
+          ? 'Model confidence note: mixed W/M/Y GFS with Archive can overestimate capacity versus the Veeam Calculator; treat as directional.'
+          : 'Model confidence note: Archive + GFS can overestimate capacity versus the Veeam Calculator; treat as directional.'
       );
     }
 
@@ -532,77 +622,117 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     if (perfWorkingSpaceTB > 0 && perfFreeTB + 0.000001 < perfWorkingSpaceTB) {
       const largestFullTB = workingSpaceByRepo[repo.id]?.largestFullTB ?? 0;
       const totalNeededTB = workingSpaceByRepo[repo.id]?.byTier.Performance ?? perfWorkingSpaceTB;
-      recommendations.push(`Performance free headroom (${perfFreeTB.toFixed(2)} TB) is below additional temporary space needed (${perfWorkingSpaceTB.toFixed(2)} TB). Working-space requirement is ${totalNeededTB.toFixed(2)} TB (${largestFullTB.toFixed(2)} TB full + ${perfWorkingSpaceTB.toFixed(2)} TB temp).`);
+      items.push({
+        id: 'INS-008',
+        priority: 'high',
+        finding: 'Performance tier free headroom is below required temporary workspace.',
+        impact: 'Synthetic/full operations can stall or force emergency capacity increases.',
+        evidence: `Free headroom ${perfFreeTB.toFixed(2)} TB < required temporary space ${perfWorkingSpaceTB.toFixed(2)} TB (working-space total ${totalNeededTB.toFixed(2)} TB).`,
+        recommendation: `Increase Performance capacity or reduce full/retention pressure. Largest full is ${largestFullTB.toFixed(2)} TB.`,
+      });
     }
 
-    const title = invalidArchiveOrdering
-      ? `Archive waits until the ${offloadDays}d offload window is met, then ${archiveDays}d more before Archive.`
-      : riskyWindow
-      ? `Offload risk: retention (${retentionDays}d) is too short for the ${offloadDays}d offload threshold.`
-      : moveEnabled && overdueInactiveCount > 0
-        ? `Action needed: ${overdueInactiveCount} inactive chain(s) are past threshold and still in Performance.`
-        : moveEnabled && offloadedInactiveCount > 0
-          ? `Healthy: ${offloadedInactiveCount} inactive chain(s) past ${offloadDays}d have moved out of Performance.`
-          : copyEnabled && !moveEnabled
-            ? 'Healthy: Copy mode is active; new restore points are copied to Capacity immediately.'
-            : moveEnabled && eligibleButNotYetOffloaded > 0
-              ? `Healthy: ${eligibleButNotYetOffloaded} inactive chain(s) are still below the ${offloadDays}d threshold.`
-              : 'Healthy: Offload and retention settings are compatible.';
+    if (copyEnabled && moveEnabled) {
+      items.push({
+        id: 'INS-010',
+        priority: 'low',
+        finding: 'Copy and Move are both enabled, creating dual residency periods.',
+        impact: 'Tier overlap can increase storage spend without proportional restore benefit.',
+        evidence: `Copy is enabled and move offload starts at ${offloadDays}d.`,
+        recommendation: 'Use Move-only for cost efficiency unless copy-driven redundancy is required.',
+      });
+    }
 
-    const severity = (invalidArchiveOrdering || riskyWindow || overdueInactiveCount > 0)
-      ? 'danger'
-      : (recommendations.length > 0 ? 'warning' : 'ok');
+    const zeroImmutabilityTiers: string[] = [];
+    if (performanceImmutabilityDays === 0) zeroImmutabilityTiers.push('Performance');
+    if (capacityImmutabilityDays === 0) zeroImmutabilityTiers.push('Capacity');
+    if (hasArchiveTier && archiveImmutabilityDays === 0) zeroImmutabilityTiers.push('Archive');
+    if (zeroImmutabilityTiers.length > 0) {
+      items.push({
+        id: 'INS-011',
+        priority: 'medium',
+        finding: 'Immutability protection is disabled on one or more tiers.',
+        impact: 'Reduced ransomware and compliance resilience for affected tier data.',
+        evidence: `Zero-day immutability on: ${zeroImmutabilityTiers.join(', ')}.`,
+        recommendation: 'Set tier-specific immutability windows aligned with recovery and compliance requirements.',
+      });
+    }
+
+    if (offloadedInactiveCount > 0) {
+      contextNotes.push(`${offloadedInactiveCount} inactive chain(s) beyond ${offloadDays}d already offloaded from Performance.`);
+    }
+    if (moveEnabled && eligibleButNotYetOffloaded > 0) {
+      contextNotes.push(`${eligibleButNotYetOffloaded} inactive chain(s) are below offload age and not yet eligible for movement.`);
+    }
+
+    if (items.length === 0) {
+      items.push({
+        id: 'INS-009',
+        priority: 'info',
+        finding: 'No active risks detected for current policy.',
+        impact: 'Current capacity, offload, and retention settings are operating within thresholds.',
+        evidence: `Retention ${retentionDays}d, Offload ${offloadDays}d, overdue inactive chains ${overdueInactiveCount}.`,
+      });
+    }
+
+    const highestPriority = getHighestPriority(items);
+    const title = highestPriority === 'high' || highestPriority === 'medium' || highestPriority === 'low'
+      ? 'Policy risks detected in current configuration.'
+      : 'No active risks detected for current policy.';
 
     return {
       title,
       offloadDays,
       retentionDays,
       oldestInactiveDays,
-      recommendations,
-      infoNotes,
-      severity,
+      items,
+      contextNotes,
+      highestPriority,
     };
-  }, [sim.state.repositories, sim.state.jobs, sim.state.chains, currentDate, restorePoints, sim, workingSpaceByRepo, temporarySpacePlanningStatus]);
+  }, [sim.state.repositories, sim.state.jobs, sim.state.chains, currentDate, restorePoints, sim, workingSpaceByRepo, temporarySpacePlanningItems]);
 
   const hasSobrRepo = sim.state.repositories.some(r => r.type === 'SOBR' && !!r.sobrConfig);
   const bodyAlignmentOffset = (showChainTimeline || showRestoreCatalog || showTierContents) ? '2.1rem' : '0';
   const policyVisual = policyInsight
-    ? policyInsight.severity === 'danger'
+    ? policyInsight.highestPriority === 'high'
       ? {
-          icon: '!',
-          badgeShape: 'octagon',
-          badgeBg: '#fce8e6',
-          badgeColor: '#b42318',
           border: '#f7c7c3',
           panelBg: 'linear-gradient(180deg, #fff8f7 0%, #fff2f1 100%)',
           shadow: '0 10px 24px rgba(180, 35, 24, 0.10)',
           accent: '#d92d20',
           titleColor: '#b42318',
         }
-      : policyInsight.severity === 'warning'
+      : policyInsight.highestPriority === 'medium'
         ? {
-            icon: '!',
-          badgeShape: 'triangle',
-            badgeBg: '#fff4dd',
-            badgeColor: '#b54708',
             border: '#f5d4a0',
             panelBg: 'linear-gradient(180deg, #fffaf2 0%, #fff7ec 100%)',
             shadow: '0 10px 24px rgba(181, 71, 8, 0.10)',
             accent: '#f79009',
             titleColor: '#9a4d00',
           }
-        : {
-            icon: '✓',
-          badgeShape: 'circle',
-            badgeBg: '#e8f7ed',
-            badgeColor: '#067647',
-            border: '#c7e9d2',
-            panelBg: 'linear-gradient(180deg, #f7fcf9 0%, #edf8f1 100%)',
-            shadow: '0 10px 24px rgba(6, 118, 71, 0.10)',
-            accent: '#12b76a',
-            titleColor: '#067647',
-          }
+        : policyInsight.highestPriority === 'low'
+          ? {
+              border: '#c9ddf7',
+              panelBg: 'linear-gradient(180deg, #f7fbff 0%, #eff6ff 100%)',
+              shadow: '0 10px 24px rgba(25, 118, 210, 0.10)',
+              accent: '#1976d2',
+              titleColor: '#1e5ea8',
+            }
+          : {
+              border: '#dde3e8',
+              panelBg: 'linear-gradient(180deg, #fbfcfd 0%, #f5f7f9 100%)',
+              shadow: '0 8px 20px rgba(69, 90, 100, 0.08)',
+              accent: '#78909c',
+              titleColor: '#546e7a',
+            }
     : null;
+
+  const itemPriorityStyle: Record<InsightPriority, { bg: string; fg: string; border: string; label: string }> = {
+    high: { bg: '#fce8e6', fg: '#b42318', border: '#f7c7c3', label: 'High' },
+    medium: { bg: '#fff4dd', fg: '#9a4d00', border: '#f5d4a0', label: 'Medium' },
+    low: { bg: '#e8f1fd', fg: '#1e5ea8', border: '#c9ddf7', label: 'Low' },
+    info: { bg: '#eceff1', fg: '#455a64', border: '#d8dee3', label: 'Info' },
+  };
 
   const typeColors: Record<string, string> = {
     Full: '#1e6bb8',
@@ -757,30 +887,21 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
           {policyInsight ? (
             <div style={{ border: `1px solid ${policyVisual!.border}`, borderRadius: '14px', background: policyVisual!.panelBg, padding: '0.95rem 1rem', minWidth: '320px', boxShadow: policyVisual!.shadow, borderLeft: `6px solid ${policyVisual!.accent}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                <span style={{
-                  width: '22px',
-                  height: '22px',
-                  borderRadius: policyVisual!.badgeShape === 'circle' ? '999px' : '0',
-                  clipPath: policyVisual!.badgeShape === 'triangle'
-                    ? 'polygon(50% 8%, 8% 92%, 92% 92%)'
-                    : policyVisual!.badgeShape === 'octagon'
-                      ? 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)'
-                      : 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: policyVisual!.badgeBg,
-                  color: policyVisual!.badgeColor,
-                  fontWeight: 900,
-                  fontSize: policyVisual!.badgeShape === 'circle' ? '0.88rem' : '0.8rem',
-                  lineHeight: 1,
-                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)'
-                }}>
-                  {policyVisual!.icon}
-                </span>
                 <div style={{ fontSize: '0.74rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: policyVisual!.titleColor }}>
                   Policy Insight
                 </div>
+                <span style={{
+                  marginLeft: 'auto',
+                  borderRadius: '999px',
+                  border: `1px solid ${itemPriorityStyle[policyInsight.highestPriority].border}`,
+                  background: itemPriorityStyle[policyInsight.highestPriority].bg,
+                  color: itemPriorityStyle[policyInsight.highestPriority].fg,
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '2px 8px',
+                }}>
+                  {itemPriorityStyle[policyInsight.highestPriority].label}
+                </span>
               </div>
               <div style={{ fontSize: '0.92rem', color: '#37474f', marginBottom: '0.45rem', lineHeight: '1.45' }}>
                 {policyInsight.title}
@@ -798,24 +919,44 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
                   <div style={{ fontSize: '0.82rem', color: '#607d8b', marginBottom: '0.25rem', fontWeight: 600 }}>
                     Retention: {policyInsight.retentionDays}d | Offload: {policyInsight.offloadDays}d | Oldest inactive chain: {policyInsight.oldestInactiveDays}d
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: policyInsight.recommendations.length > 0 ? '0.45rem' : 0 }}>
+                  <div style={{ fontSize: '0.8rem', color: '#607d8b', marginBottom: '0.45rem' }}>
                     GENs: {genSummary.total} total, {genSummary.locked} locked, {genSummary.deletable} deletable
                     {genSummary.nextDeleteOn ? ` | Next DeleteOn: ${genSummary.nextDeleteOn}` : ''}
                     {genSummary.nextImmutabilityExpiry ? ` | Next immutability expiry: ${genSummary.nextImmutabilityExpiry}` : ''}
                   </div>
                 </>
               )}
-              {policyInsight.recommendations.length > 0 && (
-                <ul style={{ margin: 0, paddingLeft: '1rem', fontSize: '0.84rem', color: '#546e7a' }}>
-                  {policyInsight.recommendations.map((rec, idx) => (
-                    <li key={idx} style={{ marginBottom: '0.2rem' }}>{rec}</li>
-                  ))}
-                </ul>
-              )}
-              {policyInsight.infoNotes.length > 0 && (
-                <div style={{ marginTop: policyInsight.recommendations.length > 0 ? '0.35rem' : 0, fontSize: '0.82rem', color: '#78909c', fontStyle: 'italic' }}>
-                  {policyInsight.infoNotes.map((note, idx) => (
-                    <div key={idx}>{note}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                {policyInsight.items.map(item => (
+                  <div key={item.id} style={{ border: `1px solid ${itemPriorityStyle[item.priority].border}`, borderRadius: '9px', background: '#fff', padding: '0.5rem 0.6rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem' }}>
+                      <span style={{
+                        borderRadius: '999px',
+                        border: `1px solid ${itemPriorityStyle[item.priority].border}`,
+                        background: itemPriorityStyle[item.priority].bg,
+                        color: itemPriorityStyle[item.priority].fg,
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        padding: '1px 7px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                      }}>
+                        {itemPriorityStyle[item.priority].label}
+                      </span>
+                      <span style={{ fontSize: '0.83rem', fontWeight: 700, color: '#37474f' }}>{item.finding}</span>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#546e7a', marginBottom: '0.15rem' }}><strong>Impact:</strong> {item.impact}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#546e7a', marginBottom: item.recommendation ? '0.15rem' : 0 }}><strong>Evidence:</strong> {item.evidence}</div>
+                    {item.recommendation && (
+                      <div style={{ fontSize: '0.78rem', color: '#455a64' }}><strong>Recommendation:</strong> {item.recommendation}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {policyInsight.contextNotes.length > 0 && (
+                <div style={{ marginTop: '0.4rem', fontSize: '0.79rem', color: '#78909c' }}>
+                  {policyInsight.contextNotes.map((note, idx) => (
+                    <div key={idx}>Context: {note}</div>
                   ))}
                 </div>
               )}
