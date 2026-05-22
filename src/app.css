@@ -2039,6 +2039,345 @@ hr {
   font-style: italic;
 }
 
+:root[data-theme='dark'] .requirements-panel {
+  background: #18223b;
+  border-color: #334b7a;
+}
+
+:root[data-theme='dark'] .requirements-title-row,
+:root[data-theme='dark'] .req-th-metric,
+:root[data-theme='dark'] .req-th-year,
+:root[data-theme='dark'] .req-label,
+:root[data-theme='dark'] .req-value-strong {
+  color: #dbe3ef;
+}
+
+:root[data-theme='dark'] .req-td,
+:root[data-theme='dark'] .req-th,
+:root[data-theme='dark'] .req-last-row {
+  border-bottom-color: #324461;
+}
+
+:root[data-theme='dark'] .sim-controls-bar {
+  background: linear-gradient(180deg, #16213a 0%, #111b30 100%);
+  border-color: #30466f;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme='dark'] .sim-date-chip {
+  background: #1a3157;
+  border-color: #3f5f93;
+  color: #d9e9ff;
+}
+
+:root[data-theme='dark'] .sim-date-chip.compact {
+  background: #1b2436;
+  border-color: #334155;
+  color: #c7d2e3;
+}
+
+:root[data-theme='dark'] .sim-weekday-chip.weekday {
+  border-color: #3c5f94;
+  background: #1a3157;
+  color: #cfe3ff;
+}
+
+:root[data-theme='dark'] .sim-weekday-chip.weekend {
+  border-color: #8b6031;
+  background: #352313;
+  color: #ffd7a7;
+}
+
+:root[data-theme='dark'] .sim-weekday-compact,
+:root[data-theme='dark'] .sim-day-offset,
+:root[data-theme='dark'] .chain-since,
+:root[data-theme='dark'] .chain-preserved,
+:root[data-theme='dark'] .chain-window-label,
+:root[data-theme='dark'] .chain-window-note,
+:root[data-theme='dark'] .tier-empty,
+:root[data-theme='dark'] .activity-empty-text,
+:root[data-theme='dark'] .activity-hidden-note,
+:root[data-theme='dark'] .policy-context-notes,
+:root[data-theme='dark'] .policy-item-line,
+:root[data-theme='dark'] .policy-item-line.rec,
+:root[data-theme='dark'] .policy-immutability-summary,
+:root[data-theme='dark'] .policy-gen-summary,
+:root[data-theme='dark'] .policy-retention-summary,
+:root[data-theme='dark'] .selected-rp-info-label,
+:root[data-theme='dark'] .tier-journey-title,
+:root[data-theme='dark'] .tier-journey-empty,
+:root[data-theme='dark'] .gen-metadata-line,
+:root[data-theme='dark'] .chain-tooltip-immutability,
+:root[data-theme='dark'] .chain-tooltip-gfs-label,
+:root[data-theme='dark'] .chain-tooltip-note,
+:root[data-theme='dark'] .chain-tooltip-subtitle,
+:root[data-theme='dark'] .chain-tooltip-id,
+:root[data-theme='dark'] .chain-legend-note {
+  color: #9fb2cb;
+}
+
+:root[data-theme='dark'] .sim-btn-day {
+  border-color: #3f5f93;
+  background: #1a3157;
+  color: #d9e9ff;
+}
+
+:root[data-theme='dark'] .sim-btn-year {
+  border-color: #8b6031;
+  background: #352313;
+  color: #ffd7a7;
+}
+
+:root[data-theme='dark'] .sim-btn-year.disabled {
+  border-color: #3f4e67;
+  background: #1f283a;
+  color: #6f809a;
+}
+
+:root[data-theme='dark'] .storage-layout-row .storage-table-card,
+:root[data-theme='dark'] .storage-layout-row .storage-insights-card,
+:root[data-theme='dark'] .policy-insight-card,
+:root[data-theme='dark'] .selected-rp-card,
+:root[data-theme='dark'] .chain-svg-wrap,
+:root[data-theme='dark'] .activity-day-group {
+  background: linear-gradient(180deg, #16213a 0%, #111b30 100%);
+  border-color: #30466f;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme='dark'] .storage-tier-row {
+  background: #152036;
+}
+
+:root[data-theme='dark'] .storage-tier-type,
+:root[data-theme='dark'] .storage-stat-label,
+:root[data-theme='dark'] .policy-insight-kicker,
+:root[data-theme='dark'] .activity-log-date,
+:root[data-theme='dark'] .selected-rp-id-line,
+:root[data-theme='dark'] .tier-journey-arrow,
+:root[data-theme='dark'] .selected-rp-separator-word,
+:root[data-theme='dark'] .selected-rp-dot,
+:root[data-theme='dark'] .tier-rp-date,
+:root[data-theme='dark'] .tier-rp-id {
+  color: #a8b8cf;
+}
+
+:root[data-theme='dark'] .storage-stat {
+  border-color: #314767;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.32);
+}
+
+:root[data-theme='dark'] .storage-stat.stat-blue { background: #1a3157; }
+:root[data-theme='dark'] .storage-stat.stat-green { background: #19352a; }
+:root[data-theme='dark'] .storage-stat.stat-amber { background: #36280f; }
+:root[data-theme='dark'] .storage-stat.stat-purple { background: #2b1f3a; }
+:root[data-theme='dark'] .storage-stat.stat-pink { background: #371f2d; }
+:root[data-theme='dark'] .storage-stat.stat-indigo { background: #1d2442; }
+:root[data-theme='dark'] .storage-stat.stat-stone { background: #2b2624; }
+
+:root[data-theme='dark'] .policy-insight-title,
+:root[data-theme='dark'] .policy-item-finding,
+:root[data-theme='dark'] .selected-rp-title,
+:root[data-theme='dark'] .selected-rp-info-value,
+:root[data-theme='dark'] .activity-log-title,
+:root[data-theme='dark'] .activity-log-content,
+:root[data-theme='dark'] .tier-rp-type,
+:root[data-theme='dark'] .chain-window-btn,
+:root[data-theme='dark'] .chain-tooltip-title {
+  color: #e5eefb;
+}
+
+:root[data-theme='dark'] .policy-item,
+:root[data-theme='dark'] .tier-rp-btn {
+  background: #13213a;
+  border-color: #2f486f;
+}
+
+:root[data-theme='dark'] .policy-priority-badge,
+:root[data-theme='dark'] .policy-item-priority {
+  border-color: #3c4d66;
+  background: #253247;
+  color: #d2dcec;
+}
+
+:root[data-theme='dark'] .policy-insight-card.priority-high {
+  border-color: #7a3e3a;
+  border-left-color: #ff6f61;
+  background: linear-gradient(180deg, #3a2121 0%, #2b1a1a 100%);
+}
+
+:root[data-theme='dark'] .policy-insight-card.priority-medium {
+  border-color: #7a5b32;
+  border-left-color: #f7b955;
+  background: linear-gradient(180deg, #382913 0%, #2b2111 100%);
+}
+
+:root[data-theme='dark'] .policy-insight-card.priority-low {
+  border-color: #355b82;
+  border-left-color: #6cb2ff;
+  background: linear-gradient(180deg, #1d2f49 0%, #18263a 100%);
+}
+
+:root[data-theme='dark'] .policy-insight-card.priority-high .policy-insight-kicker { color: #ffaea6; }
+:root[data-theme='dark'] .policy-insight-card.priority-medium .policy-insight-kicker { color: #ffd29c; }
+:root[data-theme='dark'] .policy-insight-card.priority-low .policy-insight-kicker { color: #a9d3ff; }
+
+:root[data-theme='dark'] .policy-priority-badge.priority-high,
+:root[data-theme='dark'] .policy-item-priority.priority-high {
+  border-color: #8a4b46;
+  background: #442625;
+  color: #ffb2ac;
+}
+
+:root[data-theme='dark'] .policy-priority-badge.priority-medium,
+:root[data-theme='dark'] .policy-item-priority.priority-medium {
+  border-color: #8b6335;
+  background: #433018;
+  color: #ffd9aa;
+}
+
+:root[data-theme='dark'] .policy-priority-badge.priority-low,
+:root[data-theme='dark'] .policy-item-priority.priority-low {
+  border-color: #3e648a;
+  background: #1f3450;
+  color: #b9daff;
+}
+
+:root[data-theme='dark'] .restore-catalog-header-row {
+  background: #1d2a46;
+}
+
+:root[data-theme='dark'] .restore-catalog-row {
+  background: #121d31;
+}
+
+:root[data-theme='dark'] .restore-catalog-row.selected,
+:root[data-theme='dark'] .tier-rp-btn.selected,
+:root[data-theme='dark'] .chain-window-btn.active {
+  background: #1f3558;
+}
+
+:root[data-theme='dark'] .restore-catalog-row.gfs-row {
+  background: #332a17;
+}
+
+:root[data-theme='dark'] .restore-catalog-row.selected.gfs-row {
+  background: #294064;
+}
+
+:root[data-theme='dark'] .tier-card {
+  border-color: #385172;
+}
+
+:root[data-theme='dark'] .tier-card-body {
+  background: #101b30;
+}
+
+:root[data-theme='dark'] .tier-rp-btn {
+  border-bottom-color: #2b3f63;
+}
+
+:root[data-theme='dark'] .activity-log-card {
+  border-color: #8b6335;
+  background: #352a18;
+}
+
+:root[data-theme='dark'] .activity-show-all {
+  color: #9dcbff;
+}
+
+:root[data-theme='dark'] .activity-hidden-note {
+  background: #1e2a40;
+}
+
+:root[data-theme='dark'] .activity-day-summary {
+  color: #e8d7bf;
+}
+
+:root[data-theme='dark'] .activity-item.cat-gen { background: #25315c; }
+:root[data-theme='dark'] .activity-item.cat-prune { background: #3a302d; }
+:root[data-theme='dark'] .activity-item.cat-copy { background: #1f3a3a; }
+:root[data-theme='dark'] .activity-item.cat-move,
+:root[data-theme='dark'] .activity-item.cat-tier-move { background: #1f3558; }
+:root[data-theme='dark'] .activity-item.cat-gfs-tag { background: #342747; }
+:root[data-theme='dark'] .activity-item.cat-gfs-expiry { background: #452626; }
+:root[data-theme='dark'] .activity-item.cat-promotion { background: #2c3544; }
+:root[data-theme='dark'] .activity-item.cat-backup { background: #223b29; }
+:root[data-theme='dark'] .activity-item.cat-retention { background: #3a2a1c; }
+:root[data-theme='dark'] .activity-item.cat-info { background: #303846; }
+
+:root[data-theme='dark'] .activity-item.cat-gen .activity-item-label { color: #bfcfff; }
+:root[data-theme='dark'] .activity-item.cat-prune .activity-item-label { color: #d5b7ad; }
+:root[data-theme='dark'] .activity-item.cat-copy .activity-item-label { color: #9be7dc; }
+:root[data-theme='dark'] .activity-item.cat-move .activity-item-label,
+:root[data-theme='dark'] .activity-item.cat-tier-move .activity-item-label { color: #a9d3ff; }
+:root[data-theme='dark'] .activity-item.cat-gfs-tag .activity-item-label { color: #d7b9f0; }
+:root[data-theme='dark'] .activity-item.cat-gfs-expiry .activity-item-label { color: #ffb0aa; }
+:root[data-theme='dark'] .activity-item.cat-promotion .activity-item-label { color: #cdd7e7; }
+:root[data-theme='dark'] .activity-item.cat-backup .activity-item-label { color: #b7e7c0; }
+:root[data-theme='dark'] .activity-item.cat-retention .activity-item-label { color: #ffc693; }
+:root[data-theme='dark'] .activity-item.cat-info .activity-item-label { color: #e4c9b3; }
+
+:root[data-theme='dark'] .selected-rp-empty {
+  color: #a8b8cf;
+}
+
+:root[data-theme='dark'] .selected-rp-divider {
+  border-top-color: #2f4366;
+}
+
+:root[data-theme='dark'] .selected-rp-pruned-note {
+  color: #e6d2c4;
+  background: #3a302d;
+  border-color: #6d5750;
+}
+
+:root[data-theme='dark'] .generation-state-chip.sealed,
+:root[data-theme='dark'] .gen-total-chip.sealed,
+:root[data-theme='dark'] .immutability-chip.protected {
+  background: #1f3558;
+  color: #a9d3ff;
+}
+
+:root[data-theme='dark'] .generation-state-chip.waiting,
+:root[data-theme='dark'] .gen-total-chip.waiting {
+  background: #3a302d;
+  color: #e0c9be;
+}
+
+:root[data-theme='dark'] .generation-state-chip.deletable,
+:root[data-theme='dark'] .gen-total-chip.deletable,
+:root[data-theme='dark'] .immutability-chip.mutable {
+  background: #223b29;
+  color: #b7e7c0;
+}
+
+:root[data-theme='dark'] .immutability-chip.na {
+  background: #2c3544;
+  color: #d2ddec;
+}
+
+:root[data-theme='dark'] .chain-window-btn {
+  border-color: #395273;
+  background: #15243d;
+}
+
+:root[data-theme='dark'] .chain-window-btn.active {
+  border-color: #6cb2ff;
+  color: #d7e9ff;
+}
+
+:root[data-theme='dark'] .chain-svg-wrap {
+  border-color: #324969;
+}
+
+:root[data-theme='dark'] .chain-tooltip-card {
+  background: #101b30;
+  border-color: #3a5274;
+  color: #e5eefb;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.55);
+}
+
 /* ── Scenario 2-column layout ── */
 .scenario-layout {
   display: grid;
