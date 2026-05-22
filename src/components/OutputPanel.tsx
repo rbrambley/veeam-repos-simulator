@@ -4,6 +4,7 @@ import { ChainTimeline } from './ChainTimeline';
 import { StateLegend } from './StateLegend';
 import { computeVeeamWorkingSpaceTB } from '../models/veeam';
 import { normalizeForecastYears } from '../models/forecast';
+import { buildInAppAdvisorReport, renderInAppAdvisorReportHtml } from '../models/inAppAdvisorReport';
 
 interface OutputPanelProps {
   sim: VeeamSimulator;
@@ -760,6 +761,81 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
     return 'ok';
   };
 
+  const downloadFile = (fileName: string, content: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAdvisorReport = (format: 'json' | 'html') => {
+    if (!primaryJob || !primaryRepo) return;
+
+    const hasAnyGfs = !!primaryJob.gfsPolicy && (
+      (primaryJob.gfsPolicy.weekly ?? 0) > 0
+      || (primaryJob.gfsPolicy.monthly ?? 0) > 0
+      || (primaryJob.gfsPolicy.yearly ?? 0) > 0
+    );
+
+    const scenarioConfig = {
+      repositoryType: primaryRepo.type,
+      jobType: primaryJob.type,
+      sourceDataTB: primaryJob.sourceDataTB,
+      annualGrowthRatePct: primaryJob.annualGrowthRatePct,
+      dailyChangeRatePct: primaryJob.dailyChangeRatePct,
+      retention: primaryJob.retention?.restorePoints ?? 7,
+      gfsPolicy: {
+        weekly: primaryJob.gfsPolicy?.weekly ?? 0,
+        monthly: primaryJob.gfsPolicy?.monthly ?? 0,
+        yearly: primaryJob.gfsPolicy?.yearly ?? 0,
+      },
+      offloadAfterDays: primaryRepo.sobrConfig?.offloadAfterDays ?? 7,
+      archiveAfterDays: primaryRepo.sobrConfig?.archiveAfterDays ?? 14,
+      generationPeriodDays: primaryRepo.sobrConfig?.generationPeriodDays,
+      performanceImmutabilityDays: primaryRepo.sobrConfig?.performanceImmutabilityDays ?? primaryRepo.immutabilityDays,
+      capacityImmutabilityDays: primaryRepo.sobrConfig?.capacityImmutabilityDays,
+      archiveImmutabilityDays: primaryRepo.sobrConfig?.archiveImmutabilityDays,
+      hasArchiveTier: !!primaryRepo.sobrConfig?.hasArchiveTier,
+      copyEnabled: !!primaryRepo.sobrConfig?.copyEnabled,
+      moveEnabled: !!primaryRepo.sobrConfig?.moveEnabled,
+    };
+
+    const report = buildInAppAdvisorReport({
+      scenarioName: primaryJob.name,
+      startDate: sim.state.startDate || currentDate,
+      simulationDate: currentDate,
+      repositoryType: primaryRepo.type,
+      scenarioConfig,
+      currentUsedTB: totalUsedTB,
+      currentWorkingSpaceTB: totalWorkingSpaceTB,
+      capacityTB: primaryRepo.capacityTB,
+      policyHighestPriority: policyInsight?.highestPriority ?? 'info',
+      immutabilitySummary,
+      hasAnyGfs,
+    });
+
+    const stamp = currentDate.replace(/-/g, '');
+    if (format === 'json') {
+      downloadFile(
+        `storage-planning-advisor-${stamp}.json`,
+        JSON.stringify(report, null, 2),
+        'application/json',
+      );
+      return;
+    }
+
+    downloadFile(
+      `storage-planning-advisor-${stamp}.html`,
+      renderInAppAdvisorReportHtml(report),
+      'text/html',
+    );
+  };
+
   return (
     <div>
       <div className="output-panel-header">
@@ -968,6 +1044,23 @@ export const OutputPanel: React.FC<OutputPanelProps> = ({ sim, currentDate, onNe
 
       {/* Section toggle + simulation controls share one sticky stack */}
       <div className="output-controls-sticky">
+        <div className="report-actions-row">
+          <button
+            onClick={() => exportAdvisorReport('html')}
+            className="report-btn"
+            disabled={!primaryJob || !primaryRepo}
+          >
+            Generate Advisor Report (HTML)
+          </button>
+          <button
+            onClick={() => exportAdvisorReport('json')}
+            className="report-btn secondary"
+            disabled={!primaryJob || !primaryRepo}
+          >
+            Export Advisor Data (JSON)
+          </button>
+        </div>
+
         <div className="panel-toggle-row">
           <button
             onClick={() => setShowChainTimeline(v => !v)}
